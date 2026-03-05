@@ -15,9 +15,9 @@ const ZaPosameznike = () => {
 
           {/* Uvod */}
           <section>
-            <p className="text-lg text-foreground font-medium leading-relaxed">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
               Pomagajte svojemu otroku razviti jasen in samozavesten govor
-            </p>
+            </h2>
             <p className="text-muted-foreground leading-relaxed mt-4">
               TomiTalk je digitalna platforma, ki otrokom pomaga razvijati govor na zabaven, igriv in strokovno podprt način.
             </p>
@@ -331,7 +331,7 @@ const ZaPosameznike = () => {
                 onClick={() => navigate("/register")}
                 className="bg-dragon-green hover:bg-dragon-green/90 text-white px-8 py-3 text-base"
               >
-                👉 Ustvarite račun in začnite z vadbo
+                Ustvarite račun in začnite z vadbo
               </Button>
             </div>
           </section>
