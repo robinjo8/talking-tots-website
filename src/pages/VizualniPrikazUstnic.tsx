@@ -17,8 +17,9 @@ const soundCards = [
     title: "Glas K",
     sounds: ["K"],
     image: `${STORAGE_BASE}/Glas_K.png`,
-    gradient: "from-app-blue/10 to-app-purple/10",
     color: "text-app-blue",
+    frontBg: "linear-gradient(145deg, hsl(207, 90%, 54%), hsl(207, 90%, 44%))",
+    frontBorder: "hsl(207, 90%, 54%)",
     audioUrl: null as string | null,
   },
   {
@@ -26,8 +27,9 @@ const soundCards = [
     title: "Glas L",
     sounds: ["L"],
     image: `${STORAGE_BASE}/Glas_L.png`,
-    gradient: "from-app-purple/10 to-app-blue/10",
     color: "text-app-purple",
+    frontBg: "linear-gradient(145deg, hsl(291, 64%, 42%), hsl(291, 64%, 32%))",
+    frontBorder: "hsl(291, 64%, 42%)",
     audioUrl: null as string | null,
   },
   {
@@ -35,8 +37,9 @@ const soundCards = [
     title: "Glas R",
     sounds: ["R"],
     image: `${STORAGE_BASE}/Glas_R.png`,
-    gradient: "from-app-orange/10 to-app-yellow/10",
     color: "text-app-orange",
+    frontBg: "linear-gradient(145deg, hsl(36, 100%, 50%), hsl(36, 100%, 40%))",
+    frontBorder: "hsl(36, 100%, 50%)",
     audioUrl: null as string | null,
   },
   {
@@ -44,8 +47,9 @@ const soundCards = [
     title: "Glasovi C, S, Z",
     sounds: ["C", "S", "Z"],
     image: `${STORAGE_BASE}/Glas_SZC.png`,
-    gradient: "from-dragon-green/10 to-app-teal/10",
     color: "text-dragon-green",
+    frontBg: "linear-gradient(145deg, hsl(122, 39%, 49%), hsl(122, 39%, 39%))",
+    frontBorder: "hsl(122, 39%, 49%)",
     audioUrl: null as string | null,
   },
   {
@@ -53,8 +57,9 @@ const soundCards = [
     title: "Glasovi Č, Š, Ž",
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
-    gradient: "from-app-teal/10 to-dragon-green/10",
     color: "text-app-teal",
+    frontBg: "linear-gradient(145deg, hsl(174, 100%, 29%), hsl(174, 100%, 22%))",
+    frontBorder: "hsl(174, 100%, 29%)",
     audioUrl: null as string | null,
   },
 ];
@@ -125,7 +130,14 @@ const VizualniPrikazUstnic = () => {
                   >
                     <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '320px' }}>
                       {/* Front */}
-                      <div className="flip-card-front flex-col gap-3">
+                      <div
+                        className="flip-card-front flex-col gap-3"
+                        style={{
+                          background: card.frontBg,
+                          borderColor: card.frontBorder,
+                          boxShadow: `0 4px 15px ${card.frontBorder}40`,
+                        }}
+                      >
                         <span className="text-4xl font-bold text-white drop-shadow-md">
                           {card.sounds.join(", ")}
                         </span>
