@@ -72,6 +72,8 @@ const VizualniPrikazUstnic = () => {
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [desktopCarouselApi, setDesktopCarouselApi] = useState<CarouselApi>();
+  const [desktopCurrentSlide, setDesktopCurrentSlide] = useState(0);
 
   const onSelect = useCallback(() => {
     if (!carouselApi) return;
