@@ -197,7 +197,7 @@ const VizualniPrikazUstnic = () => {
                 </div>
               </div>
             ) : (
-              <div className="w-full max-w-lg mx-auto mt-8">
+              <div className="w-full max-w-xl mx-auto mt-8">
                 <Carousel
                   setApi={setDesktopCarouselApi}
                   className="w-full"
@@ -206,22 +206,22 @@ const VizualniPrikazUstnic = () => {
                     loop: false,
                   }}
                 >
-                  <CarouselContent>
+                  <CarouselContent className="-ml-0">
                     {soundCards.map((card) => {
                       const isFlipped = flippedCardId === card.id;
                       return (
-                        <CarouselItem key={card.id} className="basis-full flex justify-center">
+                        <CarouselItem key={card.id} className="pl-0 basis-full flex justify-center">
                           <div className="w-full p-1">
                             <div
                               className="flip-card cursor-pointer rounded-xl shadow-lg border-0 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
-                              style={{ minHeight: '420px' }}
+                              style={{ minHeight: '525px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
-                              <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '420px' }}>
+                              <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: '525px' }}>
                                 <div className="flip-card-front flex-col p-0 overflow-hidden rounded-xl">
                                   <div className={`w-full flex-1 bg-gradient-to-br ${card.gradient} flex flex-col items-center justify-center gap-1`}>
                                     <span className={`text-sm font-bold ${card.textColor} opacity-80 uppercase tracking-widest`}>Glas</span>
-                                    <span className={`text-5xl md:text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
+                                    <span className={`text-6xl font-black ${card.textColor} drop-shadow-sm`}>{card.sounds.join(", ")}</span>
                                   </div>
                                   <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-border">
                                     <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
@@ -229,7 +229,7 @@ const VizualniPrikazUstnic = () => {
                                 </div>
                                 <div className="flip-card-back flex-col p-4 justify-between rounded-xl">
                                   <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
-                                  <img src={card.image} alt={card.title} className="w-full max-h-[250px] object-contain rounded-lg" loading="lazy" />
+                                  <img src={card.image} alt={card.title} className="w-full max-h-[312px] object-contain rounded-lg" loading="lazy" />
                                   <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
                                     <Volume2 className="w-4 h-4" />
                                     {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
@@ -242,6 +242,8 @@ const VizualniPrikazUstnic = () => {
                       );
                     })}
                   </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
                 </Carousel>
                 <div className="flex justify-center gap-2 mt-6">
                   {soundCards.map((_, i) => (
