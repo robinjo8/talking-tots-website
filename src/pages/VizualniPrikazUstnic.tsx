@@ -213,7 +213,7 @@ const VizualniPrikazUstnic = () => {
                         <CarouselItem key={card.id} className="pl-0 basis-full flex justify-center">
                           <div className="w-full p-1">
                             <div
-                              className="flip-card cursor-pointer rounded-xl shadow-lg border-0 bg-white transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+                              className="flip-card cursor-pointer rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02]"
                               style={{ minHeight: '525px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
@@ -227,7 +227,7 @@ const VizualniPrikazUstnic = () => {
                                     <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
                                   </div>
                                 </div>
-                                <div className="flip-card-back flex-col p-4 justify-between rounded-xl">
+                                <div className="flip-card-back flex-col p-4 justify-between rounded-xl border border-gray-200">
                                   <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
                                   <img src={card.image} alt={card.title} className="w-full max-h-[312px] object-contain rounded-lg" loading="lazy" />
                                   <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
@@ -242,8 +242,8 @@ const VizualniPrikazUstnic = () => {
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  <CarouselPrevious className="h-16 w-16 bg-black text-white border-black hover:bg-black/80 hover:text-white" />
+                  <CarouselNext className="h-16 w-16 bg-black text-white border-black hover:bg-black/80 hover:text-white" />
                 </Carousel>
                 <div className="flex justify-center gap-2 mt-6">
                   {soundCards.map((_, i) => (
