@@ -80,12 +80,24 @@ const VizualniPrikazUstnic = () => {
     setCurrentSlide(carouselApi.selectedScrollSnap());
   }, [carouselApi]);
 
+  const onDesktopSelect = useCallback(() => {
+    if (!desktopCarouselApi) return;
+    setDesktopCurrentSlide(desktopCarouselApi.selectedScrollSnap());
+  }, [desktopCarouselApi]);
+
   useEffect(() => {
     if (!carouselApi) return;
     onSelect();
     carouselApi.on("select", onSelect);
     return () => { carouselApi.off("select", onSelect); };
   }, [carouselApi, onSelect]);
+
+  useEffect(() => {
+    if (!desktopCarouselApi) return;
+    onDesktopSelect();
+    desktopCarouselApi.on("select", onDesktopSelect);
+    return () => { desktopCarouselApi.off("select", onDesktopSelect); };
+  }, [desktopCarouselApi, onDesktopSelect]);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
