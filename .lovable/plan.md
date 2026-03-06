@@ -1,45 +1,28 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Desktop carousel: puščice, večje kartice, centriranje
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Problem
+1. Kartica ni centrirana — vidi se rob naslednje kartice na desni. Vzrok: `CarouselContent` ima `-ml-4` in vsak `CarouselItem` ima `pl-4` (privzeti Embla padding). Ta offset povzroči, da kartica ni povsem na sredini.
+2. Manjkajo puščice za navigacijo levo/desno.
+3. Kartice so premajhne — povečati za 25%.
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+## Spremembe v `src/pages/VizualniPrikazUstnic.tsx`
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+### 1. Centriranje
+- Na `CarouselContent` dodaj `className="-ml-0"` da preglasiš privzeti `-ml-4`
+- Na `CarouselItem` dodaj `className="pl-0 basis-full"` da odstraniš `pl-4` offset
+- To bo kartico postavilo na pravo sredino
 
-**Spremembe:**
+### 2. Puščice
+- Dodaj `CarouselPrevious` in `CarouselNext` iz UI carousel komponent zraven desktop `Carousel`
+- Uporabim obstoječe komponente iz `carousel.tsx` (že imajo pozicioniranje)
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+### 3. Povečanje kartic za 25%
+- `max-w-lg` (512px) → `max-w-xl` (576px) na containerju — to je ~12.5% povečanje containerja
+- `minHeight: '420px'` → `minHeight: '525px'` (420 * 1.25)
+- `max-h-[250px]` na sliki → `max-h-[312px]`
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
-
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
-
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
-
-**Spremembe:**
-
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
-
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
-
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
-
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
-
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+### Datoteke
+- `src/pages/VizualniPrikazUstnic.tsx`
 
