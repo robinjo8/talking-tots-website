@@ -39,7 +39,7 @@ export function MemoryCard({
     <div className="flip-card" onClick={handleCardClick}>
       <div className={cn("flip-card-inner", flipped || matched ? "flipped" : "")}>
         {/* Front side - Green with question mark */}
-        <div className="flip-card-front" style={{ background: 'hsl(var(--dragon-green, 142 71% 45%))' }}>
+        <div className="flip-card-front bg-dragon-green">
           <div className="flex items-center justify-center w-full h-full">
             <span className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg select-none">
               ?
