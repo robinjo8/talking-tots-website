@@ -115,7 +115,7 @@ export function MobileMenu({
   };
   // Note: isOpen state is declared at the top of the component
 
-  return <div className="lg:hidden flex items-center gap-2">
+  return <div className="2xl:hidden flex items-center gap-2">
       {/* Notification bell - only for logged in users */}
       {user && <UserNotificationBell />}
       
