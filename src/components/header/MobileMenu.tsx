@@ -34,7 +34,7 @@ export function MobileMenu({
   // If user is a logopedist, show simplified menu with organization button
   if (user && profile?.isLogopedist) {
     return (
-      <div className="lg:hidden flex items-center gap-2">
+      <div className="2xl:hidden flex items-center gap-2">
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
           <Button variant="ghost" size="sm" className="flex items-center ml-auto" aria-label="Odpri meni">
