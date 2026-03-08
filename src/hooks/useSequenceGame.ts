@@ -31,7 +31,7 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
         throw error;
       }
       
-      return data as unknown as SequenceImage[];
+      return (data as unknown as SequenceImage[]).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 

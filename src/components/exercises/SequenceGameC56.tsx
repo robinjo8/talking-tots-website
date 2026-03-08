@@ -32,7 +32,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
         throw error;
       }
       
-      return data as unknown as SequenceImage[];
+      return (data as unknown as SequenceImage[]).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 

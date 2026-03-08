@@ -35,7 +35,7 @@ export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableN
         throw error;
       }
       
-      return data as unknown as SequenceImage[];
+      return (data as unknown as SequenceImage[]).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 

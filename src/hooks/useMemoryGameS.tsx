@@ -42,7 +42,7 @@ export const useMemoryGameS = () => {
       }
       
       console.log("Fetched memory cards:", data);
-      return data || [];
+      return (data || []).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 
