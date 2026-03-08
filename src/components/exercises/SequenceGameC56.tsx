@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeAudioUrl } from "@/utils/audioUtils";
 import { SequenceImage } from "@/hooks/useSequenceGame";
 import { SequenceImageSelectionDialog } from "./SequenceImageSelectionDialog";
 import { Loader2, Eye, EyeOff, ArrowLeft, ArrowRight } from "lucide-react";
@@ -31,7 +32,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
         throw error;
       }
       
-      return data as unknown as SequenceImage[];
+      return (data as unknown as SequenceImage[]).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useEnhancedProgress } from "./useEnhancedProgress";
+import { normalizeAudioUrl } from "@/utils/audioUtils";
 
 export interface MemoryCard {
   id: string;
@@ -41,7 +42,7 @@ export const useMemoryGameŠ = () => {
       }
       
       console.log("Fetched memory cards:", data);
-      return data || [];
+      return (data || []).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 
