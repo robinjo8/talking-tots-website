@@ -388,7 +388,7 @@ export const ponoviPovedCH: PonoviPovedConfig = {
   sentences: [
     {
       words: [
-        { word: "Čuvaj", image: "cuvaj1.webp", audio: "Cuvaj.mp3" },
+        { word: "Čebelar", image: "cebelar1.webp", audio: "Cebelar.mp3" },
         { word: "ima", image: "Stickman_imeti.webp", audio: "Ima.mp3" },
         { word: "čoln", image: "coln1.webp", audio: "Coln.mp3" }
       ],
