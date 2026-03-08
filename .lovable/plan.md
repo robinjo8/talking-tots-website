@@ -1,45 +1,62 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Analiza: Vse memory_cards_* tabele uporabljajo .m4a namesto .mp3
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Ugotovitev
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+**Vseh 10 Supabase tabel** (`memory_cards`, `memory_cards_K`, `memory_cards_c`, `memory_cards_l`, `memory_cards_S`, `memory_cards_z`, `memory_cards_Č`, `memory_cards_Š_duplicate`, `memory_cards_Ž`, `memory_cards_r_zacetek`) ima `audio_url` polja z `.m4a` končnico in malimi črkami (npr. `sneg.m4a` namesto `Sneg.mp3`).
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+**Skupaj 130 vnosov** je prizadetih. To vpliva na:
+- **Spomin (3-4)**: 9 `useMemoryGame*.tsx` hookov
+- **Zaporedja (5-6)**: `SequenceGame56Base.tsx` + `SequenceGameC56.tsx`
+- **Zaporedja (3-4)**: `useSequenceGame.ts`
+- **Zaporedja (7-8, 9-10)**: `SequenceGameBase.tsx`
 
-**Spremembe:**
+Igre kot Bingo, Met kocke, Ponovi poved že uporabljajo pravilne `.mp3` URL-je ker podatke definirajo lokalno v kodi (ne iz baze).
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+## Posebni primeri v bazi
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+Nekatere `.m4a` datoteke imajo drugačna imena kot `.mp3` standard:
+| Beseda | .m4a v bazi | Pravilen .mp3 |
+|--------|-------------|---------------|
+| KOKOŠ | `kokos_1.m4a` | `Kokos_zival.mp3` |
+| kokos | `kokos_sadez.m4a` | `Kokos_sadez.mp3` |
+| KOŽA | `koza_skin.m4a` | `Koza_cutilo.mp3` |
+| KOZA | `koza.m4a` | `Koza_zival.mp3` |
+| KOŠ | `kos.m4a` | `Kos_predmet.mp3` |
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+## Rešitev
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+Ker nimam možnosti poganjati UPDATE stavkov na bazi, bom dodal **runtime transformacijo** ki pretvori `.m4a` URL-je v `.mp3` ob nalaganju podatkov.
 
-**Spremembe:**
+### 1. Nova utility funkcija (`src/utils/audioUtils.ts`)
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+Dodal bom funkcijo `normalizeAudioUrl(url)` ki:
+- Zamenja `.m4a` z `.mp3`
+- Kapitalizira prvo črko datoteke (npr. `sneg` → `Sneg`)
+- Obravnava posebne primere s preslikavo (`kokos_1` → `Kokos_zival`, itd.)
+- Če je URL že `.mp3`, ga ne spreminja
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
+### 2. Uporaba v hookih in komponentah
 
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+Normalizacijo dodam na teh mestih (po fetchanju podatkov iz baze):
+- `src/hooks/useSequenceGame.ts` — po `supabase.from(tableName).select("*")`
+- `src/components/exercises/SequenceGame56Base.tsx` — po fetchanju
+- `src/components/exercises/SequenceGameC56.tsx` — po fetchanju
+- `src/hooks/useMemoryGameC.tsx`, `useMemoryGameK.tsx`, `useMemoryGameL.tsx`, `useMemoryGameR.tsx`, `useMemoryGameS.tsx`, `useMemoryGameZ.tsx`, `useMemoryGameČ.tsx`, `useMemoryGameŠ.tsx`, `useMemoryGameŽ.tsx` — po fetchanju
+- `src/hooks/useMemoryGame.tsx` — generični hook
 
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+Na vsakem mestu dodam eno vrstico:
+```ts
+const normalized = data.map(item => ({
+  ...item,
+  audio_url: normalizeAudioUrl(item.audio_url)
+}));
+return normalized;
+```
 
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+### Obseg sprememb
+- 1 nova funkcija v obstoječi datoteki
+- ~13 datotek z minimalno spremembo (dodana 1-2 vrstici po fetch klicu)
+- Nobenih vizualnih sprememb, samo zvočni posnetki se bodo pravilno predvajali
 
