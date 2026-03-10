@@ -287,6 +287,8 @@ export default function AdminArtikulacijskiTest() {
           setShowInfoDialog(false);
         }}
         onBack={() => navigate(`/admin/children/${childId}/workspace`)}
+        childName={child?.name}
+        wordCount={totalWordCount}
       />
 
       {/* Completion Dialog */}
