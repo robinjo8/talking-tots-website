@@ -125,7 +125,7 @@ const ArticulationSettingsDialog = ({
               Nastavitve preverjanja
             </DialogTitle>
             <DialogDescription>
-              Izberite zahtevnost preverjanja in čas snemanja glede na sposobnosti otroka.
+              Izberite zahtevnost preverjanja, čas snemanja in število besed.
             </DialogDescription>
           </DialogHeader>
 
