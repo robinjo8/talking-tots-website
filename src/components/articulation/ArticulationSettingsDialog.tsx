@@ -29,44 +29,36 @@ interface ArticulationSettingsDialogProps {
 const difficultyOptions: {
   value: DifficultyLevel;
   label: string;
-  description: string;
 }[] = [
   {
     value: "nizka",
-    label: "Nizka",
-    description: "Lažje preverjanje",
+    label: "Lahka",
   },
   {
     value: "srednja",
     label: "Srednja (priporočeno)",
-    description: "Za večino otrok",
   },
   {
     value: "visoka",
-    label: "Visoka",
-    description: "Strožje preverjanje",
+    label: "Težja",
   },
 ];
 
 const durationOptions: {
   value: RecordingDuration;
   label: string;
-  description: string;
 }[] = [
   {
     value: 3,
     label: "3 sekunde",
-    description: "Za hitrejše otroke",
   },
   {
     value: 4,
     label: "4 sekunde (priporočeno)",
-    description: "Za večino otrok",
   },
   {
     value: 5,
     label: "5 sekund",
-    description: "Za otroke z večjimi težavami",
   },
 ];
 
