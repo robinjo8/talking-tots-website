@@ -311,6 +311,11 @@ const ArtikuacijskiTest = () => {
         onDifficultyChange={setDifficulty}
         recordingDuration={recordingDuration}
         onRecordingDurationChange={setRecordingDuration}
+        childAge={childAge}
+        wordCount={wordsPerLetter === 1 ? 20 : 60}
+        onWordCountChange={(count) => {
+          if (childId) setWordCountOverride(childId, count);
+        }}
       />
 
       {/* Resume Dialog */}
