@@ -151,17 +151,12 @@ const ArticulationSettingsDialog = ({
                     onClick={() => onDifficultyChange(option.value)}
                   >
                     <RadioGroupItem value={option.value} id={`diff-${option.value}`} className="mt-0.5" />
-                    <div className="flex-1">
-                      <Label
-                        htmlFor={`diff-${option.value}`}
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        {option.label}
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {option.description}
-                      </p>
-                    </div>
+                    <Label
+                      htmlFor={`diff-${option.value}`}
+                      className="text-sm font-medium cursor-pointer"
+                    >
+                      {option.label}
+                    </Label>
                   </div>
                 ))}
               </RadioGroup>
