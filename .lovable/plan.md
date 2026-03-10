@@ -1,45 +1,81 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Poenotenje vseh potrditvenih oken v igrah
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Trenutno stanje — vsa obvestila v igrah
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+Obstajata **2 različna stila** potrditvenih oken:
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+### Stil 1: `MemoryExitConfirmationDialog` (zeleni/rdeči gumbi, VELIKE ČRKE)
+- Naslov: **OPOZORILO** (centriran, uppercase)
+- Opis: **ALI RES ŽELITE PREKINITI IGRO?** (centriran)
+- Gumbi: Zelen ✓ DA | Rdeč ✗ NE (z ikonami Check/X)
+- **Uporablja se za**: izhod iz iger (Home gumb)
 
-**Spremembe:**
+### Stil 2: `ConfirmDialog` (privzet stil, navadni gumbi)
+- Naslov: navaden tekst (levo poravnan)
+- Opis: navadno besedilo
+- Gumbi: Outline "Ne" | Privzet "Da" (brez ikon, brez barv)
+- **Uporablja se za**:
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+| Igra | Naslov | Opis |
+|------|--------|------|
+| Kolo besed | "Nova igra" | "Ali res želiš začeti novo igro? Ves napredek bo ponastavljen na začetno stanje." |
+| Bingo | "Nova igra" | "Ali res želiš začeti novo igro? Ves napredek bo ponastavljen na začetno stanje." |
+| Met kocke | "Nova igra" | "Ali res želiš začeti novo igro? Napredek bo izgubljen." |
+| Poveži pare | "Nova igra" | "Ali res želiš začeti novo igro?" |
+| Drsna sestavljanka | "Nova igra" | "Ali res želiš začeti novo igro?" |
+| Sestavljanke (PuzzleSuccessDialog) | "ZAPRI IGRO" | "ČE ZAPREŠ IGRO, NE BOŠ PREJEL ZVEZDICE. ALI SI PREPRIČAN?" |
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+Tudi `PuzzleConfirmationDialog` ima drugačen stil (za potrditev zaključka sestavljanke): naslov "Potrditev", opis "Ali si res zaključil/a igro?" z zelenim/rdečim Da/Ne.
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+## Cilj
+Poenotiti **vse** potrditvene dialoge znotraj iger na stil `MemoryExitConfirmationDialog`:
+- Naslov centriran, **VELIKE ČRKE**
+- Opis centriran
+- Zeleni gumb ✓ DA | Rdeči gumb ✗ NE
+- Enotno besedilo
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+## Spremembe
 
-**Spremembe:**
+### 1. Posodobi `ConfirmDialog` (confirm-dialog.tsx)
+Spremenimo stil tako da bo **vedno** kot MemoryExitConfirmationDialog:
+- Naslov: centriran, uppercase
+- Opis: centriran
+- Gumbi: zeleni (DA z ✓) in rdeči (NE z ✗), centrirani, zaokroženi, uppercase
+- Ohranimo vse obstoječe props (title, description, confirmText, cancelText itd.)
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+### 2. Posodobi "Nova igra" dialoge — poenoti besedilo
+V vseh igrah spremenimo:
+- **Naslov**: "Nova igra" → `"OPOZORILO"`
+- **Opis**: → `"ALI RES ŽELIŠ ZAČETI NOVO IGRO?"`
+- **confirmText**: `"DA"`, **cancelText**: `"NE"`
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
+Igre za posodobitev:
+- `GenericWheelGame.tsx` (vrstica ~229)
+- `GenericBingoGame.tsx` (vrstica ~301)
+- `GenericMetKockeGame.tsx` (vrstica ~366)
+- `GenericPoveziPareGame.tsx` (vrstica ~299, ~356)
+- `GenericDrsnaSestavljankaGame.tsx` (vrstica ~205)
 
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+### 3. Posodobi `PuzzleSuccessDialog` dialog besedilo
+- Naslov: "ZAPRI IGRO" → `"OPOZORILO"`
+- Opis: ostane `"ČE ZAPREŠ IGRO, NE BOŠ PREJEL ZVEZDICE. ALI SI PREPRIČAN?"` (že uppercase)
+- confirmText: `"DA"`, cancelText: `"NE"`
 
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+### 4. Posodobi `PuzzleConfirmationDialog`
+Spremenimo stil na enak poenoten videz:
+- Naslov: "Potrditev" → `"OPOZORILO"`
+- Opis: → `"ALI SI RES ZAKLJUČIL/A IGRO?"`
+- Gumbi: zeleni DA / rdeči NE (že ima ta stil, le besedilo se poenoti)
 
 ### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+- `src/components/ui/confirm-dialog.tsx` — stil gumbov in poravnava
+- `src/components/games/GenericWheelGame.tsx` — besedilo Nova igra
+- `src/components/games/GenericBingoGame.tsx` — besedilo Nova igra
+- `src/components/games/GenericMetKockeGame.tsx` — besedilo Nova igra
+- `src/components/games/GenericPoveziPareGame.tsx` — besedilo Nova igra (2x)
+- `src/components/games/GenericDrsnaSestavljankaGame.tsx` — besedilo Nova igra
+- `src/components/puzzle/PuzzleSuccessDialog.tsx` — besedilo
+- `src/components/puzzle/PuzzleConfirmationDialog.tsx` — besedilo
 
