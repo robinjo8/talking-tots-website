@@ -183,17 +183,12 @@ const ArticulationSettingsDialog = ({
                     onClick={() => onRecordingDurationChange(option.value)}
                   >
                     <RadioGroupItem value={String(option.value)} id={`dur-${option.value}`} className="mt-0.5" />
-                    <div className="flex-1">
-                      <Label
-                        htmlFor={`dur-${option.value}`}
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        {option.label}
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {option.description}
-                      </p>
-                    </div>
+                    <Label
+                      htmlFor={`dur-${option.value}`}
+                      className="text-sm font-medium cursor-pointer"
+                    >
+                      {option.label}
+                    </Label>
                   </div>
                 ))}
               </RadioGroup>
