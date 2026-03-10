@@ -289,6 +289,8 @@ const ArtikuacijskiTest = () => {
           await initializeSession();
           setShowInfoDialog(false);
         }}
+        childName={childName}
+        wordCount={totalWordCount}
       />
 
       {/* Completion Dialog */}
