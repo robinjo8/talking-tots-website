@@ -124,14 +124,21 @@ export default function AdminArtikulacijskiTest() {
     recordingDuration,
     setRecordingDuration,
     clearProgress,
+    getWordCountOverride,
+    setWordCountOverride,
   } = useArticulationSettings();
   
   const sejaParam = searchParams.get('seja');
   const fixedSessionNumber = sejaParam ? parseInt(sejaParam, 10) : undefined;
   
-  // For age group 3-4, use only 1 word per letter (20 words total)
+  // For age group 3-4, always use 1 word per letter (20 words total)
+  // For 5+, check override; default to 3 (60 words)
   const childAge = child?.age;
-  const wordsPerLetter = (childAge === 3 || childAge === 4) ? 1 : 3;
+  const wordCountOverride = childId ? getWordCountOverride(childId) : null;
+  const wordsPerLetter = (childAge === 3 || childAge === 4) 
+    ? 1 
+    : (wordCountOverride === 20 ? 1 : 3);
+  const totalWordCount = wordsPerLetter === 1 ? 20 : 60;
   
   // Dynamic start index - updates when session info loads
   const [effectiveStartIndex, setEffectiveStartIndex] = useState<number>(0);
