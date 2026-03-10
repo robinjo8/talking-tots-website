@@ -1,55 +1,45 @@
 
 
-# Pomoč in podpora — popravljeni plan
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Popravki glede na vaše pripombe
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-### Sklop 1: Naročnina
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-**Kako deluje podaljšanje naročnine?**
-Naročnina se samodejno podaljša ob koncu obračunskega obdobja. Stripe samodejno pošlje e-poštna obvestila pred podaljšanjem in po uspešnem plačilu (to je vgrajena funkcija Stripe, ki jo je treba vklopiti v Stripe Dashboard > Settings > Customer emails). Trenutno to morda še ni vklopljeno — preveriti moramo nastavitve v Stripe Dashboard.
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-**Kako lahko prekinem naročnino?**
-Popravljeno: naročnino upravljate na strani **Nastavitve** (`/profile`), v razdelku **Naročnina**, s klikom na gumb **Upravljaj naročnino**, ki vas preusmeri na Stripe portal. Tam lahko prekinete naročnino. Po prekinitvi ohranite dostop do konca obračunskega obdobja.
+**Spremembe:**
 
-**Kako preverim svojo naročnino?**
-Popravljeno: podatke o naročnini najdete na strani **Nastavitve** > razdelek **Naročnina**.
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-**Kje najdem račun?**
-Stripe samodejno generira račune (invoices) ob vsakem plačilu naročnine. Po dokumentaciji Stripe se računi pošljejo po e-pošti samodejno, **če je to vklopljeno** v Stripe Dashboard (Settings > Customer emails > toggle "Successful payments"). Račune lahko uporabnik vidi tudi v Stripe portalu (gumb Upravljaj naročnino). V testnem načinu (test mode) se e-pošta ne pošilja. Predlagam, da v odgovoru napišemo: "Račune najdete v portalu za upravljanje naročnine (Nastavitve > Naročnina > Upravljaj naročnino)."
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-### Sklop 2: Plačila
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-**Katere vrste plačil podpirate?**
-Da, Stripe omogoča plačila z Visa, Mastercard, American Express in drugimi karticami. To je dejstvo iz Stripe dokumentacije.
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
 
-**Ali je plačilo varno?**
-Stripe je certificiran po standardu PCI DSS Level 1 — to je javno dokumentirano na stripe.com/docs/security. Mi podatkov o karticah nikoli ne vidimo, ker gredo neposredno na Stripe.
+**Spremembe:**
 
-**Ali lahko zamenjam plačilno metodo?**
-Popravljeno: plačilno metodo spremenite v portalu za upravljanje naročnine, do katerega dostopate na strani **Nastavitve** > razdelek **Naročnina** > gumb **Upravljaj naročnino**.
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
 
-### Sklop 3: Težave z dostopom
-Vsebina ostane enaka (geslo, e-pošta, napake) — ste potrdili, da je OK.
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
 
-### Sklop 4: Tehnična pomoč
-Besedilo s kontaktom in linkom na pogosta vprašanja.
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
 
----
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
 
-## Tehnične spremembe
-
-### Datoteka
-- `src/pages/PomocInPodpora.tsx` — celotna preoblikovanje
-
-### Pristop
-- Accordion komponenta iz obstoječega UI
-- 4 sklopi z ikonami (CreditCard, Wallet, KeyRound, Headphones)
-- Popravljeni odgovori z natančnimi referencami (Nastavitve > Naročnina > Upravljaj naročnino)
-- Header + BreadcrumbNavigation
-- CTA na dnu z linkom na `/clanki/pogosta-vprasanja` in `info@tomitalk.si`
-- Stil: `max-w-4xl`, bele zaokrožene kartice
-
-### Vprašanje za vas
-Glede pošiljanja računov po e-pošti: Stripe to podpira samodejno, ampak mora biti vklopljeno v Stripe Dashboard (Settings > Customer emails). Ali želite, da to preverim/vklopim, ali za zdaj v odgovoru napišemo le, da so računi dostopni v portalu za upravljanje naročnine?
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 
