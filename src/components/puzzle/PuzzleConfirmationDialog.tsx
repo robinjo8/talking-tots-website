@@ -14,9 +14,9 @@ export function PuzzleConfirmationDialog({ children, onConfirm }: PuzzleConfirma
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-center">Potrditev</AlertDialogTitle>
+          <AlertDialogTitle className="text-center uppercase">OPOZORILO</AlertDialogTitle>
           <AlertDialogDescription className="text-center">
-            Ali si res zaključil/a igro?
+            ALI SI RES ZAKLJUČIL/A IGRO?
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-3 mt-6">

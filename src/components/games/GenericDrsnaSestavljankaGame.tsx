@@ -202,10 +202,10 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
       <ConfirmDialog 
         open={showNewGameDialog} 
         onOpenChange={setShowNewGameDialog} 
-        title="Nova igra" 
-        description="Ali res želiš začeti novo igro?" 
-        confirmText="Da" 
-        cancelText="Ne" 
+        title="OPOZORILO" 
+        description="ALI RES ŽELIŠ ZAČETI NOVO IGRO?" 
+        confirmText="DA" 
+        cancelText="NE" 
         onConfirm={handleConfirmNewGame} 
         onCancel={() => setShowNewGameDialog(false)} 
       />

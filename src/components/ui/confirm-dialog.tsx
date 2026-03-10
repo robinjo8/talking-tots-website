@@ -1,6 +1,6 @@
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 import { ReactNode } from "react";
 
 export interface ConfirmDialogProps {
