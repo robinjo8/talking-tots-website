@@ -1,7 +1,6 @@
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { Link } from "react-router-dom";
-import { CreditCard, Wallet, KeyRound, Headphones } from "lucide-react";
 import {
   Accordion,
   AccordionContent,
@@ -11,8 +10,7 @@ import {
 
 const helpSections = [
   {
-    title: "Naročnina",
-    icon: CreditCard,
+    title: "1. Naročnina",
     items: [
       {
         question: "Kako deluje podaljšanje naročnine?",
@@ -37,8 +35,7 @@ const helpSections = [
     ],
   },
   {
-    title: "Plačila",
-    icon: Wallet,
+    title: "2. Plačila",
     items: [
       {
         question: "Katere vrste plačil podpirate?",
@@ -58,8 +55,7 @@ const helpSections = [
     ],
   },
   {
-    title: "Težave z dostopom",
-    icon: KeyRound,
+    title: "3. Težave z dostopom",
     items: [
       {
         question: "Pozabil/a sem geslo. Kako ga ponastavim?",
@@ -84,73 +80,62 @@ const PomocInPodpora = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="pt-20">
+
+      <div className="max-w-4xl mx-auto px-4 py-8 pt-24">
         <BreadcrumbNavigation />
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Pomoč in podpora</h1>
-        <p className="text-muted-foreground mb-10">
-          Poiščite odgovore na pogosta vprašanja o naročnini, plačilih in uporabi aplikacije.
-        </p>
+        <h1 className="text-3xl font-bold text-dragon-green mb-8">
+          Pomoč in podpora
+        </h1>
 
-        <div className="space-y-10">
-          {helpSections.map((section) => {
-            const Icon = section.icon;
-            return (
-              <div key={section.title}>
-                <div className="flex items-center gap-2.5 mb-4">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <h2 className="text-xl font-semibold text-foreground">{section.title}</h2>
-                </div>
-                <div className="bg-card rounded-xl border border-border shadow-sm">
-                  <Accordion type="single" collapsible className="w-full">
-                    {section.items.map((item, idx) => (
-                      <AccordionItem
-                        key={idx}
-                        value={`${section.title}-${idx}`}
-                        className={idx === section.items.length - 1 ? "border-b-0" : ""}
-                      >
-                        <AccordionTrigger className="px-5 text-left text-foreground hover:no-underline">
-                          {item.question}
-                        </AccordionTrigger>
-                        <AccordionContent className="px-5 text-muted-foreground leading-relaxed">
-                          {item.answer}
-                        </AccordionContent>
-                      </AccordionItem>
-                    ))}
-                  </Accordion>
-                </div>
-              </div>
-            );
-          })}
+        <div className="prose prose-slate max-w-none space-y-8 text-justify">
+          {helpSections.map((section) => (
+            <section key={section.title}>
+              <h2 className="text-2xl font-semibold text-foreground mb-4">
+                {section.title}
+              </h2>
+              <Accordion type="single" collapsible className="w-full">
+                {section.items.map((item, idx) => (
+                  <AccordionItem
+                    key={idx}
+                    value={`${section.title}-${idx}`}
+                    className="border-border"
+                  >
+                    <AccordionTrigger className="text-left text-muted-foreground hover:text-foreground hover:no-underline">
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground leading-relaxed">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+          ))}
 
-          {/* Tehnična pomoč */}
-          <div>
-            <div className="flex items-center gap-2.5 mb-4">
-              <Headphones className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold text-foreground">Tehnična pomoč</h2>
-            </div>
-            <div className="bg-card rounded-xl border border-border shadow-sm p-6">
-              <p className="text-muted-foreground leading-relaxed">
-                Če niste našli odgovora na vaše vprašanje na tej strani ali med{" "}
-                <Link
-                  to="/clanki/pogosta-vprasanja"
-                  className="text-primary underline underline-offset-4 hover:text-primary/80"
-                >
-                  pogostimi vprašanji
-                </Link>
-                , nas kontaktirajte na{" "}
-                <a
-                  href="mailto:info@tomitalk.si"
-                  className="text-primary underline underline-offset-4 hover:text-primary/80"
-                >
-                  info@tomitalk.si
-                </a>{" "}
-                in z veseljem vam bomo pomagali.
-              </p>
-            </div>
-          </div>
+          {/* 4. Tehnična pomoč */}
+          <section>
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
+              4. Tehnična pomoč
+            </h2>
+            <p className="text-muted-foreground leading-relaxed">
+              Če niste našli odgovora na vaše vprašanje na tej strani ali med{" "}
+              <Link
+                to="/clanki/pogosta-vprasanja"
+                className="text-primary underline underline-offset-4 hover:text-primary/80"
+              >
+                pogostimi vprašanji
+              </Link>
+              , nas kontaktirajte na{" "}
+              <a
+                href="mailto:info@tomitalk.si"
+                className="text-primary underline underline-offset-4 hover:text-primary/80"
+              >
+                info@tomitalk.si
+              </a>{" "}
+              in z veseljem vam bomo pomagali.
+            </p>
+          </section>
         </div>
       </div>
     </div>
