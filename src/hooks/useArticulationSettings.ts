@@ -161,6 +161,48 @@ export const useArticulationSettings = () => {
     return `pred ${diffDays} ${diffDays === 1 ? "dnevom" : diffDays < 5 ? "dnevi" : "dnevi"}`;
   }, []);
 
+  // Get word count override for a specific child
+  const getWordCountOverride = useCallback((childId: string): WordCount | null => {
+    try {
+      const stored = localStorage.getItem(SETTINGS_KEY);
+      if (stored) {
+        const settings: ArticulationSettings = JSON.parse(stored);
+        if (settings.wordCountOverrides && settings.wordCountOverrides[childId]) {
+          return settings.wordCountOverrides[childId];
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error("Error loading word count override:", error);
+      return null;
+    }
+  }, []);
+
+  // Set word count override for a specific child
+  const setWordCountOverride = useCallback((childId: string, count: WordCount) => {
+    try {
+      const stored = localStorage.getItem(SETTINGS_KEY);
+      const settings: ArticulationSettings = stored
+        ? JSON.parse(stored)
+        : { difficulty, recordingDuration };
+      
+      if (!settings.wordCountOverrides) {
+        settings.wordCountOverrides = {};
+      }
+      
+      if (count === 60) {
+        // Remove override when switching back to default
+        delete settings.wordCountOverrides[childId];
+      } else {
+        settings.wordCountOverrides[childId] = count;
+      }
+      
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+    } catch (error) {
+      console.error("Error saving word count override:", error);
+    }
+  }, [difficulty, recordingDuration]);
+
   return {
     difficulty,
     setDifficulty,
@@ -171,5 +213,7 @@ export const useArticulationSettings = () => {
     loadProgress,
     clearProgress,
     getTimeAgo,
+    getWordCountOverride,
+    setWordCountOverride,
   };
 };

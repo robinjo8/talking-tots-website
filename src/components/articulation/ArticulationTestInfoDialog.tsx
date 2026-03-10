@@ -105,6 +105,11 @@ const ArticulationTestInfoDialog = ({
           className="flex-1 min-h-0 overflow-auto"
         >
           <div className="px-6 py-4 space-y-6 text-sm leading-relaxed">
+            {childName && wordCount && (
+              <p className="font-bold text-destructive text-base">
+                Za otroka {childName} ste izbrali {wordCount} besed za preverjanje izgovorjave.
+              </p>
+            )}
             <section>
               <h3 className="font-bold text-base mb-2">Kaj je preverjanje izgovorjave?</h3>
               <p className="text-muted-foreground">
