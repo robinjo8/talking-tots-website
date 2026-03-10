@@ -9,6 +9,8 @@ interface ArticulationTestInfoDialogProps {
   open: boolean;
   onClose: () => void;
   onBack?: () => void;
+  childName?: string;
+  wordCount?: number;
 }
 
 const ArticulationTestInfoDialog = ({
