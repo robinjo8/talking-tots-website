@@ -273,10 +273,10 @@ export const PuzzleSuccessDialog: React.FC<PuzzleSuccessDialogProps> = ({
       <ConfirmDialog
         open={showConfirmDialog}
         onOpenChange={setShowConfirmDialog}
-        title="ZAPRI IGRO"
+        title="OPOZORILO"
         description="ČE ZAPREŠ IGRO, NE BOŠ PREJEL ZVEZDICE. ALI SI PREPRIČAN?"
-        confirmText="V REDU"
-        cancelText="PREKLIČI"
+        confirmText="DA"
+        cancelText="NE"
         onConfirm={handleConfirmClose}
         onCancel={() => setShowConfirmDialog(false)}
       />

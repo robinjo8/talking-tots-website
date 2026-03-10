@@ -298,10 +298,10 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
       <ConfirmDialog
         open={showNewGameConfirmation}
         onOpenChange={setShowNewGameConfirmation}
-        title="Nova igra"
-        description="Ali res želiš začeti novo igro? Ves napredek bo ponastavljen na začetno stanje."
-        confirmText="Da"
-        cancelText="Ne"
+        title="OPOZORILO"
+        description="ALI RES ŽELIŠ ZAČETI NOVO IGRO?"
+        confirmText="DA"
+        cancelText="NE"
         onConfirm={handleConfirmNewGame}
         onCancel={() => setShowNewGameConfirmation(false)}
       />

@@ -296,10 +296,10 @@ export function GenericPoveziPareGame({ config }: Props) {
         <ConfirmDialog
           open={showNewGameConfirmation}
           onOpenChange={setShowNewGameConfirmation}
-          title="Nova igra"
-          description="Ali res želiš začeti novo igro?"
-          confirmText="Da"
-          cancelText="Ne"
+          title="OPOZORILO"
+          description="ALI RES ŽELIŠ ZAČETI NOVO IGRO?"
+          confirmText="DA"
+          cancelText="NE"
           onConfirm={handleConfirmNewGame}
           onCancel={() => setShowNewGameConfirmation(false)}
         />
@@ -353,10 +353,10 @@ export function GenericPoveziPareGame({ config }: Props) {
       <ConfirmDialog
         open={showNewGameConfirmation}
         onOpenChange={setShowNewGameConfirmation}
-        title="Nova igra"
-        description="Ali res želiš začeti novo igro?"
-        confirmText="Da"
-        cancelText="Ne"
+        title="OPOZORILO"
+        description="ALI RES ŽELIŠ ZAČETI NOVO IGRO?"
+        confirmText="DA"
+        cancelText="NE"
         onConfirm={handleConfirmNewGame}
         onCancel={() => setShowNewGameConfirmation(false)}
       />

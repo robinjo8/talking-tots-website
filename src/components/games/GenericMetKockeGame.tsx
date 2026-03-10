@@ -363,8 +363,10 @@ export function GenericMetKockeGame({
         open={showNewGameDialog}
         onOpenChange={setShowNewGameDialog}
         onConfirm={handleConfirmNewGame}
-        title="Nova igra"
-        description="Ali res želiš začeti novo igro? Napredek bo izgubljen."
+        title="OPOZORILO"
+        description="ALI RES ŽELIŠ ZAČETI NOVO IGRO?"
+        confirmText="DA"
+        cancelText="NE"
       />
 
       {/* Instructions modal */}

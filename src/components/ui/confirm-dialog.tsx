@@ -1,6 +1,6 @@
 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import { Check, X } from "lucide-react";
 import { ReactNode } from "react";
 
 export interface ConfirmDialogProps {
@@ -90,29 +90,28 @@ export function ConfirmDialog({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-center uppercase">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="text-center">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter className="gap-2">
-          <Button 
-            variant="outline" 
+        <AlertDialogFooter className="flex flex-row justify-center sm:justify-center items-center gap-4 mt-6">
+          <AlertDialogAction
             disabled={isLoading}
-            className="w-full sm:w-auto"
-            onClick={handleCancel}
-          >
-            {cancelText}
-          </Button>
-          <Button 
-            variant={confirmVariant}
-            disabled={isLoading}
-            className="w-full sm:w-auto flex items-center gap-1 transition-all duration-150"
+            className="bg-green-500 hover:bg-green-600 text-white rounded-lg px-8 py-3 text-base font-medium min-w-[100px] uppercase"
             onClick={handleConfirm}
           >
+            <Check className="w-5 h-5 mr-2" />
             {isLoading ? "Nalaganje..." : confirmText}
-            {confirmIcon && !isLoading && confirmIcon}
-          </Button>
+          </AlertDialogAction>
+          <AlertDialogCancel
+            disabled={isLoading}
+            className="bg-red-500 hover:bg-red-600 text-white border-red-500 hover:border-red-600 rounded-lg px-8 py-3 text-base font-medium min-w-[100px] uppercase"
+            onClick={handleCancel}
+          >
+            <X className="w-5 h-5 mr-2" />
+            {cancelText}
+          </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
