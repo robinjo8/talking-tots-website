@@ -2,10 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 
 export type DifficultyLevel = "nizka" | "srednja" | "visoka";
 export type RecordingDuration = 3 | 4 | 5;
+export type WordCount = 20 | 60;
 
 interface ArticulationSettings {
   difficulty: DifficultyLevel;
   recordingDuration: RecordingDuration;
+  wordCountOverrides?: Record<string, WordCount>;
 }
 
 interface ArticulationProgress {
