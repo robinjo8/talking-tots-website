@@ -33,7 +33,7 @@ export const articulationData: LetterGroup[] = [
   {
     letter: "M",
     words: [
-      { text: "MIZA", image: "miza1.webp", audio: "Miza.mp3", acceptedVariants: ["MIZA", "MISA", "MIŽA", "NIZA", "BIZA", "MIZA!", "MIZE", "MIZa", "MIZA?", "MIZO", "MITA", "NISA", "MIŠA"] },
+      { text: "MED", image: "med1.webp", audio: "Med.mp3", acceptedVariants: ["MED", "MET", "NET", "BED", "MED!", "MED?", "MEDA", "MEDU", "MEDI", "NED", "LED"] },
       { text: "GUMA", image: "guma1.webp", audio: "Guma.mp3", acceptedVariants: ["GUMA", "GULA", "DUMA", "GUNA", "BUMA", "GUMA!", "GUME", "GUMa", "GUMA?", "GUMO", "DUNA", "UMA", "KUMA"] },
       { text: "SEDEM", image: "sedem1.webp", audio: "Sedem.mp3", acceptedVariants: ["SEDEM", "SEDEM!", "SEDEM?", "SEDE", "SEDEm", "SEDET", "SEDEM-", "SEDEM…", "SEVEN", "SEDEN", "SETEM", "SEDM", "SETM", "SEDN", "ŠEDEM", "ŠEDM"] },
     ]
