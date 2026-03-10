@@ -1,77 +1,45 @@
 
 
-# Opcijski izbor 20/60 besed za preverjanje izgovorjave
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Povzetek
-Za otroke stare 5+ let dodamo možnost ročnega preklopa med 20 in 60 besedami. Privzeto ostane 60 besed. Pri izbiri 20 besed se prikaže opozorilo s potrditvijo. V info dialogu pred testom se prikaže krepko rdeče obvestilo o izbranem številu besed.
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-## Trenutno stanje
-- `wordsPerLetter` se avtomatsko nastavi na 1 (20 besed) za otroke 3-4 let, sicer 3 (60 besed)
-- Nastavitve (zahtevnost, čas snemanja) so shranjene v `localStorage` pod ključem `articulation_settings`
-- Info dialog (`ArticulationTestInfoDialog`) se prikaže pred začetkom testa
-- Admin portal (`AdminArtikulacijskiTest.tsx`) ima enako logiko
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-## Spremembe
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-### 1. Razširi `useArticulationSettings` hook
-- Dodaj nov tip `WordCount = 20 | 60`
-- Dodaj `wordCountOverride` v `ArticulationSettings` interface (shrani se v localStorage)
-- Funkcije: `setWordCountOverride(childId, count)`, `getWordCountOverride(childId)` — per-child nastavitev
-- Za otroke 3-4 let se override ignorira (vedno 20)
+**Spremembe:**
 
-### 2. Dodaj potrditveni dialog za 20 besed
-- Nova komponenta `ArticulationWordCountDialog.tsx`
-- Prikaže se v `ArticulationSettingsDialog` kot tretji stolpec ali nova sekcija
-- Opcije: 20 besed / 60 besed (privzeto)
-- Pri izbiri 20 besed → opozorilo: "Za to starostno skupino se priporoča uporaba 60 besed. Če ima otrok večje težave z govorom, lahko uporabite 20 besed." + gumb "Potrdi"
-- Nazaj na 60 → brez opozorila, le sporočilo "Za preverjanje izgovorjave se bo uporabljalo 60 besed."
-- Za otroke 3-4 let se ta sekcija ne prikaže (avtomatsko 20)
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-### 3. Posodobi `ArticulationSettingsDialog`
-- Dodaj tretjo sekcijo "Število besed" pod obstoječima dvema
-- Prikaže se samo za otroke stare 5+
-- RadioGroup z opcijama 20 in 60
-- Opozorilni dialog (AlertDialog) pri izbiri 20
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-### 4. Posodobi `ArticulationTestInfoDialog`
-- Dodaj nov prop: `childName: string`, `wordCount: number`
-- Pred sekcijo "Kaj je preverjanje izgovorjave?" dodaj:
-  ```
-  <p className="font-bold text-red-600">
-    Za otroka {childName} ste izbrali {wordCount} besed za preverjanje izgovorjave.
-  </p>
-  ```
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-### 5. Posodobi `ArtikuacijskiTest.tsx` (uporabniški portal)
-- Iz `useArticulationSettings` preberi `wordCountOverride` za izbranega otroka
-- `wordsPerLetter` logika:
-  - Otrok 3-4 let → vedno 1
-  - Otrok 5+ let + override 20 → 1
-  - Otrok 5+ let + brez override ali 60 → 3
-- Posreduj `childName` in `totalWords` (20 ali 60) v info dialog
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
 
-### 6. Posodobi `AdminArtikulacijskiTest.tsx` (admin portal)
-- Enaka logika kot uporabniški portal za wordCount override
-- Admin ima dostop do nastavitev za izbranega otroka
+**Spremembe:**
+
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
+
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
 
 ### Datoteke za spremembo
-- `src/hooks/useArticulationSettings.ts` — dodaj wordCount logiko (per-child)
-- `src/components/articulation/ArticulationSettingsDialog.tsx` — dodaj sekcijo za število besed
-- `src/components/articulation/ArticulationTestInfoDialog.tsx` — dodaj rdeče opozorilo
-- `src/pages/ArtikuacijskiTest.tsx` — uporabi wordCount override
-- `src/pages/admin/AdminArtikulacijskiTest.tsx` — uporabi wordCount override
-
-### Shranjevanje
-Shranjujemo v `localStorage` pod obstoječim ključem `articulation_settings` z dodanim poljem:
-```json
-{
-  "difficulty": "srednja",
-  "recordingDuration": 4,
-  "wordCountOverrides": {
-    "child-uuid-1": 20,
-    "child-uuid-2": 60
-  }
-}
-```
-Per-child ker imajo lahko različni otroci različne potrebe.
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 
