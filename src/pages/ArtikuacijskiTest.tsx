@@ -114,10 +114,8 @@ const ArtikuacijskiTest = () => {
 
   const childId = selectedChild?.id;
   const childAge = selectedChild?.age;
+  const childName = selectedChild?.name;
   const userId = user?.id;
-  
-  // For age group 3-4, use only 1 word per letter (20 words total)
-  const wordsPerLetter = (childAge === 3 || childAge === 4) ? 1 : 3;
   
   // Settings hook
   const {
@@ -125,7 +123,17 @@ const ArtikuacijskiTest = () => {
     setDifficulty,
     recordingDuration,
     setRecordingDuration,
+    getWordCountOverride,
+    setWordCountOverride,
   } = useArticulationSettings();
+
+  // For age group 3-4, always use 1 word per letter (20 words total)
+  // For 5+, check override; default to 3 (60 words)
+  const wordCountOverride = childId ? getWordCountOverride(childId) : null;
+  const wordsPerLetter = (childAge === 3 || childAge === 4) 
+    ? 1 
+    : (wordCountOverride === 20 ? 1 : 3);
+  const totalWordCount = wordsPerLetter === 1 ? 20 : 60;
 
   // Session manager hook - uses database for persistence (like admin portal)
   const {
