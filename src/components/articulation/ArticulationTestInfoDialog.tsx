@@ -16,7 +16,9 @@ interface ArticulationTestInfoDialogProps {
 const ArticulationTestInfoDialog = ({
   open,
   onClose,
-  onBack
+  onBack,
+  childName,
+  wordCount,
 }: ArticulationTestInfoDialogProps) => {
   const [readAgreement, setReadAgreement] = useState(false);
   const [termsAgreement, setTermsAgreement] = useState(false);
