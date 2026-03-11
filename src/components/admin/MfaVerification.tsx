@@ -96,7 +96,7 @@ export function MfaVerification({ userId, email, onVerified, onCancel }: MfaVeri
       if (data?.success) {
         toast.success('Nova koda poslana na vaš email');
         setResendCooldown(60);
-        setExpirySeconds(600);
+        setExpirySeconds(300);
         setCode('');
       } else {
         const errorMsg = data?.error || 'Napaka pri pošiljanju';
