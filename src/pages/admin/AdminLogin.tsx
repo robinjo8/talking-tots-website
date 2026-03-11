@@ -214,6 +214,7 @@ export default function AdminLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
+                    autoComplete="new-password"
                     className="h-11 pr-10"
                   />
                   <Button
