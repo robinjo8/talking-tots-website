@@ -53,8 +53,26 @@ export function MfaVerification({ userId, email, onVerified, onCancel }: MfaVeri
         body: { user_id: userId, code: otpCode },
       });
 
+      // supabase.functions.invoke returns error for non-2xx responses
+      // We need to parse the response body from the error to get the actual message
       if (error) {
-        toast.error('Napaka pri preverjanju kode');
+        try {
+          // The error context may contain the response body
+          const errorBody = typeof error === 'object' && 'context' in error 
+            ? await (error as any).context?.json?.() 
+            : null;
+          
+          if (errorBody) {
+            toast.error(errorBody.error || 'Napačna koda');
+            if (errorBody.expired || errorBody.locked) {
+              setExpirySeconds(0);
+            }
+          } else {
+            toast.error('Napaka pri preverjanju kode');
+          }
+        } catch {
+          toast.error('Napaka pri preverjanju kode');
+        }
         setCode('');
         return;
       }
