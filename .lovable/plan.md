@@ -1,29 +1,45 @@
 
 
-# Popravek: Ema ne more dodajati otrok v OŠ Test
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Problem
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-Na tabeli `logopedist_children` sta **dva BEFORE INSERT triggerja**:
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-1. `check_child_limit_trigger` → `check_organization_child_limit()` — pravilno preverja organizacijsko licenco
-2. `enforce_child_limit` → `check_logopedist_child_limit()` — preverja **samo individualno licenco**
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-Oba triggerja se izvedeta ob vsakem INSERT. Funkcija `check_organization_child_limit()` pravilno najprej preveri organizacijsko licenco in šele nato individualno kot fallback. Vendar `check_logopedist_child_limit()` vedno išče individualno licenco — in ker Ema nima individualne licence, ta trigger vrže napako.
+**Spremembe:**
 
-Janez in Špela imata obe licenci (individualno + organizacijsko), zato gresta skozi oba triggerja brez težav.
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-## Rešitev
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-Odstranimo odvečni trigger `enforce_child_limit`, ki kliče `check_logopedist_child_limit()`. Funkcija `check_organization_child_limit()` že vsebuje fallback logiko za individualno licenco, zato en trigger zadošča.
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-## Spremembe
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
 
-### Supabase migracija
+**Spremembe:**
 
-```sql
-DROP TRIGGER IF EXISTS enforce_child_limit ON public.logopedist_children;
-```
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
 
-To je ena vrstica. Po tej spremembi bo za vse člane OŠ Test (vključno z Emo) veljala organizacijska licenca s 100 otroki.
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
+
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 

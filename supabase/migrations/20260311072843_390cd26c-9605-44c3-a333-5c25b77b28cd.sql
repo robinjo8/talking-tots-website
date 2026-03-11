@@ -1,0 +1,1 @@
+DROP TRIGGER IF EXISTS enforce_child_limit ON public.logopedist_children;
