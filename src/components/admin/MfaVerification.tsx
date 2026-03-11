@@ -18,7 +18,7 @@ export function MfaVerification({ userId, email, onVerified, onCancel }: MfaVeri
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(60);
-  const [expirySeconds, setExpirySeconds] = useState(600);
+  const [expirySeconds, setExpirySeconds] = useState(300);
 
   // Countdown for resend cooldown
   useEffect(() => {
