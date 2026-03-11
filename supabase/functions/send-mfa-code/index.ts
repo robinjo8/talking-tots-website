@@ -128,7 +128,7 @@ serve(async (req: Request) => {
 
     const plainCode = generateCode();
     const hashedCode = await hashCode(plainCode);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     const { error: insertError } = await supabase.from("mfa_codes").insert({
       user_id,
@@ -169,7 +169,7 @@ serve(async (req: Request) => {
               <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #1e293b;">${plainCode}</span>
             </div>
             <p style="color: #64748b; font-size: 13px; margin-bottom: 8px;">
-              Koda velja <strong>10 minut</strong>. Če niste zahtevali te kode, prezrite to sporočilo.
+              Koda velja <strong>5 minut</strong>. Če niste zahtevali te kode, prezrite to sporočilo.
             </p>
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
             <p style="color: #94a3b8; font-size: 12px; text-align: center;">
@@ -195,7 +195,7 @@ serve(async (req: Request) => {
       JSON.stringify({
         success: true,
         message: "Koda poslana na email",
-        expires_in_seconds: 600,
+        expires_in_seconds: 300,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
