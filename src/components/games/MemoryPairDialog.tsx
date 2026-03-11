@@ -189,14 +189,10 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
           <div className="flex justify-center">
             <Button 
               onClick={handleContinue}
-              className={`gap-2 ${
-                isLastPair 
-                  ? 'bg-yellow-500 hover:bg-yellow-600 text-white max-w-32' 
-                  : 'bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28'
-              }`}
+              className="gap-2 bg-dragon-green hover:bg-dragon-green/90 text-white max-w-28"
               disabled={!hasRecorded}
             >
-              {isLastPair ? 'VZEMI ZVEZDICO' : 'NADALJUJ'}
+              NADALJUJ
             </Button>
           </div>
         </div>
