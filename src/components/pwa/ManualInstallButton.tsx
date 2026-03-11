@@ -17,7 +17,8 @@ export function ManualInstallButton() {
   const [linkCopied, setLinkCopied] = useState(false);
 
   const isGamePage = window.location.pathname.includes('/govorne-igre/');
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isModernIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || isModernIPad;
 
   if (isInstalled || isStandalone || isGamePage || !isMobile || !canInstall) return null;
 
