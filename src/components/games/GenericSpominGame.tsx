@@ -124,14 +124,42 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
     navigate(effectiveBackPath);
   };
 
+  // Show BRAVO dialog when game completes (after last pair dialog closes)
+  useEffect(() => {
+    if (gameCompleted && !showNewGameButton) {
+      // Small delay for smooth transition after pair dialog closes
+      const timer = setTimeout(() => setShowBravoDialog(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameCompleted, showNewGameButton]);
+
+  const handleBravoClose = async () => {
+    await handleClaimStar();
+    onGameComplete?.();
+    setShowBravoDialog(false);
+    setShowNewGameButton(true);
+  };
+
+  const handleBravoXClose = () => {
+    setShowBravoConfirm(true);
+  };
+
+  const handleConfirmBravoClose = () => {
+    setShowBravoConfirm(false);
+    setShowBravoDialog(false);
+    setShowNewGameButton(true);
+  };
+
   const handleNewGame = () => {
     setMenuOpen(false);
     setShowNewGameButton(false);
+    setShowBravoDialog(false);
     resetGame();
   };
 
   const handleNewGameDirect = () => {
     setShowNewGameButton(false);
+    setShowBravoDialog(false);
     resetGame();
   };
 
