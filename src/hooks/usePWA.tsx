@@ -43,7 +43,8 @@ export function usePWA(): PWAState & PWAActions {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [swRegistration, setSwRegistration] = useState<ServiceWorkerRegistration | null>(null);
 
-  const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isModernIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || isModernIPad;
   const isAndroidDevice = /Android/.test(navigator.userAgent);
   const isInSafari = /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|OPiOS|FxiOS/.test(navigator.userAgent);
   const isIOSSafari = isIOSDevice && isInSafari;
@@ -178,8 +179,8 @@ export function usePWA(): PWAState & PWAActions {
   const canInstall = useMemo(() => {
     if (isInstalled || isStandalone) return false;
     if (isDismissed) return false;
-    return isInstallable || isIOSDevice;
-  }, [isInstallable, isInstalled, isStandalone, isDismissed, isIOSDevice]);
+    return isInstallable || isIOSDevice || isAndroidDevice;
+  }, [isInstallable, isInstalled, isStandalone, isDismissed, isIOSDevice, isAndroidDevice]);
 
   return {
     isInstallable,

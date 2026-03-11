@@ -1,50 +1,45 @@
 
 
-# Popravek: Gumb "Prenesi aplikacijo" se ne prikaže na Android tablicah in modernih iPadih
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Problem
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-Dva ločena problema:
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-### 1. Android tablica: ni fallbacka brez `beforeinstallprompt`
-`canInstall` logika (vrstica 181 v `usePWA.tsx`):
-```typescript
-return isInstallable || isIOSDevice;
-```
-Za Android naprave `canInstall` zahteva `isInstallable`, ki je `true` samo če brskalnik sproži event `beforeinstallprompt`. Če ta event ne sproži (npr. uporabnik je že zavrnila prompt, brskalnik ne izpolnjuje pogojev, ali je to Samsung Internet browser), je `canInstall = false` in gumb se sploh ne prikaže. Za iOS obstaja fallback (`isIOSDevice`), za Android pa ne.
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-### 2. Moderni iPadi (iPadOS 13+): napačna zaznava
-Moderni iPadi se v user agent stringu javljajo kot `MacIntel` brez besede "iPad". Zato:
-- `isIOSDevice` v `usePWA.tsx` je `false`
-- `isMobile` v `ManualInstallButton.tsx` je `false`
-- Gumb se ne prikaže
+**Spremembe:**
 
-## Rešitev
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-### `src/hooks/usePWA.tsx`
-1. Dodaj zaznavo modernih iPadov:
-   ```typescript
-   const isModernIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-   const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) || isModernIPad;
-   ```
-2. Dodaj novo stanje `isTablet` za Android tablete:
-   ```typescript
-   const isTablet = (isAndroidDevice && Math.min(screen.width, screen.height) >= 600) || isModernIPad;
-   ```
-3. Posodobi `canInstall` da vključi Android naprave kot fallback (za prikaz ročnih navodil):
-   ```typescript
-   return isInstallable || isIOSDevice || isAndroidDevice;
-   ```
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-### `src/components/pwa/ManualInstallButton.tsx`
-1. Posodobi `isMobile` da vključi moderne iPade:
-   ```typescript
-   const isModernIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || isModernIPad;
-   ```
-2. V `handleInstallClick`: za Android brez nativnega prompta (`isAndroidDevice && !isInstallable`) prikaži ročna navodila (obstoječi modal z navodili za meni → "Namesti aplikacijo") namesto da ne naredi nič.
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-## Datoteke za spremembo
-- `src/hooks/usePWA.tsx` — zaznava iPadov, `canInstall` vključi Android fallback
-- `src/components/pwa/ManualInstallButton.tsx` — zaznava iPadov v `isMobile`, Android fallback na ročna navodila
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+
+**Spremembe:**
+
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
+
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 
