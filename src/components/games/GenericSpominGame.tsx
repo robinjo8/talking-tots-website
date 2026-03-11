@@ -30,6 +30,8 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showBravoDialog, setShowBravoDialog] = useState(false);
+  const [showBravoConfirm, setShowBravoConfirm] = useState(false);
   
   // Mobile detection and orientation state
   const [isTouchDevice, setIsTouchDevice] = useState(false);
