@@ -1,35 +1,45 @@
 
 
-# Fix: Landscape overlay ne deluje na iOS za Ponovi Poved
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Problem
-Ko uporabnik na iPhonu obrne telefon v landscape, `useIsMobile()` vrne `false` (ker `window.innerWidth` postane > 768px). Zato pogoj `isLand && isMobile` na vrstici 247 nikoli ni `true` v landscape načinu in overlay se ne prikaže.
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-## Rešitev
-Namesto da se zanašamo na `useIsMobile()` (ki temelji na širini okna), uporabimo **touch detection + iOS detection** za določanje ali gre za mobilno napravo. To zagotovi, da se overlay prikaže tudi ko je telefon obrnjen v landscape.
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-## Spremembe
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-### `src/components/games/PonoviPovedGame.tsx`
+**Spremembe:**
 
-1. Dodamo state `isTouchDevice` z synchronous init (kot per projekt konvencija):
-```ts
-const [isTouchDevice] = useState(() => {
-  if (typeof window === 'undefined') return false;
-  const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  const isSmallDevice = Math.min(window.innerWidth, window.innerHeight) < 768;
-  return hasTouch && isSmallDevice;
-});
-```
-Uporabimo `Math.min(width, height)` — to vrne krajšo stranico (portrait width), ki je vedno < 768 na telefonih, ne glede na orientacijo.
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-2. V landscape detection zamenjamo `isMobile` z `isTouchDevice`:
-```ts
-const isLand = window.innerWidth > window.innerHeight;
-setIsLandscape(isLand && isTouchDevice);
-```
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-3. `isMobile` ohranimo za layout odločitve (mobile vs desktop grid), `isTouchDevice` pa uporabimo samo za landscape overlay detection.
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-To je minimalna sprememba — 3 vrstice kode.
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+
+**Spremembe:**
+
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
+
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 
