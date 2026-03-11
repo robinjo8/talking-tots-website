@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
+import { useLogopedistChild } from "@/hooks/useLogopedistChildren";
+import { getAgeGroup } from "@/utils/ageUtils";
 
 const sestavljankeLetters = [
   { id: "s", letter: "S", description: "Sestavi sliko z glasom S", image: "zmajcek_crka_S.png" },
