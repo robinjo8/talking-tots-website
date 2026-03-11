@@ -179,8 +179,8 @@ export function usePWA(): PWAState & PWAActions {
   const canInstall = useMemo(() => {
     if (isInstalled || isStandalone) return false;
     if (isDismissed) return false;
-    return isInstallable || isIOSDevice;
-  }, [isInstallable, isInstalled, isStandalone, isDismissed, isIOSDevice]);
+    return isInstallable || isIOSDevice || isAndroidDevice;
+  }, [isInstallable, isInstalled, isStandalone, isDismissed, isIOSDevice, isAndroidDevice]);
 
   return {
     isInstallable,

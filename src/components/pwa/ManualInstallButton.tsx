@@ -42,6 +42,12 @@ export function ManualInstallButton() {
       return;
     }
 
+    // Android without native prompt — show manual instructions
+    if (isAndroidDevice && !isInstallable) {
+      setShowInstructions(true);
+      return;
+    }
+
     // iOS but NOT Safari
     if (isIOSNonSafari) {
       setShowSafariModal(true);
