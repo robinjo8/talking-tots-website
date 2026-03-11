@@ -228,6 +228,7 @@ export default function AdminRegister() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={isLoading}
+                  autoComplete="new-password"
                   className="h-11"
                 />
               </div>
