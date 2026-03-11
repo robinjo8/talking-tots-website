@@ -10,7 +10,7 @@ interface MemoryPairDialogProps {
   onClose: () => void;
   onContinue: () => void;
   onUnmatch: () => void;
-  onStarClaimed?: () => void;
+  onStarClaimed?: () => void; // kept for backward compatibility but no longer used in dialog
   pairNumber: number;
   totalPairs: number;
   imageUrl: string | null;
