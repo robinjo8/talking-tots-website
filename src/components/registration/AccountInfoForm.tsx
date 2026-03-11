@@ -79,6 +79,7 @@ export function AccountInfoForm({
           placeholder="Ustvarite geslo"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
           className="rounded-md text-base"
           required
         />
