@@ -169,7 +169,7 @@ serve(async (req: Request) => {
               <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #1e293b;">${plainCode}</span>
             </div>
             <p style="color: #64748b; font-size: 13px; margin-bottom: 8px;">
-              Koda velja <strong>10 minut</strong>. Če niste zahtevali te kode, prezrite to sporočilo.
+              Koda velja <strong>5 minut</strong>. Če niste zahtevali te kode, prezrite to sporočilo.
             </p>
             <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
             <p style="color: #94a3b8; font-size: 12px; text-align: center;">
