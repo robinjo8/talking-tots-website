@@ -300,6 +300,39 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
           onClose={() => setShowInstructions(false)}
           type="spomin"
         />
+
+        {/* BRAVO Dialog */}
+        <Dialog open={showBravoDialog} onOpenChange={(open) => !open && handleBravoXClose()}>
+          <DialogContent className="sm:max-w-md">
+            <div className="text-center py-6">
+              <h1 className="text-5xl font-bold text-dragon-green mb-6">
+                BRAVO!
+              </h1>
+              <img
+                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+                alt="Zmajček"
+                className="w-48 h-48 object-contain mx-auto mb-6"
+              />
+              <Button
+                onClick={handleBravoClose}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 text-lg"
+              >
+                VZEMI ZVEZDICO
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <ConfirmDialog
+          open={showBravoConfirm}
+          onOpenChange={setShowBravoConfirm}
+          title="OPOZORILO"
+          description="ALI RES ŽELIŠ ZAPRETI OKNO? NE BOŠ PREJEL ZVEZDICE."
+          confirmText="DA"
+          cancelText="NE"
+          onConfirm={handleConfirmBravoClose}
+          onCancel={() => setShowBravoConfirm(false)}
+        />
       </div>
     );
   }
