@@ -1,45 +1,74 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Popravek: Igre na admin strani ne upoštevajo starosti otroka
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Problem
+Na admin strani vseh 4 iger z različicami po starosti (Sestavljanke, Drsna sestavljanka, Zaporedja, Igra ujemanja) navigirajo na URL brez starostnega sufiksa (npr. `/s` namesto `/s56`). To pomeni, da vsi otroci dobijo različico za starost 3-4 let, ne glede na dejansko starost.
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+Na uporabniškem portalu te igre pravilno dodajo sufiks glede na starost otroka: `/s` (3-4), `/s56` (5-6), `/s78` (7-8), `/s910` (9-10).
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+## Katere igre so prizadete
+Samo 4 igre imajo starostne različice:
+1. **Sestavljanke** (`AdminSestavljankeGames.tsx`)
+2. **Drsna sestavljanka** (`AdminDrsnaSestavljankaGames.tsx`)
+3. **Zaporedja** (`AdminZaporedjaGames.tsx`)
+4. **Igra ujemanja** (`AdminIgraUjemanjaGames.tsx`)
 
-**Spremembe:**
+Preostalih 7 iger (Spomin, Bingo, Kolo besed, Labirint, Met kocke, Ponovi poved, Kače) **nima** starostnih različic in ne potrebujejo sprememb.
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+## Rešitev
+V vsakem od 4 prizadetih admin game selection komponent:
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+1. Uvozimo `useLogopedistChild` hook za pridobitev starosti otroka iz baze
+2. Uvozimo `getAgeGroup` za pretvorbo starosti v starostno skupino
+3. V `handleLetterClick` dodamo ustrezen sufiks glede na starostno skupino
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+### Logika sufiksa
+```text
+Starost 3-4 → brez sufiksa (npr. /s)
+Starost 5-6 → sufiks "56" (npr. /s56)
+Starost 7-8 → sufiks "78" (npr. /s78)
+Starost 9-10 → sufiks "910" (npr. /s910)
+```
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+## Spremembe (4 datoteke)
 
-**Spremembe:**
+### 1. `src/pages/admin/games/AdminSestavljankeGames.tsx`
+- Uvoz `useLogopedistChild` in `getAgeGroup`
+- Pridobi otrokovo starost prek `useLogopedistChild(childId)`
+- V `handleLetterClick`: izračunaj sufiks in ga dodaj na URL
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+### 2. `src/pages/admin/games/AdminDrsnaSestavljankaGames.tsx`
+- Enaka sprememba kot zgoraj
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
+### 3. `src/pages/admin/games/AdminZaporedjaGames.tsx`
+- Enaka sprememba kot zgoraj
 
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+### 4. `src/pages/admin/games/AdminIgraUjemanjaGames.tsx`
+- Enaka sprememba kot zgoraj
 
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+### Primer spremembe (enak vzorec za vse 4)
+```typescript
+import { useLogopedistChild } from "@/hooks/useLogopedistChildren";
+import { getAgeGroup } from "@/utils/ageUtils";
 
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+// V komponenti:
+const { data: child } = useLogopedistChild(childId);
+
+const getAgeSuffix = (): string => {
+  if (!child?.age) return '';
+  const ageGroup = getAgeGroup(child.age);
+  const suffixMap: Record<string, string> = {
+    '3-4': '', '5-6': '56', '7-8': '78', '9-10': '910'
+  };
+  return suffixMap[ageGroup] || '';
+};
+
+const handleLetterClick = (letterId: string) => {
+  const suffix = getAgeSuffix();
+  navigate(`/admin/children/${childId}/games/[game-type]/${letterId}${suffix}`);
+};
+```
+
+Nobenih sprememb baze, routerjev ali game komponent ni potrebnih — admin routerji že pravilno obravnavajo URL-je s sufiksi.
 
