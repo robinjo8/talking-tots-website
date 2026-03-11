@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useNavigate } from "react-router-dom";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
