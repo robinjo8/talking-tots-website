@@ -293,31 +293,6 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
           <></>
         </MemoryExitConfirmationDialog>
 
-        {/* Game completed overlay - Bingo style */}
-        {gameCompleted && !showNewGameButton && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
-              <h1 className="text-5xl font-bold text-dragon-green mb-6">
-                BRAVO!
-              </h1>
-              <img
-                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
-                alt="Zmajček"
-                className="w-48 h-48 object-contain mx-auto mb-6"
-              />
-              <button
-                onClick={async () => {
-                  await handleClaimStar();
-                  onGameComplete?.();
-                  setShowNewGameButton(true);
-                }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
-              >
-                VZEMI ZVEZDICO
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Instructions modal */}
         <InstructionsModal
