@@ -195,7 +195,7 @@ serve(async (req: Request) => {
       JSON.stringify({
         success: true,
         message: "Koda poslana na email",
-        expires_in_seconds: 600,
+        expires_in_seconds: 300,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
