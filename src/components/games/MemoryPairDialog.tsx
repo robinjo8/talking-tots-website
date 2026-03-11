@@ -83,9 +83,6 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   };
 
   const handleContinue = () => {
-    if (isLastPair) {
-      onStarClaimed?.();
-    }
     onContinue();
   };
 
