@@ -75,6 +75,7 @@ export function PasswordChangeSection() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Vnesi novo geslo"
+              autoComplete="new-password"
             />
           </div>
           
