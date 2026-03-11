@@ -87,6 +87,7 @@ export function PasswordChangeSection() {
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
               placeholder="Ponovi novo geslo"
+              autoComplete="new-password"
             />
           </div>
           

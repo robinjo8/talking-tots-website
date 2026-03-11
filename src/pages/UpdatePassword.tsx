@@ -100,6 +100,7 @@ export default function UpdatePassword() {
               placeholder="Ponovno vnesite novo geslo"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              autoComplete="new-password"
               className="rounded-md text-base"
               required
             />
