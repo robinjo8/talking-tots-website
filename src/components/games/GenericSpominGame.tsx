@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useNavigate } from "react-router-dom";
 import { MemoryGrid } from "@/components/games/MemoryGrid";
 import { MemoryProgressIndicator } from "@/components/games/MemoryProgressIndicator";
@@ -27,6 +30,8 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNewGameButton, setShowNewGameButton] = useState(false);
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showBravoDialog, setShowBravoDialog] = useState(false);
+  const [showBravoConfirm, setShowBravoConfirm] = useState(false);
   
   // Mobile detection and orientation state
   const [isTouchDevice, setIsTouchDevice] = useState(false);
@@ -119,14 +124,42 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
     navigate(effectiveBackPath);
   };
 
+  // Show BRAVO dialog when game completes (after last pair dialog closes)
+  useEffect(() => {
+    if (gameCompleted && !showNewGameButton) {
+      // Small delay for smooth transition after pair dialog closes
+      const timer = setTimeout(() => setShowBravoDialog(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameCompleted, showNewGameButton]);
+
+  const handleBravoClose = async () => {
+    await handleClaimStar();
+    onGameComplete?.();
+    setShowBravoDialog(false);
+    setShowNewGameButton(true);
+  };
+
+  const handleBravoXClose = () => {
+    setShowBravoConfirm(true);
+  };
+
+  const handleConfirmBravoClose = () => {
+    setShowBravoConfirm(false);
+    setShowBravoDialog(false);
+    setShowNewGameButton(true);
+  };
+
   const handleNewGame = () => {
     setMenuOpen(false);
     setShowNewGameButton(false);
+    setShowBravoDialog(false);
     resetGame();
   };
 
   const handleNewGameDirect = () => {
     setShowNewGameButton(false);
+    setShowBravoDialog(false);
     resetGame();
   };
 
@@ -260,10 +293,18 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
           <></>
         </MemoryExitConfirmationDialog>
 
-        {/* Game completed overlay - Bingo style */}
-        {gameCompleted && !showNewGameButton && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
+
+        {/* Instructions modal */}
+        <InstructionsModal
+          isOpen={showInstructions}
+          onClose={() => setShowInstructions(false)}
+          type="spomin"
+        />
+
+        {/* BRAVO Dialog */}
+        <Dialog open={showBravoDialog} onOpenChange={(open) => !open && handleBravoXClose()}>
+          <DialogContent className="sm:max-w-md">
+            <div className="text-center py-6">
               <h1 className="text-5xl font-bold text-dragon-green mb-6">
                 BRAVO!
               </h1>
@@ -272,25 +313,25 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
                 alt="Zmajček"
                 className="w-48 h-48 object-contain mx-auto mb-6"
               />
-              <button
-                onClick={async () => {
-                  await handleClaimStar();
-                  onGameComplete?.();
-                  setShowNewGameButton(true);
-                }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
+              <Button
+                onClick={handleBravoClose}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 text-lg"
               >
                 VZEMI ZVEZDICO
-              </button>
+              </Button>
             </div>
-          </div>
-        )}
+          </DialogContent>
+        </Dialog>
 
-        {/* Instructions modal */}
-        <InstructionsModal
-          isOpen={showInstructions}
-          onClose={() => setShowInstructions(false)}
-          type="spomin"
+        <ConfirmDialog
+          open={showBravoConfirm}
+          onOpenChange={setShowBravoConfirm}
+          title="OPOZORILO"
+          description="ALI RES ŽELIŠ ZAPRETI OKNO? NE BOŠ PREJEL ZVEZDICE."
+          confirmText="DA"
+          cancelText="NE"
+          onConfirm={handleConfirmBravoClose}
+          onCancel={() => setShowBravoConfirm(false)}
         />
       </div>
     );
@@ -401,32 +442,6 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
           <></>
         </MemoryExitConfirmationDialog>
 
-        {/* Game completed overlay - Bingo style */}
-        {gameCompleted && !showNewGameButton && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-2xl p-8 text-center max-w-md mx-4">
-              <h1 className="text-5xl font-bold text-dragon-green mb-6">
-                BRAVO!
-              </h1>
-              <img
-                src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
-                alt="Zmajček"
-                className="w-48 h-48 object-contain mx-auto mb-6"
-              />
-              <button
-                onClick={async () => {
-                  await handleClaimStar();
-                  onGameComplete?.();
-                  setShowNewGameButton(true);
-                }}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 rounded-lg text-lg transition-colors"
-              >
-                VZEMI ZVEZDICO
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Instructions modal */}
         <InstructionsModal
           isOpen={showInstructions}
@@ -434,6 +449,39 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
           type="spomin"
         />
       </div>
+
+      {/* BRAVO Dialog - shared between mobile and desktop */}
+      <Dialog open={showBravoDialog} onOpenChange={(open) => !open && handleBravoXClose()}>
+        <DialogContent className="sm:max-w-md">
+          <div className="text-center py-6">
+            <h1 className="text-5xl font-bold text-dragon-green mb-6">
+              BRAVO!
+            </h1>
+            <img
+              src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_11.webp"
+              alt="Zmajček"
+              className="w-48 h-48 object-contain mx-auto mb-6"
+            />
+            <Button
+              onClick={handleBravoClose}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-8 py-3 text-lg"
+            >
+              VZEMI ZVEZDICO
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <ConfirmDialog
+        open={showBravoConfirm}
+        onOpenChange={setShowBravoConfirm}
+        title="OPOZORILO"
+        description="ALI RES ŽELIŠ ZAPRETI OKNO? NE BOŠ PREJEL ZVEZDICE."
+        confirmText="DA"
+        cancelText="NE"
+        onConfirm={handleConfirmBravoClose}
+        onCancel={() => setShowBravoConfirm(false)}
+      />
     </div>
   );
 }
