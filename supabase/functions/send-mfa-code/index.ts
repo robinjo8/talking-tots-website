@@ -128,7 +128,7 @@ serve(async (req: Request) => {
 
     const plainCode = generateCode();
     const hashedCode = await hashCode(plainCode);
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     const { error: insertError } = await supabase.from("mfa_codes").insert({
       user_id,
