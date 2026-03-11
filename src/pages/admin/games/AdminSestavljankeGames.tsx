@@ -1,6 +1,8 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
+import { useLogopedistChild } from "@/hooks/useLogopedistChildren";
+import { getAgeGroup } from "@/utils/ageUtils";
 
 const sestavljankeLetters = [
   { id: "s", letter: "S", description: "Sestavi sliko z glasom S", image: "zmajcek_crka_S.png" },
@@ -19,9 +21,18 @@ export default function AdminSestavljankeGames() {
   const navigate = useNavigate();
   const { childId } = useParams<{ childId: string }>();
   const isMobile = useIsMobile();
+  const { data: child } = useLogopedistChild(childId);
+
+  const getAgeSuffix = (): string => {
+    if (!child?.age) return '';
+    const ageGroup = getAgeGroup(child.age);
+    const suffixMap: Record<string, string> = { '3-4': '', '5-6': '56', '7-8': '78', '9-10': '910' };
+    return suffixMap[ageGroup] || '';
+  };
 
   const handleLetterClick = (letterId: string) => {
-    navigate(`/admin/children/${childId}/games/sestavljanke/${letterId}`);
+    const suffix = getAgeSuffix();
+    navigate(`/admin/children/${childId}/games/sestavljanke/${letterId}${suffix}`);
   };
 
   return (
