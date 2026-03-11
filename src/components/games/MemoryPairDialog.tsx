@@ -38,7 +38,7 @@ export const MemoryPairDialog: React.FC<MemoryPairDialogProps> = ({
   const { playAudio } = useAudioPlayback();
   const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
-  const isLastPair = pairNumber === totalPairs;
+  // Last pair no longer has special handling - BRAVO dialog is shown separately
 
   // Cleanup on dialog close
   useEffect(() => {
