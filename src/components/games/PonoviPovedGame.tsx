@@ -240,11 +240,19 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const isMobile = useIsMobile();
   const [isLandscape, setIsLandscape] = useState(false);
   
+  // Detect touch device using shortest screen dimension (stable across orientations)
+  const [isTouchDevice] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const isSmallDevice = Math.min(window.innerWidth, window.innerHeight) < 768;
+    return hasTouch && isSmallDevice;
+  });
+  
   // Detect landscape orientation on mobile (especially iOS where orientation lock doesn't work)
   useEffect(() => {
     const checkOrientation = () => {
       const isLand = window.innerWidth > window.innerHeight;
-      setIsLandscape(isLand && isMobile);
+      setIsLandscape(isLand && isTouchDevice);
     };
     
     checkOrientation();
@@ -255,7 +263,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       window.removeEventListener('resize', checkOrientation);
       window.removeEventListener('orientationchange', checkOrientation);
     };
-  }, [isMobile]);
+  }, [isTouchDevice]);
   
   // Select positions based on device
   const STONE_POSITIONS = isMobile ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
