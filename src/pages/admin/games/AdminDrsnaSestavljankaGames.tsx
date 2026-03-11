@@ -21,9 +21,18 @@ export default function AdminDrsnaSestavljankaGames() {
   const navigate = useNavigate();
   const { childId } = useParams<{ childId: string }>();
   const isMobile = useIsMobile();
+  const { data: child } = useLogopedistChild(childId);
+
+  const getAgeSuffix = (): string => {
+    if (!child?.age) return '';
+    const ageGroup = getAgeGroup(child.age);
+    const suffixMap: Record<string, string> = { '3-4': '', '5-6': '56', '7-8': '78', '9-10': '910' };
+    return suffixMap[ageGroup] || '';
+  };
 
   const handleLetterClick = (letterId: string) => {
-    navigate(`/admin/children/${childId}/games/drsna-sestavljanka/${letterId}`);
+    const suffix = getAgeSuffix();
+    navigate(`/admin/children/${childId}/games/drsna-sestavljanka/${letterId}${suffix}`);
   };
 
   return (
