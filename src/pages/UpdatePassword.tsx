@@ -86,6 +86,7 @@ export default function UpdatePassword() {
               placeholder="Vnesite novo geslo"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="new-password"
               className="rounded-md text-base"
               required
             />
