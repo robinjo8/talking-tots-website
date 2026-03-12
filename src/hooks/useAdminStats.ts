@@ -41,7 +41,8 @@ export function useAdminStats() {
         // Organization stats - all tests in the system
         const { count: orgTotalCount } = await supabase
           .from('articulation_test_sessions')
-          .select('*', { count: 'exact', head: true });
+          .select('*', { count: 'exact', head: true })
+          .eq('is_completed', true);
 
         // Organization - pending tests (status = pending)
         const { count: orgPendingCount } = await supabase
