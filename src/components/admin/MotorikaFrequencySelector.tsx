@@ -31,8 +31,8 @@ export function formatMotorikaFrequencyText(
       return 'Priporočamo vaje za motoriko govoril vsak dan.';
     case 'weekly':
       return 'Priporočamo vaje za motoriko govoril enkrat na teden.';
-    case 'monthly':
-      return 'Priporočamo vaje za motoriko govoril enkrat na mesec.';
+    case 'not_needed':
+      return 'Vaje za motoriko govoril niso potrebne.';
     case 'custom': {
       if (!customCount || !customUnit) return '';
       const unitText = customUnit === 'day' ? 'dan' : customUnit === 'week' ? 'teden' : 'mesec';
