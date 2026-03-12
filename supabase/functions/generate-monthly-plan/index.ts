@@ -23,8 +23,7 @@ const LETTER_URL_MAP: Record<string, string> = {
 };
 
 const SUPPORTED_LETTERS = Object.keys(LETTER_URL_MAP);
-const DAY_NAMES = ["Nedelja", "Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota"];
-const TOTAL_PLAN_DAYS = 90;
+const TOTAL_SETS = 30;
 
 // Games split by position
 const START_GAMES = [
@@ -76,12 +75,6 @@ function formatDate(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
-function addDays(date: Date, days: number): Date {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return result;
-}
-
 interface LetterPosition {
   letter: string;
   position: "start" | "middle-end";
@@ -108,13 +101,10 @@ function buildGameCombinations(letterPositions: LetterPosition[], ageGroup: stri
     if (!SUPPORTED_LETTERS.includes(lp.letter)) continue;
     const urlKey = LETTER_URL_MAP[lp.letter];
 
-    // Determine which games to include based on position
     let games: GameDef[];
     if (lp.position === "start") {
-      // Only start games
       games = [...START_GAMES, ...START_AGE_GAMES];
     } else {
-      // middle-end: ALL games (start + middle-end)
       games = [...START_GAMES, ...START_AGE_GAMES, ...MIDDLE_END_GAMES];
     }
 
@@ -135,56 +125,70 @@ interface MotorikaConfig {
   unit?: "day" | "week" | "month" | null;
 }
 
-function shouldIncludeMotorikaOnDay(dayIndex: number, totalDays: number, motorika: MotorikaConfig): boolean {
+/**
+ * Determine if motorika should be included in a given set.
+ * For set-based system: 
+ * - daily = every set
+ * - weekly = every 7th set (sets 0, 7, 14, 21, 28)
+ * - monthly = only set 0
+ * - custom = spread across sets
+ */
+function shouldIncludeMotorikaInSet(setIndex: number, motorika: MotorikaConfig): boolean {
   if (!motorika.type || motorika.type === "daily") return true;
-  if (motorika.type === "weekly") return dayIndex % 7 === 0;
-  if (motorika.type === "monthly") return dayIndex % 30 === 0;
+  if (motorika.type === "weekly") return setIndex % 7 === 0;
+  if (motorika.type === "monthly") return setIndex === 0;
   if (motorika.type === "custom" && motorika.count && motorika.unit) {
-    if (motorika.unit === "day") return true; // X times per day = every day
+    if (motorika.unit === "day") return true;
     if (motorika.unit === "week") {
-      // Spread X times across 7 days
       const interval = Math.max(1, Math.floor(7 / motorika.count));
-      return dayIndex % interval === 0 && (dayIndex % 7) / interval < motorika.count;
+      return setIndex % interval === 0;
     }
     if (motorika.unit === "month") {
       const interval = Math.max(1, Math.floor(30 / motorika.count));
-      return dayIndex % interval === 0;
+      return setIndex % interval === 0;
     }
   }
   return true;
 }
 
-interface PlanDay {
-  date: string;
-  dayName: string;
-  activities: {
-    type: "motorika" | "igra";
-    title: string;
-    path: string;
-    letter?: string;
-    gameId?: string;
-  }[];
+interface PlanSetActivity {
+  type: "motorika" | "igra";
+  title: string;
+  path: string;
+  letter?: string;
+  gameId?: string;
 }
 
-function generateDeterministicPlan(startDate: Date, totalDays: number, combinations: GameCombination[], motorika: MotorikaConfig): PlanDay[] {
-  const days: PlanDay[] = [];
+interface PlanSet {
+  setNumber: number;
+  activities: PlanSetActivity[];
+}
+
+function generateSetBasedPlan(totalSets: number, combinations: GameCombination[], motorika: MotorikaConfig): PlanSet[] {
+  const sets: PlanSet[] = [];
   let combinationIndex = 0;
 
-  for (let i = 0; i < totalDays; i++) {
-    const currentDate = addDays(startDate, i);
-    const dayName = DAY_NAMES[currentDate.getDay()];
-    const activities: PlanDay["activities"] = [];
+  for (let i = 0; i < totalSets; i++) {
+    const activities: PlanSetActivity[] = [];
+    const includeMotorikaInThisSet = shouldIncludeMotorikaInSet(i, motorika);
+    
+    // Determine how many games to include
+    // With motorika: 1 motorika + 4 games = 5 activities
+    // Without motorika: 5 games
+    const targetGames = includeMotorikaInThisSet ? 4 : 5;
 
-    // Add motorika based on frequency
-    if (shouldIncludeMotorikaOnDay(i, totalDays, motorika)) {
-      activities.push({ type: "motorika", title: "Vaje za motoriko govoril", path: "/govorno-jezikovne-vaje/vaje-motorike-govoril" });
+    if (includeMotorikaInThisSet) {
+      activities.push({ 
+        type: "motorika", 
+        title: "Vaje za motoriko govoril", 
+        path: "/govorno-jezikovne-vaje/vaje-motorike-govoril" 
+      });
     }
 
     if (combinations.length > 0) {
       const usedGameIds = new Set<string>();
       let attempts = 0;
       const maxAttempts = combinations.length * 2;
-      const targetGames = 4;
 
       while (activities.filter(a => a.type === "igra").length < targetGames && attempts < maxAttempts) {
         const combo = combinations[combinationIndex % combinations.length];
@@ -192,25 +196,54 @@ function generateDeterministicPlan(startDate: Date, totalDays: number, combinati
         attempts++;
         if (!usedGameIds.has(combo.gameId)) {
           usedGameIds.add(combo.gameId);
-          activities.push({ type: "igra", title: combo.gameName, path: combo.path, letter: combo.letter, gameId: combo.gameId });
+          activities.push({ 
+            type: "igra", 
+            title: combo.gameName, 
+            path: combo.path, 
+            letter: combo.letter, 
+            gameId: combo.gameId 
+          });
         }
       }
 
+      // Fill remaining slots if needed
       if (activities.filter(a => a.type === "igra").length < targetGames) {
         for (const combo of combinations) {
           if (activities.filter(a => a.type === "igra").length >= targetGames) break;
           if (!usedGameIds.has(combo.gameId)) {
             usedGameIds.add(combo.gameId);
-            activities.push({ type: "igra", title: combo.gameName, path: combo.path, letter: combo.letter, gameId: combo.gameId });
+            activities.push({ 
+              type: "igra", 
+              title: combo.gameName, 
+              path: combo.path, 
+              letter: combo.letter, 
+              gameId: combo.gameId 
+            });
           }
+        }
+      }
+      
+      // If still not enough (fewer unique games than slots), reuse combinations
+      if (activities.filter(a => a.type === "igra").length < targetGames) {
+        let fillIdx = 0;
+        while (activities.filter(a => a.type === "igra").length < targetGames && fillIdx < combinations.length) {
+          const combo = combinations[fillIdx];
+          fillIdx++;
+          activities.push({ 
+            type: "igra", 
+            title: combo.gameName, 
+            path: combo.path, 
+            letter: combo.letter, 
+            gameId: combo.gameId 
+          });
         }
       }
     }
 
-    days.push({ date: formatDate(currentDate), dayName, activities });
+    sets.push({ setNumber: i + 1, activities });
   }
 
-  return days;
+  return sets;
 }
 
 serve(async (req) => {
@@ -312,10 +345,8 @@ serve(async (req) => {
     let motorikaConfig: MotorikaConfig = { type: "daily" };
 
     if (reportDetails?.letters && Array.isArray(reportDetails.letters)) {
-      // New format with positions
       letterPositions = reportDetails.letters;
     } else if (report.recommended_letters && Array.isArray(report.recommended_letters)) {
-      // Legacy format - default to 'start'
       letterPositions = report.recommended_letters.map((l: string) => ({ letter: l, position: "start" as const }));
     }
 
@@ -358,18 +389,15 @@ serve(async (req) => {
       });
     }
 
-    const startDate = new Date(report.created_at);
-    startDate.setUTCHours(0, 0, 0, 0);
-    const endDate = addDays(startDate, TOTAL_PLAN_DAYS - 1);
-    const startDateStr = formatDate(startDate);
-    const endDateStr = formatDate(endDate);
-
-    console.log(`Plan period: ${startDateStr} to ${endDateStr} (${TOTAL_PLAN_DAYS} days)`);
+    const now = new Date();
+    const startDateStr = formatDate(now);
+    // expires_at = 90 days from now (safety net)
+    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
     const combinations = buildGameCombinations(letterPositions, ageGroup);
-    const days = generateDeterministicPlan(startDate, TOTAL_PLAN_DAYS, combinations, motorikaConfig);
+    const sets = generateSetBasedPlan(TOTAL_SETS, combinations, motorikaConfig);
 
-    console.log(`Generated ${days.length} days with ${combinations.length} game combinations`);
+    console.log(`Generated ${sets.length} sets with ${combinations.length} game combinations`);
 
     const childNameCapitalized = child.name.charAt(0).toUpperCase() + child.name.slice(1);
     const isFemale = ["female", "F", "f"].includes(child.gender || "");
@@ -382,6 +410,7 @@ serve(async (req) => {
         : `glasove ${targetLetters.slice(0, -1).join(", ")} in ${targetLetters[targetLetters.length - 1]}`;
     const summary = `Hej ${childNameCapitalized}! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš ${vadil} ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in igrice! Zbiraj zvezdice in postani ${sampion}!`;
 
+    // Archive any existing active/generating plans
     await supabase
       .from("child_monthly_plans")
       .update({ status: "archived" })
@@ -389,7 +418,12 @@ serve(async (req) => {
       .in("status", ["active", "generating"]);
 
     const planData = {
-      summary, days, targetLetters, childAge, ageGroup, totalDays: TOTAL_PLAN_DAYS,
+      summary, 
+      sets, 
+      targetLetters, 
+      childAge, 
+      ageGroup, 
+      totalSets: TOTAL_SETS,
     };
 
     const { data: planRecord, error: planInsertError } = await supabase
@@ -397,13 +431,14 @@ serve(async (req) => {
       .insert({
         child_id: childId,
         report_id: reportId,
-        month: startDate.getMonth() + 1,
-        year: startDate.getFullYear(),
+        month: now.getMonth() + 1,
+        year: now.getFullYear(),
         start_date: startDateStr,
-        end_date: endDateStr,
+        end_date: null, // No fixed end date for set-based plans
         focus_letters: targetLetters,
         status: "active",
         plan_data: planData,
+        expires_at: expiresAt,
       })
       .select("id")
       .single();
@@ -415,12 +450,16 @@ serve(async (req) => {
       });
     }
 
-    console.log(`90-day plan generated for ${child.name} (${planRecord.id}): ${startDateStr} to ${endDateStr}`);
+    console.log(`30-set plan generated for ${child.name} (${planRecord.id})`);
 
     return new Response(
       JSON.stringify({
-        success: true, planId: planRecord.id, targetLetters, ageGroup,
-        totalDays: TOTAL_PLAN_DAYS, startDate: startDateStr, endDate: endDateStr,
+        success: true, 
+        planId: planRecord.id, 
+        targetLetters, 
+        ageGroup,
+        totalSets: TOTAL_SETS, 
+        startDate: startDateStr,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

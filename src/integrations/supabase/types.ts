@@ -605,6 +605,7 @@ export type Database = {
           child_id: string
           created_at: string
           end_date: string | null
+          expires_at: string | null
           focus_letters: string[] | null
           id: string
           month: number
@@ -619,6 +620,7 @@ export type Database = {
           child_id: string
           created_at?: string
           end_date?: string | null
+          expires_at?: string | null
           focus_letters?: string[] | null
           id?: string
           month: number
@@ -633,6 +635,7 @@ export type Database = {
           child_id?: string
           created_at?: string
           end_date?: string | null
+          expires_at?: string | null
           focus_letters?: string[] | null
           id?: string
           month?: number
@@ -1557,6 +1560,7 @@ export type Database = {
           id: string
           plan_id: string
           play_number: number
+          set_number: number | null
         }
         Insert: {
           activity_index: number
@@ -1566,6 +1570,7 @@ export type Database = {
           id?: string
           plan_id: string
           play_number?: number
+          set_number?: number | null
         }
         Update: {
           activity_index?: number
@@ -1575,6 +1580,7 @@ export type Database = {
           id?: string
           plan_id?: string
           play_number?: number
+          set_number?: number | null
         }
         Relationships: [
           {
@@ -1600,6 +1606,71 @@ export type Database = {
           },
           {
             foreignKeyName: "plan_activity_completions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "child_monthly_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_set_tracking: {
+        Row: {
+          child_id: string
+          completed_at: string | null
+          expired_at: string | null
+          id: string
+          plan_id: string
+          set_number: number
+          started_at: string
+          status: string
+          total_stars: number
+        }
+        Insert: {
+          child_id: string
+          completed_at?: string | null
+          expired_at?: string | null
+          id?: string
+          plan_id: string
+          set_number: number
+          started_at?: string
+          status?: string
+          total_stars?: number
+        }
+        Update: {
+          child_id?: string
+          completed_at?: string | null
+          expired_at?: string | null
+          id?: string
+          plan_id?: string
+          set_number?: number
+          started_at?: string
+          status?: string
+          total_stars?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_set_tracking_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_set_tracking_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "plan_set_tracking_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "plan_set_tracking_plan_id_fkey"
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "child_monthly_plans"

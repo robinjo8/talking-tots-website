@@ -1,72 +1,174 @@
-import { useEffect, useMemo, useCallback } from "react";
+import { useEffect, useMemo, useCallback, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMonthlyPlan } from "@/hooks/useMonthlyPlan";
+import { useMonthlyPlan, type PlanSet } from "@/hooks/useMonthlyPlan";
 import {
   usePlanCompletions,
-  useStarsByDate,
+  useSetTracking,
   useCompleteActivity,
   checkNewProgress,
   getActivityPlayCount,
-  buildCompletionCountsByDay,
+  buildCompletionCountsBySet,
+  startSet,
+  completeSet,
+  expireSet,
+  isSetExpired,
+  hasCompletedSetToday,
+  getTodayDateStr,
+  type SetTracking,
 } from "@/hooks/usePlanProgress";
-import { PlanDayCard } from "@/components/plan/PlanDayCard";
+import { PlanSetCard } from "@/components/plan/PlanSetCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Loader2, Calendar, History, ClipboardCheck } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Loader2, Calendar, History, ClipboardCheck, PartyPopper } from "lucide-react";
 import { motion } from "framer-motion";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
 
 interface StoredActivityTracking {
   planId: string;
-  dayDate: string;
+  setNumber: number;
   activityIndex: number;
-  activityType: string; // "motorika" | "igra"
-  leftAt: string; // ISO timestamp
+  activityType: string;
+  leftAt: string;
 }
 
 export default function MojiIzzivi() {
   const { selectedChild } = useAuth();
   const { data: plan, isLoading } = useMonthlyPlan(selectedChild?.id);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const isGenerating = plan?.status === "generating";
   const isActive = plan?.status === "active";
   const planData = plan?.plan_data;
 
-  // Calculate date range for stars query from start_date/end_date
-  const dateRange = useMemo(() => {
-    if (!plan) return { start: "", end: "" };
-    const start = plan.start_date || plan.plan_data?.days?.[0]?.date || "";
-    const end = plan.end_date || plan.plan_data?.days?.[plan.plan_data?.days?.length - 1]?.date || "";
-    return { start, end };
-  }, [plan]);
+  const isSetBased = !!(planData?.sets && planData.sets.length > 0);
+  const totalSets = planData?.totalSets || 30;
 
   const { data: completions = [] } = usePlanCompletions(plan?.id, selectedChild?.id);
-  const { data: starsByDate = [] } = useStarsByDate(
-    selectedChild?.id,
-    dateRange.start,
-    dateRange.end
-  );
+  const { data: trackingEntries = [], refetch: refetchTracking } = useSetTracking(plan?.id, selectedChild?.id);
   const completeActivity = useCompleteActivity();
 
-  const completionCountsByDay = useMemo(() => {
-    return buildCompletionCountsByDay(completions);
+  const completionCountsBySet = useMemo(() => {
+    return buildCompletionCountsBySet(completions);
   }, [completions]);
 
-  const starsMap = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const s of starsByDate) {
-      map.set(s.day, Number(s.stars));
-    }
-    return map;
-  }, [starsByDate]);
+  // Determine current state
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // Check for returning from a game - verify actual play before marking complete
-  // Now supports multiple plays (e.g., user clicked "Nova igra" inside the game)
+  const activeTracking = useMemo(() => {
+    return trackingEntries.find(e => e.status === "active") || null;
+  }, [trackingEntries]);
+
+  const completedSetsCount = useMemo(() => {
+    return trackingEntries.filter(e => e.status === "completed").length;
+  }, [trackingEntries]);
+
+  const allSetsCompleted = completedSetsCount >= totalSets;
+
+  const todayAlreadyDone = useMemo(() => {
+    return hasCompletedSetToday(trackingEntries);
+  }, [trackingEntries]);
+
+  // Find the next set number to work on
+  const nextSetNumber = useMemo(() => {
+    if (!isSetBased) return null;
+    const completedOrTracked = new Set(trackingEntries.map(e => e.set_number));
+    for (let i = 1; i <= totalSets; i++) {
+      if (!completedOrTracked.has(i)) return i;
+    }
+    return null;
+  }, [trackingEntries, totalSets, isSetBased]);
+
+  // Get the current set data
+  const currentSetData = useMemo((): PlanSet | null => {
+    if (!isSetBased || !planData?.sets) return null;
+    const setNum = activeTracking?.set_number || nextSetNumber;
+    if (!setNum) return null;
+    return planData.sets.find(s => s.setNumber === setNum) || null;
+  }, [isSetBased, planData, activeTracking, nextSetNumber]);
+
+  // Handle expired set detection and auto-start
+  useEffect(() => {
+    if (!plan?.id || !selectedChild?.id || !isSetBased || isProcessing) return;
+
+    const processSetState = async () => {
+      if (activeTracking && isSetExpired(activeTracking.started_at)) {
+        setIsProcessing(true);
+        // Calculate stars earned for this set
+        const setCompletions = completionCountsBySet.get(activeTracking.set_number) || new Map();
+        let stars = 0;
+        const setData = planData?.sets?.find(s => s.setNumber === activeTracking.set_number);
+        if (setData) {
+          setData.activities.forEach((act, idx) => {
+            const plays = setCompletions.get(idx) || 0;
+            const required = act.type === "motorika" ? 1 : 2;
+            stars += Math.min(plays, required) * (act.type === "motorika" ? 2 : 1);
+          });
+        }
+        await expireSet(plan.id, selectedChild.id, activeTracking.set_number, stars);
+        await refetchTracking();
+        setIsProcessing(false);
+      }
+    };
+
+    processSetState();
+  }, [activeTracking, plan?.id, selectedChild?.id, isSetBased]);
+
+  // Calculate time remaining for active set
+  const timeRemaining = useMemo(() => {
+    if (!activeTracking) return undefined;
+    const startTime = new Date(activeTracking.started_at).getTime();
+    const endTime = startTime + 24 * 60 * 60 * 1000;
+    const remaining = endTime - Date.now();
+    if (remaining <= 0) return undefined;
+    const hours = Math.floor(remaining / (60 * 60 * 1000));
+    const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+    if (hours > 0) return `${hours}h ${minutes}min`;
+    return `${minutes}min`;
+  }, [activeTracking]);
+
+  // Stars for current set
+  const currentSetStars = useMemo(() => {
+    if (!currentSetData || !activeTracking) return 0;
+    const setCompletions = completionCountsBySet.get(activeTracking.set_number) || new Map();
+    let stars = 0;
+    currentSetData.activities.forEach((act, idx) => {
+      const plays = setCompletions.get(idx) || 0;
+      const required = act.type === "motorika" ? 1 : 2;
+      stars += Math.min(plays, required) * (act.type === "motorika" ? 2 : 1);
+    });
+    return stars;
+  }, [currentSetData, activeTracking, completionCountsBySet]);
+
+  // Check if current set is fully completed (10 stars)
+  useEffect(() => {
+    if (!activeTracking || !plan?.id || !selectedChild?.id || currentSetStars < 10) return;
+
+    const doComplete = async () => {
+      await completeSet(plan.id, selectedChild.id, activeTracking.set_number, currentSetStars);
+      await refetchTracking();
+      queryClient.invalidateQueries({ queryKey: ["set-tracking", plan.id, selectedChild.id] });
+    };
+    doComplete();
+  }, [currentSetStars, activeTracking, plan?.id, selectedChild?.id]);
+
+  // Handle starting a new set
+  const handleStartSet = useCallback(async () => {
+    if (!plan?.id || !selectedChild?.id || !nextSetNumber) return;
+    setIsProcessing(true);
+    await startSet(plan.id, selectedChild.id, nextSetNumber);
+    await refetchTracking();
+    setIsProcessing(false);
+  }, [plan?.id, selectedChild?.id, nextSetNumber]);
+
+  // Check for returning from a game
   useEffect(() => {
     const stored = localStorage.getItem(PLAN_ACTIVITY_STORAGE_KEY);
     if (stored && plan?.id && selectedChild?.id) {
@@ -76,28 +178,30 @@ export default function MojiIzzivi() {
         const tracking: StoredActivityTracking = JSON.parse(stored);
         if (tracking.planId !== plan.id) return;
 
+        const todayStr = getTodayDateStr();
+
         const processCompletions = async () => {
           const { count } = await checkNewProgress(selectedChild!.id, tracking.leftAt);
           if (count <= 0) return;
 
-          // Get how many completions already exist for this activity
           const existingCount = await getActivityPlayCount(
             tracking.planId,
             selectedChild!.id,
-            tracking.dayDate,
-            tracking.activityIndex
+            todayStr,
+            tracking.activityIndex,
+            tracking.setNumber
           );
 
           const requiredPlays = tracking.activityType === "motorika" ? 1 : 2;
           const maxNewPlays = Math.min(count, requiredPlays - existingCount);
 
-          // Insert each missing completion sequentially
           for (let i = 0; i < maxNewPlays; i++) {
             await completeActivity.mutateAsync({
               planId: tracking.planId,
               childId: selectedChild!.id,
-              dayDate: tracking.dayDate,
+              dayDate: todayStr,
               activityIndex: tracking.activityIndex,
+              setNumber: tracking.setNumber,
             });
           }
         };
@@ -110,11 +214,11 @@ export default function MojiIzzivi() {
   }, [plan?.id, selectedChild?.id]);
 
   const handleActivityPlay = useCallback(
-    (dayDate: string, activityIndex: number, activityType: string, path: string) => {
-      if (plan?.id) {
+    (activityIndex: number, activityType: string, path: string) => {
+      if (plan?.id && activeTracking) {
         const tracking: StoredActivityTracking = {
           planId: plan.id,
-          dayDate,
+          setNumber: activeTracking.set_number,
           activityIndex,
           activityType,
           leftAt: new Date().toISOString(),
@@ -123,54 +227,33 @@ export default function MojiIzzivi() {
       }
       navigate(path);
     },
-    [plan?.id, navigate]
+    [plan?.id, activeTracking, navigate]
   );
 
-  // Get today's date string
-  const todayStr = useMemo(() => {
-    const now = new Date();
-    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  }, []);
+  // Auto-renew plan when all 30 sets are completed
+  useEffect(() => {
+    if (!allSetsCompleted || !plan?.report_id || !plan?.id) return;
 
-  // Get days from plan (new format: flat days, legacy: weeks)
-  const allDays = useMemo(() => {
-    if (!planData) return [];
-    if (planData.days) return planData.days;
-    // Legacy format conversion with actual dates
-    if (planData.weeks && plan) {
-      let dayCounter = 0;
-      return planData.weeks.flatMap((week) =>
-        week.days.map((day) => {
-          dayCounter++;
-          const actualDate = `${plan.year}-${String(plan.month).padStart(2, "0")}-${String(dayCounter).padStart(2, "0")}`;
-          const dateObj = new Date(plan.year, plan.month - 1, dayCounter);
-          const dayNames = ["Nedelja", "Ponedeljek", "Torek", "Sreda", "Četrtek", "Petek", "Sobota"];
-          return {
-            ...day,
-            date: actualDate,
-            dayName: day.dayName || dayNames[dateObj.getDay()],
-          };
-        })
-      );
-    }
-    return [];
-  }, [planData, plan]);
+    const renewPlan = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
 
-  // Find today's day card
-  const todayDay = useMemo(() => {
-    return allDays.find((d) => d.date === todayStr) || null;
-  }, [allDays, todayStr]);
+        await supabase.functions.invoke("generate-monthly-plan", {
+          body: { reportId: plan.report_id },
+        });
 
-  // Check if there are past days to show archive button
-  const hasPastDays = useMemo(() => {
-    return allDays.some((d) => d.date < todayStr);
-  }, [allDays, todayStr]);
+        queryClient.invalidateQueries({ queryKey: ["monthly-plan", selectedChild?.id] });
+      } catch (err) {
+        console.error("Error auto-renewing plan:", err);
+      }
+    };
 
-  // Check if today is within the plan range
-  const isTodayInRange = useMemo(() => {
-    if (!dateRange.start || !dateRange.end) return false;
-    return todayStr >= dateRange.start && todayStr <= dateRange.end;
-  }, [todayStr, dateRange]);
+    renewPlan();
+  }, [allSetsCompleted, plan?.report_id]);
+
+  // Progress percentage
+  const progressPercent = Math.round((completedSetsCount / totalSets) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -184,7 +267,7 @@ export default function MojiIzzivi() {
           <PlanSkeleton />
         ) : isGenerating ? (
           <GeneratingState />
-        ) : isActive && planData && allDays.length > 0 ? (
+        ) : isActive && planData && isSetBased ? (
           <div className="space-y-6">
             {/* Header */}
             <motion.div
@@ -196,59 +279,92 @@ export default function MojiIzzivi() {
               {planData.summary && (
                 <p className="text-muted-foreground text-sm mt-1 text-justify">{planData.summary}</p>
               )}
-              {hasPastDays && (
+              
+              {/* Progress bar */}
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Napredek</span>
+                  <span className="font-semibold">{completedSetsCount}/{totalSets} sklopov</span>
+                </div>
+                <Progress value={progressPercent} className="h-3" />
+              </div>
+
+              {trackingEntries.length > 0 && (
                 <div className="flex justify-center mt-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="gap-2"
-                  >
+                  <Button variant="outline" size="sm" asChild className="gap-2">
                     <Link to="/moji-izzivi/arhiv">
                       <History className="h-4 w-4" />
-                      <span>Pretekli dnevi</span>
+                      <span>Zgodovina</span>
                     </Link>
                   </Button>
                 </div>
               )}
             </motion.div>
 
-            {/* Today's day card only */}
-            {todayDay ? (
-              <div>
-                {(() => {
-                  const dayCompletionCounts = completionCountsByDay.get(todayDay.date) || new Map<number, number>();
-                  const dayStars = starsMap.get(todayDay.date) || 0;
-
-                  return (
-                    <PlanDayCard
-                      date={todayDay.date}
-                      dayName={todayDay.dayName}
-                      activities={todayDay.activities}
-                      starsForDay={dayStars}
-                      completionCounts={dayCompletionCounts}
-                      isToday={true}
-                      isPast={false}
-                      planId={plan!.id}
-                      childId={selectedChild!.id}
-                      childAvatarUrl={selectedChild?.avatarUrl}
-                      onActivityPlay={(activityIndex, activityType, path) =>
-                        handleActivityPlay(todayDay.date, activityIndex, activityType, path)
-                      }
-                    />
-                  );
-                })()}
-              </div>
-            ) : isTodayInRange ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>Za danes ni predvidenih aktivnosti.</p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Calendar className="h-10 w-10 text-muted-foreground mb-4" />
-                <p className="text-muted-foreground max-w-md">
-                  Tvoj osebni načrt je zaključen ali se še ni začel. Počakaj na nov pregled pri logopedu za osvežen načrt.
+            {/* Current set or state */}
+            {allSetsCompleted ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-12 text-center"
+              >
+                <PartyPopper className="h-12 w-12 text-primary mb-4" />
+                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets} sklopov je opravljenih!</h2>
+                <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
+                <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
+              </motion.div>
+            ) : todayAlreadyDone && !activeTracking ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center py-12 text-center bg-accent/10 rounded-2xl border border-accent/20"
+              >
+                <div className="text-4xl mb-4">🌟</div>
+                <h2 className="text-xl font-bold mb-2">Odlično opravljeno!</h2>
+                <p className="text-muted-foreground">
+                  Danes si že opravil sklop. Naslednji sklop te čaka jutri!
                 </p>
+              </motion.div>
+            ) : activeTracking && currentSetData ? (
+              <PlanSetCard
+                setNumber={activeTracking.set_number}
+                totalSets={totalSets}
+                activities={currentSetData.activities}
+                totalStars={currentSetStars}
+                completionCounts={completionCountsBySet.get(activeTracking.set_number) || new Map()}
+                isActive={true}
+                isCompleted={false}
+                isExpired={false}
+                isLocked={false}
+                timeRemaining={timeRemaining}
+                childAvatarUrl={selectedChild?.avatarUrl}
+                onActivityPlay={handleActivityPlay}
+              />
+            ) : nextSetNumber && currentSetData ? (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center py-8 text-center"
+              >
+                <h2 className="text-lg font-semibold mb-3">Sklop {nextSetNumber} je pripravljen!</h2>
+                <p className="text-muted-foreground text-sm mb-4">
+                  Ko začneš, imaš 24 ur časa da ga dokončaš.
+                </p>
+                <Button 
+                  onClick={handleStartSet} 
+                  disabled={isProcessing}
+                  size="lg" 
+                  className="gap-2"
+                >
+                  {isProcessing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : null}
+                  Začni sklop {nextSetNumber}
+                </Button>
+              </motion.div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>Ni več sklopov na voljo.</p>
               </div>
             )}
           </div>
