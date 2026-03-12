@@ -308,10 +308,17 @@ export function MyDocumentsSection() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="h-8 w-8 p-0"
-                                onClick={() => toggleDocumentPreview(report.path)}
-                                title={isExpanded ? "Zapri predogled" : "Ogled"}
+                                onClick={async () => {
+                                  const { data } = await supabase.storage
+                                    .from('uporabniski-profili')
+                                    .createSignedUrl(report.path, 3600);
+                                  if (data?.signedUrl) {
+                                    window.open(data.signedUrl, '_blank');
+                                  }
+                                }}
+                                title="Odpri poročilo"
                               >
-                                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                <Eye className="h-4 w-4" />
                               </Button>
                               <Button 
                                 variant="ghost" 
