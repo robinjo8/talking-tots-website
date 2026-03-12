@@ -1,45 +1,83 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Analiza in predlog: Preureditev strani /admin/all-tests
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Trenutno stanje v bazi
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+**Lea (8 let)** ima 2 seji:
+- `986ae4ed` — `is_completed=false`, `word_count=0`, `session_number=1` (prazna/opuščena seja)
+- `974b21a0` — `is_completed=true`, `word_count=67`, `session_number=1`, zaključena z poročilom
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+**Tristan (6 let)** ima 2 seji:
+- `9aa7479c` — `is_completed=false`, `word_count=0` (opuščena)
+- `821fbeb7` — `is_completed=false`, `word_count=0`, ampak `status=completed` (nekonsistentno stanje — verjetno ročno spremenjen status brez dejanskih podatkov)
 
-**Spremembe:**
+## Zakaj nastanejo "podvojeni" zapisi
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+Ko uporabnik začne test, se takoj ustvari nova vrstica v `articulation_test_sessions`. Če uporabnik zapusti test brez dokončanja in pozneje začne znova, se ustvari **nova seja** z istim `session_number=1`. Stara prazna seja ostane v bazi. To ni bug — je posledica "resume" logike, ki pa ne prepreči ustvarjanja nove seje, če je stara opuščena.
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+## Odgovor na vprašanje: Kaj se zgodi pri drugem preverjanju?
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+Ko isti otrok naredi drugo preverjanje (npr. čez 3 mesece), se ustvari nova seja s `session_number=2`. Ta seja se pojavi na `/admin/all-tests` kot **nova vrstica**. Logoped jo mora prevzeti nase, neodvisno od prvega preverjanja.
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+## Predlog preureditve
 
-**Spremembe:**
+### Pristop: Grupiranje po otroku z razširljivimi sejami
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+Namesto ploskega seznama sej predlagam **en zapis (vrstica) na otroka**, ki se razširi in prikaže posamezne seje znotraj.
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
+```text
+┌──────────────────────────────────────────────────────────┐
+│ Uporabnik    │ Otrok      │ Starost │ Seje │ Status      │
+├──────────────────────────────────────────────────────────┤
+│ ▶ Ana Novak  │ Lea        │ 8 let   │  1   │ Zaključeno  │
+│ ▶ Ema Vidmar │ Tristan    │ 6 let   │  1   │ V čakanju   │
+└──────────────────────────────────────────────────────────┘
 
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
+Klik na "▶ Lea" razširi:
+┌──────────────────────────────────────────────────────────┐
+│ ▼ Ana Novak  │ Lea        │ 8 let   │  1   │ Zaključeno  │
+│   └─ Seja 1  │ 22. 2. 2026 │ 60 besed │ Zaključeno │ [Ogled] │
+│ ▶ Ema Vidmar │ Tristan    │ 6 let   │  1   │ V čakanju   │
+└──────────────────────────────────────────────────────────┘
 
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
+Če bi Lea naredila drugo preverjanje:
+┌──────────────────────────────────────────────────────────┐
+│ ▼ Ana Novak  │ Lea        │ 8 let   │  2   │ V čakanju   │
+│   └─ Seja 1  │ 22. 2. 2026 │ 60 besed │ Zaključeno │ [Ogled] │
+│   └─ Seja 2  │ 22. 5. 2026 │ 60 besed │ V čakanju  │ [Ogled] │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Konkretne spremembe
+
+**1. Skrij prazne/opuščene seje (brez spremembe baze)**
+V `useAdminTests.ts` — filtriraj seje kjer `is_completed = false` **IN** `word_count = 0` (ali preprosto samo `is_completed = false`, kar že ustreza obstoječi logiki iz konteksta). Te seje nimajo nobenih podatkov in so neuporabne za logopede.
+
+**2. Grupiranje po otroku v `AdminTests.tsx`**
+- Po pridobitvi sej jih grupiraj po `child_id` (za parent source) oz. `logopedist_child_id` (za logopedist source)
+- Vsaka skupina = ena vrstica v tabeli
+- Glavni status vrstice = status najnovejše seje
+- Stolpec "Seje" prikaže število dokončanih sej (npr. "2")
+- Klik na vrstico razširi/zapre seznam sej znotraj
+
+**3. Razširjena vrstica prikaže seje**
+- Vsaka seja: Seja X, datum oddaje, število besed, status, gumb "Ogled"
+- Klik na "Ogled" odpre obstoječo stran `/admin/tests/{sessionId}`
+
+**4. Podatek o številu besed v seji**
+Dodaj `word_count` v `useAdminTests` (COUNT iz `articulation_word_results`), da se v razširjeni vrstici prikaže koliko besed je bilo izgovorjenih. Tristanovi seji imata 0 besed ker sta obe prazni — ni 54 besed. Morda si videl `total_words=60` minus `current_word_index` nekje?
+
+**5. Manjkajoče ime starša**
+Za Leino starš (`767acee5`) ni `first_name`/`last_name` v `profiles`. V vrstici se prikaže "Ni podatka" (to že deluje v trenutni kodi).
 
 ### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+- `src/hooks/useAdminTests.ts` — filtriranje opuščenih sej, dodaj `word_count`, dodaj grupiranje pomožno
+- `src/pages/admin/AdminTests.tsx` — nova logika grupiranja po otroku, razširljive vrstice, stolpec "Seje"
+- Stats prilagoditev — `total` šteje otroke namesto sej, ali pa ohranimo oba pogleda
+
+### Kaj ostane nespremenjeno
+- Stran `/admin/tests/{sessionId}` — ostane kot je, prikazuje eno sejo
+- Baza podatkov — brez sprememb sheme
+- RLS politike — brez sprememb
 
