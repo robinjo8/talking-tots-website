@@ -81,7 +81,7 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
     onLettersChange(selectedLetters.filter(l => l.letter !== letter));
   };
 
-  const changePosition = (letter: string, position: 'start' | 'middle-end') => {
+  const changePosition = (letter: string, position: 'start' | 'middle-end' | 'initial-exercises') => {
     onLettersChange(selectedLetters.map(l => 
       l.letter === letter ? { ...l, position } : l
     ));
