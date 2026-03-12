@@ -8,12 +8,24 @@ interface ActivityCompletion {
   day_date: string;
   activity_index: number;
   play_number: number;
-  completed_at: string;
+  set_number: number | null;
 }
 
 interface StarsByDate {
   day: string;
   stars: number;
+}
+
+export interface SetTracking {
+  id: string;
+  plan_id: string;
+  child_id: string;
+  set_number: number;
+  started_at: string;
+  completed_at: string | null;
+  expired_at: string | null;
+  total_stars: number;
+  status: "active" | "completed" | "expired";
 }
 
 export function usePlanCompletions(planId: string | undefined, childId: string | undefined) {
@@ -34,6 +46,30 @@ export function usePlanCompletions(planId: string | undefined, childId: string |
       }
 
       return (data || []) as ActivityCompletion[];
+    },
+    enabled: !!planId && !!childId,
+  });
+}
+
+export function useSetTracking(planId: string | undefined, childId: string | undefined) {
+  return useQuery({
+    queryKey: ["set-tracking", planId, childId],
+    queryFn: async () => {
+      if (!planId || !childId) return [];
+
+      const { data, error } = await supabase
+        .from("plan_set_tracking")
+        .select("*")
+        .eq("plan_id", planId)
+        .eq("child_id", childId)
+        .order("set_number", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching set tracking:", error);
+        throw error;
+      }
+
+      return (data || []) as unknown as SetTracking[];
     },
     enabled: !!planId && !!childId,
   });
@@ -65,7 +101,6 @@ export function useStarsByDate(childId: string | undefined, startDate: string, e
 
 /**
  * Check if new progress entries were created after a given timestamp.
- * Used to verify that a child actually played a game before marking it complete.
  */
 export async function checkNewProgress(
   childId: string,
@@ -94,9 +129,10 @@ export async function getActivityPlayCount(
   planId: string,
   childId: string,
   dayDate: string,
-  activityIndex: number
+  activityIndex: number,
+  setNumber?: number
 ): Promise<number> {
-  const { data, error } = await supabase
+  let query = supabase
     .from("plan_activity_completions")
     .select("play_number")
     .eq("plan_id", planId)
@@ -105,6 +141,12 @@ export async function getActivityPlayCount(
     .eq("activity_index", activityIndex)
     .order("play_number", { ascending: false })
     .limit(1);
+
+  if (setNumber !== undefined) {
+    query = query.eq("set_number", setNumber);
+  }
+
+  const { data, error } = await query;
 
   if (error || !data || data.length === 0) return 0;
   return data[0].play_number;
@@ -119,14 +161,15 @@ export function useCompleteActivity() {
       childId,
       dayDate,
       activityIndex,
+      setNumber,
     }: {
       planId: string;
       childId: string;
       dayDate: string;
       activityIndex: number;
+      setNumber?: number;
     }) => {
-      // Get current play count to determine next play_number
-      const currentCount = await getActivityPlayCount(planId, childId, dayDate, activityIndex);
+      const currentCount = await getActivityPlayCount(planId, childId, dayDate, activityIndex, setNumber);
       const nextPlayNumber = currentCount + 1;
 
       const { data, error } = await supabase
@@ -137,12 +180,12 @@ export function useCompleteActivity() {
           day_date: dayDate,
           activity_index: activityIndex,
           play_number: nextPlayNumber,
-        })
+          set_number: setNumber ?? null,
+        } as any)
         .select()
         .single();
 
       if (error) {
-        // Ignore unique constraint violations (already completed this play)
         if (error.code === "23505") return null;
         throw error;
       }
@@ -152,14 +195,150 @@ export function useCompleteActivity() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["plan-completions", variables.planId, variables.childId] });
       queryClient.invalidateQueries({ queryKey: ["stars-by-date", variables.childId] });
+      queryClient.invalidateQueries({ queryKey: ["set-tracking", variables.planId, variables.childId] });
     },
   });
 }
 
 /**
- * Build a map of completion counts per day per activity.
- * Returns Map<dayDate, Map<activityIndex, completionCount>>
+ * Start a new set - creates a tracking entry.
  */
+export async function startSet(
+  planId: string,
+  childId: string,
+  setNumber: number
+): Promise<SetTracking | null> {
+  const { data, error } = await supabase
+    .from("plan_set_tracking")
+    .insert({
+      plan_id: planId,
+      child_id: childId,
+      set_number: setNumber,
+      status: "active",
+    } as any)
+    .select()
+    .single();
+
+  if (error) {
+    if (error.code === "23505") {
+      // Already exists, fetch it
+      const { data: existing } = await supabase
+        .from("plan_set_tracking")
+        .select("*")
+        .eq("plan_id", planId)
+        .eq("child_id", childId)
+        .eq("set_number", setNumber)
+        .single();
+      return existing as unknown as SetTracking | null;
+    }
+    console.error("Error starting set:", error);
+    return null;
+  }
+
+  return data as unknown as SetTracking;
+}
+
+/**
+ * Complete a set.
+ */
+export async function completeSet(
+  planId: string,
+  childId: string,
+  setNumber: number,
+  totalStars: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("plan_set_tracking")
+    .update({
+      status: "completed",
+      completed_at: new Date().toISOString(),
+      total_stars: totalStars,
+    } as any)
+    .eq("plan_id", planId)
+    .eq("child_id", childId)
+    .eq("set_number", setNumber);
+
+  if (error) {
+    console.error("Error completing set:", error);
+  }
+}
+
+/**
+ * Expire an active set that has been open for 24+ hours.
+ */
+export async function expireSet(
+  planId: string,
+  childId: string,
+  setNumber: number,
+  totalStars: number
+): Promise<void> {
+  const { error } = await supabase
+    .from("plan_set_tracking")
+    .update({
+      status: "expired",
+      expired_at: new Date().toISOString(),
+      total_stars: totalStars,
+    } as any)
+    .eq("plan_id", planId)
+    .eq("child_id", childId)
+    .eq("set_number", setNumber)
+    .eq("status", "active");
+
+  if (error) {
+    console.error("Error expiring set:", error);
+  }
+}
+
+/**
+ * Get the current date string in Ljubljana timezone.
+ */
+export function getTodayDateStr(): string {
+  const now = new Date();
+  // Use Ljubljana timezone offset approximation
+  const ljTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Ljubljana" }));
+  return `${ljTime.getFullYear()}-${String(ljTime.getMonth() + 1).padStart(2, "0")}-${String(ljTime.getDate()).padStart(2, "0")}`;
+}
+
+/**
+ * Check if a set has expired (24 hours since started).
+ */
+export function isSetExpired(startedAt: string): boolean {
+  const startTime = new Date(startedAt).getTime();
+  const now = Date.now();
+  return now - startTime > 24 * 60 * 60 * 1000;
+}
+
+/**
+ * Check if any set was completed or expired today (to enforce 1 set/day limit).
+ */
+export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
+  const todayStr = getTodayDateStr();
+  return trackingEntries.some(entry => {
+    if (entry.status === "active") return false;
+    const dateStr = entry.completed_at || entry.expired_at || entry.started_at;
+    return dateStr.startsWith(todayStr);
+  });
+}
+
+/**
+ * Build a map of completion counts per set per activity.
+ * Returns Map<setNumber, Map<activityIndex, completionCount>>
+ */
+export function buildCompletionCountsBySet(
+  completions: ActivityCompletion[]
+): Map<number, Map<number, number>> {
+  const map = new Map<number, Map<number, number>>();
+  for (const c of completions) {
+    const setNum = c.set_number ?? 0;
+    if (!map.has(setNum)) map.set(setNum, new Map());
+    const setMap = map.get(setNum)!;
+    const current = setMap.get(c.activity_index) || 0;
+    setMap.set(c.activity_index, current + 1);
+  }
+  return map;
+}
+
+// Legacy compatibility
 export function buildCompletionCountsByDay(
   completions: ActivityCompletion[]
 ): Map<string, Map<number, number>> {

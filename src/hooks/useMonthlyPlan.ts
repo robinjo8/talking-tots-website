@@ -12,15 +12,19 @@ export interface PlanActivity {
   duration?: string;
 }
 
+export interface PlanSet {
+  setNumber: number;
+  activities: PlanActivity[];
+}
+
+// Legacy types kept for backward compatibility
 export interface PlanDay {
   date: string;
   dayName: string;
   activities: PlanActivity[];
-  // Legacy fields
   dayNumber?: number;
 }
 
-// Legacy types kept for backward compatibility
 export interface PlanWeek {
   weekNumber: number;
   theme: string;
@@ -32,9 +36,12 @@ export interface MonthlyPlanData {
   targetLetters: string[];
   childAge: number;
   ageGroup: string;
+  // New set-based format
+  totalSets?: number;
+  sets?: PlanSet[];
+  // Legacy day-based format
   totalDays?: number;
   days?: PlanDay[];
-  // Legacy
   weeks?: PlanWeek[];
 }
 
@@ -48,6 +55,7 @@ export interface MonthlyPlan {
   year: number;
   start_date: string | null;
   end_date: string | null;
+  expires_at: string | null;
   status: string;
   created_at: string;
   updated_at: string;
