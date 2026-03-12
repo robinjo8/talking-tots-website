@@ -41,7 +41,8 @@ export function useAdminStats() {
         // Organization stats - all tests in the system
         const { count: orgTotalCount } = await supabase
           .from('articulation_test_sessions')
-          .select('*', { count: 'exact', head: true });
+          .select('*', { count: 'exact', head: true })
+          .eq('is_completed', true);
 
         // Organization - pending tests (status = pending)
         const { count: orgPendingCount } = await supabase
@@ -55,6 +56,7 @@ export function useAdminStats() {
         const { data: orgReviewedData } = await supabase
           .from('articulation_test_sessions')
           .select('id, reviewed_at, completed_at, status')
+          .eq('is_completed', true)
           .is('completed_at', null);
         
         const orgReviewedCount = orgReviewedData?.filter(s => 
