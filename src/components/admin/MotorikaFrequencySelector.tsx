@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export type MotorikaFrequencyType = 'daily' | 'weekly' | 'monthly' | 'custom' | null;
+export type MotorikaFrequencyType = 'daily' | 'weekly' | 'not_needed' | 'custom' | null;
 export type MotorikaCustomUnit = 'day' | 'week' | 'month' | null;
 
 interface MotorikaFrequencySelectorProps {
