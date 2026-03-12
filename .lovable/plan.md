@@ -1,45 +1,48 @@
 
 
-# Posodobitev dveh dialogov na strani /artikulacijski-test
+# Analiza problema: Zakaj manjkajo podatki na /admin/all-tests
 
-Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
+## Kaj se je zgodilo
 
-## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
+V zadnjem popravku sem v `useAdminTests.ts` (vrstica 190) dodal filter:
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
-- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
+```typescript
+return allSessions.filter(s => s.is_completed || s.word_count > 0);
+```
 
-**Spremembe:**
+Ta filter skrije seje kjer je `is_completed = false` **IN** `word_count = 0`. 
 
-- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
-  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
+**Problem**: Tristanovi seji sta obe `is_completed = false` in `word_count = 0` (ena ima celo `status = 'completed'`), zato sta **obe filtrirani ven** in Tristan popolnoma izgine.
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
-  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
-  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
+Leina opuščena seja (`is_completed = false`, `word_count = 0`) je prav tako filtrirana, ostane samo 1 dokončana seja.
 
-## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
+## Rešitev
 
-**Kaj manjka:**
-- Omemba prilagojene razlicice (20 besed)
-- Omemba nastavitev (zahtevnost, cas snemanja)
-- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
+Spremeniti filter tako, da ohrani **vse seje ki imajo kakršenkoli status razen 'pending' z is_completed=false in word_count=0**. Konkretno:
 
-**Spremembe:**
+**V `src/hooks/useAdminTests.ts`** — spremeniti filter na vrstici 190:
+- Skrij samo seje kjer je `is_completed = false` **IN** `word_count = 0` **IN** `status = 'pending'` (privzeti status za novo ustvarjene seje)
+- Seje s `status = 'completed'` ali drugimi statusi ohrani, tudi če je `is_completed = false` (nekonsistentno stanje, ki ga mora logoped videti)
+- Seje kjer `word_count > 0` vedno prikaži (otrok je začel test ampak ni dokončal)
 
-- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
+Nova logika:
+```typescript
+return allSessions.filter(s => {
+  // Always show completed sessions
+  if (s.is_completed) return true;
+  // Show sessions with recorded words (in progress)
+  if (s.word_count > 0) return true;
+  // Show sessions with non-default status (manually changed)
+  if (s.status !== 'pending') return true;
+  // Hide truly abandoned empty sessions
+  return false;
+});
+```
 
-- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
-  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
-  - Cas snemanja: 3, 4, 5 sekund z opisi
+To bo:
+- Tristana spet prikazalo (njegova seja ima `status = 'completed'`)
+- Leino opuščeno prazno sejo (`status = 'pending'`, `word_count = 0`, `is_completed = false`) še vedno skrilo
+- Ohranilo grupiranje po otroku z razširljivimi sejami
 
-- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
-
-- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
-
-### Datoteke za spremembo
-- `src/components/articulation/ArticulationTestInfoDialog.tsx`
-- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
+Sprememba: **1 datoteka, 1 vrstica logike**.
 
