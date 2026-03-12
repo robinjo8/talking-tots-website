@@ -15,6 +15,7 @@ const VIDEO_LETTERS = ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'];
 interface VideoLetterSelectorProps {
   selectedLetters: string[];
   onLettersChange: (letters: string[]) => void;
+  hidePreview?: boolean;
 }
 
 export function formatVideoLettersText(letters: string[]): string {

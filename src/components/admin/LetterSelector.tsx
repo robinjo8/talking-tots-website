@@ -30,6 +30,7 @@ export interface RecommendedLetter {
 interface LetterSelectorProps {
   selectedLetters: RecommendedLetter[];
   onLettersChange: (letters: RecommendedLetter[]) => void;
+  hidePreview?: boolean;
 }
 
 export function formatRecommendedLettersText(letters: RecommendedLetter[]): string {
