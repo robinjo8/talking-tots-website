@@ -182,12 +182,14 @@ export async function generateReportPdf(data: ReportData, options: GenerateRepor
     const lineHeight = 5;
     
     // Build predlog content
-    const recommendedText = data.recommendedLetters && data.recommendedLetters.length > 0
-      ? formatRecommendedLettersText(data.recommendedLetters) : '';
-    const motorikaText = formatMotorikaFrequencyText(data.motorikaFrequency, data.motorikaCustomCount, data.motorikaCustomUnit);
-    const videoText = data.recommendedVideoLetters && data.recommendedVideoLetters.length > 0
-      ? formatVideoLettersText(data.recommendedVideoLetters) : '';
-    const fullPredlog = [recommendedText, motorikaText, videoText, data.predlogVaj.trim()].filter(Boolean).join('\n') || '(ni vnosa)';
+    const combinedText = formatCombinedRecommendationText(
+      data.recommendedLetters || [],
+      data.motorikaFrequency,
+      data.motorikaCustomCount,
+      data.motorikaCustomUnit,
+      data.recommendedVideoLetters || [],
+    );
+    const fullPredlog = [combinedText, data.predlogVaj.trim()].filter(Boolean).join('\n') || '(ni vnosa)';
 
     const sections = [
       { title: 'Anamneza', content: data.anamneza.trim() || '(ni vnosa)' },
