@@ -105,14 +105,17 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
               </Badge>
               <Select
                 value={item.position}
-                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end')}
+                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end' | 'initial-exercises')}
               >
-                <SelectTrigger className="h-7 text-xs w-[140px] px-2">
+                <SelectTrigger className={cn("h-7 text-xs px-2", item.letter === 'R' ? "w-[160px]" : "w-[140px]")}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="start">Začetek</SelectItem>
                   <SelectItem value="middle-end">Sredina/konec</SelectItem>
+                  {item.letter === 'R' && (
+                    <SelectItem value="initial-exercises">Začetne vaje</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
