@@ -101,9 +101,9 @@ export function useAdminTests() {
         organizationIds.length > 0
           ? supabase.from('organizations').select('id, name').in('id', organizationIds)
           : Promise.resolve({ data: [], error: null }),
-        // Get word counts per session
+        // Get word counts per session (select target_word for deduplication)
         sessionIds.length > 0
-          ? supabase.from('articulation_word_results').select('session_id').in('session_id', sessionIds)
+          ? supabase.from('articulation_word_results').select('session_id, target_word').in('session_id', sessionIds)
           : Promise.resolve({ data: [], error: null }),
       ]);
 
