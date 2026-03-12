@@ -1,9 +1,7 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
 import { loadRobotoFonts } from './fonts/robotoBase64';
-import { formatRecommendedLettersText } from '@/components/admin/LetterSelector';
-import { formatMotorikaFrequencyText } from '@/components/admin/MotorikaFrequencySelector';
-import { formatVideoLettersText } from '@/components/admin/VideoLetterSelector';
+import { formatCombinedRecommendationText } from '@/components/admin/ReportTemplateEditor';
 
 export interface GenerateReportPdfOptions {
   hideParentSection?: boolean;
