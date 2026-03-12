@@ -292,7 +292,6 @@ export function MyDocumentsSection() {
                 ) : (
                   <div className="space-y-3 pt-4">
                     {reports.map((report, idx) => {
-                      const isExpanded = expandedDocId === report.path;
                       return (
                         <div key={idx} className="border border-gray-100 rounded-lg overflow-hidden">
                           <div className="flex items-center justify-between p-3 bg-gray-50">
