@@ -56,6 +56,7 @@ export function useAdminStats() {
         const { data: orgReviewedData } = await supabase
           .from('articulation_test_sessions')
           .select('id, reviewed_at, completed_at, status')
+          .eq('is_completed', true)
           .is('completed_at', null);
         
         const orgReviewedCount = orgReviewedData?.filter(s => 
