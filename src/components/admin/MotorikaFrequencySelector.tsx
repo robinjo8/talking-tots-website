@@ -63,7 +63,7 @@ export function MotorikaFrequencySelector({
         <SelectContent>
           <SelectItem value="daily">Vsak dan</SelectItem>
           <SelectItem value="weekly">Enkrat na teden</SelectItem>
-          <SelectItem value="monthly">Enkrat na mesec</SelectItem>
+          <SelectItem value="not_needed">Ni potrebno</SelectItem>
           <SelectItem value="custom">Po meri</SelectItem>
         </SelectContent>
       </Select>

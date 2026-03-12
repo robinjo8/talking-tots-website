@@ -332,30 +332,6 @@ export function MyDocumentsSection() {
                             </div>
                           </div>
                           
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="p-4 border-t bg-background">
-                                  <DocumentPreview 
-                                    fileName={report.name}
-                                    getSignedUrl={async () => {
-                                      const { data } = await supabase.storage
-                                        .from('uporabniski-profili')
-                                        .createSignedUrl(report.path, 3600);
-                                      return data?.signedUrl || null;
-                                    }}
-                                    onDownload={() => handleDownloadReport(report.path)}
-                                  />
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
                         </div>
                       );
                     })}

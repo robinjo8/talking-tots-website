@@ -571,20 +571,6 @@ export default function AdminTests() {
                               {latest.is_completed ? formatDate(latest.submitted_at) : '-'}
                             </TableCell>
                             <TableCell className="text-right">
-                              {!hasMutipleSessions && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  title="Ogled podrobnosti"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/admin/tests/${latest.id}`);
-                                  }}
-                                >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  Ogled
-                                </Button>
-                              )}
                             </TableCell>
                           </TableRow>
                           
