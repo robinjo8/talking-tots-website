@@ -1,70 +1,45 @@
 
 
-# Preoblikovanje sekcije "PREDLOG ZA IGRE IN VAJE"
+# Posodobitev dveh dialogov na strani /artikulacijski-test
 
-## Trenutno stanje
+Oba dialoga je treba posodobiti, da vkljucujeta informacije o prilagojeni razlicici (20 besed) in nastavljivih parametrih (zahtevnost, cas snemanja), skladno s posodobljenim besedilom na /kako-deluje.
 
-Tri ločene sekcije z velikimi naslovi (UPPERCASE, bold):
-1. **"PREDLOG ZA IGRE IN VAJE:"** — LetterSelector (popover z checkboxi + badge-i + position select per letter) + Textarea
-2. **"PRIPOROČAMO VAJE ZA MOTORIKO GOVORIL:"** — MotorikaFrequencySelector (dropdown)
-3. **"PRIPOROČAMO OGLED VIDEO NAVODIL:"** — VideoLetterSelector (popover z checkboxi + badge-i)
+## 1. ArticulationTestInfoDialog.tsx (Obvestilo pred zacetkom)
 
-Vsaka sekcija ima svoj preview tekst (sivi box) znotraj komponente.
+**Kaj manjka:**
+- Omemba prilagojene razlicice za starost 3-4 let (20 besed)
+- Omemba nastavitev preverjanja (zahtevnost, cas snemanja)
 
-## Želeno stanje
+**Spremembe:**
 
-Ena sekcija **"PREDLOG ZA IGRE IN VAJE:"** z tremi vrsticami, kjer je label + kontrola na isti vrstici:
+- **Sekcija "Kaj se preverja?"** (vrstica 119): Dodati odstavek o prilagojeni razlicici:
+  > "Za otroke v starostni skupini 3-4 let je na voljo prilagojena razlicica s 20 besedami (1 beseda na glas), ki je krajsa in manj obremenjujoca."
 
-```text
-PREDLOG ZA IGRE IN VAJE: *
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Kako preverjanje poteka?"):
+  - Opis, da lahko uporabnik pred ali med preverjanjem prilagodi nastavitve
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka
+  - Cas snemanja: 3, 4 (privzeto) ali 5 sekund
 
-Priporočamo igre in vaje za glas:    [+ Dodaj glas]  (badge-i izbranih + position select)
-Vaje za motoriko govoril:            [Izberi pogostost ▾]  (+ custom polja če "Po meri")
-Ogled video navodil:                 [+ Dodaj glas]  (badge-i izbranih)
+## 2. ArticulationTestInstructionsDialog.tsx (Kako deluje)
 
-┌─────────────────────────────────────────────────────┐
-│ Priporočamo igre in vaje za glas P na začetku...   │
-│                                                     │
-│ Priporočamo vaje za motoriko govoril vsak dan.     │
-│                                                     │
-│ Priporočamo ogled video navodil za glas R.          │
-└─────────────────────────────────────────────────────┘
+**Kaj manjka:**
+- Omemba prilagojene razlicice (20 besed)
+- Omemba nastavitev (zahtevnost, cas snemanja)
+- Hardkodirano "5 sekund" in "60 besed" namesto nastavljive vrednosti
 
-[Dodatne opombe textarea]
-```
+**Spremembe:**
 
-Ključne spremembe:
-- Vsi trije labeli imajo **enako pisavo** (text-sm font-medium, ne uppercase bold)
-- Kontrole (dropdown/popover) so **desno od labela** na isti vrstici
-- Preview teksti se **ne prikazujejo znotraj posamezne komponente** ampak v enem skupnem boxu pod vsemi tremi vrsticami, vsak v svojem odstavku
-- Textarea za dodatne opombe ostane pod skupnim preview boxom
+- **Sekcija "Struktura preverjanja"** (vrstica 52-60): Razdeliti na "Standardna razlicica" (60 besed) in "Prilagojena razlicica" (20 besed za 3-4 let), enako kot na /kako-deluje
 
-## Tehnični plan
+- **Nova sekcija "Nastavitve preverjanja"** (za sekcijo "Struktura preverjanja"):
+  - Stopnja zahtevnosti: Nizka, Srednja (privzeto), Visoka -- opis vpliva na strogost ocenjevanja
+  - Cas snemanja: 3, 4, 5 sekund z opisi
 
-### 1. `src/components/admin/LetterSelector.tsx`
-- Dodaj prop `hidePreview?: boolean` (privzeto false za nazaj-kompatibilnost)
-- Ko `hidePreview = true`, ne prikaži sivi preview box znotraj komponente
-- Spremeni layout: label "Priporočamo igre in vaje za glas:" + gumb "+ Dodaj glas" na isti vrstici, badge-i z position selecti pod tem
+- **Sekcija "Potek izgovorjave"** (vrstica 114): Popraviti "5 sekund" na "nastavljiv cas snemanja (3, 4 ali 5 sekund, privzeto 4 sekunde)"
 
-### 2. `src/components/admin/MotorikaFrequencySelector.tsx`
-- Dodaj prop `hidePreview?: boolean`
-- Dodaj prop `inline?: boolean` — ko true, prikaži label + dropdown na isti vrstici (flex row)
-- Ko `hidePreview = true`, ne prikaži sivi preview box
+- **Zakljucna vrstica** (vrstica 170): Popraviti "60 besed" na "vseh besed (60 pri standardni oz. 20 pri prilagojeni razlicici)"
 
-### 3. `src/components/admin/VideoLetterSelector.tsx`
-- Dodaj prop `hidePreview?: boolean`
-- Ko `hidePreview = true`, ne prikaži sivi preview box
-
-### 4. `src/components/admin/ReportTemplateEditor.tsx`
-- Zamenjaj tri ločene sekcije z eno sekcijo "PREDLOG ZA IGRE IN VAJE:"
-- Znotraj: tri vrstice z inline layout (label levo, kontrola desno)
-- Pod vsemi tremi: en skupni preview box ki prikaže izbire v ločenih odstavkih
-- Pod preview: textarea za dodatne opombe
-- Posodobi `generateReportText` da ohranja enak format
-
-### Datoteke za spremembo:
-1. `src/components/admin/LetterSelector.tsx`
-2. `src/components/admin/MotorikaFrequencySelector.tsx`
-3. `src/components/admin/VideoLetterSelector.tsx`
-4. `src/components/admin/ReportTemplateEditor.tsx`
+### Datoteke za spremembo
+- `src/components/articulation/ArticulationTestInfoDialog.tsx`
+- `src/components/articulation/ArticulationTestInstructionsDialog.tsx`
 

@@ -18,6 +18,8 @@ interface MotorikaFrequencySelectorProps {
   onFrequencyChange: (frequency: MotorikaFrequencyType) => void;
   onCustomCountChange: (count: number | null) => void;
   onCustomUnitChange: (unit: MotorikaCustomUnit) => void;
+  hidePreview?: boolean;
+  inline?: boolean;
 }
 
 export function formatMotorikaFrequencyText(
@@ -50,9 +52,11 @@ export function MotorikaFrequencySelector({
   onFrequencyChange,
   onCustomCountChange,
   onCustomUnitChange,
+  hidePreview = false,
+  inline = false,
 }: MotorikaFrequencySelectorProps) {
   return (
-    <div className="space-y-3">
+    <div className={inline ? "flex items-center gap-2 flex-wrap" : "space-y-3"}>
       <Select
         value={frequency || ''}
         onValueChange={(val) => onFrequencyChange(val as MotorikaFrequencyType)}
@@ -69,7 +73,7 @@ export function MotorikaFrequencySelector({
       </Select>
 
       {frequency === 'custom' && (
-        <div className="flex items-center gap-2 pl-2">
+        <div className="flex items-center gap-2">
           <Input
             type="number"
             min={1}
@@ -96,7 +100,7 @@ export function MotorikaFrequencySelector({
         </div>
       )}
 
-      {frequency && formatMotorikaFrequencyText(frequency, customCount, customUnit) && (
+      {!hidePreview && frequency && formatMotorikaFrequencyText(frequency, customCount, customUnit) && (
         <p className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2">
           {formatMotorikaFrequencyText(frequency, customCount, customUnit)}
         </p>
