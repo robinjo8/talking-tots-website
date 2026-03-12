@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminTests, TestSessionData, calculateTestStats } from '@/hooks/useAdminTests';
+import { useAdminTests, TestSessionData, calculateTestStats, groupSessionsByChild, ChildGroup } from '@/hooks/useAdminTests';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, ClipboardList, Clock, UserCheck, CheckCircle, Eye, Loader2, ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 
@@ -29,7 +29,7 @@ interface SourceDisplay {
   line2: string | null;
 }
 
-function formatSource(session: TestSessionData): SourceDisplay {
+function formatSource(session: TestSessionData | ChildGroup): SourceDisplay {
   if (session.source_type === 'logopedist') {
     const logopedistName = [session.logopedist_first_name, session.logopedist_last_name]
       .filter(Boolean).join(' ') || null;
@@ -38,7 +38,6 @@ function formatSource(session: TestSessionData): SourceDisplay {
       line2: logopedistName,
     };
   }
-  // Parent
   const parentName = [session.parent_first_name, session.parent_last_name]
     .filter(Boolean).join(' ');
   return {
@@ -59,7 +58,6 @@ const StatusBadge = ({
   completedAt?: string | null;
   isCompleted: boolean;
 }) => {
-  // Ni opravljeno
   if (!isCompleted) {
     return (
       <Badge variant="outline" className="border-gray-400 text-gray-600 bg-gray-50 dark:bg-gray-900 dark:text-gray-400">
@@ -68,7 +66,6 @@ const StatusBadge = ({
     );
   }
 
-  // V čakanju
   if (status === 'pending') {
     return (
       <Badge variant="outline" className="border-amber-500 text-amber-700 bg-amber-50 dark:bg-amber-950 dark:text-amber-300">
@@ -77,7 +74,6 @@ const StatusBadge = ({
     );
   }
   
-  // Zaključeno = poročilo generirano (completed_at nastavljen)
   if (completedAt) {
     return (
       <Badge variant="outline" className="border-emerald-500 text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300">
@@ -86,7 +82,6 @@ const StatusBadge = ({
     );
   }
   
-  // Pregledano = ocene oddane, brez poročila (reviewed_at nastavljen ALI status = completed)
   if (reviewedAt || status === 'completed') {
     return (
       <Badge variant="outline" className="border-purple-500 text-purple-700 bg-purple-50 dark:bg-purple-950 dark:text-purple-300">
@@ -95,7 +90,6 @@ const StatusBadge = ({
     );
   }
   
-  // V obdelavi = assigned ali in_review
   return (
     <Badge variant="outline" className="border-blue-500 text-blue-700 bg-blue-50 dark:bg-blue-950 dark:text-blue-300">
       V obdelavi
@@ -103,43 +97,69 @@ const StatusBadge = ({
   );
 };
 
-// Mobile card component for test display with accordion behavior
-const TestCard = ({ 
-  session, 
-  formatGender,
-  formatDate,
+// Helper to format gender
+const formatGender = (gender: string | null): string => {
+  if (!gender) return '';
+  const genderLower = gender.toLowerCase();
+  if (genderLower === 'm' || genderLower === 'male' || genderLower === 'moški') return 'M';
+  if (genderLower === 'f' || genderLower === 'female' || genderLower === 'ženski' || genderLower === 'z' || genderLower === 'ž') return 'Ž';
+  return gender;
+};
+
+// Helper to format date
+const formatDate = (date: string | null): string => {
+  if (!date) return '-';
+  try {
+    return format(new Date(date), 'd. M. yyyy', { locale: sl });
+  } catch {
+    return '-';
+  }
+};
+
+// Mobile card for grouped view
+const GroupedTestCard = ({ 
+  group, 
   isExpanded,
   onToggle,
   onNavigate
 }: { 
-  session: TestSessionData; 
-  formatGender: (gender: string | null) => string;
-  formatDate: (date: string | null) => string;
+  group: ChildGroup; 
   isExpanded: boolean;
   onToggle: () => void;
   onNavigate: (sessionId: string) => void;
 }) => {
-  const source = formatSource(session);
-  const gender = formatGender(session.child_gender);
+  const source = formatSource(group);
+  const gender = formatGender(group.child_gender);
+  const latest = group.latestSession;
   
   return (
     <div className="border rounded-lg bg-card overflow-hidden">
-      {/* Header - always visible, clickable */}
       <button
         onClick={onToggle}
         className="w-full p-4 flex items-center justify-between text-left hover:bg-muted/50 transition-colors"
       >
         <div className="flex flex-col gap-1">
-          <span className="font-medium">{session.child_name}</span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{group.child_name}</span>
+            {group.sessions.length > 1 && (
+              <Badge variant="secondary" className="text-xs px-1.5 py-0">
+                {group.sessions.length} sej
+              </Badge>
+            )}
+          </div>
           <div className="text-sm text-muted-foreground">
-            <span>{source.line1 || <span className="italic">Ni podatka</span>}</span>
+            {source.line1 ? (
+              <span>{source.line1}</span>
+            ) : (
+              <span className="italic">Ni podatka</span>
+            )}
             {source.line2 && (
               <span className="block text-xs">{source.line2}</span>
             )}
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} isCompleted={session.is_completed} />
+          <StatusBadge status={latest.status} reviewedAt={latest.reviewed_at} completedAt={latest.completed_at} isCompleted={latest.is_completed} />
           <ChevronDown 
             className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
               isExpanded ? 'rotate-180' : ''
@@ -148,44 +168,45 @@ const TestCard = ({
         </div>
       </button>
       
-      {/* Content - shown only when expanded */}
       {isExpanded && (
         <div className="px-4 pb-4 space-y-3 border-t">
-          {/* Age & Gender */}
           <div className="pt-3 grid grid-cols-2 gap-4">
             <div>
               <span className="text-xs text-muted-foreground">Starost</span>
-              <p>
-                {session.child_age !== null ? (
-                  `${session.child_age} let`
-                ) : (
-                  <span className="text-muted-foreground">-</span>
-                )}
-              </p>
+              <p>{group.child_age !== null ? `${group.child_age} let` : <span className="text-muted-foreground">-</span>}</p>
             </div>
             <div>
               <span className="text-xs text-muted-foreground">Spol</span>
-              <p>
-                {gender || <span className="text-muted-foreground italic">Ni določen</span>}
-              </p>
+              <p>{gender || <span className="text-muted-foreground italic">Ni določen</span>}</p>
             </div>
           </div>
           
-          {/* Submitted date */}
-          <div>
-            <span className="text-xs text-muted-foreground">Oddano</span>
-            <p>{session.is_completed ? formatDate(session.submitted_at) : '-'}</p>
-          </div>
-          
-          {/* Actions - read only */}
-          <div className="flex items-center gap-2 pt-2 border-t">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => onNavigate(session.id)}
-            >
-              <Eye className="h-4 w-4 mr-1" /> Ogled
-            </Button>
+          {/* Session list */}
+          <div className="space-y-2">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Seje</span>
+            {group.sessions.map((session, idx) => (
+              <div key={session.id} className="flex items-center justify-between p-2 rounded-md bg-muted/30 border">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium">Seja {group.sessions.length - idx}</span>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{session.is_completed ? formatDate(session.submitted_at) : '-'}</span>
+                    <span>·</span>
+                    <span>{session.word_count} besed</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} isCompleted={session.is_completed} />
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-7 px-2"
+                    onClick={() => onNavigate(session.id)}
+                  >
+                    <Eye className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -197,7 +218,7 @@ export default function AdminTests() {
   const navigate = useNavigate();
   const { data: sessions, isLoading, error } = useAdminTests();
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
+  const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
   
   // Filter states
   const [ageFilter, setAgeFilter] = useState('all');
@@ -209,8 +230,8 @@ export default function AdminTests() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const toggleCard = (cardId: string) => {
-    setExpandedCardId(prev => prev === cardId ? null : cardId);
+  const toggleGroup = (groupId: string) => {
+    setExpandedGroupId(prev => prev === groupId ? null : groupId);
   };
 
   // Reset page when filters change
@@ -218,12 +239,12 @@ export default function AdminTests() {
     setCurrentPage(1);
   }, [searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
 
-  // Filter based on search and filters
+  // Filter sessions first, then group
   const filteredSessions = useMemo(() => {
     if (!sessions) return [];
     
     return sessions.filter(session => {
-      // Search filter - search in parent name, child name, org name, logopedist name
+      // Search filter
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
         const parentNameMatch = 
@@ -277,18 +298,21 @@ export default function AdminTests() {
           case 'today':
             if (submittedDate.toDateString() !== now.toDateString()) return false;
             break;
-          case 'week':
+          case 'week': {
             const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
             if (submittedDate < weekAgo) return false;
             break;
-          case 'month':
+          }
+          case 'month': {
             const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
             if (submittedDate < monthAgo) return false;
             break;
-          case 'year':
+          }
+          case 'year': {
             const yearAgo = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
             if (submittedDate < yearAgo) return false;
             break;
+          }
         }
       }
       
@@ -296,36 +320,24 @@ export default function AdminTests() {
     });
   }, [sessions, searchQuery, ageFilter, genderFilter, statusFilter, dateFilter]);
 
-  // Pagination calculations
-  const totalPages = Math.max(1, Math.ceil(filteredSessions.length / itemsPerPage));
+  // Group filtered sessions by child
+  const groupedSessions = useMemo(() => {
+    return groupSessionsByChild(filteredSessions);
+  }, [filteredSessions]);
+
+  // Pagination on groups
+  const totalPages = Math.max(1, Math.ceil(groupedSessions.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedSessions = filteredSessions.slice(startIndex, endIndex);
+  const paginatedGroups = groupedSessions.slice(startIndex, endIndex);
 
-  // Stats calculations
+  // Stats calculations (on all sessions, not filtered)
   const stats = useMemo(() => {
-    if (!sessions) return { total: 0, pending: 0, inReview: 0, completed: 0 };
+    if (!sessions) return { total: 0, pending: 0, inReview: 0, completed: 0, reviewed: 0, notCompleted: 0 };
     return calculateTestStats(sessions);
   }, [sessions]);
 
-  // Helper to format gender
-  const formatGender = (gender: string | null): string => {
-    if (!gender) return '';
-    const genderLower = gender.toLowerCase();
-    if (genderLower === 'm' || genderLower === 'male' || genderLower === 'moški') return 'M';
-    if (genderLower === 'f' || genderLower === 'female' || genderLower === 'ženski' || genderLower === 'z' || genderLower === 'ž') return 'Ž';
-    return gender;
-  };
-
-  // Helper to format date
-  const formatDate = (date: string | null): string => {
-    if (!date) return '-';
-    try {
-      return format(new Date(date), 'd. M. yyyy', { locale: sl });
-    } catch {
-      return '-';
-    }
-  };
+  const hasActiveFilters = searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all';
 
   return (
     <div className="space-y-6">
@@ -386,7 +398,7 @@ export default function AdminTests() {
         <CardHeader>
           <CardTitle>Seznam preverjanj</CardTitle>
           <CardDescription>
-            Vsa opravljena preverjanja izgovorjave na portalu TomiTalk
+            Preverjanja so grupirana po otroku — kliknite na vrstico za prikaz posameznih sej
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -472,84 +484,155 @@ export default function AdminTests() {
             </div>
           )}
 
-          {/* Desktop: Table */}
+          {/* Desktop: Table with expandable rows */}
           {!isLoading && !error && (
             <div className="hidden md:block rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-8"></TableHead>
                     <TableHead>Uporabnik</TableHead>
                     <TableHead>Ime otroka</TableHead>
                     <TableHead>Starost</TableHead>
                     <TableHead>Spol</TableHead>
+                    <TableHead>Seje</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Oddano</TableHead>
                     <TableHead className="text-right">Akcije</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedSessions.length === 0 ? (
+                  {paginatedGroups.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-12 text-muted-foreground">
-                        {searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all' 
+                      <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
+                        {hasActiveFilters
                           ? 'Ni rezultatov za izbrane filtre' 
                           : 'Ni opravljenih preverjanj'}
                       </TableCell>
                     </TableRow>
                   ) : (
-                    paginatedSessions.map((session) => {
-                      const source = formatSource(session);
-                      const gender = formatGender(session.child_gender);
+                    paginatedGroups.map((group) => {
+                      const source = formatSource(group);
+                      const gender = formatGender(group.child_gender);
+                      const latest = group.latestSession;
+                      const isExpanded = expandedGroupId === group.childKey;
+                      const hasMutipleSessions = group.sessions.length > 1;
                       
                       return (
-                        <TableRow key={session.id}>
-                          <TableCell>
-                            {source.line1 ? (
-                              <div className="flex flex-col">
-                                <span className="font-medium">{source.line1}</span>
-                                {source.line2 && (
-                                  <span className="text-sm text-muted-foreground">{source.line2}</span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground italic">Ni podatka</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <span className="font-medium">{session.child_name}</span>
-                          </TableCell>
-                          <TableCell>
-                            {session.child_age !== null ? (
-                              `${session.child_age} let`
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {gender ? (
-                              <span>{gender}</span>
-                            ) : (
-                              <span className="text-muted-foreground italic">Ni določen</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} isCompleted={session.is_completed} />
-                          </TableCell>
-                          <TableCell>
-                            {session.is_completed ? formatDate(session.submitted_at) : '-'}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              title="Ogled podrobnosti"
-                              onClick={() => navigate(`/admin/tests/${session.id}`)}
+                        <React.Fragment key={group.childKey}>
+                          {/* Main row */}
+                          <TableRow 
+                            className={`cursor-pointer ${isExpanded ? 'bg-muted/30' : ''}`}
+                            onClick={() => {
+                              if (hasMutipleSessions) {
+                                toggleGroup(group.childKey);
+                              } else {
+                                navigate(`/admin/tests/${latest.id}`);
+                              }
+                            }}
+                          >
+                            <TableCell className="w-8 px-2">
+                              {hasMutipleSessions && (
+                                <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {source.line1 ? (
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{source.line1}</span>
+                                  {source.line2 && (
+                                    <span className="text-sm text-muted-foreground">{source.line2}</span>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground italic">Ni podatka</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <span className="font-medium">{group.child_name}</span>
+                            </TableCell>
+                            <TableCell>
+                              {group.child_age !== null ? (
+                                `${group.child_age} let`
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {gender ? (
+                                <span>{gender}</span>
+                              ) : (
+                                <span className="text-muted-foreground italic">Ni določen</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className="text-xs">
+                                {group.sessions.length}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <StatusBadge status={latest.status} reviewedAt={latest.reviewed_at} completedAt={latest.completed_at} isCompleted={latest.is_completed} />
+                            </TableCell>
+                            <TableCell>
+                              {latest.is_completed ? formatDate(latest.submitted_at) : '-'}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {!hasMutipleSessions && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  title="Ogled podrobnosti"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigate(`/admin/tests/${latest.id}`);
+                                  }}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Ogled
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                          
+                          {/* Expanded sub-rows */}
+                          {isExpanded && group.sessions.map((session, idx) => (
+                            <TableRow 
+                              key={session.id} 
+                              className="bg-muted/20 hover:bg-muted/40"
                             >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Ogled
-                            </Button>
-                          </TableCell>
-                        </TableRow>
+                              <TableCell className="w-8 px-2"></TableCell>
+                              <TableCell colSpan={2}>
+                                <div className="flex items-center gap-2 pl-4">
+                                  <span className="text-muted-foreground">└</span>
+                                  <span className="text-sm font-medium">Seja {group.sessions.length - idx}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell colSpan={2}>
+                                <span className="text-sm text-muted-foreground">
+                                  {session.word_count} besed
+                                </span>
+                              </TableCell>
+                              <TableCell></TableCell>
+                              <TableCell>
+                                <StatusBadge status={session.status} reviewedAt={session.reviewed_at} completedAt={session.completed_at} isCompleted={session.is_completed} />
+                              </TableCell>
+                              <TableCell>
+                                {session.is_completed ? formatDate(session.submitted_at) : '-'}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm" 
+                                  title="Ogled podrobnosti"
+                                  onClick={() => navigate(`/admin/tests/${session.id}`)}
+                                >
+                                  <Eye className="h-4 w-4 mr-1" />
+                                  Ogled
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </React.Fragment>
                       );
                     })
                   )}
@@ -559,10 +642,10 @@ export default function AdminTests() {
           )}
 
           {/* Pagination */}
-          {!isLoading && !error && filteredSessions.length > 0 && (
+          {!isLoading && !error && groupedSessions.length > 0 && (
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4 pt-4 border-t">
               <div className="text-sm text-muted-foreground">
-                Prikazujem {startIndex + 1}-{Math.min(endIndex, filteredSessions.length)} od {filteredSessions.length}
+                Prikazujem {startIndex + 1}-{Math.min(endIndex, groupedSessions.length)} od {groupedSessions.length} otrok ({filteredSessions.length} sej)
               </div>
               
               <div className="flex items-center gap-4">
@@ -615,21 +698,19 @@ export default function AdminTests() {
           {/* Mobile: Cards */}
           {!isLoading && !error && (
             <div className="md:hidden space-y-3">
-              {paginatedSessions.length === 0 ? (
+              {paginatedGroups.length === 0 ? (
                 <div className="text-center py-12 text-muted-foreground">
-                  {searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all'
+                  {hasActiveFilters
                     ? 'Ni rezultatov za izbrane filtre' 
                     : 'Ni opravljenih preverjanj'}
                 </div>
               ) : (
-                paginatedSessions.map((session) => (
-                  <TestCard 
-                    key={session.id} 
-                    session={session} 
-                    formatGender={formatGender}
-                    formatDate={formatDate}
-                    isExpanded={expandedCardId === session.id}
-                    onToggle={() => toggleCard(session.id)}
+                paginatedGroups.map((group) => (
+                  <GroupedTestCard 
+                    key={group.childKey} 
+                    group={group}
+                    isExpanded={expandedGroupId === group.childKey}
+                    onToggle={() => toggleGroup(group.childKey)}
                     onNavigate={(sessionId) => navigate(`/admin/tests/${sessionId}`)}
                   />
                 ))
