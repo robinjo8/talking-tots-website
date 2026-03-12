@@ -35,7 +35,7 @@ export function formatRecommendedLettersText(letters: RecommendedLetter[]): stri
   if (letters.length === 0) return '';
   
   const parts = letters.map(l => {
-    const posText = l.position === 'start' ? 'na začetku besed' : 'na sredini/koncu besed';
+    const posText = l.position === 'start' ? 'na začetku besed' : l.position === 'initial-exercises' ? '(začetne vaje)' : 'na sredini/koncu besed';
     return `glas ${l.letter} ${posText}`;
   });
   
