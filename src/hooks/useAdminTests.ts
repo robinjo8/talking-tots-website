@@ -186,8 +186,13 @@ export function useAdminTests() {
         };
       });
 
-      // Filter out abandoned sessions (not completed AND no recorded words)
-      return allSessions.filter(s => s.is_completed || s.word_count > 0);
+      // Filter out truly abandoned empty sessions (pending, not completed, no words)
+      return allSessions.filter(s => {
+        if (s.is_completed) return true;
+        if (s.word_count > 0) return true;
+        if (s.status !== 'pending') return true;
+        return false;
+      });
     },
   });
 }
