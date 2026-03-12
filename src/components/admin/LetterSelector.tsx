@@ -23,7 +23,7 @@ const ALL_LETTERS = [
 
 export interface RecommendedLetter {
   letter: string;
-  position: 'start' | 'middle-end';
+  position: 'start' | 'middle-end' | 'initial-exercises';
 }
 
 interface LetterSelectorProps {
