@@ -182,45 +182,67 @@ export function ReportTemplateEditor({
       </div>
 
       {/* Predlog za igre in vaje Section */}
-      <div className="space-y-2">
+      <div className="space-y-3">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
           PREDLOG ZA IGRE IN VAJE: <span className="text-red-500">*</span>
         </h2>
-        <LetterSelector
-          selectedLetters={data.recommendedLetters}
-          onLettersChange={onRecommendedLettersChange}
-        />
+        
+        {/* Row 1: Letter selector */}
+        <div className="flex items-start gap-2">
+          <span className="text-sm font-medium text-foreground whitespace-nowrap pt-1">Priporočamo igre in vaje za glas:</span>
+          <LetterSelector
+            selectedLetters={data.recommendedLetters}
+            onLettersChange={onRecommendedLettersChange}
+            hidePreview
+          />
+        </div>
+
+        {/* Row 2: Motorika */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-foreground whitespace-nowrap">Vaje za motoriko govoril:</span>
+          <MotorikaFrequencySelector
+            frequency={data.motorikaFrequency}
+            customCount={data.motorikaCustomCount}
+            customUnit={data.motorikaCustomUnit}
+            onFrequencyChange={onMotorikaFrequencyChange}
+            onCustomCountChange={onMotorikaCustomCountChange}
+            onCustomUnitChange={onMotorikaCustomUnitChange}
+            hidePreview
+            inline
+          />
+        </div>
+
+        {/* Row 3: Video navodila */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-foreground whitespace-nowrap">Ogled video navodil:</span>
+          <VideoLetterSelector
+            selectedLetters={data.recommendedVideoLetters}
+            onLettersChange={onRecommendedVideoLettersChange}
+            hidePreview
+          />
+        </div>
+
+        {/* Combined preview box */}
+        {(() => {
+          const letterText = data.recommendedLetters.length > 0 ? formatRecommendedLettersText(data.recommendedLetters) : '';
+          const motorikaText = formatMotorikaFrequencyText(data.motorikaFrequency, data.motorikaCustomCount, data.motorikaCustomUnit);
+          const videoText = data.recommendedVideoLetters?.length > 0 ? formatVideoLettersText(data.recommendedVideoLetters) : '';
+          const parts = [letterText, motorikaText, videoText].filter(Boolean);
+          if (parts.length === 0) return null;
+          return (
+            <div className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2 space-y-2">
+              {parts.map((text, i) => (
+                <p key={i}>{text}</p>
+              ))}
+            </div>
+          );
+        })()}
+
         <Textarea
           placeholder="Dodatne opombe k predlogu za igre in vaje..."
           value={data.predlogVaj}
           onChange={(e) => onFieldChange('predlogVaj', e.target.value)}
           className="resize-none min-h-[60px] text-sm"
-        />
-      </div>
-
-      {/* Motorika govoril Section */}
-      <div className="space-y-2">
-        <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
-          PRIPOROČAMO VAJE ZA MOTORIKO GOVORIL: <span className="text-red-500">*</span>
-        </h2>
-        <MotorikaFrequencySelector
-          frequency={data.motorikaFrequency}
-          customCount={data.motorikaCustomCount}
-          customUnit={data.motorikaCustomUnit}
-          onFrequencyChange={onMotorikaFrequencyChange}
-          onCustomCountChange={onMotorikaCustomCountChange}
-          onCustomUnitChange={onMotorikaCustomUnitChange}
-        />
-      </div>
-
-      {/* Video navodila Section */}
-      <div className="space-y-2">
-        <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
-          PRIPOROČAMO OGLED VIDEO NAVODIL:
-        </h2>
-        <VideoLetterSelector
-          selectedLetters={data.recommendedVideoLetters}
-          onLettersChange={onRecommendedVideoLettersChange}
         />
       </div>
 

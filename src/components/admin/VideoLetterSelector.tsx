@@ -28,7 +28,7 @@ export function formatVideoLettersText(letters: string[]): string {
   return `Priporočamo ogled video navodil za ${parts.join(', ')} in za glas ${last}.`;
 }
 
-export function VideoLetterSelector({ selectedLetters, onLettersChange }: VideoLetterSelectorProps) {
+export function VideoLetterSelector({ selectedLetters, onLettersChange, hidePreview = false }: VideoLetterSelectorProps) {
   const toggleLetter = (letter: string) => {
     if (selectedLetters.includes(letter)) {
       onLettersChange(selectedLetters.filter(l => l !== letter));
@@ -44,8 +44,6 @@ export function VideoLetterSelector({ selectedLetters, onLettersChange }: VideoL
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 flex-wrap">
-        <span className="text-sm text-muted-foreground whitespace-nowrap">Priporočamo ogled video navodil za</span>
-        
         {selectedLetters.map(letter => (
           <Badge 
             key={letter} 
@@ -83,7 +81,7 @@ export function VideoLetterSelector({ selectedLetters, onLettersChange }: VideoL
         </Popover>
       </div>
 
-      {selectedLetters.length > 0 && (
+      {!hidePreview && selectedLetters.length > 0 && (
         <p className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2">
           {formatVideoLettersText(selectedLetters)}
         </p>
