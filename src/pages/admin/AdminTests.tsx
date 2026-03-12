@@ -528,9 +528,7 @@ export default function AdminTests() {
                              }}
                           >
                             <TableCell className="w-8 px-2">
-                              {hasMutipleSessions && (
-                                <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
-                              )}
+                              <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
                             </TableCell>
                             <TableCell>
                               {source.line1 ? (
