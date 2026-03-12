@@ -524,12 +524,8 @@ export default function AdminTests() {
                           <TableRow 
                             className={`cursor-pointer ${isExpanded ? 'bg-muted/30' : ''}`}
                             onClick={() => {
-                              if (hasMutipleSessions) {
-                                toggleGroup(group.childKey);
-                              } else {
-                                navigate(`/admin/tests/${latest.id}`);
-                              }
-                            }}
+                               toggleGroup(group.childKey);
+                             }}
                           >
                             <TableCell className="w-8 px-2">
                               {hasMutipleSessions && (
