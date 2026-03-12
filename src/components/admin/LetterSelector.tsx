@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 const ALL_LETTERS = [
   'P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V',
@@ -23,7 +24,7 @@ const ALL_LETTERS = [
 
 export interface RecommendedLetter {
   letter: string;
-  position: 'start' | 'middle-end';
+  position: 'start' | 'middle-end' | 'initial-exercises';
 }
 
 interface LetterSelectorProps {
@@ -35,7 +36,7 @@ export function formatRecommendedLettersText(letters: RecommendedLetter[]): stri
   if (letters.length === 0) return '';
   
   const parts = letters.map(l => {
-    const posText = l.position === 'start' ? 'na začetku besed' : 'na sredini/koncu besed';
+    const posText = l.position === 'start' ? 'na začetku besed' : l.position === 'initial-exercises' ? '(začetne vaje)' : 'na sredini/koncu besed';
     return `glas ${l.letter} ${posText}`;
   });
   
@@ -81,7 +82,7 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
     onLettersChange(selectedLetters.filter(l => l.letter !== letter));
   };
 
-  const changePosition = (letter: string, position: 'start' | 'middle-end') => {
+  const changePosition = (letter: string, position: 'start' | 'middle-end' | 'initial-exercises') => {
     onLettersChange(selectedLetters.map(l => 
       l.letter === letter ? { ...l, position } : l
     ));
@@ -105,14 +106,17 @@ export function LetterSelector({ selectedLetters, onLettersChange }: LetterSelec
               </Badge>
               <Select
                 value={item.position}
-                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end')}
+                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end' | 'initial-exercises')}
               >
-                <SelectTrigger className="h-7 text-xs w-[140px] px-2">
+                <SelectTrigger className={cn("h-7 text-xs px-2", item.letter === 'R' ? "w-[160px]" : "w-[140px]")}>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="start">Začetek</SelectItem>
                   <SelectItem value="middle-end">Sredina/konec</SelectItem>
+                  {item.letter === 'R' && (
+                    <SelectItem value="initial-exercises">Začetne vaje</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

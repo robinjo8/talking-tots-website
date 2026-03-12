@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export type MotorikaFrequencyType = 'daily' | 'weekly' | 'monthly' | 'custom' | null;
+export type MotorikaFrequencyType = 'daily' | 'weekly' | 'not_needed' | 'custom' | null;
 export type MotorikaCustomUnit = 'day' | 'week' | 'month' | null;
 
 interface MotorikaFrequencySelectorProps {
@@ -31,8 +31,8 @@ export function formatMotorikaFrequencyText(
       return 'Priporočamo vaje za motoriko govoril vsak dan.';
     case 'weekly':
       return 'Priporočamo vaje za motoriko govoril enkrat na teden.';
-    case 'monthly':
-      return 'Priporočamo vaje za motoriko govoril enkrat na mesec.';
+    case 'not_needed':
+      return 'Vaje za motoriko govoril niso potrebne.';
     case 'custom': {
       if (!customCount || !customUnit) return '';
       const unitText = customUnit === 'day' ? 'dan' : customUnit === 'week' ? 'teden' : 'mesec';
@@ -63,7 +63,7 @@ export function MotorikaFrequencySelector({
         <SelectContent>
           <SelectItem value="daily">Vsak dan</SelectItem>
           <SelectItem value="weekly">Enkrat na teden</SelectItem>
-          <SelectItem value="monthly">Enkrat na mesec</SelectItem>
+          <SelectItem value="not_needed">Ni potrebno</SelectItem>
           <SelectItem value="custom">Po meri</SelectItem>
         </SelectContent>
       </Select>

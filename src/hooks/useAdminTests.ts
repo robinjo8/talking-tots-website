@@ -101,9 +101,9 @@ export function useAdminTests() {
         organizationIds.length > 0
           ? supabase.from('organizations').select('id, name').in('id', organizationIds)
           : Promise.resolve({ data: [], error: null }),
-        // Get word counts per session
+        // Get word counts per session (select target_word for deduplication)
         sessionIds.length > 0
-          ? supabase.from('articulation_word_results').select('session_id').in('session_id', sessionIds)
+          ? supabase.from('articulation_word_results').select('session_id, target_word').in('session_id', sessionIds)
           : Promise.resolve({ data: [], error: null }),
       ]);
 
@@ -113,11 +113,18 @@ export function useAdminTests() {
       if (organizationsResult.error) console.error('Error fetching organizations:', organizationsResult.error);
       if (wordCountsResult.error) console.error('Error fetching word counts:', wordCountsResult.error);
 
-      // Count words per session
+      // Count unique words per session (deduplicate by target_word to exclude repeats)
       const wordCountMap = new Map<string, number>();
       if (wordCountsResult.data) {
+        const uniqueWordsPerSession = new Map<string, Set<string>>();
         for (const row of wordCountsResult.data) {
-          wordCountMap.set(row.session_id, (wordCountMap.get(row.session_id) || 0) + 1);
+          if (!uniqueWordsPerSession.has(row.session_id)) {
+            uniqueWordsPerSession.set(row.session_id, new Set());
+          }
+          uniqueWordsPerSession.get(row.session_id)!.add(row.target_word);
+        }
+        for (const [sessionId, words] of uniqueWordsPerSession) {
+          wordCountMap.set(sessionId, words.size);
         }
       }
 

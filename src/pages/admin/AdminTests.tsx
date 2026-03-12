@@ -524,17 +524,11 @@ export default function AdminTests() {
                           <TableRow 
                             className={`cursor-pointer ${isExpanded ? 'bg-muted/30' : ''}`}
                             onClick={() => {
-                              if (hasMutipleSessions) {
-                                toggleGroup(group.childKey);
-                              } else {
-                                navigate(`/admin/tests/${latest.id}`);
-                              }
-                            }}
+                               toggleGroup(group.childKey);
+                             }}
                           >
                             <TableCell className="w-8 px-2">
-                              {hasMutipleSessions && (
-                                <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
-                              )}
+                              <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
                             </TableCell>
                             <TableCell>
                               {source.line1 ? (
@@ -577,20 +571,6 @@ export default function AdminTests() {
                               {latest.is_completed ? formatDate(latest.submitted_at) : '-'}
                             </TableCell>
                             <TableCell className="text-right">
-                              {!hasMutipleSessions && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm" 
-                                  title="Ogled podrobnosti"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    navigate(`/admin/tests/${latest.id}`);
-                                  }}
-                                >
-                                  <Eye className="h-4 w-4 mr-1" />
-                                  Ogled
-                                </Button>
-                              )}
                             </TableCell>
                           </TableRow>
                           

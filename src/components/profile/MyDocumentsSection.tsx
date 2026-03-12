@@ -292,7 +292,6 @@ export function MyDocumentsSection() {
                 ) : (
                   <div className="space-y-3 pt-4">
                     {reports.map((report, idx) => {
-                      const isExpanded = expandedDocId === report.path;
                       return (
                         <div key={idx} className="border border-gray-100 rounded-lg overflow-hidden">
                           <div className="flex items-center justify-between p-3 bg-gray-50">
@@ -308,10 +307,17 @@ export function MyDocumentsSection() {
                                 variant="ghost" 
                                 size="sm" 
                                 className="h-8 w-8 p-0"
-                                onClick={() => toggleDocumentPreview(report.path)}
-                                title={isExpanded ? "Zapri predogled" : "Ogled"}
+                                onClick={async () => {
+                                  const { data } = await supabase.storage
+                                    .from('uporabniski-profili')
+                                    .createSignedUrl(report.path, 3600);
+                                  if (data?.signedUrl) {
+                                    window.open(data.signedUrl, '_blank');
+                                  }
+                                }}
+                                title="Odpri poročilo"
                               >
-                                {isExpanded ? <ChevronUp className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                <Eye className="h-4 w-4" />
                               </Button>
                               <Button 
                                 variant="ghost" 
@@ -325,30 +331,6 @@ export function MyDocumentsSection() {
                             </div>
                           </div>
                           
-                          <AnimatePresence>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="p-4 border-t bg-background">
-                                  <DocumentPreview 
-                                    fileName={report.name}
-                                    getSignedUrl={async () => {
-                                      const { data } = await supabase.storage
-                                        .from('uporabniski-profili')
-                                        .createSignedUrl(report.path, 3600);
-                                      return data?.signedUrl || null;
-                                    }}
-                                    onDownload={() => handleDownloadReport(report.path)}
-                                  />
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
                         </div>
                       );
                     })}
