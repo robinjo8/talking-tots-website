@@ -9,9 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LetterSelector, formatRecommendedLettersText, RecommendedLetter } from './LetterSelector';
-import { MotorikaFrequencySelector, formatMotorikaFrequencyText, MotorikaFrequencyType, MotorikaCustomUnit } from './MotorikaFrequencySelector';
-import { VideoLetterSelector, formatVideoLettersText } from './VideoLetterSelector';
+import { LetterSelector, RecommendedLetter } from './LetterSelector';
+import { MotorikaFrequencySelector, MotorikaFrequencyType, MotorikaCustomUnit } from './MotorikaFrequencySelector';
+import { VideoLetterSelector } from './VideoLetterSelector';
 
 export interface TestSession {
   id: string;
