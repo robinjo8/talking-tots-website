@@ -9,9 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { LetterSelector, formatRecommendedLettersText, RecommendedLetter } from './LetterSelector';
-import { MotorikaFrequencySelector, formatMotorikaFrequencyText, MotorikaFrequencyType, MotorikaCustomUnit } from './MotorikaFrequencySelector';
-import { VideoLetterSelector, formatVideoLettersText } from './VideoLetterSelector';
+import { LetterSelector, RecommendedLetter } from './LetterSelector';
+import { MotorikaFrequencySelector, MotorikaFrequencyType, MotorikaCustomUnit } from './MotorikaFrequencySelector';
+import { VideoLetterSelector } from './VideoLetterSelector';
 
 export interface TestSession {
   id: string;
@@ -58,6 +58,99 @@ interface ReportTemplateEditorProps {
   onRecommendedVideoLettersChange: (letters: string[]) => void;
 }
 
+/**
+ * Combines all recommendation parts into a single sentence.
+ * E.g.: "Priporočamo igre in vaje za glas B na začetku besed, vaje za motoriko govoril enkrat na teden in ogled video navodil za glas R."
+ */
+export function formatCombinedRecommendationText(
+  letters: RecommendedLetter[],
+  motorikaFrequency: MotorikaFrequencyType,
+  motorikaCustomCount: number | null,
+  motorikaCustomUnit: MotorikaCustomUnit,
+  videoLetters: string[],
+): string {
+  const parts: string[] = [];
+
+  // Part 1: Letters
+  if (letters.length > 0) {
+    const letterParts = letters.map(l => {
+      const posText = l.position === 'start' ? 'na začetku besed' : l.position === 'initial-exercises' ? '(začetne vaje)' : 'na sredini/koncu besed';
+      return `glas ${l.letter} ${posText}`;
+    });
+    if (letterParts.length === 1) {
+      parts.push(`igre in vaje za ${letterParts[0]}`);
+    } else {
+      const allButLast = letterParts.slice(0, -1);
+      const last = letterParts[letterParts.length - 1];
+      parts.push(`igre in vaje za ${allButLast.join(', ')} in za ${last}`);
+    }
+  }
+
+  // Part 2: Motorika
+  if (motorikaFrequency) {
+    let motorikaText = '';
+    switch (motorikaFrequency) {
+      case 'daily':
+        motorikaText = 'vaje za motoriko govoril vsak dan';
+        break;
+      case 'weekly':
+        motorikaText = 'vaje za motoriko govoril enkrat na teden';
+        break;
+      case 'not_needed':
+        // Special case: this is a negative statement, handle separately
+        break;
+      case 'custom':
+        if (motorikaCustomCount && motorikaCustomUnit) {
+          const unitText = motorikaCustomUnit === 'day' ? 'dan' : motorikaCustomUnit === 'week' ? 'teden' : 'mesec';
+          motorikaText = `vaje za motoriko govoril ${motorikaCustomCount}-krat na ${unitText}`;
+        }
+        break;
+    }
+    if (motorikaText) {
+      parts.push(motorikaText);
+    }
+  }
+
+  // Part 3: Video
+  if (videoLetters.length > 0) {
+    if (videoLetters.length === 1) {
+      parts.push(`ogled video navodil za glas ${videoLetters[0]}`);
+    } else {
+      const allButLast = videoLetters.slice(0, -1);
+      const last = videoLetters[videoLetters.length - 1];
+      const vParts = allButLast.map(l => `glas ${l}`);
+      parts.push(`ogled video navodil za ${vParts.join(', ')} in za glas ${last}`);
+    }
+  }
+
+  if (parts.length === 0 && motorikaFrequency === 'not_needed') {
+    return 'Vaje za motoriko govoril niso potrebne.';
+  }
+
+  if (parts.length === 0) return '';
+
+  // Build combined sentence
+  let sentence = '';
+  if (parts.length === 1) {
+    sentence = `Priporočamo ${parts[0]}`;
+  } else if (parts.length === 2) {
+    sentence = `Priporočamo ${parts[0]} in ${parts[1]}`;
+  } else {
+    const allButLast = parts.slice(0, -1);
+    const last = parts[parts.length - 1];
+    sentence = `Priporočamo ${allButLast.join(', ')} in ${last}`;
+  }
+
+  // Append "not needed" note if motorika is not_needed AND there are other parts
+  if (motorikaFrequency === 'not_needed' && parts.length > 0) {
+    sentence += '. Vaje za motoriko govoril niso potrebne.';
+  } else {
+    sentence += '.';
+  }
+
+  return sentence;
+}
+
 export function ReportTemplateEditor({ 
   data, testSessions, hideParentSection = false, 
   onFieldChange, onSessionChange, onRecommendedLettersChange,
@@ -78,6 +171,14 @@ export function ReportTemplateEditor({
     if (age >= 3 && age <= 4) return `${age} leta`;
     return `${age} let`;
   };
+
+  const combinedText = formatCombinedRecommendationText(
+    data.recommendedLetters,
+    data.motorikaFrequency,
+    data.motorikaCustomCount,
+    data.motorikaCustomUnit,
+    data.recommendedVideoLetters || [],
+  );
 
   return (
     <div className="bg-white border rounded-lg p-6 space-y-6 text-sm print:text-xs">
@@ -182,14 +283,14 @@ export function ReportTemplateEditor({
       </div>
 
       {/* Predlog za igre in vaje Section */}
-      <div className="space-y-3">
+      <div className="space-y-4">
         <h2 className="font-bold text-foreground uppercase text-xs tracking-wide">
           PREDLOG ZA IGRE IN VAJE: <span className="text-red-500">*</span>
         </h2>
         
-        {/* Row 1: Letter selector */}
-        <div className="flex items-start gap-2">
-          <span className="text-sm font-medium text-foreground whitespace-nowrap pt-1">Priporočamo igre in vaje za glas:</span>
+        {/* Row 1: Letter selector - vertical layout */}
+        <div className="space-y-1">
+          <span className="text-sm font-medium text-foreground">Priporočamo igre in vaje za glas:</span>
           <LetterSelector
             selectedLetters={data.recommendedLetters}
             onLettersChange={onRecommendedLettersChange}
@@ -197,9 +298,9 @@ export function ReportTemplateEditor({
           />
         </div>
 
-        {/* Row 2: Motorika */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-foreground whitespace-nowrap">Vaje za motoriko govoril:</span>
+        {/* Row 2: Motorika - vertical layout */}
+        <div className="space-y-1">
+          <span className="text-sm font-medium text-foreground">Vaje za motoriko govoril:</span>
           <MotorikaFrequencySelector
             frequency={data.motorikaFrequency}
             customCount={data.motorikaCustomCount}
@@ -208,13 +309,12 @@ export function ReportTemplateEditor({
             onCustomCountChange={onMotorikaCustomCountChange}
             onCustomUnitChange={onMotorikaCustomUnitChange}
             hidePreview
-            inline
           />
         </div>
 
-        {/* Row 3: Video navodila */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-foreground whitespace-nowrap">Ogled video navodil:</span>
+        {/* Row 3: Video navodila - vertical layout */}
+        <div className="space-y-1">
+          <span className="text-sm font-medium text-foreground">Ogled video navodil:</span>
           <VideoLetterSelector
             selectedLetters={data.recommendedVideoLetters}
             onLettersChange={onRecommendedVideoLettersChange}
@@ -223,20 +323,11 @@ export function ReportTemplateEditor({
         </div>
 
         {/* Combined preview box */}
-        {(() => {
-          const letterText = data.recommendedLetters.length > 0 ? formatRecommendedLettersText(data.recommendedLetters) : '';
-          const motorikaText = formatMotorikaFrequencyText(data.motorikaFrequency, data.motorikaCustomCount, data.motorikaCustomUnit);
-          const videoText = data.recommendedVideoLetters?.length > 0 ? formatVideoLettersText(data.recommendedVideoLetters) : '';
-          const parts = [letterText, motorikaText, videoText].filter(Boolean);
-          if (parts.length === 0) return null;
-          return (
-            <div className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2 space-y-2">
-              {parts.map((text, i) => (
-                <p key={i}>{text}</p>
-              ))}
-            </div>
-          );
-        })()}
+        {combinedText && (
+          <div className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2">
+            <p>{combinedText}</p>
+          </div>
+        )}
 
         <Textarea
           placeholder="Dodatne opombe k predlogu za igre in vaje..."
@@ -299,14 +390,14 @@ export function generateReportText(data: ReportData): string {
     return `${age} let`;
   };
 
-  const recommendedText = data.recommendedLetters && data.recommendedLetters.length > 0
-    ? formatRecommendedLettersText(data.recommendedLetters)
-    : '';
-  const motorikaText = formatMotorikaFrequencyText(data.motorikaFrequency, data.motorikaCustomCount, data.motorikaCustomUnit);
-  const videoText = data.recommendedVideoLetters && data.recommendedVideoLetters.length > 0
-    ? formatVideoLettersText(data.recommendedVideoLetters)
-    : '';
-  const predlogContent = [recommendedText, motorikaText, videoText, data.predlogVaj].filter(Boolean).join('\n') || '(ni vnosa)';
+  const combinedText = formatCombinedRecommendationText(
+    data.recommendedLetters || [],
+    data.motorikaFrequency,
+    data.motorikaCustomCount,
+    data.motorikaCustomUnit,
+    data.recommendedVideoLetters || [],
+  );
+  const predlogContent = [combinedText, data.predlogVaj].filter(Boolean).join('\n') || '(ni vnosa)';
 
   return `LOGOPEDSKO POROČILO – TomiTalk
 

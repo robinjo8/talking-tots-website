@@ -2,12 +2,12 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Only letters that have video navodila
 const VIDEO_LETTERS = ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'];
@@ -41,45 +41,44 @@ export function VideoLetterSelector({ selectedLetters, onLettersChange, hidePrev
     onLettersChange(selectedLetters.filter(l => l !== letter));
   };
 
+  // Available letters (not yet selected)
+  const availableLetters = VIDEO_LETTERS.filter(
+    letter => !selectedLetters.includes(letter)
+  );
+
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2 flex-wrap">
-        {selectedLetters.map(letter => (
-          <Badge 
-            key={letter} 
-            variant="secondary" 
-            className="gap-1 cursor-pointer hover:bg-destructive/10"
-            onClick={() => removeLetter(letter)}
-          >
-            {letter}
-            <X className="h-3 w-3" />
-          </Badge>
-        ))}
+      <Select
+        value=""
+        onValueChange={(val) => toggleLetter(val)}
+      >
+        <SelectTrigger className="w-[200px] h-8 text-sm">
+          <SelectValue placeholder="Izberi glas" />
+        </SelectTrigger>
+        <SelectContent>
+          {availableLetters.map(letter => (
+            <SelectItem key={letter} value={letter}>
+              {letter}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-7 text-xs">
-              + Dodaj glas
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-56 p-3" align="start">
-            <div className="grid grid-cols-3 gap-2">
-              {VIDEO_LETTERS.map(letter => (
-                <label
-                  key={letter}
-                  className="flex items-center gap-1.5 cursor-pointer text-sm"
-                >
-                  <Checkbox
-                    checked={selectedLetters.includes(letter)}
-                    onCheckedChange={() => toggleLetter(letter)}
-                  />
-                  {letter}
-                </label>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
+      {selectedLetters.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          {selectedLetters.map(letter => (
+            <Badge 
+              key={letter} 
+              variant="secondary" 
+              className="gap-1 cursor-pointer hover:bg-destructive/10"
+              onClick={() => removeLetter(letter)}
+            >
+              {letter}
+              <X className="h-3 w-3" />
+            </Badge>
+          ))}
+        </div>
+      )}
 
       {!hidePreview && selectedLetters.length > 0 && (
         <p className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2">

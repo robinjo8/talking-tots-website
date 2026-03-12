@@ -1,9 +1,7 @@
 import jsPDF from 'jspdf';
 import { ReportData } from '@/components/admin/ReportTemplateEditor';
 import { loadRobotoFonts } from './fonts/robotoBase64';
-import { formatRecommendedLettersText } from '@/components/admin/LetterSelector';
-import { formatMotorikaFrequencyText } from '@/components/admin/MotorikaFrequencySelector';
-import { formatVideoLettersText } from '@/components/admin/VideoLetterSelector';
+import { formatCombinedRecommendationText } from '@/components/admin/ReportTemplateEditor';
 
 export interface GenerateReportPdfOptions {
   hideParentSection?: boolean;
@@ -184,12 +182,14 @@ export async function generateReportPdf(data: ReportData, options: GenerateRepor
     const lineHeight = 5;
     
     // Build predlog content
-    const recommendedText = data.recommendedLetters && data.recommendedLetters.length > 0
-      ? formatRecommendedLettersText(data.recommendedLetters) : '';
-    const motorikaText = formatMotorikaFrequencyText(data.motorikaFrequency, data.motorikaCustomCount, data.motorikaCustomUnit);
-    const videoText = data.recommendedVideoLetters && data.recommendedVideoLetters.length > 0
-      ? formatVideoLettersText(data.recommendedVideoLetters) : '';
-    const fullPredlog = [recommendedText, motorikaText, videoText, data.predlogVaj.trim()].filter(Boolean).join('\n') || '(ni vnosa)';
+    const combinedText = formatCombinedRecommendationText(
+      data.recommendedLetters || [],
+      data.motorikaFrequency,
+      data.motorikaCustomCount,
+      data.motorikaCustomUnit,
+      data.recommendedVideoLetters || [],
+    );
+    const fullPredlog = [combinedText, data.predlogVaj.trim()].filter(Boolean).join('\n') || '(ni vnosa)';
 
     const sections = [
       { title: 'Anamneza', content: data.anamneza.trim() || '(ni vnosa)' },

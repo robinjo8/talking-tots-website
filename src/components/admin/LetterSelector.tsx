@@ -2,13 +2,6 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { X } from 'lucide-react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -88,61 +81,60 @@ export function LetterSelector({ selectedLetters, onLettersChange, hidePreview =
     ));
   };
 
+  // Available letters (not yet selected)
+  const availableLetters = ALL_LETTERS.filter(
+    letter => !selectedLetters.some(l => l.letter === letter)
+  );
+
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2 flex-wrap">
-        {selectedLetters.map(item => (
-          <div key={item.letter} className="flex items-center gap-1">
-            <Badge 
-              variant="secondary" 
-              className="gap-1 cursor-pointer hover:bg-destructive/10 min-w-[2.5rem] justify-center"
-              onClick={() => removeLetter(item.letter)}
-            >
-              {item.letter}
-              <X className="h-3 w-3" />
-            </Badge>
-            <Select
-              value={item.position}
-              onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end' | 'initial-exercises')}
-            >
-              <SelectTrigger className={cn("h-7 text-xs px-2", item.letter === 'R' ? "w-[160px]" : "w-[140px]")}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="start">Začetek</SelectItem>
-                <SelectItem value="middle-end">Sredina/konec</SelectItem>
-                {item.letter === 'R' && (
-                  <SelectItem value="initial-exercises">Začetne vaje</SelectItem>
-                )}
-              </SelectContent>
-            </Select>
-          </div>
-        ))}
+      <Select
+        value=""
+        onValueChange={(val) => toggleLetter(val)}
+      >
+        <SelectTrigger className="w-[200px] h-8 text-sm">
+          <SelectValue placeholder="Izberi glas" />
+        </SelectTrigger>
+        <SelectContent>
+          {availableLetters.map(letter => (
+            <SelectItem key={letter} value={letter}>
+              {letter}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="sm" className="h-7 text-xs">
-              + Dodaj glas
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64 p-3" align="start">
-            <div className="grid grid-cols-5 gap-2">
-              {ALL_LETTERS.map(letter => (
-                <label
-                  key={letter}
-                  className="flex items-center gap-1.5 cursor-pointer text-sm"
-                >
-                  <Checkbox
-                    checked={selectedLetters.some(l => l.letter === letter)}
-                    onCheckedChange={() => toggleLetter(letter)}
-                  />
-                  {letter}
-                </label>
-              ))}
+      {selectedLetters.length > 0 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          {selectedLetters.map(item => (
+            <div key={item.letter} className="flex items-center gap-1">
+              <Badge 
+                variant="secondary" 
+                className="gap-1 cursor-pointer hover:bg-destructive/10 min-w-[2.5rem] justify-center"
+                onClick={() => removeLetter(item.letter)}
+              >
+                {item.letter}
+                <X className="h-3 w-3" />
+              </Badge>
+              <Select
+                value={item.position}
+                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end' | 'initial-exercises')}
+              >
+                <SelectTrigger className={cn("h-7 text-xs px-2", item.letter === 'R' ? "w-[160px]" : "w-[140px]")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="start">Začetek</SelectItem>
+                  <SelectItem value="middle-end">Sredina/konec</SelectItem>
+                  {item.letter === 'R' && (
+                    <SelectItem value="initial-exercises">Začetne vaje</SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
             </div>
-          </PopoverContent>
-        </Popover>
-      </div>
+          ))}
+        </div>
+      )}
 
       {!hidePreview && selectedLetters.length > 0 && (
         <p className="text-sm font-medium text-foreground bg-muted/50 rounded-md px-3 py-2">
