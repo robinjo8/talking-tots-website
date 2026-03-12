@@ -15,32 +15,56 @@ export interface TestSessionData {
   parent_first_name: string | null;
   parent_last_name: string | null;
   assigned_to: string | null;
-  // Fields for organization filtering
   source_type: 'parent' | 'logopedist';
   logopedist_child_id: string | null;
   organization_id: string | null;
-  // Fields for source display
   organization_name: string | null;
   logopedist_first_name: string | null;
   logopedist_last_name: string | null;
   is_completed: boolean;
+  word_count: number;
+  session_number: number;
+  total_words: number | null;
+}
+
+export interface ChildGroup {
+  childKey: string; // child_id or logopedist_child_id
+  child_name: string;
+  child_age: number | null;
+  child_gender: string | null;
+  parent_id: string;
+  parent_first_name: string | null;
+  parent_last_name: string | null;
+  source_type: 'parent' | 'logopedist';
+  organization_id: string | null;
+  organization_name: string | null;
+  logopedist_first_name: string | null;
+  logopedist_last_name: string | null;
+  sessions: TestSessionData[];
+  latestSession: TestSessionData;
+  completedSessionCount: number;
 }
 
 export interface TestSessionStats {
   total: number;
   pending: number;
-  inReview: number; // includes 'assigned' and 'in_review'
+  inReview: number;
   completed: number;
+}
+
+export interface TestSessionStatsExtended extends TestSessionStats {
+  reviewed: number;
+  notCompleted: number;
 }
 
 export function useAdminTests() {
   return useQuery({
     queryKey: ['admin-tests'],
     queryFn: async (): Promise<TestSessionData[]> => {
-      // 1. Get all test sessions (RLS already filters by organization context)
+      // 1. Get all test sessions
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed')
+        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed, session_number, total_words')
         .order('submitted_at', { ascending: false });
 
       if (sessionsError) {
@@ -52,7 +76,7 @@ export function useAdminTests() {
         return [];
       }
 
-      // 2. Get unique IDs for both parent and logopedist children
+      // 2. Get unique IDs
       const parentChildIds = sessions
         .filter(s => s.source_type !== 'logopedist' && s.child_id)
         .map(s => s.child_id);
@@ -61,9 +85,10 @@ export function useAdminTests() {
         .map(s => s.logopedist_child_id);
       const parentIds = [...new Set(sessions.map(s => s.parent_id))];
       const organizationIds = [...new Set(sessions.filter(s => s.organization_id).map(s => s.organization_id))];
+      const sessionIds = sessions.map(s => s.id);
 
-      // 3. Fetch all data in parallel
-      const [childrenResult, logopedistChildrenResult, profilesResult, organizationsResult] = await Promise.all([
+      // 3. Fetch all data in parallel (including word counts)
+      const [childrenResult, logopedistChildrenResult, profilesResult, organizationsResult, wordCountsResult] = await Promise.all([
         parentChildIds.length > 0
           ? supabase.from('children').select('id, name, age, gender').in('id', parentChildIds)
           : Promise.resolve({ data: [], error: null }),
@@ -76,22 +101,27 @@ export function useAdminTests() {
         organizationIds.length > 0
           ? supabase.from('organizations').select('id, name').in('id', organizationIds)
           : Promise.resolve({ data: [], error: null }),
+        // Get word counts per session
+        sessionIds.length > 0
+          ? supabase.from('articulation_word_results').select('session_id').in('session_id', sessionIds)
+          : Promise.resolve({ data: [], error: null }),
       ]);
 
-      if (childrenResult.error) {
-        console.error('Error fetching children:', childrenResult.error);
-      }
-      if (logopedistChildrenResult.error) {
-        console.error('Error fetching logopedist children:', logopedistChildrenResult.error);
-      }
-      if (profilesResult.error) {
-        console.error('Error fetching profiles:', profilesResult.error);
-      }
-      if (organizationsResult.error) {
-        console.error('Error fetching organizations:', organizationsResult.error);
+      if (childrenResult.error) console.error('Error fetching children:', childrenResult.error);
+      if (logopedistChildrenResult.error) console.error('Error fetching logopedist children:', logopedistChildrenResult.error);
+      if (profilesResult.error) console.error('Error fetching profiles:', profilesResult.error);
+      if (organizationsResult.error) console.error('Error fetching organizations:', organizationsResult.error);
+      if (wordCountsResult.error) console.error('Error fetching word counts:', wordCountsResult.error);
+
+      // Count words per session
+      const wordCountMap = new Map<string, number>();
+      if (wordCountsResult.data) {
+        for (const row of wordCountsResult.data) {
+          wordCountMap.set(row.session_id, (wordCountMap.get(row.session_id) || 0) + 1);
+        }
       }
 
-      // 4. Get logopedist IDs from logopedist_children to fetch their names
+      // 4. Get logopedist profiles
       const logopedistIds = [...new Set(
         (logopedistChildrenResult.data || [])
           .map(c => c.logopedist_id)
@@ -102,29 +132,17 @@ export function useAdminTests() {
         ? await supabase.from('logopedist_profiles').select('id, first_name, last_name').in('id', logopedistIds)
         : { data: [], error: null };
 
-      if (logopedistProfilesResult.error) {
-        console.error('Error fetching logopedist profiles:', logopedistProfilesResult.error);
-      }
+      if (logopedistProfilesResult.error) console.error('Error fetching logopedist profiles:', logopedistProfilesResult.error);
 
       // 5. Create lookup maps
-      const childrenMap = new Map(
-        (childrenResult.data || []).map(c => [c.id, c])
-      );
-      const logopedistChildrenMap = new Map(
-        (logopedistChildrenResult.data || []).map(c => [c.id, c])
-      );
-      const profilesMap = new Map(
-        (profilesResult.data || []).map(p => [p.id, p])
-      );
-      const organizationsMap = new Map(
-        (organizationsResult.data || []).map(o => [o.id, o])
-      );
-      const logopedistProfilesMap = new Map(
-        (logopedistProfilesResult.data || []).map(lp => [lp.id, lp])
-      );
+      const childrenMap = new Map((childrenResult.data || []).map(c => [c.id, c]));
+      const logopedistChildrenMap = new Map((logopedistChildrenResult.data || []).map(c => [c.id, c]));
+      const profilesMap = new Map((profilesResult.data || []).map(p => [p.id, p]));
+      const organizationsMap = new Map((organizationsResult.data || []).map(o => [o.id, o]));
+      const logopedistProfilesMap = new Map((logopedistProfilesResult.data || []).map(lp => [lp.id, lp]));
 
-      // 6. Build result
-      const result: TestSessionData[] = sessions.map(session => {
+      // 6. Build result — filter out abandoned empty sessions
+      const allSessions: TestSessionData[] = sessions.map(session => {
         let childData: { name: string; age: number | null; gender: string | null; logopedist_id?: string } | undefined;
         let logopedistProfile: { first_name: string; last_name: string } | undefined;
 
@@ -139,6 +157,7 @@ export function useAdminTests() {
 
         const parent = profilesMap.get(session.parent_id);
         const organization = session.organization_id ? organizationsMap.get(session.organization_id) : null;
+        const wordCount = wordCountMap.get(session.id) || 0;
 
         return {
           id: session.id,
@@ -161,17 +180,68 @@ export function useAdminTests() {
           logopedist_first_name: logopedistProfile?.first_name || null,
           logopedist_last_name: logopedistProfile?.last_name || null,
           is_completed: session.is_completed ?? false,
+          word_count: wordCount,
+          session_number: session.session_number ?? 1,
+          total_words: session.total_words ?? null,
         };
       });
 
-      return result;
+      // Filter out abandoned sessions (not completed AND no recorded words)
+      return allSessions.filter(s => s.is_completed || s.word_count > 0);
     },
   });
 }
 
-export interface TestSessionStatsExtended extends TestSessionStats {
-  reviewed: number;
-  notCompleted: number;
+export function groupSessionsByChild(sessions: TestSessionData[]): ChildGroup[] {
+  const groupMap = new Map<string, TestSessionData[]>();
+
+  for (const session of sessions) {
+    const key = session.source_type === 'logopedist'
+      ? (session.logopedist_child_id || session.child_id)
+      : session.child_id;
+    if (!groupMap.has(key)) {
+      groupMap.set(key, []);
+    }
+    groupMap.get(key)!.push(session);
+  }
+
+  const groups: ChildGroup[] = [];
+  for (const [childKey, childSessions] of groupMap) {
+    // Sort sessions by submitted_at desc (latest first)
+    childSessions.sort((a, b) => {
+      const dateA = a.submitted_at ? new Date(a.submitted_at).getTime() : 0;
+      const dateB = b.submitted_at ? new Date(b.submitted_at).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    const latest = childSessions[0];
+    groups.push({
+      childKey,
+      child_name: latest.child_name,
+      child_age: latest.child_age,
+      child_gender: latest.child_gender,
+      parent_id: latest.parent_id,
+      parent_first_name: latest.parent_first_name,
+      parent_last_name: latest.parent_last_name,
+      source_type: latest.source_type,
+      organization_id: latest.organization_id,
+      organization_name: latest.organization_name,
+      logopedist_first_name: latest.logopedist_first_name,
+      logopedist_last_name: latest.logopedist_last_name,
+      sessions: childSessions,
+      latestSession: latest,
+      completedSessionCount: childSessions.filter(s => s.is_completed).length,
+    });
+  }
+
+  // Sort groups by latest session date (newest first)
+  groups.sort((a, b) => {
+    const dateA = a.latestSession.submitted_at ? new Date(a.latestSession.submitted_at).getTime() : 0;
+    const dateB = b.latestSession.submitted_at ? new Date(b.latestSession.submitted_at).getTime() : 0;
+    return dateB - dateA;
+  });
+
+  return groups;
 }
 
 export function calculateTestStats(sessions: TestSessionData[]): TestSessionStatsExtended {
