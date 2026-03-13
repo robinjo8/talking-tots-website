@@ -30,7 +30,7 @@ interface GenericBingoGameProps {
   lipsImage?: string;
 }
 
-export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija', onGameComplete }: GenericBingoGameProps) {
+export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija', onGameComplete, lipsImage }: GenericBingoGameProps) {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
