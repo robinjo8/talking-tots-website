@@ -226,7 +226,7 @@ const KakoDeluje = () => {
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Bingo</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Igra ustvari mrežo 4 × 4 (16 polj) s slikami in besedami. Sistem naključno izbere besedo, otrok pa mora v mreži označiti vsa polja, kjer se ta beseda pojavi.
+              Igra naključno izbere sliko, otrok pa mora v mreži označiti vsa polja, kjer se ta slika pojavi.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Igra se zaključi, ko otrok:
