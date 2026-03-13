@@ -196,6 +196,7 @@ export default function AdminArtikulacijskiTest() {
     hasRecorded,
     isTestComplete,
     isTranscribing,
+    isAudioPlaying,
     transcriptionResult,
     sessionNumber,
     currentLetter,
@@ -210,6 +211,7 @@ export default function AdminArtikulacijskiTest() {
     handleNext,
     resetTest,
     initializeSession,
+    playWordAudio,
   } = useArticulationTestNew(
     childId, 
     undefined, 
