@@ -70,6 +70,7 @@ export function KaceLestveGame({
   childId,
   logopedistChildId,
   wordList,
+  lipsImage,
 }: KaceLestveGameProps) {
   const navigate = useNavigate();
   const { checkForNewTrophy } = useTrophyContext();
