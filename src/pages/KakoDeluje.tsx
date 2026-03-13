@@ -190,7 +190,7 @@ const KakoDeluje = () => {
               <li>zvočne posnetke.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Težavnost se prilagaja starosti otroka. V logopedski različici otrok povezuje elemente z istim začetnim glasom, kar krepi glasovno zavedanje in pravilno artikulacijo.
+              Težavnost se prilagaja starosti otroka.
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Igra zaporedja</h4>
