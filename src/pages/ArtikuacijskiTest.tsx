@@ -260,8 +260,8 @@ const ArtikuacijskiTest = () => {
 
   // Handle resume dialog actions
   const handleResume = () => {
-    // Just close the dialog - sessionInfo already has the startIndex from database
     setShowResumeDialog(false);
+    setTestStarted(true);
   };
 
   const handleCloseResumeDialog = () => {
