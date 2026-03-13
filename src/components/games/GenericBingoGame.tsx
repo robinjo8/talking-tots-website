@@ -27,6 +27,7 @@ interface GenericBingoGameProps {
   exerciseId: string;
   backPath?: string;
   onGameComplete?: () => void;
+  lipsImage?: string;
 }
 
 export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija', onGameComplete }: GenericBingoGameProps) {
