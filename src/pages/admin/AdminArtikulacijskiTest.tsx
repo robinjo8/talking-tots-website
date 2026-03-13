@@ -56,6 +56,7 @@ export default function AdminArtikulacijskiTest() {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [testStarted, setTestStarted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
   const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
