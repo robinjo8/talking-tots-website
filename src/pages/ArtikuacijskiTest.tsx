@@ -202,6 +202,7 @@ const ArtikuacijskiTest = () => {
     hasRecorded,
     isTestComplete,
     isTranscribing,
+    isAudioPlaying,
     transcriptionResult,
     currentLetter,
     currentLetterIndex,
@@ -215,6 +216,7 @@ const ArtikuacijskiTest = () => {
     handleNext,
     resetTest,
     initializeSession,
+    playWordAudio,
   } = useArticulationTestNew(
     childId, 
     userId, 
