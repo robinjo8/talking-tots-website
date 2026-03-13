@@ -18,6 +18,8 @@ import { useTrophyContext } from '@/contexts/TrophyContext';
 import { MetKockeWord } from '@/data/metKockeConfig';
 import { useWordProgress } from '@/hooks/useWordProgress';
 import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 interface GenericMetKockeGameProps {
   letter: string;
