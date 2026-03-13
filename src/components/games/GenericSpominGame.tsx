@@ -14,8 +14,6 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/compon
 import { Loader, Home, RefreshCw } from "lucide-react";
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
-import { LipsImageButton } from "@/components/games/LipsImageButton";
-import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 import { useGameMode, useGameNavigation } from "@/contexts/GameModeContext";
 
 export interface GenericSpominGameProps {
