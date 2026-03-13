@@ -153,16 +153,16 @@ export const useArticulationTestNew = (
     fetchImage();
   }, [currentWordIndex]);
 
-  // Auto-play word audio 1 second after image loads
+  // Auto-play word audio 1 second after image loads (only when autoPlayEnabled)
   useEffect(() => {
-    if (!currentData?.word.audio || loading) return;
+    if (!autoPlayEnabled || !currentData?.word.audio || loading) return;
 
     const timer = setTimeout(() => {
       playWordAudio();
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [currentWordIndex, loading]);
+  }, [currentWordIndex, loading, autoPlayEnabled]);
 
   // Play word audio function
   const playWordAudio = useCallback(() => {
