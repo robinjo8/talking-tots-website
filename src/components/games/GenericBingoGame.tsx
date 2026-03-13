@@ -306,6 +306,8 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
         onConfirm={handleConfirmNewGame}
         onCancel={() => setShowNewGameConfirmation(false)}
       />
+
+      {lipsImage && <LipsImageButton lipsImage={lipsImage} />}
     </div>
   );
 }
