@@ -292,6 +292,7 @@ const ArtikuacijskiTest = () => {
           // Initialize session when user confirms and closes dialog
           await initializeSession();
           setShowInfoDialog(false);
+          setTestStarted(true);
         }}
         childName={childName}
         wordCount={totalWordCount}
