@@ -30,6 +30,7 @@ import {
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { toast } from "sonner";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public";
 const PLAYER_NAMES = ["ZMAJČEK 1", "ZMAJČEK 2"];
