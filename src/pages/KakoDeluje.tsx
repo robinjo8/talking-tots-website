@@ -690,7 +690,7 @@ const KakoDeluje = () => {
               <li>pokali in trofeje.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              <strong>Primer:</strong> za vsako uspešno zaključeno igro ali vajo otrok prejme zvezdico. Po 100 zbranih zvezdicah otrok prejme nagrado zmajčka in za 100 zvezdil oz. 10 zmajčkov prejme najvišjo nagrado pokal.
+              <strong>Primer:</strong> za vsako uspešno zaključeno igro ali vajo otrok prejme zvezdico. Po 100 zbranih zvezdicah otrok prejme nagrado zmajčka in za 100 zvezdic oz. 10 zmajčkov prejme najvišjo nagrado pokal.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Pomembno:
