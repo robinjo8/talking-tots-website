@@ -16,6 +16,8 @@ import { SlidingPuzzle910 } from "@/components/puzzle/SlidingPuzzle910";
 import { SlidingPuzzle34 } from "@/components/puzzle/SlidingPuzzle34";
 import { getImageUrl, type PuzzleImage } from "@/data/puzzleImages";
 import type { DrsnaSestavljankaGameConfig } from "@/data/drsnaSestavljankaConfig";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 interface GenericDrsnaSestavljankaGameProps {
   config: DrsnaSestavljankaGameConfig;
