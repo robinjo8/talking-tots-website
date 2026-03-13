@@ -63,15 +63,6 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
     return Math.max(200, Math.min(availableWidth, availableHeight, 500));
   }, [windowSize.height, windowSize.width]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [showLipsImage, setShowLipsImage] = useState(false);
-
-  // Auto-close lips image after 3 seconds
-  useEffect(() => {
-    if (showLipsImage) {
-      const timer = setTimeout(() => setShowLipsImage(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showLipsImage]);
 
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
   const { checkForNewTrophy } = useTrophyContext();
