@@ -26,6 +26,7 @@ export default function AdminArtikulacijaVajeRouter() {
         title={config.title}
         wordsData={config.wordsData as WordData[]}
         backPath={backPath}
+        lipsImage={config.lipsImage}
       />
     );
   }
