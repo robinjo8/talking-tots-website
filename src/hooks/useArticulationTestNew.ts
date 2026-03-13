@@ -152,6 +152,42 @@ export const useArticulationTestNew = (
     fetchImage();
   }, [currentWordIndex]);
 
+  // Auto-play word audio 1 second after image loads
+  useEffect(() => {
+    if (!currentData?.word.audio || loading) return;
+
+    const timer = setTimeout(() => {
+      playWordAudio();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [currentWordIndex, loading]);
+
+  // Play word audio function
+  const playWordAudio = useCallback(() => {
+    const word = currentData?.word;
+    if (!word?.audio) return;
+
+    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${word.audio}`;
+    
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    
+    const audio = audioRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = audioUrl;
+
+    setIsAudioPlaying(true);
+    
+    audio.onended = () => setIsAudioPlaying(false);
+    audio.onerror = () => setIsAudioPlaying(false);
+    
+    audio.load();
+    audio.play().catch(() => setIsAudioPlaying(false));
+  }, [currentData]);
+
   // Get current word text
   const getCurrentWord = () => {
     return currentData?.word.text ?? "";
