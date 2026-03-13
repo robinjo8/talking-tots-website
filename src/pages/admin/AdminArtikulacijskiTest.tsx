@@ -223,7 +223,8 @@ export default function AdminArtikulacijskiTest() {
     profile?.id, 
     undefined,
     sessionInfo?.sessionId,
-    wordsPerLetter
+    wordsPerLetter,
+    testStarted
   );
 
   // Check for saved progress from database on mount
