@@ -147,7 +147,7 @@ const KakoDeluje = () => {
               Osrednja prednost aplikacije TomiTalk je, da učenje poteka skozi igro. Govorne igre so zasnovane kot interaktivne dejavnosti, s katerimi otrok na naraven in zabaven način utrjuje pravilno izgovorjavo glasov in besed.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Aplikacija vključuje več vrst govornih iger, prilagojenih logopedskim ciljem:
+              Aplikacija vključuje več vrst govornih iger, prilagojenih logopedskim ciljem. Na voljo so različice igre za glasove: C, Č, R, L, K, S, Š, Z in Ž (skupno 9 različic).
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Igra »Spomin«</h4>
