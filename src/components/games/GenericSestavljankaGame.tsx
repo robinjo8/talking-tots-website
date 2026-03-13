@@ -17,6 +17,8 @@ import { useGameMode } from "@/contexts/GameModeContext";
 import { Home, RefreshCw } from "lucide-react";
 import type { SestavljankeGameConfig } from "@/data/sestavljankeGameConfig";
 import type { PuzzleImage } from "@/data/puzzleImages";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 const SUPABASE_URL = "https://ecmtctwovkheohqwahvt.supabase.co";
 const BACKGROUND_URL = `${SUPABASE_URL}/storage/v1/object/public/ozadja/zeleno_ozadje.webp`;
