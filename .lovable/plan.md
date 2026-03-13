@@ -22,3 +22,28 @@
 - `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
 - `PlanSetCard.tsx` — nova komponenta za sklop
 - `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+
+---
+
+# Popravki preverjanja izgovorjave (implementirano)
+
+## Implementirane spremembe
+
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
