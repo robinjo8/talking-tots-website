@@ -26,6 +26,7 @@ export default function ArtikulacijaVajeRouter() {
         displayLetter={config.displayLetter}
         title={config.title}
         wordsData={config.wordsData as WordData[]}
+        lipsImage={config.lipsImage}
       />
     );
   }
