@@ -62,6 +62,7 @@ interface KaceLestveGameProps {
   childId?: string;
   logopedistChildId?: string;
   wordList?: import("@/data/kaceLestveConfig").KaceLestveWord[];
+  lipsImage?: string;
 }
 
 export function KaceLestveGame({
