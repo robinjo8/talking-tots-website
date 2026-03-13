@@ -42,6 +42,7 @@ const ArtikuacijskiTest = () => {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [testStarted, setTestStarted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
   const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
@@ -227,7 +228,8 @@ const ArtikuacijskiTest = () => {
     undefined,
     undefined,
     sessionInfo?.sessionId,
-    wordsPerLetter
+    wordsPerLetter,
+    testStarted
   );
 
   // Check for existing session on mount (using database, not localStorage)
@@ -258,8 +260,8 @@ const ArtikuacijskiTest = () => {
 
   // Handle resume dialog actions
   const handleResume = () => {
-    // Just close the dialog - sessionInfo already has the startIndex from database
     setShowResumeDialog(false);
+    setTestStarted(true);
   };
 
   const handleCloseResumeDialog = () => {
@@ -290,6 +292,7 @@ const ArtikuacijskiTest = () => {
           // Initialize session when user confirms and closes dialog
           await initializeSession();
           setShowInfoDialog(false);
+          setTestStarted(true);
         }}
         childName={childName}
         wordCount={totalWordCount}

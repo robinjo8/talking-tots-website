@@ -56,6 +56,7 @@ export default function AdminArtikulacijskiTest() {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [testStarted, setTestStarted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string | null>(null);
   const [resumeWordIndex, setResumeWordIndex] = useState<number>(0);
@@ -222,7 +223,8 @@ export default function AdminArtikulacijskiTest() {
     profile?.id, 
     undefined,
     sessionInfo?.sessionId,
-    wordsPerLetter
+    wordsPerLetter,
+    testStarted
   );
 
   // Check for saved progress from database on mount
@@ -252,8 +254,8 @@ export default function AdminArtikulacijskiTest() {
   }, []);
 
   const handleResume = () => {
-    // Just close the dialog - sessionInfo already has the startIndex from database
     setShowResumeDialog(false);
+    setTestStarted(true);
   };
 
   const handleCloseResumeDialog = async () => {
@@ -287,6 +289,7 @@ export default function AdminArtikulacijskiTest() {
         onClose={async () => {
           await initializeSession();
           setShowInfoDialog(false);
+          setTestStarted(true);
         }}
         onBack={() => navigate(`/admin/children/${childId}/workspace`)}
         childName={child?.name}

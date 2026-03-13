@@ -19,7 +19,8 @@ export const useArticulationTestNew = (
   logopedistId?: string,
   maxWords?: number,
   sessionId?: string,  // DB session UUID for word results
-  wordsPerLetter: number = 3  // 1 for age group 3-4, 3 for all others
+  wordsPerLetter: number = 3,  // 1 for age group 3-4, 3 for all others
+  autoPlayEnabled: boolean = true  // Controls whether auto-play audio is active
 ) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
@@ -152,16 +153,16 @@ export const useArticulationTestNew = (
     fetchImage();
   }, [currentWordIndex]);
 
-  // Auto-play word audio 1 second after image loads
+  // Auto-play word audio 1 second after image loads (only when autoPlayEnabled)
   useEffect(() => {
-    if (!currentData?.word.audio || loading) return;
+    if (!autoPlayEnabled || !currentData?.word.audio || loading) return;
 
     const timer = setTimeout(() => {
       playWordAudio();
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [currentWordIndex, loading]);
+  }, [currentWordIndex, loading, autoPlayEnabled]);
 
   // Play word audio function
   const playWordAudio = useCallback(() => {
