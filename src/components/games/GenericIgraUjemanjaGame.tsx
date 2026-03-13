@@ -17,6 +17,8 @@ import { getLetterData, getImagesForAgeGroup, type MatchingGameImage } from "@/d
 import { getRandomThreeColumnItems, getRandomFourColumnItems, type ThreeColumnMatchingItem, type FourColumnMatchingItem } from "@/data/threeColumnMatchingData";
 import type { IgraUjemanjaGameConfig } from "@/data/igraUjemanjaConfig";
 import { digraphToLetter } from "@/data/igraUjemanjaConfig";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 interface GenericIgraUjemanjaGameProps {
   config: IgraUjemanjaGameConfig;
