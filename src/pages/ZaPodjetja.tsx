@@ -22,14 +22,13 @@ const ZaPodjetja = () => {
               TomiTalk je sodobna digitalna platforma za podporo pri razvoju govora otrok, ki združuje logopedske vaje, interaktivne igre, preverjanje izgovorjave in spremljanje napredka.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Platforma je zasnovana za uporabo v:
+              Platforma je zasnovana za logopede v:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>logopedskih ambulantah in zasebnih logopedskih praksah</li>
+              <li>ambulantah in zasebnih logopedskih praksah</li>
               <li>vrtcih</li>
               <li>osnovnih šolah</li>
-              <li>zdravstvenih ustanovah z logopedskimi oddelki</li>
-              <li>drugih organizacijah, ki delajo z otroki z govornimi težavami</li>
+              <li>drugih organizacijah, ki delajo z otroki z govornimo-jezikovnimi težavami</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
               TomiTalk omogoča, da lahko logopedi in strokovni delavci del procesa logopedske obravnave digitalizirajo, poenostavijo in naredijo bolj preglednega, hkrati pa otrokom ponudi motivacijsko okolje za vadbo govora.

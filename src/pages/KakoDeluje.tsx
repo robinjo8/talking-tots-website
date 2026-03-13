@@ -696,7 +696,6 @@ const KakoDeluje = () => {
               Pomembno:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>v aplikaciji ni kazni za napake,</li>
               <li>poudarek je na pohvali za trud in vztrajnost,</li>
               <li>učenje govora ostaja pozitivna in varna izkušnja.</li>
             </ul>
