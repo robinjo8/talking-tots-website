@@ -200,7 +200,7 @@ const KakoDeluje = () => {
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Labirint</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Labirint se generira naključno na mreži 8 × 12 celic. Otrok lik zmajčka premika v smeri gor, dol, levo in desno, po poti pobira zvezdice, kjer posamezna zvezdica predstavlja eno naključno izbrano besedo za ciljno črko. Ko otrok osvoji vse zvezdice se pot do cilja odpre. Na koncu, ko doseže cilj – ponovi vse besede še enkrat.
+              Otrok lik zmajčka premika v smeri gor, dol, levo in desno, po poti pobira zvezdice, kjer posamezna zvezdica predstavlja eno naključno izbrano besedo za ciljno črko. Ko otrok osvoji vse zvezdice se pot do cilja odpre. Na koncu, ko doseže cilj – ponovi vse besede še enkrat.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Igra razvija:
