@@ -129,7 +129,7 @@ const KakoDeluje = () => {
               <li><strong>Moj osebni načrt</strong> – Pregled personaliziranega programa vaj in iger, pripravljenega glede na otrokovo starost in govorne težave (na voljo v naročnini TomiTalk Pro).</li>
               <li><strong>Govorne igre</strong> – Interaktivne igre za utrjevanje pravilne izgovorjave glasov in besed skozi igro.</li>
               <li><strong>Govorne vaje</strong> – Strukturirane vaje za ciljno vadbo posameznih glasov in govornih spretnosti.</li>
-              <li><strong>Preverjanje izgovorjave</strong> – Funkcionalnost za preverjanje otrokove izgovorjave in spremljanje napredka.</li>
+              <li><strong>Preverjanje izgovorjave</strong> – Funkcija za preverjanje otrokove izgovorjave in spremljanje napredka.</li>
               <li><strong>Video navodila</strong> – Kratki strokovni videi z razlago pravilne izvedbe vaj in izgovorjave glasov.</li>
               <li><strong>Logopedski nasveti</strong> – Strokovni nasveti in usmeritve za starše, ki podpirajo govorni razvoj otroka doma.</li>
             </ul>
