@@ -398,6 +398,7 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
         completedImage={starImages[0] || enrichImageWithAudio(config.images[0])}
         allImages={starImages}
         onStarClaimed={handleStarClaimed}
+      />
 
       {(() => {
         const lipsImage = getLipsImageForLetter(config.letter);
