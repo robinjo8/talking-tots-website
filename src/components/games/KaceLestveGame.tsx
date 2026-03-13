@@ -551,6 +551,8 @@ export function KaceLestveGame({
       >
         <span />
       </MemoryExitConfirmationDialog>
+
+      {lipsImage && <LipsImageButton lipsImage={lipsImage} />}
     </div>
   );
 }

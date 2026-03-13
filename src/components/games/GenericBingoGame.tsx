@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { BingoWordData } from "@/data/artikulacijaVajeConfig";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
 
 interface GenericBingoGameProps {
   letter: string;

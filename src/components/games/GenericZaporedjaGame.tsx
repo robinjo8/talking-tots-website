@@ -442,6 +442,11 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
       >
         <></>
       </MemoryExitConfirmationDialog>
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

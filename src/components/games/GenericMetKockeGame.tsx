@@ -377,6 +377,11 @@ export function GenericMetKockeGame({
         onClose={() => setShowInstructions(false)}
         type="dice"
       />
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

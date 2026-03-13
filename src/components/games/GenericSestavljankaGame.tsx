@@ -303,6 +303,11 @@ export function GenericSestavljankaGame({ config, backPath = '/govorne-igre/sest
           allImages={config.images.map(enrichImageWithAudio)}
           onStarClaimed={handleStarClaimed}
         />
+
+        {(() => {
+          const lipsImage = getLipsImageForLetter(config.letter);
+          return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+        })()}
       </div>
     </AppLayout>
   );

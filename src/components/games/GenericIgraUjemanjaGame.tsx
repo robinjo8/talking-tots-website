@@ -352,6 +352,11 @@ export function GenericIgraUjemanjaGame({ config, backPath = '/govorne-igre/igra
           </MemoryExitConfirmationDialog>
         </>
       )}
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

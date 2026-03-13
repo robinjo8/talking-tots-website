@@ -211,6 +211,11 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
         onConfirm={handleConfirmNewGame} 
         onCancel={() => setShowNewGameDialog(false)} 
       />
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

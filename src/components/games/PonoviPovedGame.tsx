@@ -1149,6 +1149,11 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
           </div>
         </DialogContent>
       </Dialog>
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }
