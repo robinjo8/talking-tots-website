@@ -332,5 +332,6 @@ export const useArticulationTestNew = (
     handleNext,
     resetTest,
     initializeSession,
+    playWordAudio,
   };
 };
