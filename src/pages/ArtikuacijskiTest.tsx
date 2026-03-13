@@ -428,7 +428,7 @@ const ArtikuacijskiTest = () => {
               onNext={handleNext}
               disabled={loading || isTranscribing}
               showNext={hasRecorded && !isTranscribing && transcriptionResult?.accepted === true}
-              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && transcriptionResult.transcribedText ? transcriptionResult.transcribedText : undefined}
+              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false ? "rejected" : undefined}
               isNoise={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && !transcriptionResult?.transcribedText}
               isTranscribing={isTranscribing}
               recordingDuration={recordingDuration}
