@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { Home, Settings } from "lucide-react";
+import { Home, Settings, Volume2 } from "lucide-react";
 import { useNavigate, useSearchParams, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -196,6 +196,7 @@ export default function AdminArtikulacijskiTest() {
     hasRecorded,
     isTestComplete,
     isTranscribing,
+    isAudioPlaying,
     transcriptionResult,
     sessionNumber,
     currentLetter,
@@ -210,6 +211,7 @@ export default function AdminArtikulacijskiTest() {
     handleNext,
     resetTest,
     initializeSession,
+    playWordAudio,
   } = useArticulationTestNew(
     childId, 
     undefined, 
@@ -432,13 +434,23 @@ export default function AdminArtikulacijskiTest() {
             className="flex flex-col items-center justify-center flex-1"
             style={{ minHeight: dimensions?.buttonHeight }}
           >
+            {/* Speaker button for replaying audio */}
+            {!hasRecorded && !isTranscribing && !isAudioPlaying && (
+              <button
+                onClick={playWordAudio}
+                className="mb-2 w-10 h-10 rounded-full bg-teal-100 hover:bg-teal-200 flex items-center justify-center transition-colors"
+                aria-label="Predvajaj posnetek besede"
+              >
+                <Volume2 className="w-5 h-5 text-teal-600" />
+              </button>
+            )}
             <ArticulationRecordButton
               onRecordingComplete={handleRecordingComplete}
               onNext={handleNext}
-              disabled={loading || isTranscribing}
+              disabled={loading || isTranscribing || isAudioPlaying}
               showNext={hasRecorded && !isTranscribing && transcriptionResult?.accepted === true}
-              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && transcriptionResult.transcribedText ? transcriptionResult.transcribedText : undefined}
-              isNoise={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false && !transcriptionResult?.transcribedText}
+              wrongWord={hasRecorded && !isTranscribing && transcriptionResult?.accepted === false ? "rejected" : undefined}
+              isNoise={false}
               isTranscribing={isTranscribing}
               recordingDuration={recordingDuration}
               compact={dimensions?.isCompact}

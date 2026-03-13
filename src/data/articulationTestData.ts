@@ -81,7 +81,7 @@ export const articulationData: LetterGroup[] = [
   {
     letter: "H",
     words: [
-      { text: "HIŠA", image: "hisa1.webp", audio: "Hisa.mp3", acceptedVariants: ["HIŠA", "HISA", "IŠA", "HIŽA", "HIŠ", "HIŠA!", "BIŠA", "DIŠA", "HIŠKA", "HISA!", "HITA"] },
+      { text: "HIŠA", image: "hisa1.webp", audio: "Hisa.mp3", acceptedVariants: ["HIŠA", "HISA", "IŠA", "HIŽA", "HIŠ", "HIŠA!", "BIŠA", "DIŠA", "HISA!", "HITA"] },
       { text: "JUHA", image: "juha1.webp", audio: "Juha.mp3", acceptedVariants: ["JUHA", "JULA", "DUHA", "UHA", "JUHA!", "JUH", "JUHE", "JUHAA", "JUGA", "JUFA", "JUTA", "JUA"] },
       { text: "KRUH", image: "kruh1.webp", audio: "Kruh.mp3", acceptedVariants: ["KRUH", "KLUH", "KRUH!", "KRU", "KRUH?", "KRUHHA", "GRUH", "KRUŠ", "KRUHOV", "KJUH", "KUH"] },
     ]

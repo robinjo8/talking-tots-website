@@ -124,13 +124,13 @@ const ArticulationRecordButton = ({
       );
     }
 
-    // Wrong word detected - show what was heard and retry option
+    // Wrong word detected - show generic message (never display raw transcription)
     if (wrongWord && !isRecording) {
       return (
         <>
           <div className={cn(spacerClass, "flex items-center justify-center")}>
-            <p className="text-red-600 font-medium text-sm">
-              Slišano: "{wrongWord}"
+            <p className="text-red-600 font-medium text-sm text-center">
+              BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE
             </p>
           </div>
           <button

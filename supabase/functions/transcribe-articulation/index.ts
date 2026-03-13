@@ -18,17 +18,26 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-// Levenshtein distance for fuzzy matching
+// Profanity filter - Slovenian + English forbidden words
+const PROFANITY_LIST = [
+  // Slovenian
+  "pizda", "kurac", "kurec", "jebat", "jebati", "jebi", "fukni", "fukaj", "sranje", "drek",
+  "pizdek", "pizdun", "kurba", "pička", "pičko", "zajebi", "odjebi", "najebi", "zajebat",
+  "fuknut", "zasrat", "posrat", "usrat", "drekač", "pizdač", "kurčev", "kurčina",
+  // English
+  "fuck", "shit", "bitch", "ass", "damn", "dick", "cock", "pussy", "whore", "slut",
+  "bastard", "cunt", "nigger", "nigga", "faggot",
+];
+
+function containsProfanity(text: string): boolean {
+  const lower = text.toLowerCase();
+  return PROFANITY_LIST.some(word => lower.includes(word));
+}
+
 function levenshteinDistance(a: string, b: string): number {
   const matrix: number[][] = [];
-  
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0][j] = j;
-  }
-  
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
   for (let i = 1; i <= b.length; i++) {
     for (let j = 1; j <= a.length; j++) {
       if (b.charAt(i - 1) === a.charAt(j - 1)) {
@@ -42,7 +51,6 @@ function levenshteinDistance(a: string, b: string): number {
       }
     }
   }
-  
   return matrix[b.length][a.length];
 }
 
@@ -63,18 +71,10 @@ function normalizeText(text: string): string {
 
 function sanitizeForStorage(text: string): string {
   const charMap: Record<string, string> = {
-    'Č': 'C', 'č': 'c',
-    'Š': 'S', 'š': 's',
-    'Ž': 'Z', 'ž': 'z',
-    'Đ': 'D', 'đ': 'd',
-    'Ć': 'C', 'ć': 'c',
+    'Č': 'C', 'č': 'c', 'Š': 'S', 'š': 's',
+    'Ž': 'Z', 'ž': 'z', 'Đ': 'D', 'đ': 'd', 'Ć': 'C', 'ć': 'c',
   };
-  
-  return text
-    .split('')
-    .map(char => charMap[char] || char)
-    .join('')
-    .replace(/[^a-zA-Z0-9\-_]/g, '');
+  return text.split('').map(char => charMap[char] || char).join('').replace(/[^a-zA-Z0-9\-_]/g, '');
 }
 
 function getThresholdForWord(wordLength: number, difficulty: string): number {
@@ -125,30 +125,57 @@ function isWordAccepted(
 function processBase64Chunks(base64String: string, chunkSize = 32768): Uint8Array {
   const chunks: Uint8Array[] = [];
   let position = 0;
-  
   while (position < base64String.length) {
     const chunk = base64String.slice(position, position + chunkSize);
     const binaryChunk = atob(chunk);
     const bytes = new Uint8Array(binaryChunk.length);
-    
     for (let i = 0; i < binaryChunk.length; i++) {
       bytes[i] = binaryChunk.charCodeAt(i);
     }
-    
     chunks.push(bytes);
     position += chunkSize;
   }
-
   const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
   const result = new Uint8Array(totalLength);
   let offset = 0;
-
   for (const chunk of chunks) {
     result.set(chunk, offset);
     offset += chunk.length;
   }
-
   return result;
+}
+
+/**
+ * Pre-validation filters for Whisper transcription output.
+ * Returns null if transcription passes, or a rejection reason string if it should be rejected.
+ */
+function preValidateTranscription(transcribedText: string, targetWord: string): string | null {
+  const normalized = normalizeText(transcribedText);
+  const normalizedTarget = normalizeText(targetWord);
+
+  // 1. Profanity filter — CRITICAL: never return profanity to client
+  if (containsProfanity(transcribedText)) {
+    console.log(`PROFANITY DETECTED in transcription: [REDACTED]. Rejecting.`);
+    return 'profanity';
+  }
+
+  // 2. Word count filter — single words expected, max 2 tokens allowed
+  const wordCount = normalized.split(/\s+/).filter(w => w.length > 0).length;
+  if (wordCount > 2) {
+    console.log(`Too many words (${wordCount}) in transcription: "${transcribedText}". Whisper hallucination detected.`);
+    return 'too_many_words';
+  }
+
+  // 3. Minimum relevance filter — at least 0.25 similarity to target word
+  //    (uses only the first word if there are 2)
+  const firstWord = normalized.split(/\s+/)[0] || '';
+  const sim = similarity(firstWord, normalizedTarget);
+  if (sim < 0.25) {
+    console.log(`Transcription "${transcribedText}" has very low similarity (${sim.toFixed(2)}) to target "${targetWord}". Rejecting as irrelevant.`);
+    return 'irrelevant';
+  }
+
+  return null; // passes all filters
 }
 
 serve(async (req) => {
@@ -159,7 +186,6 @@ serve(async (req) => {
   }
 
   try {
-    // JWT verification - only authenticated users can use transcription
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(
@@ -185,34 +211,18 @@ serve(async (req) => {
     console.log(`Authenticated user for transcription: ${userData.user.id}`);
 
     const { 
-      audio, 
-      targetWord, 
-      acceptedVariants = [],
-      childId,
-      userId,
-      sessionNumber,
-      wordIndex,
-      letter,
-      difficulty = "srednja",
-      logopedistId,
-      sessionId,
-      position
+      audio, targetWord, acceptedVariants = [],
+      childId, userId, sessionNumber, wordIndex, letter,
+      difficulty = "srednja", logopedistId, sessionId, position
     } = await req.json();
 
     console.log(`Transcription request for word: ${targetWord}, letter: ${letter}, index: ${wordIndex}, session: ${sessionNumber}, difficulty: ${difficulty}, logopedistId: ${logopedistId || 'none'}`);
 
-    if (!audio) {
-      throw new Error('No audio data provided');
-    }
-
-    if (!targetWord) {
-      throw new Error('No target word provided');
-    }
+    if (!audio) throw new Error('No audio data provided');
+    if (!targetWord) throw new Error('No target word provided');
 
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY is not configured');
-    }
+    if (!openAIApiKey) throw new Error('OPENAI_API_KEY is not configured');
 
     const binaryAudio = processBase64Chunks(audio);
     console.log(`Audio size: ${binaryAudio.length} bytes`);
@@ -223,14 +233,11 @@ serve(async (req) => {
     formData.append('model', 'whisper-1');
     formData.append('language', 'sl');
     formData.append('prompt', targetWord);
-    console.log(`Whisper API call with prompt hint: "${targetWord}"`);
 
     console.log('Sending to OpenAI Whisper API...');
     const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-      },
+      headers: { 'Authorization': `Bearer ${openAIApiKey}` },
       body: formData,
     });
 
@@ -248,11 +255,51 @@ serve(async (req) => {
       console.log('Empty or too short transcription - likely silence');
       return new Response(
         JSON.stringify({
+          success: true, transcribedText: '', targetWord,
+          accepted: false, matchType: 'silence', confidence: 0, storagePath: null
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // === PRE-VALIDATION FILTERS ===
+    const rejectionReason = preValidateTranscription(transcribedText, targetWord);
+    if (rejectionReason) {
+      console.log(`Transcription rejected by pre-validation: ${rejectionReason}`);
+      
+      // Save rejected result to DB if sessionId exists (for logging, but with sanitized text)
+      if (sessionId) {
+        try {
+          const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+          const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+          const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+          
+          // For profanity, store "[REDACTED]" instead of the actual text
+          const safeText = rejectionReason === 'profanity' ? '[FILTRIRANO]' : transcribedText;
+          
+          await supabaseAdmin.from('articulation_word_results').insert({
+            session_id: sessionId,
+            letter: letter || 'X',
+            position: position || 'začetek',
+            target_word: targetWord,
+            transcribed_text: safeText,
+            audio_url: '',
+            ai_accepted: false,
+            ai_confidence: 0,
+            ai_match_type: `rejected_${rejectionReason}`,
+          });
+        } catch (dbErr) {
+          console.error('Error saving rejected result:', dbErr);
+        }
+      }
+
+      return new Response(
+        JSON.stringify({
           success: true,
-          transcribedText: '',
+          transcribedText: '', // NEVER return raw text to client for rejected transcriptions
           targetWord,
           accepted: false,
-          matchType: 'silence',
+          matchType: `rejected_${rejectionReason}`,
           confidence: 0,
           storagePath: null
         }),
@@ -281,14 +328,9 @@ serve(async (req) => {
           storagePath = `${userId}/${childId}/Preverjanje-izgovorjave/${sessionFolder}/${safeLetter}-${wordIndex}-${safeWord}-${timestamp}.webm`;
         }
 
-        console.log(`Attempting to save recording to: ${storagePath}`);
-
         const { error: uploadError } = await supabase.storage
           .from('uporabniski-profili')
-          .upload(storagePath, binaryAudio, {
-            contentType: 'audio/webm',
-            upsert: false
-          });
+          .upload(storagePath, binaryAudio, { contentType: 'audio/webm', upsert: false });
 
         if (uploadError) {
           console.error('Storage upload error:', uploadError);
@@ -298,8 +340,6 @@ serve(async (req) => {
       } catch (storageError) {
         console.error('Storage error:', storageError);
       }
-    } else if (childId && userId && !matchResult.accepted) {
-      console.log(`Recording not saved - word not accepted. Transcribed: "${transcribedText}", Target: "${targetWord}", Match type: ${matchResult.matchType}`);
     }
 
     // Insert word result into articulation_word_results table
@@ -309,34 +349,29 @@ serve(async (req) => {
         const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
         const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-        const { error: insertError } = await supabaseAdmin
-          .from('articulation_word_results')
-          .insert({
-            session_id: sessionId,
-            letter: letter || 'X',
-            position: position || 'začetek',
-            target_word: targetWord,
-            transcribed_text: transcribedText,
-            audio_url: storagePath || '',
-            ai_accepted: matchResult.accepted,
-            ai_confidence: matchResult.confidence,
-            ai_match_type: matchResult.matchType,
-          });
-
-        if (insertError) {
-          console.error('Error inserting word result:', insertError);
-        } else {
-          console.log('Word result saved to database for session:', sessionId);
-        }
+        await supabaseAdmin.from('articulation_word_results').insert({
+          session_id: sessionId,
+          letter: letter || 'X',
+          position: position || 'začetek',
+          target_word: targetWord,
+          transcribed_text: transcribedText,
+          audio_url: storagePath || '',
+          ai_accepted: matchResult.accepted,
+          ai_confidence: matchResult.confidence,
+          ai_match_type: matchResult.matchType,
+        });
       } catch (dbError) {
         console.error('Database error saving word result:', dbError);
       }
     }
 
+    // For non-accepted results, don't send raw transcription to client
+    const clientTranscribedText = matchResult.accepted ? transcribedText : '';
+
     return new Response(
       JSON.stringify({
         success: true,
-        transcribedText,
+        transcribedText: clientTranscribedText,
         targetWord,
         accepted: matchResult.accepted,
         matchType: matchResult.matchType,
@@ -349,15 +384,8 @@ serve(async (req) => {
   } catch (error) {
     console.error('Transcription error:', error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message,
-        accepted: false 
-      }),
-      { 
-        status: 500, 
-        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } 
-      }
+      JSON.stringify({ success: false, error: error.message, accepted: false }),
+      { status: 500, headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' } }
     );
   }
 });

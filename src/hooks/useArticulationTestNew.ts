@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { articulationData } from "@/data/articulationTestData";
 import { useTranscription } from "./useTranscription";
@@ -27,6 +27,8 @@ export const useArticulationTestNew = (
   const [loading, setLoading] = useState(true);
   const [hasRecorded, setHasRecorded] = useState(false);
   const [isTestComplete, setIsTestComplete] = useState(false);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [sessionNumber, setSessionNumber] = useState<number | null>(fixedSessionNumber ?? null);
   const [sessionInitialized, setSessionInitialized] = useState(fixedSessionNumber ? true : false);
   const [transcriptionResult, setTranscriptionResult] = useState<{
@@ -149,6 +151,42 @@ export const useArticulationTestNew = (
 
     fetchImage();
   }, [currentWordIndex]);
+
+  // Auto-play word audio 1 second after image loads
+  useEffect(() => {
+    if (!currentData?.word.audio || loading) return;
+
+    const timer = setTimeout(() => {
+      playWordAudio();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [currentWordIndex, loading]);
+
+  // Play word audio function
+  const playWordAudio = useCallback(() => {
+    const word = currentData?.word;
+    if (!word?.audio) return;
+
+    const audioUrl = `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/${word.audio}`;
+    
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    
+    const audio = audioRef.current;
+    audio.pause();
+    audio.currentTime = 0;
+    audio.src = audioUrl;
+
+    setIsAudioPlaying(true);
+    
+    audio.onended = () => setIsAudioPlaying(false);
+    audio.onerror = () => setIsAudioPlaying(false);
+    
+    audio.load();
+    audio.play().catch(() => setIsAudioPlaying(false));
+  }, [currentData]);
 
   // Get current word text
   const getCurrentWord = () => {
@@ -273,6 +311,7 @@ export const useArticulationTestNew = (
     hasRecorded,
     isTestComplete,
     isTranscribing,
+    isAudioPlaying,
     transcriptionResult,
     sessionNumber,
 
@@ -293,5 +332,6 @@ export const useArticulationTestNew = (
     handleNext,
     resetTest,
     initializeSession,
+    playWordAudio,
   };
 };
