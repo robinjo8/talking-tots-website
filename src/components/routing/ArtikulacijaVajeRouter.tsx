@@ -39,6 +39,7 @@ export default function ArtikulacijaVajeRouter() {
         title={config.title}
         wordsData={config.wordsData as BingoWordData[]}
         exerciseId={config.exerciseId || `artikulacija_bingo_${config.letter.toLowerCase()}`}
+        lipsImage={config.lipsImage}
       />
     );
   }

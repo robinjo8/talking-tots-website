@@ -25,6 +25,7 @@ export default function BingoRouter() {
       wordsData={config.wordsData as BingoWordData[]}
       exerciseId={config.exerciseId || `bingo_${config.letter.toLowerCase()}`}
       backPath="/govorne-igre/bingo"
+      lipsImage={config.lipsImage}
     />
   );
 }

@@ -40,6 +40,7 @@ export default function AdminArtikulacijaVajeRouter() {
         wordsData={config.wordsData as BingoWordData[]}
         exerciseId={config.exerciseId || `artikulacija_bingo_${config.letter.toLowerCase()}`}
         backPath={backPath}
+        lipsImage={config.lipsImage}
       />
     );
   }

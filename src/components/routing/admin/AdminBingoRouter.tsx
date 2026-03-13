@@ -26,6 +26,7 @@ export default function AdminBingoRouter() {
       wordsData={config.wordsData as BingoWordData[]}
       exerciseId={config.exerciseId || `bingo-${letter}`}
       backPath={backPath}
+      lipsImage={config.lipsImage}
     />
   );
 }
