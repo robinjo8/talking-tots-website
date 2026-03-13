@@ -129,7 +129,7 @@ const KakoDeluje = () => {
               <li><strong>Moj osebni načrt</strong> – Pregled personaliziranega programa vaj in iger, pripravljenega glede na otrokovo starost in govorne težave (na voljo v naročnini TomiTalk Pro).</li>
               <li><strong>Govorne igre</strong> – Interaktivne igre za utrjevanje pravilne izgovorjave glasov in besed skozi igro.</li>
               <li><strong>Govorne vaje</strong> – Strukturirane vaje za ciljno vadbo posameznih glasov in govornih spretnosti.</li>
-              <li><strong>Preverjanje izgovorjave</strong> – Funkcionalnost za preverjanje otrokove izgovorjave in spremljanje napredka.</li>
+              <li><strong>Preverjanje izgovorjave</strong> – Funkcija za preverjanje otrokove izgovorjave in spremljanje napredka.</li>
               <li><strong>Video navodila</strong> – Kratki strokovni videi z razlago pravilne izvedbe vaj in izgovorjave glasov.</li>
               <li><strong>Logopedski nasveti</strong> – Strokovni nasveti in usmeritve za starše, ki podpirajo govorni razvoj otroka doma.</li>
             </ul>
@@ -147,7 +147,7 @@ const KakoDeluje = () => {
               Osrednja prednost aplikacije TomiTalk je, da učenje poteka skozi igro. Govorne igre so zasnovane kot interaktivne dejavnosti, s katerimi otrok na naraven in zabaven način utrjuje pravilno izgovorjavo glasov in besed.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Aplikacija vključuje več vrst govornih iger, prilagojenih logopedskim ciljem:
+              Aplikacija vključuje več vrst govornih iger, prilagojenih logopedskim ciljem. Na voljo so različice igre za glasove: C, Č, R, L, K, S, Š, Z in Ž (skupno 9 različic).
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Igra »Spomin«</h4>
@@ -190,20 +190,17 @@ const KakoDeluje = () => {
               <li>zvočne posnetke.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              Težavnost se prilagaja starosti otroka. V logopedski različici otrok povezuje elemente z istim začetnim glasom, kar krepi glasovno zavedanje in pravilno artikulacijo.
+              Težavnost se prilagaja starosti otroka.
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Igra zaporedja</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Igra se začne z naborom 20 slik, kjer ima vsaka slika svojo besedo in zvok. Sistem naključno izbere 4–5 slik kot ciljno zaporedje, nato jih premeša.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
               Otrok z uporabo funkcije »povleci in spusti« razporeja slike v pravilnem vrstnem redu. Ko je zaporedje pravilno sestavljeno, se igra zaključi in prikaže se pojavno okno z besedami za izgovorjavo.
             </p>
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Labirint</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Labirint se generira naključno na mreži 8 × 12 celic. Otrok lik zmajčka premika v smeri gor, dol, levo in desno, po poti pobira zvezdice, kjer posamezna zvezdica predstavlja eno naključno izbrano besedo za ciljno črko. Ko otrok osvoji vse zvezdice se pot do cilja odpre. Na koncu, ko doseže cilj – ponovi vse besede še enkrat.
+              Otrok lik zmajčka premika v smeri gor, dol, levo in desno, po poti pobira zvezdice, kjer posamezna zvezdica predstavlja eno naključno izbrano besedo za ciljno črko. Ko otrok osvoji vse zvezdice se pot do cilja odpre. Na koncu, ko doseže cilj – ponovi vse besede še enkrat.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Igra razvija:
@@ -229,7 +226,7 @@ const KakoDeluje = () => {
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Bingo</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Igra ustvari mrežo 4 × 4 (16 polj) s slikami in besedami. Sistem naključno izbere besedo, otrok pa mora v mreži označiti vsa polja, kjer se ta beseda pojavi.
+              Igra naključno izbere sliko, otrok pa mora v mreži označiti vsa polja, kjer se ta slika pojavi.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Igra se zaključi, ko otrok:
@@ -693,13 +690,12 @@ const KakoDeluje = () => {
               <li>pokali in trofeje.</li>
             </ul>
             <p className="text-muted-foreground leading-relaxed mt-4">
-              <strong>Primer:</strong> za vsako uspešno zaključeno igro ali vajo otrok prejme zvezdico. Po 100 zbranih zvezdicah otrok prejme nagrado zmajčka in za 100 zvezdil oz. 10 zmajčkov prejme najvišjo nagrado pokal.
+              <strong>Primer:</strong> za vsako uspešno zaključeno igro ali vajo otrok prejme zvezdico. Po 100 zbranih zvezdicah otrok prejme nagrado zmajčka in za 100 zvezdic oz. 10 zmajčkov prejme najvišjo nagrado pokal.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-4">
               Pomembno:
             </p>
             <ul className="list-disc list-inside text-muted-foreground space-y-2 mt-4">
-              <li>v aplikaciji ni kazni za napake,</li>
               <li>poudarek je na pohvali za trud in vztrajnost,</li>
               <li>učenje govora ostaja pozitivna in varna izkušnja.</li>
             </ul>
