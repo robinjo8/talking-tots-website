@@ -1,49 +1,25 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Popravki besedil na straneh /kako-deluje in /za-podjetja
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Spremembe
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+### Datoteka: `src/pages/KakoDeluje.tsx`
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+1. **Vrstica 132** — "Funkcionalnost" → "Funkcija"
+2. **Vrstica 150** — Zamenjaj stavek z daljšo verzijo ki vključuje seznam glasov (C, Č, R, L, K, S, Š, Z, Ž)
+3. **Vrstica 193** — Odstrani stavek "V logopedski različici otrok povezuje elemente z istim začetnim glasom..." (ohrani le "Težavnost se prilagaja starosti otroka.")
+4. **Vrstice 197-199** — Odstrani odstavek "Igra se začne z naborom 20 slik..." (celoten `<p>` element)
+5. **Vrstica 206** — Odstrani "Labirint se generira naključno na mreži 8 × 12 celic. " iz začetka stavka (ohrani ostalo besedilo)
+6. **Vrstica 232** — Zamenjaj "Igra ustvari mrežo 4 × 4 (16 polj) s slikami in besedami. Sistem naključno izbere besedo, otrok pa mora v mreži označiti vsa polja, kjer se ta beseda pojavi." → "Igra naključno izbere sliko, otrok pa mora v mreži označiti vsa polja, kjer se ta slika pojavi."
+7. **Vrstica 696** — "za 100 zvezdil" → "za 100 zvezdic"
+8. **Vrstica 702** — Odstrani `<li>v aplikaciji ni kazni za napake,</li>`
 
----
+### Datoteka: `src/pages/ZaPodjetja.tsx`
 
-# Popravki preverjanja izgovorjave (implementirano)
+1. **Vrstice 24-32** — Zamenjaj celoten blok:
+   - "za uporabo v:" → "za logopede v:"
+   - Odstrani "logopedskih" pred "ambulantah" (ohrani "ambulantah in zasebnih logopedskih praksah")
+   - Odstrani vrstico "zdravstvenih ustanovah z logopedskimi oddelki"
+   - "govornimi težavami" → "govornimo-jezikovnimi težavami"
 
-## Implementirane spremembe
-
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
-
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
