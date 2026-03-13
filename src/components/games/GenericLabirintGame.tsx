@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { LabirintConfig } from "@/data/labirintConfig";
 import type { PuzzleImage } from "@/data/puzzleImages";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 const backgroundImageUrl = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/ozadja/svetlomodro_ozadje.webp';
 
