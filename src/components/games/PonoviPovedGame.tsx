@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 type GamePhase = "start" | "word" | "sentence" | "complete";
 
