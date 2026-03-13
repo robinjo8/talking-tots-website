@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { BingoWordData } from "@/data/artikulacijaVajeConfig";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
 
 interface GenericBingoGameProps {
   letter: string;
@@ -27,9 +28,10 @@ interface GenericBingoGameProps {
   exerciseId: string;
   backPath?: string;
   onGameComplete?: () => void;
+  lipsImage?: string;
 }
 
-export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija', onGameComplete }: GenericBingoGameProps) {
+export function GenericBingoGame({ letter, displayLetter, title, wordsData, exerciseId, backPath = '/govorno-jezikovne-vaje/artikulacija', onGameComplete, lipsImage }: GenericBingoGameProps) {
   const navigate = useNavigate();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
@@ -305,6 +307,8 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
         onConfirm={handleConfirmNewGame}
         onCancel={() => setShowNewGameConfirmation(false)}
       />
+
+      {lipsImage && <LipsImageButton lipsImage={lipsImage} />}
     </div>
   );
 }

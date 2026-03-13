@@ -21,6 +21,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { PoveziPareConfig } from '@/data/poveziPareConfig';
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 interface Props {
   config: PoveziPareConfig;
@@ -360,6 +362,11 @@ export function GenericPoveziPareGame({ config }: Props) {
         onConfirm={handleConfirmNewGame}
         onCancel={() => setShowNewGameConfirmation(false)}
       />
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

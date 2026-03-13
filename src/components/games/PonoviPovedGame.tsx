@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 type GamePhase = "start" | "word" | "sentence" | "complete";
 
@@ -1147,6 +1149,11 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
           </div>
         </DialogContent>
       </Dialog>
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

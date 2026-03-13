@@ -472,28 +472,28 @@ const bingoDataRZacetek: BingoWordData[] = [
 // Uses ASCII digraphs for diacritics: č->ch, š->sh, ž->zh
 export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   // Wheel games (začetek)
-  'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO BESED - C', wordsData: wordsDataC },
-  'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO BESED - Č', wordsData: wordsDataCH },
-  'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK },
-  'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL },
-  'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR },
-  'r-zacetek': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R začetne vaje', wordsData: wordsDataRZacetek },
+  'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO BESED - C', wordsData: wordsDataC, lipsImage: 'Glas_SZC.png' },
+  'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO BESED - Č', wordsData: wordsDataCH, lipsImage: 'Glas_ShZhCh.png' },
+  'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK, lipsImage: 'Glas_K.png' },
+  'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL, lipsImage: 'Glas_L.png' },
+  'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR, lipsImage: 'Glas_R.png' },
+  'r-zacetek': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R začetne vaje', wordsData: wordsDataRZacetek, lipsImage: 'Glas_R.png' },
   's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO BESED - S', wordsData: wordsDataS, lipsImage: 'Glas_SZC.png' },
-  'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH },
-  'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ },
-  'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO BESED - Ž', wordsData: wordsDataZH },
+  'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH, lipsImage: 'Glas_ShZhCh.png' },
+  'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ, lipsImage: 'Glas_SZC.png' },
+  'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO BESED - Ž', wordsData: wordsDataZH, lipsImage: 'Glas_ShZhCh.png' },
   
   // Bingo games (sredina/konec)
-  'c-sredina-konec': { letter: 'C', displayLetter: 'C', gameType: 'bingo', title: 'BINGO - C', wordsData: bingoDataCSredinaKonec, exerciseId: 'artikulacija_bingo_c' },
-  'ch-sredina-konec': { letter: 'Č', displayLetter: 'Č', gameType: 'bingo', title: 'BINGO - Č', wordsData: bingoDataCHSredinaKonec, exerciseId: 'artikulacija_bingo_ch' },
-  'k-sredina-konec': { letter: 'K', displayLetter: 'K', gameType: 'bingo', title: 'BINGO - K', wordsData: bingoDataKSredinaKonec, exerciseId: 'artikulacija_bingo_k' },
-  'l-sredina-konec': { letter: 'L', displayLetter: 'L', gameType: 'bingo', title: 'BINGO - L', wordsData: bingoDataLSredinaKonec, exerciseId: 'artikulacija_bingo_l' },
-  'r-sredina-konec': { letter: 'R', displayLetter: 'R', gameType: 'bingo', title: 'BINGO - R', wordsData: bingoDataRSredinaKonec, exerciseId: 'artikulacija_bingo_r' },
-  'r-zacetek-bingo': { letter: 'R', displayLetter: 'R', gameType: 'bingo', title: 'BINGO - R začetne vaje', wordsData: bingoDataRZacetek, exerciseId: 'artikulacija_bingo_r_zacetek' },
-  's-sredina-konec': { letter: 'S', displayLetter: 'S', gameType: 'bingo', title: 'BINGO - S', wordsData: bingoDataSSredinaKonec, exerciseId: 'artikulacija_bingo_s' },
-  'sh-sredina-konec': { letter: 'Š', displayLetter: 'Š', gameType: 'bingo', title: 'BINGO - Š', wordsData: bingoDataSHSredinaKonec, exerciseId: 'artikulacija_bingo_sh' },
-  'z-sredina-konec': { letter: 'Z', displayLetter: 'Z', gameType: 'bingo', title: 'BINGO - Z', wordsData: bingoDataZSredinaKonec, exerciseId: 'artikulacija_bingo_z' },
-  'zh-sredina-konec': { letter: 'Ž', displayLetter: 'Ž', gameType: 'bingo', title: 'BINGO - Ž', wordsData: bingoDataZHSredinaKonec, exerciseId: 'artikulacija_bingo_zh' },
+  'c-sredina-konec': { letter: 'C', displayLetter: 'C', gameType: 'bingo', title: 'BINGO - C', wordsData: bingoDataCSredinaKonec, exerciseId: 'artikulacija_bingo_c', lipsImage: 'Glas_SZC.png' },
+  'ch-sredina-konec': { letter: 'Č', displayLetter: 'Č', gameType: 'bingo', title: 'BINGO - Č', wordsData: bingoDataCHSredinaKonec, exerciseId: 'artikulacija_bingo_ch', lipsImage: 'Glas_ShZhCh.png' },
+  'k-sredina-konec': { letter: 'K', displayLetter: 'K', gameType: 'bingo', title: 'BINGO - K', wordsData: bingoDataKSredinaKonec, exerciseId: 'artikulacija_bingo_k', lipsImage: 'Glas_K.png' },
+  'l-sredina-konec': { letter: 'L', displayLetter: 'L', gameType: 'bingo', title: 'BINGO - L', wordsData: bingoDataLSredinaKonec, exerciseId: 'artikulacija_bingo_l', lipsImage: 'Glas_L.png' },
+  'r-sredina-konec': { letter: 'R', displayLetter: 'R', gameType: 'bingo', title: 'BINGO - R', wordsData: bingoDataRSredinaKonec, exerciseId: 'artikulacija_bingo_r', lipsImage: 'Glas_R.png' },
+  'r-zacetek-bingo': { letter: 'R', displayLetter: 'R', gameType: 'bingo', title: 'BINGO - R začetne vaje', wordsData: bingoDataRZacetek, exerciseId: 'artikulacija_bingo_r_zacetek', lipsImage: 'Glas_R.png' },
+  's-sredina-konec': { letter: 'S', displayLetter: 'S', gameType: 'bingo', title: 'BINGO - S', wordsData: bingoDataSSredinaKonec, exerciseId: 'artikulacija_bingo_s', lipsImage: 'Glas_SZC.png' },
+  'sh-sredina-konec': { letter: 'Š', displayLetter: 'Š', gameType: 'bingo', title: 'BINGO - Š', wordsData: bingoDataSHSredinaKonec, exerciseId: 'artikulacija_bingo_sh', lipsImage: 'Glas_ShZhCh.png' },
+  'z-sredina-konec': { letter: 'Z', displayLetter: 'Z', gameType: 'bingo', title: 'BINGO - Z', wordsData: bingoDataZSredinaKonec, exerciseId: 'artikulacija_bingo_z', lipsImage: 'Glas_SZC.png' },
+  'zh-sredina-konec': { letter: 'Ž', displayLetter: 'Ž', gameType: 'bingo', title: 'BINGO - Ž', wordsData: bingoDataZHSredinaKonec, exerciseId: 'artikulacija_bingo_zh', lipsImage: 'Glas_ShZhCh.png' },
 };
 
 // Helper to convert URL param to config key

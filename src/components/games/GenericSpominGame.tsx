@@ -12,6 +12,8 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
 import { Loader, Home, RefreshCw } from "lucide-react";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 import { useGameMode, useGameNavigation } from "@/contexts/GameModeContext";
 
 export interface GenericSpominGameProps {
@@ -482,6 +484,11 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
         onConfirm={handleConfirmBravoClose}
         onCancel={() => setShowBravoConfirm(false)}
       />
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.displayLetter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }

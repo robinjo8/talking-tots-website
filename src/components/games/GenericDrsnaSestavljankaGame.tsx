@@ -16,6 +16,8 @@ import { SlidingPuzzle910 } from "@/components/puzzle/SlidingPuzzle910";
 import { SlidingPuzzle34 } from "@/components/puzzle/SlidingPuzzle34";
 import { getImageUrl, type PuzzleImage } from "@/data/puzzleImages";
 import type { DrsnaSestavljankaGameConfig } from "@/data/drsnaSestavljankaConfig";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 interface GenericDrsnaSestavljankaGameProps {
   config: DrsnaSestavljankaGameConfig;
@@ -209,6 +211,11 @@ export function GenericDrsnaSestavljankaGame({ config, backPath = '/govorne-igre
         onConfirm={handleConfirmNewGame} 
         onCancel={() => setShowNewGameDialog(false)} 
       />
+
+      {(() => {
+        const lipsImage = getLipsImageForLetter(config.letter);
+        return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+      })()}
     </div>
   );
 }
