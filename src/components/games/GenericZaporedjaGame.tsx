@@ -21,6 +21,8 @@ import { SequenceGameČ } from "@/components/exercises/SequenceGameČ";
 import { SequenceGameŠ } from "@/components/exercises/SequenceGameŠ";
 import { SequenceGameŽ } from "@/components/exercises/SequenceGameŽ";
 import type { ZaporedjaGameConfig } from "@/data/zaporedjaConfig";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
 // Game configs for different age groups
 const config78: SequenceGameConfig = {
