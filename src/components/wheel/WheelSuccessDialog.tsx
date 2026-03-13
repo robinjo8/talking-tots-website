@@ -131,7 +131,7 @@ export const WheelSuccessDialog: React.FC<WheelSuccessDialogProps> = ({
       <DialogContent className="max-w-[95vw] max-h-[90vh] sm:max-w-lg overflow-y-auto p-4 sm:p-6">
         <div className="space-y-2 sm:space-y-4 py-1 sm:py-4">
           <h2 className="text-lg sm:text-2xl font-bold text-dragon-green text-center uppercase">
-            ODLIČNO!
+            POIMENUJ SLIKO
           </h2>
 
           <p className="text-xs sm:text-sm text-black text-center">KLIKNI NA SPODNJO SLIKO IN PONOVI BESEDO</p>
