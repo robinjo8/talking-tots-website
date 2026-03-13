@@ -228,7 +228,8 @@ const ArtikuacijskiTest = () => {
     undefined,
     undefined,
     sessionInfo?.sessionId,
-    wordsPerLetter
+    wordsPerLetter,
+    testStarted
   );
 
   // Check for existing session on mount (using database, not localStorage)
