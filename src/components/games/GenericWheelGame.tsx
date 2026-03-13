@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Home } from "lucide-react";
-import { LipsIcon } from "@/components/icons/LipsIcon";
+import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { FortuneWheel } from "@/components/wheel/FortuneWheel";
 import { useFortuneWheel } from "@/hooks/useFortuneWheel";
 import { useTrophyContext } from "@/contexts/TrophyContext";
