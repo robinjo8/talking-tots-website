@@ -289,6 +289,7 @@ export default function AdminArtikulacijskiTest() {
         onClose={async () => {
           await initializeSession();
           setShowInfoDialog(false);
+          setTestStarted(true);
         }}
         onBack={() => navigate(`/admin/children/${childId}/workspace`)}
         childName={child?.name}
