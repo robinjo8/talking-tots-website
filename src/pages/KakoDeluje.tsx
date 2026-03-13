@@ -195,9 +195,6 @@ const KakoDeluje = () => {
 
             <h4 className="text-lg font-medium text-foreground mb-2 mt-6">Igra zaporedja</h4>
             <p className="text-muted-foreground leading-relaxed">
-              Igra se začne z naborom 20 slik, kjer ima vsaka slika svojo besedo in zvok. Sistem naključno izbere 4–5 slik kot ciljno zaporedje, nato jih premeša.
-            </p>
-            <p className="text-muted-foreground leading-relaxed mt-4">
               Otrok z uporabo funkcije »povleci in spusti« razporeja slike v pravilnem vrstnem redu. Ko je zaporedje pravilno sestavljeno, se igra zaključi in prikaže se pojavno okno z besedami za izgovorjavo.
             </p>
 
