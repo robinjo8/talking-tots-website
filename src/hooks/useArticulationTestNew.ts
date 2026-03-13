@@ -311,6 +311,7 @@ export const useArticulationTestNew = (
     hasRecorded,
     isTestComplete,
     isTranscribing,
+    isAudioPlaying,
     transcriptionResult,
     sessionNumber,
 
