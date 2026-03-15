@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Home, Volume2, Mic, ArrowUp, RefreshCw, RotateCcw } from "lucide-react";
-import { isIOSDevice } from "@/utils/appleDetection";
+import { isIOSDevice, safeRequestFullscreen, safeLockLandscape, safeExitFullscreen, safeUnlockOrientation } from "@/utils/appleDetection";
 import { 
   PonoviPovedConfig, 
   SentenceWord,
