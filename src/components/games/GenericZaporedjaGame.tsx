@@ -139,6 +139,52 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
     }
   }, [effectiveFullscreen]);
 
+  // Intercept Android hardware Back button via popstate
+  useEffect(() => {
+    if (!effectiveFullscreen) return;
+
+    // Push a sentinel state so "Back" pops it instead of navigating away
+    window.history.pushState({ zaporedjaGame: true }, '');
+
+    const handlePopState = (e: PopStateEvent) => {
+      // Re-push sentinel so future Back presses are also caught
+      window.history.pushState({ zaporedjaGame: true }, '');
+      // Show exit confirmation dialog
+      setShowExitConfirmation(true);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [effectiveFullscreen]);
+
+  // Re-acquire fullscreen + landscape lock when fullscreen is lost unexpectedly
+  useEffect(() => {
+    if (!effectiveFullscreen) return;
+
+    const handleFullscreenChange = async () => {
+      const isFullscreen = !!(document.fullscreenElement || (document as any).webkitFullscreenElement);
+      if (!isFullscreen) {
+        // Fullscreen was lost (e.g. Android Back briefly exits it) — re-acquire
+        try {
+          const { safeRequestFullscreen, safeLockLandscape } = await import('@/utils/appleDetection');
+          await safeRequestFullscreen();
+          await safeLockLandscape();
+        } catch {
+          // Best-effort; game still works without fullscreen
+        }
+      }
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
+  }, [effectiveFullscreen]);
+
   const handleGameComplete = (images: any[]) => {
     if (!gameCompletedRef.current) {
       gameCompletedRef.current = true;
