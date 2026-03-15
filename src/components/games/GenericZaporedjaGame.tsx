@@ -76,31 +76,46 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
     setIsTouchDevice(hasTouch && isSmallScreen);
   }, []);
 
-  // Reliable orientation detection
+  // Reliable orientation detection using real viewport dimensions
   useEffect(() => {
     const checkOrientation = () => {
-      if (window.screen.orientation) {
-        setIsPortrait(window.screen.orientation.type.includes('portrait'));
-      } else {
-        setIsPortrait(window.screen.height > window.screen.width);
-      }
+      const width = window.visualViewport?.width ?? window.innerWidth;
+      const height = window.visualViewport?.height ?? window.innerHeight;
+      setIsPortrait(height > width);
     };
     
     checkOrientation();
     
-    const handleOrientationChange = () => {
-      setTimeout(checkOrientation, 100);
+    const handleDelayedCheck = () => {
+      // Immediate check + delayed check to catch post-rotation layout reflow
+      checkOrientation();
+      setTimeout(checkOrientation, 150);
+      setTimeout(checkOrientation, 500);
     };
     
-    window.addEventListener('orientationchange', handleOrientationChange);
+    // Listen to multiple events for robust detection across Android/iOS
+    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('orientationchange', handleDelayedCheck);
+    document.addEventListener('fullscreenchange', handleDelayedCheck);
+    document.addEventListener('webkitfullscreenchange', handleDelayedCheck);
+    
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', checkOrientation);
+    }
     if (window.screen.orientation) {
-      window.screen.orientation.addEventListener('change', checkOrientation);
+      window.screen.orientation.addEventListener('change', handleDelayedCheck);
     }
     
     return () => {
-      window.removeEventListener('orientationchange', handleOrientationChange);
+      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('orientationchange', handleDelayedCheck);
+      document.removeEventListener('fullscreenchange', handleDelayedCheck);
+      document.removeEventListener('webkitfullscreenchange', handleDelayedCheck);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', checkOrientation);
+      }
       if (window.screen.orientation) {
-        window.screen.orientation.removeEventListener('change', checkOrientation);
+        window.screen.orientation.removeEventListener('change', handleDelayedCheck);
       }
     };
   }, []);
