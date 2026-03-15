@@ -447,16 +447,16 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       offsetY,
       edgeMargin,
     };
-  }, [containerSize, isMobile]);
+  }, [containerSize, useMobileLayout]);
   
   // Use calculated sizes or fallback
-  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 100);
-  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 75);
-  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 120);
-  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 120);
-  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 100);
-  const offsetX = calculatedSizes?.offsetX ?? (isMobile ? 30 : 100);
-  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 100 : 80);
+  const stoneWidth = calculatedSizes?.stoneWidth ?? (useMobileLayout ? 80 : 100);
+  const stoneHeight = calculatedSizes?.stoneHeight ?? (useMobileLayout ? 60 : 75);
+  const gapX = calculatedSizes?.gapX ?? (useMobileLayout ? 90 : 120);
+  const gapY = calculatedSizes?.gapY ?? (useMobileLayout ? 75 : 120);
+  const dragonSize = calculatedSizes?.dragonSize ?? (useMobileLayout ? 80 : 100);
+  const offsetX = calculatedSizes?.offsetX ?? (useMobileLayout ? 30 : 100);
+  const offsetY = calculatedSizes?.offsetY ?? (useMobileLayout ? 100 : 80);
   
   // Game state
   const [phase, setPhase] = useState<GamePhase>("start");
