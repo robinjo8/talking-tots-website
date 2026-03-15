@@ -988,8 +988,8 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
             </div>
           </div>
           
-          {/* MOBILE: Bottom right jump button */}
-          <div className="fixed bottom-4 right-4 z-20">
+          {/* MOBILE: Bottom center jump button */}
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20">
             <JumpButton 
               onClick={handleNext} 
               disabled={isJumping || phase === "complete" || showSentenceDialog || isPlayingAudio}
