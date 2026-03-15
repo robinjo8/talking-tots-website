@@ -358,7 +358,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     }
     
     // DESKTOP: Rectangular path layout (7 columns x 3 rows) - SCALED 1.5x
-    if (!isMobile) {
+    if (!useMobileLayout) {
       // Base sizes scaled by 1.5
       const baseStoneWidth = 120;   // 80 * 1.5
       const baseStoneHeight = 90;   // 60 * 1.5
