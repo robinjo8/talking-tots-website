@@ -1,24 +1,49 @@
 
-Cilj: ohraniti pravilo “Zaporedja deluje samo v ležečem položaju”, hkrati pa popraviti bug, da obvestilo v pokončnem načinu ostane tudi po vrnitvi v ležeči položaj.
+# Osebni načrt — Set-based sistem (implementirano)
 
-Kaj bomo naredili
-1. Popravimo detekcijo orientacije v `src/components/games/GenericZaporedjaGame.tsx`, da bo primarno temeljila na realnem viewportu (`innerWidth/innerHeight` oziroma `visualViewport`), ne na `screen.orientation.type`.
-2. Dodamo robustne poslušalce dogodkov za ponovno preverjanje orientacije:
-   - `resize`
-   - `orientationchange` (z majhnim `setTimeout`)
-   - `fullscreenchange` (ker na Androidu fullscreen pogosto spremeni metrike)
-3. Obdržimo obstoječi portrait overlay (to je pravilen UX), ampak ga vežemo na novo zanesljivo stanje `isPortrait`, da se takoj skrije, ko je telefon nazaj ležeče.
-4. Ohranimo obstoječe `safeRequestFullscreen` + `safeLockLandscape` ob mountu; dodatno sprožimo “retry lock” ob prehodu nazaj v ležeči položaj (best-effort, brez blokiranja igre).
+## Implementirane spremembe
 
-Tehnične podrobnosti
-- Datoteka: `src/components/games/GenericZaporedjaGame.tsx`
-- Ključna sprememba: funkcija `checkOrientation()` bo računala:
-  - `const width = window.visualViewport?.width ?? window.innerWidth`
-  - `const height = window.visualViewport?.height ?? window.innerHeight`
-  - `setIsPortrait(height > width)`
-- Event cleanup bo simetričen (isti handler reference za add/remove), da ne ostanejo “mrtvi” listenerji.
-- S tem ostane iOS kompatibilnost nespremenjena (appleDetection že varno preskoči lock/fullscreen na iOS).
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-Kaj bo rezultat
-- V pokončnem načinu se še vedno pokaže obvestilo.
-- Ko uporabnik obrne nazaj v ležeči položaj, obvestilo izgine in igra se normalno nadaljuje brez refresh/restart.
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
+
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+
+---
+
+# Popravki preverjanja izgovorjave (implementirano)
+
+## Implementirane spremembe
+
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
