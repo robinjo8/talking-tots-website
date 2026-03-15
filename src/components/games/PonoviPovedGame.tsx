@@ -529,7 +529,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     }
     
     return DRAGON_RIGHT;
-  }, [dragonPosition, isMobile, STONE_POSITIONS]);
+  }, [dragonPosition, useMobileLayout, STONE_POSITIONS]);
 
   // Play audio helper - returns Promise that resolves when audio ends
   const playAudio = useCallback((audioFile: string): Promise<void> => {
