@@ -723,7 +723,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
         await playAudio(word.audio);
       }
     }, 600);
-  }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, isMobile, STONE_POSITIONS]);
+  }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, useMobileLayout, STONE_POSITIONS]);
 
   // Reset game
   const handleReset = () => {
