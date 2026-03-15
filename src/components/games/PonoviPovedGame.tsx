@@ -890,7 +890,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       )}
       
       {/* DESKTOP: Word cards + Dice CENTERED on screen between middle row stones */}
-      {!isMobile && calculatedSizes && (
+      {!useMobileLayout && calculatedSizes && (
         <div 
           className="fixed z-20 flex items-center gap-6"
           style={{
