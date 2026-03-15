@@ -805,7 +805,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     );
   }
 
-  // Show landscape warning overlay on mobile (especially iOS)
+  // Show landscape warning overlay on phone (especially iOS)
   if (isLandscape) {
     return (
       <div 
@@ -824,6 +824,19 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
           <p className="text-sm text-gray-500 text-center">
             Ta igra deluje samo v pokončnem načinu
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show portrait warning overlay on tablet (force landscape)
+  if (isTablet && isTabletPortrait) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-dragon-green to-app-teal p-8 game-container z-[9999]">
+        <div className="text-center text-white">
+          <div className="text-6xl mb-4">📱</div>
+          <h2 className="text-2xl font-bold mb-2">Obrni tablico</h2>
+          <p className="text-lg opacity-80">Za igro obrni tablico v ležeči položaj</p>
         </div>
       </div>
     );
