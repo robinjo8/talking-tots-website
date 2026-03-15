@@ -990,7 +990,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
         {/* Stones grid */}
         <div className="absolute inset-0">
           {/* Decorative bottom center green stone (mobile only, not part of path) */}
-          {isMobile && (
+          {useMobileLayout && (
             <div
               className="absolute"
               style={{
