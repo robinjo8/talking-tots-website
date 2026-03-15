@@ -241,8 +241,9 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
   const [isLandscape, setIsLandscape] = useState(false);
+  const [isTabletPortrait, setIsTabletPortrait] = useState(false);
   
-  // Detect touch device using shortest screen dimension (stable across orientations)
+  // Detect touch device (phone) using shortest screen dimension (stable across orientations)
   const [isTouchDevice] = useState(() => {
     if (typeof window === 'undefined') return false;
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -250,7 +251,18 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     return hasTouch && isSmallDevice;
   });
   
-  // Detect landscape orientation on mobile (especially iOS where orientation lock doesn't work)
+  // Detect tablet (touch device with min dimension 768-1200px)
+  const [isTablet] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const minDim = Math.min(window.innerWidth, window.innerHeight);
+    return hasTouch && minDim >= 768 && minDim <= 1200;
+  });
+  
+  // Use mobile layout for both phones and tablets (landscape-optimized)
+  const useMobileLayout = isMobile || isTablet;
+  
+  // Detect landscape orientation on phone (especially iOS where orientation lock doesn't work)
   useEffect(() => {
     const checkOrientation = () => {
       const isLand = window.innerWidth > window.innerHeight;
@@ -267,8 +279,54 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     };
   }, [isTouchDevice]);
   
-  // Select positions based on device
-  const STONE_POSITIONS = isMobile ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
+  // Detect portrait orientation on tablet
+  useEffect(() => {
+    if (!isTablet) return;
+    
+    const checkOrientation = () => {
+      if (window.screen.orientation) {
+        setIsTabletPortrait(window.screen.orientation.type.includes('portrait'));
+      } else {
+        setIsTabletPortrait(window.innerHeight > window.innerWidth);
+      }
+    };
+    
+    checkOrientation();
+    
+    const handleChange = () => setTimeout(checkOrientation, 100);
+    window.addEventListener('orientationchange', handleChange);
+    window.addEventListener('resize', checkOrientation);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', checkOrientation);
+    }
+    
+    return () => {
+      window.removeEventListener('orientationchange', handleChange);
+      window.removeEventListener('resize', checkOrientation);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', checkOrientation);
+      }
+    };
+  }, [isTablet]);
+  
+  // Automatic fullscreen and landscape lock on tablets (iOS-safe)
+  useEffect(() => {
+    if (!isTablet) return;
+    
+    const setup = async () => {
+      await safeRequestFullscreen();
+      await safeLockLandscape();
+    };
+    setup();
+    
+    return () => {
+      safeExitFullscreen();
+      safeUnlockOrientation();
+    };
+  }, [isTablet]);
+  
+  // Select positions based on device (tablets use mobile/landscape layout)
+  const STONE_POSITIONS = useMobileLayout ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
   
   // Dynamic window size measurement
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
