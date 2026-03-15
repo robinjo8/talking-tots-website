@@ -745,7 +745,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const getStonePixelPosition = (index: number) => {
     const stone = STONE_POSITIONS[index];
     
-    if (!isMobile) {
+    if (!useMobileLayout) {
       // DESKTOP: Original logic with extra vertical offset
       let extraYOffset = 0;
       if (stone.y === 1) {
