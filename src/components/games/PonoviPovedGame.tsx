@@ -941,7 +941,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       )}
       
       {/* MOBILE: Original top word cards + bottom jump button */}
-      {isMobile && (
+      {useMobileLayout && (
         <>
           <div className="fixed top-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
             <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 pointer-events-auto ${collectedWords.length > 0 ? 'min-w-[300px]' : 'min-w-[200px]'}`}>
