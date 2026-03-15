@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Home, Volume2, Mic, ArrowUp, RefreshCw, RotateCcw } from "lucide-react";
-import { isIOSDevice } from "@/utils/appleDetection";
+import { isIOSDevice, safeRequestFullscreen, safeLockLandscape, safeExitFullscreen, safeUnlockOrientation } from "@/utils/appleDetection";
 import { 
   PonoviPovedConfig, 
   SentenceWord,
@@ -241,8 +241,9 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
   const [isLandscape, setIsLandscape] = useState(false);
+  const [isTabletPortrait, setIsTabletPortrait] = useState(false);
   
-  // Detect touch device using shortest screen dimension (stable across orientations)
+  // Detect touch device (phone) using shortest screen dimension (stable across orientations)
   const [isTouchDevice] = useState(() => {
     if (typeof window === 'undefined') return false;
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -250,7 +251,18 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     return hasTouch && isSmallDevice;
   });
   
-  // Detect landscape orientation on mobile (especially iOS where orientation lock doesn't work)
+  // Detect tablet (touch device with min dimension 768-1200px)
+  const [isTablet] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    const minDim = Math.min(window.innerWidth, window.innerHeight);
+    return hasTouch && minDim >= 768 && minDim <= 1200;
+  });
+  
+  // Use mobile layout for both phones and tablets (landscape-optimized)
+  const useMobileLayout = isMobile || isTablet;
+  
+  // Detect landscape orientation on phone (especially iOS where orientation lock doesn't work)
   useEffect(() => {
     const checkOrientation = () => {
       const isLand = window.innerWidth > window.innerHeight;
@@ -267,8 +279,54 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     };
   }, [isTouchDevice]);
   
-  // Select positions based on device
-  const STONE_POSITIONS = isMobile ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
+  // Detect portrait orientation on tablet
+  useEffect(() => {
+    if (!isTablet) return;
+    
+    const checkOrientation = () => {
+      if (window.screen.orientation) {
+        setIsTabletPortrait(window.screen.orientation.type.includes('portrait'));
+      } else {
+        setIsTabletPortrait(window.innerHeight > window.innerWidth);
+      }
+    };
+    
+    checkOrientation();
+    
+    const handleChange = () => setTimeout(checkOrientation, 100);
+    window.addEventListener('orientationchange', handleChange);
+    window.addEventListener('resize', checkOrientation);
+    if (window.screen.orientation) {
+      window.screen.orientation.addEventListener('change', checkOrientation);
+    }
+    
+    return () => {
+      window.removeEventListener('orientationchange', handleChange);
+      window.removeEventListener('resize', checkOrientation);
+      if (window.screen.orientation) {
+        window.screen.orientation.removeEventListener('change', checkOrientation);
+      }
+    };
+  }, [isTablet]);
+  
+  // Automatic fullscreen and landscape lock on tablets (iOS-safe)
+  useEffect(() => {
+    if (!isTablet) return;
+    
+    const setup = async () => {
+      await safeRequestFullscreen();
+      await safeLockLandscape();
+    };
+    setup();
+    
+    return () => {
+      safeExitFullscreen();
+      safeUnlockOrientation();
+    };
+  }, [isTablet]);
+  
+  // Select positions based on device (tablets use mobile/landscape layout)
+  const STONE_POSITIONS = useMobileLayout ? STONE_POSITIONS_MOBILE : STONE_POSITIONS_DESKTOP;
   
   // Dynamic window size measurement
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -300,7 +358,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     }
     
     // DESKTOP: Rectangular path layout (7 columns x 3 rows) - SCALED 1.5x
-    if (!isMobile) {
+    if (!useMobileLayout) {
       // Base sizes scaled by 1.5
       const baseStoneWidth = 120;   // 80 * 1.5
       const baseStoneHeight = 90;   // 60 * 1.5
@@ -389,16 +447,16 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       offsetY,
       edgeMargin,
     };
-  }, [containerSize, isMobile]);
+  }, [containerSize, useMobileLayout]);
   
   // Use calculated sizes or fallback
-  const stoneWidth = calculatedSizes?.stoneWidth ?? (isMobile ? 80 : 100);
-  const stoneHeight = calculatedSizes?.stoneHeight ?? (isMobile ? 60 : 75);
-  const gapX = calculatedSizes?.gapX ?? (isMobile ? 90 : 120);
-  const gapY = calculatedSizes?.gapY ?? (isMobile ? 75 : 120);
-  const dragonSize = calculatedSizes?.dragonSize ?? (isMobile ? 80 : 100);
-  const offsetX = calculatedSizes?.offsetX ?? (isMobile ? 30 : 100);
-  const offsetY = calculatedSizes?.offsetY ?? (isMobile ? 100 : 80);
+  const stoneWidth = calculatedSizes?.stoneWidth ?? (useMobileLayout ? 80 : 100);
+  const stoneHeight = calculatedSizes?.stoneHeight ?? (useMobileLayout ? 60 : 75);
+  const gapX = calculatedSizes?.gapX ?? (useMobileLayout ? 90 : 120);
+  const gapY = calculatedSizes?.gapY ?? (useMobileLayout ? 75 : 120);
+  const dragonSize = calculatedSizes?.dragonSize ?? (useMobileLayout ? 80 : 100);
+  const offsetX = calculatedSizes?.offsetX ?? (useMobileLayout ? 30 : 100);
+  const offsetY = calculatedSizes?.offsetY ?? (useMobileLayout ? 100 : 80);
   
   // Game state
   const [phase, setPhase] = useState<GamePhase>("start");
@@ -430,7 +488,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     
     // DESKTOP: Rectangular path logic with 7 columns
     // Dragon turns LEFT only on gray stone at top-right corner (x=6, y=2) and beyond
-    if (!isMobile) {
+    if (!useMobileLayout) {
       // Left side (x=0): moving UP → facing right
       if (stone.x === 0) return DRAGON_RIGHT;
       
@@ -471,7 +529,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     }
     
     return DRAGON_RIGHT;
-  }, [dragonPosition, isMobile, STONE_POSITIONS]);
+  }, [dragonPosition, useMobileLayout, STONE_POSITIONS]);
 
   // Play audio helper - returns Promise that resolves when audio ends
   const playAudio = useCallback((audioFile: string): Promise<void> => {
@@ -665,7 +723,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
         await playAudio(word.audio);
       }
     }, 600);
-  }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, isMobile, STONE_POSITIONS]);
+  }, [dragonPosition, isJumping, showSentenceDialog, config.sentences, playAudio, useMobileLayout, STONE_POSITIONS]);
 
   // Reset game
   const handleReset = () => {
@@ -687,7 +745,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const getStonePixelPosition = (index: number) => {
     const stone = STONE_POSITIONS[index];
     
-    if (!isMobile) {
+    if (!useMobileLayout) {
       // DESKTOP: Original logic with extra vertical offset
       let extraYOffset = 0;
       if (stone.y === 1) {
@@ -747,7 +805,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     );
   }
 
-  // Show landscape warning overlay on mobile (especially iOS)
+  // Show landscape warning overlay on phone (especially iOS)
   if (isLandscape) {
     return (
       <div 
@@ -766,6 +824,19 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
           <p className="text-sm text-gray-500 text-center">
             Ta igra deluje samo v pokončnem načinu
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show portrait warning overlay on tablet (force landscape)
+  if (isTablet && isTabletPortrait) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-dragon-green to-app-teal p-8 game-container z-[9999]">
+        <div className="text-center text-white">
+          <div className="text-6xl mb-4">📱</div>
+          <h2 className="text-2xl font-bold mb-2">Obrni tablico</h2>
+          <p className="text-lg opacity-80">Za igro obrni tablico v ležeči položaj</p>
         </div>
       </div>
     );
@@ -832,7 +903,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       )}
       
       {/* DESKTOP: Word cards + Dice CENTERED on screen between middle row stones */}
-      {!isMobile && calculatedSizes && (
+      {!useMobileLayout && calculatedSizes && (
         <div 
           className="fixed z-20 flex items-center gap-6"
           style={{
@@ -883,7 +954,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
       )}
       
       {/* MOBILE: Original top word cards + bottom jump button */}
-      {isMobile && (
+      {useMobileLayout && (
         <>
           <div className="fixed top-4 left-0 right-0 z-20 flex justify-center px-4 pointer-events-none">
             <div className={`bg-sky-100/90 backdrop-blur-sm rounded-2xl p-4 shadow-lg transition-all duration-300 pointer-events-auto ${collectedWords.length > 0 ? 'min-w-[300px]' : 'min-w-[200px]'}`}>
@@ -932,7 +1003,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
         {/* Stones grid */}
         <div className="absolute inset-0">
           {/* Decorative bottom center green stone (mobile only, not part of path) */}
-          {isMobile && (
+          {useMobileLayout && (
             <div
               className="absolute"
               style={{
