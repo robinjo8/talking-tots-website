@@ -488,7 +488,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     
     // DESKTOP: Rectangular path logic with 7 columns
     // Dragon turns LEFT only on gray stone at top-right corner (x=6, y=2) and beyond
-    if (!isMobile) {
+    if (!useMobileLayout) {
       // Left side (x=0): moving UP → facing right
       if (stone.x === 0) return DRAGON_RIGHT;
       
