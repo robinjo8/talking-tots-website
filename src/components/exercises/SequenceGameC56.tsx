@@ -506,7 +506,7 @@ export const SequenceGameC56 = ({ onGameComplete, isLandscape = false }: Sequenc
 
       {/* Help button - in select or arrange phase */}
       {(gamePhase === "select" || gamePhase === "arrange") && !isComplete && helpUsesLeft > 0 && (
-        <div className="fixed bottom-4 right-4 z-40">
+        <div className="fixed bottom-24 right-4 z-40">
           <Button
             onClick={handleHelp}
             disabled={showHelp}
