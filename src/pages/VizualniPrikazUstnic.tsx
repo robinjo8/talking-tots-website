@@ -2,9 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
-import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { Volume2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -50,18 +48,8 @@ const soundCards = [
   },
 ];
 
-const navButtons = [
-  { label: "K", index: 0 },
-  { label: "L", index: 1 },
-  { label: "R", index: 2 },
-];
-const navButtons2 = [
-  { label: "C, S, Z", index: 3 },
-  { label: "Č, Š, Ž", index: 4 },
-];
-
 const VizualniPrikazUstnic = () => {
-  const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
+  const { user, selectedChild, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
@@ -95,9 +83,6 @@ const VizualniPrikazUstnic = () => {
     return null;
   }
 
-  const api = carouselApi;
-  const slide = currentSlide;
-
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -114,49 +99,8 @@ const VizualniPrikazUstnic = () => {
           </p>
         </div>
 
-        {/* Breadcrumb */}
-        <div className="mb-8">
-          <BreadcrumbNavigation />
-        </div>
-
         {selectedChild ? (
           <>
-            {/* Navigation buttons */}
-            <div className="flex flex-col items-center gap-2 mb-6">
-              <div className="flex gap-2">
-                {navButtons.map((btn) => (
-                  <button
-                    key={btn.label}
-                    onClick={() => api?.scrollTo(btn.index)}
-                    className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
-                      slide === btn.index
-                        ? "bg-foreground text-white"
-                        : "bg-white text-foreground hover:bg-foreground/10"
-                    )}
-                  >
-                    {btn.label}
-                  </button>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                {navButtons2.map((btn) => (
-                  <button
-                    key={btn.label}
-                    onClick={() => api?.scrollTo(btn.index)}
-                    className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
-                      slide === btn.index
-                        ? "bg-foreground text-white"
-                        : "bg-white text-foreground hover:bg-foreground/10"
-                    )}
-                  >
-                    {btn.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Carousel */}
             <div className={cn("w-full mx-auto", isMobile ? "" : "max-w-xl")}>
               <Carousel
@@ -172,7 +116,7 @@ const VizualniPrikazUstnic = () => {
                       <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
                         <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
                           <div
-                            className="flip-card cursor-pointer rounded-xl border-2 border-foreground bg-white transition-all duration-300"
+                            className="flip-card cursor-pointer rounded-xl border border-border bg-card shadow-sm transition-all duration-300"
                             style={{ minHeight: cardHeight }}
                             onClick={() => handleCardClick(card.id)}
                           >
@@ -182,11 +126,11 @@ const VizualniPrikazUstnic = () => {
                                   <span className="text-sm font-bold text-muted-foreground opacity-80 uppercase tracking-widest">Glas</span>
                                   <span className="text-5xl md:text-6xl font-black text-foreground drop-shadow-sm">{card.sounds.join(", ")}</span>
                                 </div>
-                                <div className="w-full bg-white py-3 px-2 flex items-center justify-center border-t border-border">
+                                <div className="w-full bg-card py-3 px-2 flex items-center justify-center border-t border-border">
                                   <span className="text-base font-bold text-foreground text-center leading-tight">Odpri</span>
                                 </div>
                               </div>
-                              <div className="flip-card-back flex-col p-4 justify-between rounded-xl border-2 border-foreground bg-white">
+                              <div className="flip-card-back flex-col p-6 justify-between rounded-xl border border-border bg-card shadow-sm">
                                 <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
                                 <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[250px]" : "max-h-[312px]")} loading="lazy" />
                                 <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
@@ -203,8 +147,8 @@ const VizualniPrikazUstnic = () => {
                 </CarouselContent>
                 {!isMobile && (
                   <>
-                    <CarouselPrevious className="h-16 w-16 bg-foreground text-white border-foreground hover:bg-foreground/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
-                    <CarouselNext className="h-16 w-16 bg-foreground text-white border-foreground hover:bg-foreground/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
+                    <CarouselPrevious />
+                    <CarouselNext />
                   </>
                 )}
               </Carousel>
