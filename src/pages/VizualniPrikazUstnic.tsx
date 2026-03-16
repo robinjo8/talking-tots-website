@@ -155,10 +155,10 @@ const VizualniPrikazUstnic = () => {
                           key={btn.label}
                           onClick={() => api?.scrollTo(btn.index)}
                           className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-400 transition-all",
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
                             slide === btn.index
-                              ? "bg-gray-500 text-white"
-                              : "bg-white text-gray-500 hover:bg-gray-100"
+                              ? "bg-foreground text-white"
+                              : "bg-white text-foreground hover:bg-foreground/10"
                           )}
                         >
                           {btn.label}
@@ -171,10 +171,10 @@ const VizualniPrikazUstnic = () => {
                           key={btn.label}
                           onClick={() => api?.scrollTo(btn.index)}
                           className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-400 transition-all",
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
                             slide === btn.index
-                              ? "bg-gray-500 text-white"
-                              : "bg-white text-gray-500 hover:bg-gray-100"
+                              ? "bg-foreground text-white"
+                              : "bg-white text-foreground hover:bg-foreground/10"
                           )}
                         >
                           {btn.label}
@@ -242,7 +242,7 @@ const VizualniPrikazUstnic = () => {
                       <span className={cn(
                         "rounded-full transition-all duration-300",
                         i === currentSlide
-                          ? "w-3 h-3 bg-gray-500 shadow-sm"
+                          ? "w-3 h-3 bg-foreground shadow-sm"
                           : "w-2.5 h-2.5 bg-muted-foreground/40"
                       )} />
                     </button>
@@ -295,8 +295,8 @@ const VizualniPrikazUstnic = () => {
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious className="h-16 w-16 bg-gray-500 text-white border-gray-500 hover:bg-gray-400 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
-                  <CarouselNext className="h-16 w-16 bg-gray-500 text-white border-gray-500 hover:bg-gray-400 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
+                  <CarouselPrevious className="h-16 w-16 bg-foreground text-white border-foreground hover:bg-foreground/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
+                  <CarouselNext className="h-16 w-16 bg-foreground text-white border-foreground hover:bg-foreground/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
                 </Carousel>
                 <div className="flex justify-center gap-2 mt-6">
                   {soundCards.map((_, i) => (
@@ -309,7 +309,7 @@ const VizualniPrikazUstnic = () => {
                       <span className={cn(
                         "rounded-full transition-all duration-300",
                         i === desktopCurrentSlide
-                          ? "w-3 h-3 bg-gray-500 shadow-sm"
+                          ? "w-3 h-3 bg-foreground shadow-sm"
                           : "w-2.5 h-2.5 bg-muted-foreground/40"
                       )} />
                     </button>
