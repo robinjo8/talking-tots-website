@@ -126,7 +126,7 @@ const VizualniPrikazUstnic = () => {
   }
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-white">
+    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
       <Header />
 
       <section className="flex-1 pt-20 md:pt-24 pb-4 flex items-center justify-center">
