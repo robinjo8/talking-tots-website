@@ -176,14 +176,12 @@
 
 .flip-card-front {
   border: none;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 .flip-card-back {
   background-color: white;
   transform: rotateY(180deg);
   border: none;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 .flip-card-back.matched {

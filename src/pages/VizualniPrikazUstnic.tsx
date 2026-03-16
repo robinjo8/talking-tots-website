@@ -126,7 +126,7 @@ const VizualniPrikazUstnic = () => {
   }
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-white">
+    <div className="h-screen overflow-hidden flex flex-col bg-gray-50">
       <Header />
 
       <section className="flex-1 pt-20 md:pt-24 pb-4 flex items-center justify-center">
@@ -155,10 +155,10 @@ const VizualniPrikazUstnic = () => {
                           key={btn.label}
                           onClick={() => api?.scrollTo(btn.index)}
                           className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-dragon-green transition-all",
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
                             slide === btn.index
-                              ? "bg-dragon-green text-white"
-                              : "bg-white text-dragon-green hover:bg-dragon-green/10"
+                              ? "bg-foreground text-white"
+                              : "bg-white text-foreground hover:bg-foreground/10"
                           )}
                         >
                           {btn.label}
@@ -171,10 +171,10 @@ const VizualniPrikazUstnic = () => {
                           key={btn.label}
                           onClick={() => api?.scrollTo(btn.index)}
                           className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-dragon-green transition-all",
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
                             slide === btn.index
-                              ? "bg-dragon-green text-white"
-                              : "bg-white text-dragon-green hover:bg-dragon-green/10"
+                              ? "bg-foreground text-white"
+                              : "bg-white text-foreground hover:bg-foreground/10"
                           )}
                         >
                           {btn.label}
@@ -242,7 +242,7 @@ const VizualniPrikazUstnic = () => {
                       <span className={cn(
                         "rounded-full transition-all duration-300",
                         i === currentSlide
-                          ? "w-3 h-3 bg-dragon-green shadow-sm"
+                          ? "w-3 h-3 bg-foreground shadow-sm"
                           : "w-2.5 h-2.5 bg-muted-foreground/40"
                       )} />
                     </button>
@@ -295,8 +295,8 @@ const VizualniPrikazUstnic = () => {
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious className="h-16 w-16 bg-dragon-green text-white border-dragon-green hover:bg-dragon-green/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
-                  <CarouselNext className="h-16 w-16 bg-dragon-green text-white border-dragon-green hover:bg-dragon-green/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
+                  <CarouselPrevious className="h-16 w-16 bg-foreground text-white border-foreground hover:bg-foreground/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
+                  <CarouselNext className="h-16 w-16 bg-foreground text-white border-foreground hover:bg-foreground/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
                 </Carousel>
                 <div className="flex justify-center gap-2 mt-6">
                   {soundCards.map((_, i) => (
@@ -309,7 +309,7 @@ const VizualniPrikazUstnic = () => {
                       <span className={cn(
                         "rounded-full transition-all duration-300",
                         i === desktopCurrentSlide
-                          ? "w-3 h-3 bg-dragon-green shadow-sm"
+                          ? "w-3 h-3 bg-foreground shadow-sm"
                           : "w-2.5 h-2.5 bg-muted-foreground/40"
                       )} />
                     </button>

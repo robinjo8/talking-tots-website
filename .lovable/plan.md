@@ -1,21 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Vizualne popravke na strani Vizualni prikaz ustnic
+## Implementirane spremembe
 
-## Spremembe
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-### 1. Odstrani sivo senčenje na karticah (`src/index.css`)
-Problem je `box-shadow` na `.flip-card-front` in `.flip-card-back` (vrstici 179 in 186) — to ustvari siv rob/senco. Odstranim `box-shadow` iz obeh.
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 2. Gumbi K, L, R, C-S-Z, Č-Š-Ž nazaj v črno (`src/pages/VizualniPrikazUstnic.tsx`)
-Zamenjaj `border-dragon-green` / `bg-dragon-green` / `text-dragon-green` z `border-foreground` / `bg-foreground` / `text-foreground` na navigacijskih gumbih (vrstice 158-161, 174-177).
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### 3. Puščici carousel nazaj v črno (`src/pages/VizualniPrikazUstnic.tsx`)
-Vrstici 298-299: Zamenjaj `bg-dragon-green border-dragon-green hover:bg-dragon-green/80` z `bg-foreground border-foreground hover:bg-foreground/80`.
+---
 
-### 4. Pikice v črno (`src/pages/VizualniPrikazUstnic.tsx`)
-Zamenjaj `bg-dragon-green` z `bg-foreground` na aktivnih pikicah (vrstici 245 in 312).
+# Popravki preverjanja izgovorjave (implementirano)
 
-### 5. Rahlo sivo ozadje celotne strani (`src/pages/VizualniPrikazUstnic.tsx`)
-Vrstica 129: Zamenjaj `bg-white` z `bg-gray-50` na glavnem `div`-u.
+## Implementirane spremembe
 
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
