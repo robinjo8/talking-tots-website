@@ -78,11 +78,13 @@ const VizualniPrikazUstnic = () => {
   const onSelect = useCallback(() => {
     if (!carouselApi) return;
     setCurrentSlide(carouselApi.selectedScrollSnap());
+    setFlippedCardId(null);
   }, [carouselApi]);
 
   const onDesktopSelect = useCallback(() => {
     if (!desktopCarouselApi) return;
     setDesktopCurrentSlide(desktopCarouselApi.selectedScrollSnap());
+    setFlippedCardId(null);
   }, [desktopCarouselApi]);
 
   useEffect(() => {
@@ -131,8 +133,59 @@ const VizualniPrikazUstnic = () => {
         <div className="container max-w-6xl mx-auto px-4">
 
           {selectedChild ? (
-            isMobile ? (
-              <div className="w-full mt-8">
+            <>
+              {/* Navigation buttons */}
+              {(() => {
+                const api = isMobile ? carouselApi : desktopCarouselApi;
+                const slide = isMobile ? currentSlide : desktopCurrentSlide;
+                const navButtons = [
+                  { label: "K", index: 0 },
+                  { label: "L", index: 1 },
+                  { label: "R", index: 2 },
+                ];
+                const navButtons2 = [
+                  { label: "C, S, Z", index: 3 },
+                  { label: "Č, Š, Ž", index: 4 },
+                ];
+                return (
+                  <div className="flex flex-col items-center gap-2 mb-4">
+                    <div className="flex gap-2">
+                      {navButtons.map((btn) => (
+                        <button
+                          key={btn.label}
+                          onClick={() => api?.scrollTo(btn.index)}
+                          className={cn(
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
+                            slide === btn.index
+                              ? "bg-foreground text-background"
+                              : "bg-background text-foreground hover:bg-muted"
+                          )}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      {navButtons2.map((btn) => (
+                        <button
+                          key={btn.label}
+                          onClick={() => api?.scrollTo(btn.index)}
+                          className={cn(
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
+                            slide === btn.index
+                              ? "bg-foreground text-background"
+                              : "bg-background text-foreground hover:bg-muted"
+                          )}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            {isMobile ? (
+              <div className="w-full">
                 <Carousel
                   setApi={setCarouselApi}
                   className="w-full"
@@ -148,7 +201,7 @@ const VizualniPrikazUstnic = () => {
                         <CarouselItem key={card.id} className="basis-full flex justify-center">
                           <div className="w-full max-w-sm p-1">
                             <div
-                              className="flip-card cursor-pointer rounded-xl"
+                              className="flip-card cursor-pointer rounded-xl border-2 border-foreground"
                               style={{ minHeight: '420px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
@@ -213,7 +266,7 @@ const VizualniPrikazUstnic = () => {
                         <CarouselItem key={card.id} className="pl-0 basis-full flex justify-center">
                           <div className="w-full p-1">
                             <div
-                              className="flip-card cursor-pointer rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02]"
+                              className="flip-card cursor-pointer rounded-xl border-2 border-foreground bg-white transition-all duration-300 hover:scale-[1.02]"
                               style={{ minHeight: '525px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
@@ -227,7 +280,7 @@ const VizualniPrikazUstnic = () => {
                                     <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
                                   </div>
                                 </div>
-                                <div className="flip-card-back flex-col p-4 justify-between rounded-xl border border-gray-200">
+                                <div className="flip-card-back flex-col p-4 justify-between rounded-xl border-2 border-foreground">
                                   <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
                                   <img src={card.image} alt={card.title} className="w-full max-h-[312px] object-contain rounded-lg" loading="lazy" />
                                   <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
@@ -263,7 +316,8 @@ const VizualniPrikazUstnic = () => {
                   ))}
                 </div>
               </div>
-            )
+            )}
+            </>
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
               <p className="text-lg text-destructive">
