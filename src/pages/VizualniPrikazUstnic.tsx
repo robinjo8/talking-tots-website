@@ -242,7 +242,7 @@ const VizualniPrikazUstnic = () => {
                       <span className={cn(
                         "rounded-full transition-all duration-300",
                         i === currentSlide
-                          ? "w-3 h-3 bg-dragon-green shadow-sm"
+                          ? "w-3 h-3 bg-foreground shadow-sm"
                           : "w-2.5 h-2.5 bg-muted-foreground/40"
                       )} />
                     </button>
