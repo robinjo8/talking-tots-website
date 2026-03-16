@@ -155,10 +155,10 @@ const VizualniPrikazUstnic = () => {
                           key={btn.label}
                           onClick={() => api?.scrollTo(btn.index)}
                           className={cn(
-                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-gray-400 transition-all",
                             slide === btn.index
-                              ? "bg-foreground text-white"
-                              : "bg-white text-foreground hover:bg-foreground/10"
+                              ? "bg-gray-500 text-white"
+                              : "bg-white text-gray-500 hover:bg-gray-100"
                           )}
                         >
                           {btn.label}
