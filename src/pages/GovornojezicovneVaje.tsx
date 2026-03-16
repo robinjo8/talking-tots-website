@@ -38,41 +38,41 @@ const GovornojezicovneVaje = () => {
     {
       id: "vaje-motorike-govoril",
       title: "VAJE MOTORIKE GOVORIL",
+      mobileTitle: "VAJE MOTORIKE\nGOVORIL",
       description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic, jezika. Hkrati gibljemo tudi nekatere druge dele obraza in ust, ki so vključeni v govor in tudi negovorne aktivnosti.",
       path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
       image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje govoril.webp",
       imageScale: "90%",
-      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
       available: true,
     },
     {
       id: "moji-prvi-glasovi",
       title: "MOJI PRVI GLASOVI",
+      mobileTitle: "MOJI PRVI\nGLASOVI",
       description: "Zabavna animacija, ki otroke uči prepoznavati in posnemati glasove. Barviti liki in interaktivni prizori spodbujajo poslušanje, ponavljanje in igro z glasovi.",
       path: "/govorno-jezikovne-vaje/artikulacija",
       image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajce_prvi glasovi.webp",
       imageScale: "90%",
-      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
       available: true,
     },
     {
       id: "vizualni-prikaz-ustnic",
       title: "VIZUALNI PRIKAZ USTNIC",
+      mobileTitle: "VIZUALNI PRIKAZ\nUSTNIC",
       description: "Prikaz pravilnega položaja ustnic pri izgovorjavi določenega glasu. Otrok lahko s pomočjo slike lažje posnema gib ustnic pri glasovih C, Č, R, L, K, S, Š, Z in Ž.",
       path: "/govorno-jezikovne-vaje/vizualni-prikaz-ustnic",
       image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_ustnice.webp",
       imageScale: "90%",
-      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
       available: true,
     },
     {
       id: "video-navodila",
       title: "VIDEO NAVODILA",
+      mobileTitle: "VIDEO\nNAVODILA",
       description: "Video navodila logopeda za pravilno izgovorjavo posameznih glasov. Kratki posnetki prikazujejo položaj govoril in tehniko izgovorjave.",
       path: "/video-navodila",
       image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video navodila.webp",
       imageScale: "90%",
-      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
       available: true,
     },
   ];
@@ -121,10 +121,7 @@ const GovornojezicovneVaje = () => {
                   >
                     {/* Card Image */}
                     <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-                      <div 
-                        className="absolute inset-0"
-                        style={{ background: exercise.customBackground }}
-                      />
+                      <div className="absolute inset-0 bg-white" />
                       <div className="absolute inset-0 flex items-center justify-center p-2">
                         <img 
                           src={exercise.image}
@@ -141,10 +138,10 @@ const GovornojezicovneVaje = () => {
                     {/* Card Content */}
                     <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-4 flex flex-col flex-grow"}>
                       <h3 className={isMobile 
-                        ? "text-sm font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors text-center" 
+                        ? "text-sm font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors text-center whitespace-pre-line" 
                         : "text-lg font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors"
                       }>
-                        {exercise.title}
+                        {isMobile ? exercise.mobileTitle : exercise.title}
                       </h3>
                       <p className={isMobile 
                         ? "text-xs text-muted-foreground line-clamp-3"
