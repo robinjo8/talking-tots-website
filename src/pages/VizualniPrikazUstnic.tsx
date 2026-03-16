@@ -280,7 +280,7 @@ const VizualniPrikazUstnic = () => {
                                     <span className={`text-base font-bold ${card.textColor} text-center leading-tight`}>Odpri</span>
                                   </div>
                                 </div>
-                                <div className="flip-card-back flex-col p-4 justify-between rounded-xl border border-gray-200">
+                                <div className="flip-card-back flex-col p-4 justify-between rounded-xl border-2 border-foreground">
                                   <h3 className={`text-lg font-bold ${card.color} text-center`}>{card.title}</h3>
                                   <img src={card.image} alt={card.title} className="w-full max-h-[312px] object-contain rounded-lg" loading="lazy" />
                                   <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
