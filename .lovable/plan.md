@@ -1,49 +1,31 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Preoblikovanje kartic na strani Govorne vaje
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Cilj
+Kartice na `/govorno-jezikovne-vaje` preoblikujemo po vzoru kartic na `/govorne-igre` (GamesList) — z veliko sliko zgoraj, naslovom in opisom spodaj, belo ozadje.
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+## Spremembe (1 datoteka: `src/pages/GovornojezicovneVaje.tsx`)
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+### 1. Dodaj slike zmajčkov v podatke kartic
+Vsaki kartici dodamo `image` in `imageScale` polje:
+- **VAJE MOTORIKE GOVORIL**: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje govoril.webp`
+- **MOJI PRVI GLASOVI**: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajce_prvi glasovi.webp`
+- **VIZUALNI PRIKAZ USTNIC**: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_ustnice.webp`
+- **VIDEO NAVODILA**: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video navodila.webp`
 
----
+Dodamo tudi `customBackground` z radialnim gradientom (enako kot v GamesList).
 
-# Popravki preverjanja izgovorjave (implementirano)
+### 2. Preoblikuj kartico po vzoru GamesList
+Zamenjamo trenutni layout (gradient header + expand/collapse opis) z:
+- **Slika zgoraj**: `aspect-square` na mobilnem, `aspect-video` na desktopu, z `customBackground` gradientom in sliko zmajčka znotraj
+- **Vsebina spodaj**: Naslov + opis vedno prikazan (brez expand/collapse na mobilnem)
+- **Grid**: Na mobilnem `grid-cols-2 gap-4`, na desktopu `grid-cols-2 gap-8`
+- **Belo ozadje**: `bg-white` na kartici
 
-## Implementirane spremembe
+### 3. Odstrani neuporabljeno stanje
+Odstranimo `expandedId` state in `ChevronDown` import, ker opisi ne bodo več zložljivi.
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+### 4. Mobilna prilagoditev
+Na mobilnem: manjši padding (`p-3`), manjši tekst (`text-base` naslov, `text-xs` opis), centriran tekst, `line-clamp-2` za opis — identično kot GamesList.
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
