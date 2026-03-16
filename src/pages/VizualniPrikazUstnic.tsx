@@ -133,8 +133,59 @@ const VizualniPrikazUstnic = () => {
         <div className="container max-w-6xl mx-auto px-4">
 
           {selectedChild ? (
-            isMobile ? (
-              <div className="w-full mt-8">
+            <>
+              {/* Navigation buttons */}
+              {(() => {
+                const api = isMobile ? carouselApi : desktopCarouselApi;
+                const slide = isMobile ? currentSlide : desktopCurrentSlide;
+                const navButtons = [
+                  { label: "K", index: 0 },
+                  { label: "L", index: 1 },
+                  { label: "R", index: 2 },
+                ];
+                const navButtons2 = [
+                  { label: "C, S, Z", index: 3 },
+                  { label: "Č, Š, Ž", index: 4 },
+                ];
+                return (
+                  <div className="flex flex-col items-center gap-2 mb-4">
+                    <div className="flex gap-2">
+                      {navButtons.map((btn) => (
+                        <button
+                          key={btn.label}
+                          onClick={() => api?.scrollTo(btn.index)}
+                          className={cn(
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
+                            slide === btn.index
+                              ? "bg-foreground text-background"
+                              : "bg-background text-foreground hover:bg-muted"
+                          )}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      {navButtons2.map((btn) => (
+                        <button
+                          key={btn.label}
+                          onClick={() => api?.scrollTo(btn.index)}
+                          className={cn(
+                            "px-4 py-2 rounded-lg text-sm font-bold border-2 border-foreground transition-all",
+                            slide === btn.index
+                              ? "bg-foreground text-background"
+                              : "bg-background text-foreground hover:bg-muted"
+                          )}
+                        >
+                          {btn.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
+            {isMobile ? (
+              <div className="w-full">
                 <Carousel
                   setApi={setCarouselApi}
                   className="w-full"
