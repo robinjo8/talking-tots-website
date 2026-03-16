@@ -295,8 +295,8 @@ const VizualniPrikazUstnic = () => {
                       );
                     })}
                   </CarouselContent>
-                  <CarouselPrevious className="h-16 w-16 bg-black text-white border-black hover:bg-black/80 hover:text-white" />
-                  <CarouselNext className="h-16 w-16 bg-black text-white border-black hover:bg-black/80 hover:text-white" />
+                  <CarouselPrevious className="h-16 w-16 bg-dragon-green text-white border-dragon-green hover:bg-dragon-green/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
+                  <CarouselNext className="h-16 w-16 bg-dragon-green text-white border-dragon-green hover:bg-dragon-green/80 hover:text-white [&>svg]:h-8 [&>svg]:w-8 [&>svg]:stroke-[3]" />
                 </Carousel>
                 <div className="flex justify-center gap-2 mt-6">
                   {soundCards.map((_, i) => (
