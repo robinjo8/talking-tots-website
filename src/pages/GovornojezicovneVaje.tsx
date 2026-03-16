@@ -121,10 +121,7 @@ const GovornojezicovneVaje = () => {
                   >
                     {/* Card Image */}
                     <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-                      <div 
-                        className="absolute inset-0"
-                        style={{ background: exercise.customBackground }}
-                      />
+                      <div className="absolute inset-0 bg-white" />
                       <div className="absolute inset-0 flex items-center justify-center p-2">
                         <img 
                           src={exercise.image}
@@ -141,10 +138,10 @@ const GovornojezicovneVaje = () => {
                     {/* Card Content */}
                     <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-4 flex flex-col flex-grow"}>
                       <h3 className={isMobile 
-                        ? "text-sm font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors text-center" 
+                        ? "text-sm font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors text-center whitespace-pre-line" 
                         : "text-lg font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors"
                       }>
-                        {exercise.title}
+                        {isMobile ? exercise.mobileTitle : exercise.title}
                       </h3>
                       <p className={isMobile 
                         ? "text-xs text-muted-foreground line-clamp-3"
