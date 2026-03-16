@@ -78,11 +78,13 @@ const VizualniPrikazUstnic = () => {
   const onSelect = useCallback(() => {
     if (!carouselApi) return;
     setCurrentSlide(carouselApi.selectedScrollSnap());
+    setFlippedCardId(null);
   }, [carouselApi]);
 
   const onDesktopSelect = useCallback(() => {
     if (!desktopCarouselApi) return;
     setDesktopCurrentSlide(desktopCarouselApi.selectedScrollSnap());
+    setFlippedCardId(null);
   }, [desktopCarouselApi]);
 
   useEffect(() => {
