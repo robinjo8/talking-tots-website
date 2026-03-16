@@ -135,6 +135,8 @@ const GovornojezicovneVaje = () => {
                       </div>
                     </div>
 
+                    <div className="border-t border-border" />
+
                     {/* Card Content */}
                     <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-4 flex flex-col flex-grow"}>
                       <h3 className={isMobile 
