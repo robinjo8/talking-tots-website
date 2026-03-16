@@ -317,6 +317,7 @@ const VizualniPrikazUstnic = () => {
                 </div>
               </div>
             )
+            </>
           ) : (
             <div className="min-h-[400px] flex flex-col items-center justify-center">
               <p className="text-lg text-destructive">
