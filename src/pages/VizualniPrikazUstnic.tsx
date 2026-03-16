@@ -266,7 +266,7 @@ const VizualniPrikazUstnic = () => {
                         <CarouselItem key={card.id} className="pl-0 basis-full flex justify-center">
                           <div className="w-full p-1">
                             <div
-                              className="flip-card cursor-pointer rounded-xl border border-gray-200 bg-white transition-all duration-300 hover:scale-[1.02]"
+                              className="flip-card cursor-pointer rounded-xl border-2 border-foreground bg-white transition-all duration-300 hover:scale-[1.02]"
                               style={{ minHeight: '525px' }}
                               onClick={() => handleCardClick(card.id)}
                             >
