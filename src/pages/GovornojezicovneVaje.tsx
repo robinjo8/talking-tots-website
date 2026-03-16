@@ -1,21 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ChevronDown } from "lucide-react";
 
 const GovornojezicovneVaje = () => {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isAuthLoading && !user) {
@@ -36,43 +33,50 @@ const GovornojezicovneVaje = () => {
   if (isAuthLoading || !user) {
     return null;
   }
-  const exerciseTypes = [{
-    id: "vaje-motorike-govoril",
-    title: "VAJE MOTORIKE GOVORIL",
-    description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic, jezika. Hkrati gibljemo tudi nekatere druge dele obraza in ust, ki so vključeni v govor in tudi negovorne aktivnosti. Vaje so pomembne za izboljšanje motorike ust, ki z ostalimi deli govornega aparata oblikuje posamezne glasove ter seveda sam govor. Vaje motorike govoril niso pogoj za pojav govora in ne uporabljamo jih pri terapiji vseh govorno-jezikovnih motenj.",
-    color: "text-app-purple",
-    gradient: "from-app-purple/10 to-app-blue/10",
-    path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
-    example: "",
-    available: true
-  }, {
-    id: "moji-prvi-glasovi",
-    title: "MOJI PRVI GLASOVI",
-    description: "Zabavna animacija, ki otroke uči prepoznavati in posnemati glasove. Barviti liki in interaktivni prizori spodbujajo poslušanje, ponavljanje in igro z glasovi, kar krepi govor in fonološke sposobnosti.",
-    color: "text-app-orange",
-    gradient: "from-app-orange/10 to-app-yellow/10",
-    path: "/govorno-jezikovne-vaje/artikulacija",
-    example: "",
-    available: true
-  }, {
-    id: "vizualni-prikaz-ustnic",
-    title: "VIZUALNI PRIKAZ USTNIC",
-    description: "Prikaz pravilnega položaja ustnic pri izgovorjavi določenega glasu. Otrok lahko s pomočjo slike lažje posnema gib ustnic pri glasovih C, Č, R, L, K, S, Š, Z in Ž.",
-    color: "text-app-teal",
-    gradient: "from-app-teal/10 to-app-blue/10",
-    path: "/govorno-jezikovne-vaje/vizualni-prikaz-ustnic",
-    example: "",
-    available: true
-  }, {
-    id: "video-navodila",
-    title: "VIDEO NAVODILA",
-    description: "Video navodila logopeda za pravilno izgovorjavo posameznih glasov. Kratki posnetki prikazujejo položaj govoril in tehniko izgovorjave.",
-    color: "text-app-teal",
-    gradient: "from-app-teal/10 to-dragon-green/10",
-    path: "/video-navodila",
-    example: "",
-    available: true
-  }];
+
+  const exerciseTypes = [
+    {
+      id: "vaje-motorike-govoril",
+      title: "VAJE MOTORIKE GOVORIL",
+      description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic, jezika. Hkrati gibljemo tudi nekatere druge dele obraza in ust, ki so vključeni v govor in tudi negovorne aktivnosti.",
+      path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje govoril.webp",
+      imageScale: "90%",
+      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+      available: true,
+    },
+    {
+      id: "moji-prvi-glasovi",
+      title: "MOJI PRVI GLASOVI",
+      description: "Zabavna animacija, ki otroke uči prepoznavati in posnemati glasove. Barviti liki in interaktivni prizori spodbujajo poslušanje, ponavljanje in igro z glasovi.",
+      path: "/govorno-jezikovne-vaje/artikulacija",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajce_prvi glasovi.webp",
+      imageScale: "90%",
+      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+      available: true,
+    },
+    {
+      id: "vizualni-prikaz-ustnic",
+      title: "VIZUALNI PRIKAZ USTNIC",
+      description: "Prikaz pravilnega položaja ustnic pri izgovorjavi določenega glasu. Otrok lahko s pomočjo slike lažje posnema gib ustnic pri glasovih C, Č, R, L, K, S, Š, Z in Ž.",
+      path: "/govorno-jezikovne-vaje/vizualni-prikaz-ustnic",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_ustnice.webp",
+      imageScale: "90%",
+      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+      available: true,
+    },
+    {
+      id: "video-navodila",
+      title: "VIDEO NAVODILA",
+      description: "Video navodila logopeda za pravilno izgovorjavo posameznih glasov. Kratki posnetki prikazujejo položaj govoril in tehniko izgovorjave.",
+      path: "/video-navodila",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video navodila.webp",
+      imageScale: "90%",
+      customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
+      available: true,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -105,75 +109,49 @@ const GovornojezicovneVaje = () => {
           </div>
           
           {selectedChild ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 gap-8"}>
               {exerciseTypes.map(exercise => (
                 <div key={exercise.id} className="flex h-full">
                   <div
                     className={cn(
-                      "bg-white rounded-xl shadow-xl border border-gray-200 transition-all duration-300 overflow-hidden group flex flex-col w-full",
-                      exercise.available 
-                        ? "hover:shadow-2xl hover:scale-[1.02] cursor-pointer" 
-                        : "opacity-50 cursor-not-allowed"
+                      "bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col w-full",
+                      !exercise.available && "opacity-50 cursor-not-allowed"
                     )}
                     onClick={() => exercise.available && navigate(exercise.path)}
                   >
-                    {/* Card Header with gradient */}
-                    <div className={`relative bg-gradient-to-br ${exercise.gradient} p-6 flex items-center justify-center min-h-[120px]`}>
-                      {!exercise.available && (
-                        <div className="absolute top-4 right-4 bg-muted text-foreground px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">
-                          Kmalu
-                        </div>
-                      )}
-                      <h3 className={`text-xl font-bold text-center ${exercise.color} px-4`}>
-                        {exercise.title}
-                      </h3>
+                    {/* Card Image */}
+                    <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
+                      <div 
+                        className="absolute inset-0"
+                        style={{ background: exercise.customBackground }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center p-2">
+                        <img 
+                          src={exercise.image}
+                          alt={exercise.title}
+                          className="object-contain group-hover:scale-110 transition-transform duration-300"
+                          style={{
+                            maxWidth: exercise.imageScale || "90%",
+                            maxHeight: exercise.imageScale || "90%",
+                          }}
+                        />
+                      </div>
                     </div>
 
                     {/* Card Content */}
-                    <div className="p-6 flex flex-col flex-grow">
-                      {isMobile ? (
-                        <>
-                          <div
-                            className={cn(
-                              "overflow-hidden transition-all duration-300",
-                              expandedId === exercise.id ? "max-h-[500px]" : "max-h-0"
-                            )}
-                          >
-                            <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                              {exercise.description}
-                            </p>
-                            {exercise.example && (
-                              <p className="text-sm text-muted-foreground/80 italic">
-                                {exercise.example}
-                              </p>
-                            )}
-                          </div>
-                          <button
-                            className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-1 py-1"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setExpandedId(prev => prev === exercise.id ? null : exercise.id);
-                            }}
-                          >
-                            {expandedId === exercise.id ? "Skrij" : "Več"}
-                            <ChevronDown className={cn(
-                              "h-3.5 w-3.5 transition-transform duration-300",
-                              expandedId === exercise.id && "rotate-180"
-                            )} />
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-sm text-muted-foreground leading-relaxed mb-3">
-                            {exercise.description}
-                          </p>
-                          {exercise.example && (
-                            <p className="text-sm text-muted-foreground/80 italic">
-                              {exercise.example}
-                            </p>
-                          )}
-                        </>
-                      )}
+                    <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-4 flex flex-col flex-grow"}>
+                      <h3 className={isMobile 
+                        ? "text-sm font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors text-center" 
+                        : "text-lg font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors"
+                      }>
+                        {exercise.title}
+                      </h3>
+                      <p className={isMobile 
+                        ? "text-xs text-muted-foreground line-clamp-3"
+                        : "text-sm text-muted-foreground leading-relaxed"
+                      }>
+                        {exercise.description}
+                      </p>
                     </div>
                   </div>
                 </div>
