@@ -200,7 +200,7 @@ export default function Labirint() {
           </div>
           
           {/* Letters grid */}
-          <div className="mb-12">
+          <div className="mb-4 md:mb-12">
             {isMobile ? (
               /* Mobile: 2-column grid */
               <div className="grid grid-cols-3 gap-2">
