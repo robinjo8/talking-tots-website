@@ -176,6 +176,13 @@ export function BreadcrumbNavigation() {
   const location = useLocation();
   const currentPath = location.pathname;
 
+  const isMobile = useIsMobile();
+
+  // Don't show breadcrumb on mobile
+  if (isMobile) {
+    return null;
+  }
+
   // Don't show breadcrumb on excluded paths
   if (excludedPaths.some(excluded => currentPath.includes(excluded))) {
     return null;
