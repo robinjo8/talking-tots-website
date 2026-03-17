@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VideoProgressBar } from "@/components/video/VideoProgressBar";
 import { VideoControls } from "@/components/video/VideoControls";
@@ -42,11 +42,10 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
   // Calculate available height for video
   useEffect(() => {
     const calculateHeight = () => {
-      const headerHeight = 64;
       const controlsHeight = 16;
       const padding = isMobile ? 16 : 48;
       const vh = window.visualViewport?.height || window.innerHeight;
-      setMaxVideoHeight(vh - headerHeight - controlsHeight - padding);
+      setMaxVideoHeight(vh - controlsHeight - padding);
     };
 
     calculateHeight();
@@ -90,12 +89,12 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
-      <Header />
+      
 
       {/* Video area - fills remaining space */}
       <div
         ref={containerRef}
-        className="flex-1 flex flex-col items-center justify-center pt-16 pb-2 px-2 md:px-8"
+        className="flex-1 flex flex-col items-center justify-center pb-2 px-2 md:px-8"
         onClick={handleInteraction}
         onMouseMove={handleInteraction}
       >
