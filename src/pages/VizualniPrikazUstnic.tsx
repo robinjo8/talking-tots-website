@@ -155,6 +155,7 @@ const VizualniPrikazUstnic = () => {
                           <div className="rounded-xl bg-background shadow-md h-[400px] flex flex-col">
                             {!isFlipped ? (
                               <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
+                                <p className="font-bold text-foreground text-lg tracking-wide">GLAS</p>
                                 <div className={cn(
                                   "rounded-2xl flex items-center justify-center shadow-md",
                                   card.color,
@@ -166,9 +167,6 @@ const VizualniPrikazUstnic = () => {
                                     {card.sounds.join(", ")}
                                   </span>
                                 </div>
-                                <p className="font-bold text-foreground text-base">
-                                  {card.title}
-                                </p>
                                 <Button
                                   variant="outline"
                                   size="sm"
