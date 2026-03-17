@@ -69,8 +69,8 @@ export function VideoPlayer({
       
       <video
         ref={videoRef}
-        className={`object-contain rounded-lg ${isMobile ? 'w-full h-full' : 'w-full h-auto'}`}
-        style={maxHeight ? { maxHeight: `${maxHeight}px` } : undefined}
+        className={isMobile ? 'w-full h-full object-cover rounded-none' : 'w-full h-auto object-contain rounded-lg'}
+        style={!isMobile && maxHeight ? { maxHeight: `${maxHeight}px` } : undefined}
         onEnded={onEnded}
         onPlay={onPlay}
         onPause={onPause}
