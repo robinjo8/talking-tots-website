@@ -210,8 +210,8 @@ export default function SpominGames() {
           {/* Letters grid */}
           <div className="mb-12">
             {isMobile ? (
-              /* Mobile: 2-column grid */
-              <div className="grid grid-cols-2 gap-4">
+              /* Mobile: 3-column grid */
+              <div className="grid grid-cols-3 gap-2">
                 {memoryGames.map(game => (
                   <LetterCard key={game.id} game={game} />
                 ))}

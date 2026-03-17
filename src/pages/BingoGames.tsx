@@ -114,9 +114,9 @@ export default function BingoGames() {
                   </div>
 
                   {/* Card Content */}
-                  <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+                  <div className={isMobile ? "p-1.5 text-center" : "p-6 flex flex-col flex-grow"}>
                     <h3 className={isMobile 
-                      ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
+                      ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight" 
                       : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
                     }>
                       {item.title}
