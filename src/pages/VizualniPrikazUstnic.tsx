@@ -99,7 +99,7 @@ const VizualniPrikazUstnic = () => {
 
       <div className={cn(
         "container max-w-4xl mx-auto px-4",
-        isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
+        isMobile ? "flex-1 flex flex-col justify-center pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
       )}>
         {/* Title Section */}
         <div className={cn("text-center", isMobile ? "mb-3" : "mb-6")}>
@@ -152,9 +152,9 @@ const VizualniPrikazUstnic = () => {
                       <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
                         {isMobile ? (
                           /* Mobile: simple show/hide instead of flip */
-                          <div className="rounded-xl bg-background shadow-md">
+                          <div className="rounded-xl bg-background shadow-md min-h-[360px] flex flex-col">
                             {!isFlipped ? (
-                              <div className="flex flex-col items-center gap-3 p-6">
+                              <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
                                 <div className={cn(
                                   "rounded-2xl flex items-center justify-center shadow-md",
                                   card.color,
@@ -179,9 +179,9 @@ const VizualniPrikazUstnic = () => {
                                 </Button>
                               </div>
                             ) : (
-                              <div className="flex flex-col items-center gap-3 p-4">
+                              <div className="flex-1 flex flex-col items-center gap-3 p-4">
                                 <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
-                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg max-h-[280px]" loading="lazy" />
+                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0" loading="lazy" />
                                 <div className="flex gap-2 w-full">
                                   <Button variant="outline" size="sm" className="flex-1 gap-2" disabled={!card.audioUrl}>
                                     <Volume2 className="w-4 h-4" />
