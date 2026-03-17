@@ -1,49 +1,64 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Poenotenje oranžnega gumba "nazaj" po celotni aplikaciji
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Problem
+Obstajata dva različna sloga oranžnega gumba za nazaj:
+- **Slog A (referenčni - GenericVideoNavodila, VizualniPrikazUstnic):** `w-16 h-16`, gradient (`from-amber-400 to-orange-500`), `border-2 border-white/50`, `backdrop-blur-sm`, `bottom-4 left-4`, ikona `w-7 h-7`
+- **Slog B (ostale strani):** `h-14 w-14`, enobarvni (`bg-app-orange`), brez obrobe, `bottom-6 left-6`, ikona `h-6 w-6`, uporaba `<Button>` komponente
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+## Kaj se NE spreminja
+Gumbi s hišico (Home) v igrah ostanejo nespremenjeni -- te imajo DropdownMenu in Home ikono.
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+## Spremembe
+Vseh 21 datotek z `bg-app-orange` ArrowLeft gumbom se posodobi na referenčni slog:
 
----
+**Iz:**
+```
+<Button onClick={...} className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg" size="icon">
+  <ArrowLeft className="h-6 w-6 text-white" />
+</Button>
+```
 
-# Popravki preverjanja izgovorjave (implementirano)
+**V:**
+```
+<button onClick={...} className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg border-2 border-white/50 backdrop-blur-sm flex items-center justify-center transition-all">
+  <ArrowLeft className="w-7 h-7 text-white" />
+</button>
+```
 
-## Implementirane spremembe
+### Datoteke za posodobitev (21 datotek):
+1. `src/pages/VideoNavodila.tsx`
+2. `src/pages/GovornojezicovneVaje.tsx`
+3. `src/pages/GovorneIgre.tsx`
+4. `src/pages/MojeAplikacije.tsx`
+5. `src/pages/LogopedskiKoticek.tsx`
+6. `src/pages/VajeZaJezik.tsx`
+7. `src/pages/ArtikulacijaVaje.tsx`
+8. `src/pages/MojiIzziviArhiv.tsx`
+9. `src/pages/MetKockeGames.tsx`
+10. `src/pages/KoloSreceGames.tsx`
+11. `src/pages/BingoGames.tsx`
+12. `src/pages/SpominGames.tsx`
+13. `src/pages/SestavljankeGames.tsx`
+14. `src/pages/DrsnaSestavljanka.tsx`
+15. `src/pages/KaceLestveGames.tsx`
+16. `src/pages/IgraUjemanja.tsx`
+17. `src/pages/Labirint.tsx`
+18. `src/pages/Zaporedja.tsx`
+19. `src/pages/PonoviPoved.tsx`
+20. `src/pages/clanki/GovornoJezikovneTezave.tsx`
+21. `src/pages/clanki/PogostaVprasanja.tsx`
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+### Ključne razlike:
+| Lastnost | Prej (Slog B) | Po (Slog A) |
+|----------|---------------|-------------|
+| Velikost | h-14 w-14 (56px) | w-16 h-16 (64px) |
+| Pozicija | bottom-6 left-6 | bottom-4 left-4 |
+| Ozadje | bg-app-orange | gradient amber→orange |
+| Obroba | brez | border-2 border-white/50 |
+| Element | `<Button>` | `<button>` |
+| Ikona | h-6 w-6 | w-7 h-7 |
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+Navigacijska logika (kam vodi gumb) in `isMobile` pogoj ostaneta nespremenjena.
 
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
