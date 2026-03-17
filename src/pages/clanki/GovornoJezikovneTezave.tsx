@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const GovornoJezikovneTezave = () => {
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background">
       <Header />
