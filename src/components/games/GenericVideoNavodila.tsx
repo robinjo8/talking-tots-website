@@ -42,11 +42,10 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
   // Calculate available height for video
   useEffect(() => {
     const calculateHeight = () => {
-      const headerHeight = 64;
       const controlsHeight = 16;
       const padding = isMobile ? 16 : 48;
       const vh = window.visualViewport?.height || window.innerHeight;
-      setMaxVideoHeight(vh - headerHeight - controlsHeight - padding);
+      setMaxVideoHeight(vh - controlsHeight - padding);
     };
 
     calculateHeight();
