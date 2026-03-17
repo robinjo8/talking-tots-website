@@ -1,40 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Spremembe na strani Artikulacija (Moji prvi glasovi)
+## Implementirane spremembe
 
-## 1. Preimenovanje naslova
-V `src/pages/ArtikulacijaVaje.tsx` zamenjam "Artikulacija" z "Moji prvi glasovi".
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## 2. Preoblikovanje ArtikulacijaVajeRouter v video stran
-V `src/components/routing/ArtikulacijaVajeRouter.tsx` namesto placeholder strani prikažem video predvajalnik z enakim dizajnom kot `GenericVideoNavodila`:
-- Zeleno ozadje (`bg-dragon-green`)
-- Bel naslov "Glas {letter}"
-- Bela kartica z video predvajalnikom (VideoPlayer, VideoProgressBar, VideoControls)
-- Oranžni gumb za nazaj, ki vodi na `/govorno-jezikovne-vaje/artikulacija`
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-Ponovno uporabim obstoječe komponente: `GenericVideoNavodila` ali neposredno `VideoPlayer`, `VideoProgressBar`, `VideoControls` in `useVideoPlayer`.
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-Najpreprosteje: uporabim kar `GenericVideoNavodila` komponento z dodanim prop-om za `backPath`, da gumb za nazaj vodi na pravilno stran (namesto `/video-navodila`).
+---
 
-## 3. Video URL-ji
-Bucket `video`, base URL: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video/`
+# Popravki preverjanja izgovorjave (implementirano)
 
-Mapiranje:
-- c → `Glas_C.mp4`
-- ch → `Glas_CH.mp4`
-- r → `Glas_R.mp4`
-- l → `Glas_L.mp4`
-- k → `Glas_K.mp4`
-- s → `Glas_S.mp4`
-- sh → `Glas_SH.mp4`
-- z → `Glas_Z.mp4`
-- zh → `Glas_ZH.mp4`
+## Implementirane spremembe
 
-## 4. Prilagoditev GenericVideoNavodila
-Dodam opcijski prop `backPath` (default: `/video-navodila`), da lahko ArtikulacijaVajeRouter uporabi isto komponento z drugačno potjo za nazaj.
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
 
-## Datoteke za spremembo
-1. `src/pages/ArtikulacijaVaje.tsx` — naslov "Artikulacija" → "Moji prvi glasovi"
-2. `src/components/games/GenericVideoNavodila.tsx` — dodam opcijski `backPath` prop
-3. `src/components/routing/ArtikulacijaVajeRouter.tsx` — zamenjam placeholder z GenericVideoNavodila + video konfiguracija
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
 
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
