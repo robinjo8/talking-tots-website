@@ -152,7 +152,7 @@ const VizualniPrikazUstnic = () => {
                       <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
                         {isMobile ? (
                           /* Mobile: simple show/hide instead of flip */
-                          <div className="rounded-xl bg-background shadow-md min-h-[360px] flex flex-col">
+                          <div className="rounded-xl bg-background shadow-md h-[400px] flex flex-col">
                             {!isFlipped ? (
                               <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
                                 <div className={cn(
