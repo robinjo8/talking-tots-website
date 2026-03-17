@@ -80,12 +80,6 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     resetOverlayTimer();
   };
 
-  const handleMobilePlay = async () => {
-    await handlers.handlePlay();
-    if (isMobile) {
-      setTimeout(() => handlers.handleToggleFullscreen(), 300);
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
