@@ -1,49 +1,35 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
+Cilj: na telefonu naj video po kliku na črko vedno zapolni celoten zaslon (brez praznega prostora zgoraj/spodaj), gumb “Nazaj” na telefonu pa naj takoj vrne na prejšnjo stran.
 
-## Implementirane spremembe
+1) Spremembe postavitve v `GenericVideoNavodila.tsx`
+- Mobilni layout preklopim iz “centriranja videa” na “full-bleed” prikaz:
+  - mobilno: container za video bo `w-full h-full` (brez `items-center justify-center`),
+  - višina ostane vezana na `visualViewport` (prek `maxVideoHeight`), da se prilagaja mobilnemu browser UI.
+- S tem video ne bo več prikazan kot “manjši element na sredini”, ampak kot glavni fullscreen content znotraj strani.
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+2) Spremembe prikaza videa v `VideoPlayer.tsx`
+- Mobilno preklopim video iz `object-contain` na `object-cover` in ohranim `w-full h-full`.
+- Mobilno odstranim zaobljene robove (`rounded-none`), da video res “od roba do roba”.
+- `maxHeight` stil uporabim samo za desktop, da mobilni fullscreen ne bo umetno omejen.
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+3) Back gumb na telefonu (ključni del zahteve)
+- Ostanemo brez auto-native-fullscreen (to je že odstranjeno), ker native fullscreen povzroči “prvi back = izhod iz fullscreen”.
+- Da uporabnik ne zaide spet v native fullscreen, v `VideoControls.tsx` na mobilnem overlayu skrijem fullscreen gumb (desktop ostane nespremenjen).
+- Rezultat: en pritisk na sistemski back gumb vrne na prejšnjo route (npr. seznam črk).
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+4) Datoteke
+- `src/components/games/GenericVideoNavodila.tsx`
+- `src/components/video/VideoPlayer.tsx`
+- `src/components/video/VideoControls.tsx`
 
----
+Tehnične podrobnosti
+- Mobilni “čez cel zaslon” bo dosežen s kombinacijo:
+  - fullscreen container (`fixed inset-0` + notranji `h-full`),
+  - video `object-cover` (zapolni cel viewport, po potrebi obreže robove videa),
+  - onemogočen mobilni vstop v native fullscreen (da back navigacija ostane pravilna).
+- Sprememba vpliva na vse strani, ki uporabljajo `GenericVideoNavodila` (tudi artikulacijske video route), kar je skladno z enotnim mobilnim vedenjem.
 
-# Popravki preverjanja izgovorjave (implementirano)
-
-## Implementirane spremembe
-
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
-
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
+Validacija po implementaciji
+- Telefon (portrait): klik na črko → video takoj zapolni ekran brez praznih pasov.
+- Telefon: sistemski back gumb enkrat → takoj na prejšnjo stran.
+- Desktop: obstoječe vedenje ostane (contain prikaz + fullscreen kontrola).
