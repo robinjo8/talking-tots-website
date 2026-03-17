@@ -1,16 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Video stran — belo ozadje + desktop overlay kontrole
+## Implementirane spremembe
 
-## Spremembe
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-### `GenericVideoNavodila.tsx`
-1. **Ozadje**: `bg-dragon-green` → `bg-white` (belo ozadje za vse naprave)
-2. **Desktop kontrole znotraj videa**: Odstrani ločene desktop kontrole pod videom. Namesto tega uporabi enak overlay pristop kot na mobilni verziji — progress bar + kontrole čez video z `overlay` in `compact` prop-i
-3. **Auto-hide overlay**: Razširi auto-hide logiko tudi na desktop (ne samo `isMobile`) — overlay se skrije po 3s med predvajanjem, ob premiku miške ali kliku se prikaže
-4. **Dinamična višina**: Prilagodi `controlsHeight` za desktop na ~16px (enako kot mobile), ker kontrole zdaj niso več pod videom
-5. **handleVideoTap**: Razširi na desktop — ob kliku/premiku miške pokaži overlay
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### Datoteke
-- `src/components/games/GenericVideoNavodila.tsx`
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
+---
+
+# Popravki preverjanja izgovorjave (implementirano)
+
+## Implementirane spremembe
+
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
