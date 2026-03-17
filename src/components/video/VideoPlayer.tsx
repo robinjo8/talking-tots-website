@@ -7,6 +7,8 @@ interface VideoPlayerProps {
   isLoading: boolean;
   error: string | null;
   isMuted: boolean;
+  maxHeight?: number;
+  children?: React.ReactNode;
   onEnded: () => void;
   onPlay: () => void;
   onPause: () => void;
@@ -23,6 +25,8 @@ export function VideoPlayer({
   isLoading,
   error,
   isMuted,
+  maxHeight,
+  children,
   onEnded,
   onPlay,
   onPause,
@@ -33,7 +37,7 @@ export function VideoPlayer({
   onError
 }: VideoPlayerProps) {
   return (
-    <div className="relative w-full overflow-hidden rounded-lg mb-4">
+    <div className="relative w-full overflow-hidden rounded-lg">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
           <div className="flex flex-col items-center gap-2 text-white">
@@ -63,7 +67,8 @@ export function VideoPlayer({
       
       <video
         ref={videoRef}
-        className="w-full h-full object-contain"
+        className="w-full h-auto object-contain rounded-lg"
+        style={maxHeight ? { maxHeight: `${maxHeight}px` } : undefined}
         onEnded={onEnded}
         onPlay={onPlay}
         onPause={onPause}
@@ -85,6 +90,9 @@ export function VideoPlayer({
         <source src={videoUrl} type="video/mp4" />
         Vaš brskalnik ne podpira video predvajanja.
       </video>
+
+      {/* Overlay slot for controls */}
+      {children}
     </div>
   );
 }

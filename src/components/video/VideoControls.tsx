@@ -10,6 +10,7 @@ interface VideoControlsProps {
   isMuted: boolean;
   volume: number;
   isFullscreen: boolean;
+  overlay?: boolean;
   onPlay: () => void;
   onPause: () => void;
   onStop: () => void;
@@ -25,6 +26,7 @@ export function VideoControls({
   isMuted,
   volume,
   isFullscreen,
+  overlay = false,
   onPlay,
   onPause,
   onStop,
@@ -36,45 +38,85 @@ export function VideoControls({
   const isMobile = useIsMobile();
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
 
+  // Overlay mode (mobile inside video)
+  if (overlay) {
+    return (
+      <div className="flex justify-center items-center gap-3 py-1">
+        <button
+          onClick={onPlay}
+          disabled={isPlaying || isLoading}
+          className="text-white disabled:opacity-40 p-1.5"
+        >
+          <Play className="h-5 w-5" />
+        </button>
+        
+        <button
+          onClick={onPause}
+          disabled={!isPlaying || isLoading}
+          className="text-white disabled:opacity-40 p-1.5"
+        >
+          <Pause className="h-5 w-5" />
+        </button>
+        
+        <button
+          onClick={onStop}
+          disabled={isLoading}
+          className="text-white disabled:opacity-40 p-1.5"
+        >
+          <Square className="h-4 w-4" />
+        </button>
+        
+        <button
+          onClick={onRestart}
+          disabled={isLoading}
+          className="text-white disabled:opacity-40 p-1.5"
+        >
+          <RotateCcw className="h-4 w-4" />
+        </button>
+        
+        <button
+          onClick={onToggleMute}
+          disabled={isLoading}
+          className="text-white disabled:opacity-40 p-1.5"
+        >
+          {isMuted || volume === 0 ? (
+            <VolumeX className="h-4 w-4" />
+          ) : (
+            <Volume2 className="h-4 w-4" />
+          )}
+        </button>
+
+        <button
+          onClick={onToggleFullscreen}
+          disabled={isLoading}
+          className="text-white disabled:opacity-40 p-1.5"
+        >
+          {isFullscreen ? (
+            <Minimize className="h-4 w-4" />
+          ) : (
+            <Maximize className="h-4 w-4" />
+          )}
+        </button>
+      </div>
+    );
+  }
+
+  // Standard mobile (non-overlay fallback)
   if (isMobile) {
     return (
       <div className="flex justify-center items-center gap-2 p-2">
-        <Button
-          onClick={onPlay}
-          disabled={isPlaying || isLoading}
-          variant="outline"
-          size="icon"
-        >
+        <Button onClick={onPlay} disabled={isPlaying || isLoading} variant="outline" size="icon">
           <Play className="h-4 w-4" />
         </Button>
-        
-        <Button
-          onClick={onPause}
-          disabled={!isPlaying || isLoading}
-          variant="outline"
-          size="icon"
-        >
+        <Button onClick={onPause} disabled={!isPlaying || isLoading} variant="outline" size="icon">
           <Pause className="h-4 w-4" />
         </Button>
-        
-        <Button
-          onClick={onStop}
-          disabled={isLoading}
-          variant="outline"
-          size="icon"
-        >
+        <Button onClick={onStop} disabled={isLoading} variant="outline" size="icon">
           <Square className="h-4 w-4" />
         </Button>
-        
-        <Button
-          onClick={onRestart}
-          disabled={isLoading}
-          variant="outline"
-          size="icon"
-        >
+        <Button onClick={onRestart} disabled={isLoading} variant="outline" size="icon">
           <RotateCcw className="h-4 w-4" />
         </Button>
-        
         <div className="relative">
           {showVolumeSlider && (
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 bg-background border rounded-lg p-3 shadow-lg z-50 flex flex-col items-center">
@@ -87,105 +129,49 @@ export function VideoControls({
                     max={1}
                     step={0.1}
                     disabled={isLoading}
-                    className="h-16 w-2 flex items-center justify-center [&>span[data-orientation=vertical]]:bg-black [&>span[data-orientation=vertical]]:w-1 [&>span[data-orientation=vertical]]:h-16 [&>span[data-orientation=vertical]]:rounded-none [&>span[role=slider]]:bg-white [&>span[role=slider]]:border-black [&>span[role=slider]]:border-2 [&>span[role=slider]]:w-4 [&>span[role=slider]]:h-4 [&>span[role=slider]]:shadow-none [&>span[role=slider]]:ring-0"
+                    className="h-16 w-2"
                   />
                 </div>
               </div>
             </div>
           )}
-          <Button
-            onClick={() => setShowVolumeSlider(!showVolumeSlider)}
-            disabled={isLoading}
-            variant="outline"
-            size="icon"
-          >
-            {isMuted || volume === 0 ? (
-              <VolumeX className="h-4 w-4" />
-            ) : (
-              <Volume2 className="h-4 w-4" />
-            )}
+          <Button onClick={() => setShowVolumeSlider(!showVolumeSlider)} disabled={isLoading} variant="outline" size="icon">
+            {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
         </div>
-
-        <Button
-          onClick={onToggleFullscreen}
-          disabled={isLoading}
-          variant="outline"
-          size="icon"
-        >
-          {isFullscreen ? (
-            <Minimize className="h-4 w-4" />
-          ) : (
-            <Maximize className="h-4 w-4" />
-          )}
+        <Button onClick={onToggleFullscreen} disabled={isLoading} variant="outline" size="icon">
+          {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
-
       </div>
     );
   }
 
+  // Desktop
   return (
     <div className="space-y-4">
-      {/* Main Playback Controls */}
       <div className="flex justify-center gap-3 flex-wrap">
-        <Button
-          onClick={onPlay}
-          disabled={isPlaying || isLoading}
-          size="lg"
-          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-        >
+        <Button onClick={onPlay} disabled={isPlaying || isLoading} size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
           <Play className="h-5 w-5 mr-2" />
           Predvajaj
         </Button>
-        
-        <Button
-          onClick={onPause}
-          disabled={!isPlaying || isLoading}
-          variant="outline"
-          size="lg"
-        >
+        <Button onClick={onPause} disabled={!isPlaying || isLoading} variant="outline" size="lg">
           <Pause className="h-5 w-5 mr-2" />
           Premor
         </Button>
-        
-        <Button
-          onClick={onStop}
-          disabled={isLoading}
-          variant="outline"
-          size="lg"
-        >
+        <Button onClick={onStop} disabled={isLoading} variant="outline" size="lg">
           <Square className="h-5 w-5 mr-2" />
           Ustavi
         </Button>
-        
-        <Button
-          onClick={onRestart}
-          disabled={isLoading}
-          variant="outline"
-          size="lg"
-        >
+        <Button onClick={onRestart} disabled={isLoading} variant="outline" size="lg">
           <RotateCcw className="h-5 w-5 mr-2" />
           Ponovi
         </Button>
       </div>
-
-      {/* Volume and Fullscreen Controls */}
       <div className="flex justify-center items-center gap-4 flex-wrap">
-        {/* Volume Controls */}
         <div className="flex items-center gap-2">
-          <Button
-            onClick={onToggleMute}
-            disabled={isLoading}
-            variant="outline"
-            size="sm"
-          >
-            {isMuted || volume === 0 ? (
-              <VolumeX className="h-4 w-4" />
-            ) : (
-              <Volume2 className="h-4 w-4" />
-            )}
+          <Button onClick={onToggleMute} disabled={isLoading} variant="outline" size="sm">
+            {isMuted || volume === 0 ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </Button>
-          
           <div className="w-20">
             <Slider
               value={[isMuted ? 0 : volume]}
@@ -197,19 +183,8 @@ export function VideoControls({
             />
           </div>
         </div>
-
-        {/* Fullscreen Toggle */}
-        <Button
-          onClick={onToggleFullscreen}
-          disabled={isLoading}
-          variant="outline"
-          size="sm"
-        >
-          {isFullscreen ? (
-            <Minimize className="h-4 w-4" />
-          ) : (
-            <Maximize className="h-4 w-4" />
-          )}
+        <Button onClick={onToggleFullscreen} disabled={isLoading} variant="outline" size="sm">
+          {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
         </Button>
       </div>
     </div>
