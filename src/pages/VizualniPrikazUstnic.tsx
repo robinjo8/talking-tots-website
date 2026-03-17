@@ -233,24 +233,26 @@ const VizualniPrikazUstnic = () => {
               )}
             </Carousel>
 
-            {/* Pagination dots */}
-            <div className={cn("flex justify-center gap-2", isMobile ? "mt-2" : "mt-6")}>
-              {soundCards.map((_, i) => (
-                <button
-                  key={i}
-                  className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
-                  onClick={() => carouselApi?.scrollTo(i)}
-                  aria-label={`Pojdi na kartico ${i + 1}`}
-                >
-                  <span className={cn(
-                    "rounded-full transition-all duration-300",
-                    i === currentSlide
-                      ? "w-3 h-3 bg-white shadow-sm"
-                      : "w-2.5 h-2.5 bg-white/40"
-                  )} />
-                </button>
-              ))}
-            </div>
+            {/* Pagination dots - desktop only */}
+            {!isMobile && (
+              <div className="flex justify-center gap-2 mt-6">
+                {soundCards.map((_, i) => (
+                  <button
+                    key={i}
+                    className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
+                    onClick={() => carouselApi?.scrollTo(i)}
+                    aria-label={`Pojdi na kartico ${i + 1}`}
+                  >
+                    <span className={cn(
+                      "rounded-full transition-all duration-300",
+                      i === currentSlide
+                        ? "w-3 h-3 bg-white shadow-sm"
+                        : "w-2.5 h-2.5 bg-white/40"
+                    )} />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <div className="min-h-[400px] flex flex-col items-center justify-center">
