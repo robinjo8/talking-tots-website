@@ -139,7 +139,7 @@ export default function PonoviPoved() {
         onClick={() => handleLetterClick(letter)}
       >
         {/* Card Image */}
-        <div className={`relative overflow-hidden bg-gradient-to-br ${letter.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+        <div className={`relative overflow-hidden bg-gradient-to-br ${letter.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
           {!isAvailable && (
             <div className="absolute top-2 right-2 bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
               <Lock className="w-3 h-3" />
