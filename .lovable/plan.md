@@ -1,28 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Popravek prikaza videa — odstranitev črnih robov
+## Implementirane spremembe
 
-## Problem
-Video predvajalnik ima fiksno razmerje `aspect-video` (16:9) z `bg-black`, kar povzroča črne pasove ob straneh pri vertikalnih/kvadratnih videih. Na mobilnih napravah je prikaz premajhen.
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## Rešitev
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 1. `src/components/video/VideoPlayer.tsx`
-- Odstrani fiksno `aspect-video` razmerje — video sam določi svojo višino
-- Zamenjaj `bg-black` z `bg-transparent` (ali odstrani)
-- Ohrani `object-contain` za pravilno prilagajanje
-- Video element dobi `rounded-lg` neposredno
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### 2. `src/components/games/GenericVideoNavodila.tsx`
-- **Desktop**: Odstrani belo kartico (bg-background wrapper) — video se prikaže neposredno na zelenem ozadju z zaobljenimi robovi
-- **Mobile**: Video zavzame celotno širino brez paddings, kontrole so kompaktne pod njim
-- Na mobilni verziji ob kliku na "Predvajaj" sproži samodejni fullscreen prek `handleToggleFullscreen` (že implementiran v `useVideoPlayer`)
+---
 
-### 3. `src/hooks/useVideoPlayer.ts`
-- Dodaj opcijo `autoFullscreenOnPlay` za mobilne naprave — ko uporabnik klikne play, se video samodejno preklopi v fullscreen
+# Popravki preverjanja izgovorjave (implementirano)
 
-### Datoteke za spremembo
-1. `src/components/video/VideoPlayer.tsx` — odstrani aspect-video, bg-black
-2. `src/components/games/GenericVideoNavodila.tsx` — poenostavi layout, odstrani belo kartico
-3. `src/hooks/useVideoPlayer.ts` — auto-fullscreen na mobile ob play
+## Implementirane spremembe
 
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje

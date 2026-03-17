@@ -38,6 +38,16 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     handlers
   } = useVideoPlayer(videoUrl);
 
+  const handleMobilePlay = async () => {
+    await handlers.handlePlay();
+    // Auto-fullscreen on mobile
+    if (isMobile) {
+      setTimeout(() => {
+        handlers.handleToggleFullscreen();
+      }, 300);
+    }
+  };
+
   return (
     <div className={cn(
       "bg-dragon-green",
@@ -46,11 +56,11 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
       <Header />
       
       <div className={cn(
-        "container max-w-4xl mx-auto px-4",
-        isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
+        "mx-auto w-full",
+        isMobile ? "flex-1 flex flex-col pt-20 pb-24 px-2" : "container max-w-4xl px-4 pt-28 md:pt-32 pb-20"
       )}>
         {/* Title Section */}
-        <div className={cn("text-center", isMobile ? "mb-3" : "mb-8")}>
+        <div className={cn("text-center", isMobile ? "mb-2" : "mb-6")}>
           <h1 className={cn(
             "font-bold text-white",
             isMobile ? "text-2xl mb-1" : "text-4xl md:text-5xl mb-2"
@@ -64,13 +74,9 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
           )}
         </div>
         
-        {/* Video Card */}
+        {/* Video - directly on green background */}
         <div className={cn(
-          isMobile ? "flex-1 flex items-center" : ""
-        )}>
-        <div className={cn(
-          "bg-background rounded-xl shadow-md border-0",
-          isMobile ? "p-3 w-full max-w-sm mx-auto" : "p-6 md:p-8"
+          isMobile ? "flex-1 flex flex-col justify-center" : ""
         )}>
           <VideoPlayer
             videoRef={videoRef}
@@ -102,7 +108,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             isMuted={isMuted}
             volume={volume}
             isFullscreen={isFullscreen}
-            onPlay={handlers.handlePlay}
+            onPlay={isMobile ? handleMobilePlay : handlers.handlePlay}
             onPause={handlers.handlePause}
             onStop={handlers.handleStop}
             onRestart={handlers.handleRestart}
@@ -110,7 +116,6 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             onVolumeChange={handlers.handleVolumeChange}
             onToggleFullscreen={handlers.handleToggleFullscreen}
           />
-        </div>
         </div>
       </div>
 
