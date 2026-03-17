@@ -1,49 +1,35 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Video stran — prilagodljiv prikaz brez naslova
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Problem
+- Na desktopju video ni v celoti viden na zaslonu (potrebno scrollanje), črno ozadje ob straneh
+- Na mobilni verziji so kontrole ločene od videa (pod njim)
+- Naslovi "Glas C" so nepotrebni
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+## Rešitev
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+### 1. `GenericVideoNavodila.tsx` — popolna preobrazba
+- **Odstrani naslove** ("Glas C" in podnaslov) — nič besedila, samo video + kontrole
+- **Desktop + mobile**: `fixed inset-0` layout (kot igre), video se dinamično prilagaja razpoložljivemu prostoru z `useEffect` na `window.resize` / `visualViewport`
+- Video container izračuna razpoložljivo višino: `window.innerHeight - headerHeight - controlsHeight` in nastavi `max-height` na video elementu
+- Na desktopju: kontrole (play/pause/stop/restart/volume/fullscreen) ostanejo pod videom
+- **Na mobilni verziji**: kontrole se preselijo **čez video** (overlay) — polprosojne ikone na dnu videa, ki izginejo po nekaj sekundah neaktivnosti (tap za prikaz)
 
----
+### 2. `VideoPlayer.tsx` — podpora za overlay kontrole
+- Dodam opcijski `children` prop ali `overlayControls` slot, da lahko GenericVideoNavodila vstavi kontrole znotraj video containerja
+- Video element dobi dinamični `max-height` style namesto fiksnega razmerja
 
-# Popravki preverjanja izgovorjave (implementirano)
+### 3. `VideoControls.tsx` — mobilni overlay način
+- Dodam prop `overlay?: boolean`
+- Ko je `overlay=true`: absolutno pozicioniranje na dnu video containerja, polprosojno ozadje, bele ikone, auto-hide po 3s
 
-## Implementirane spremembe
+### 4. `VideoProgressBar.tsx` — integracija v overlay
+- Na mobilni verziji se progress bar prikaže znotraj overlay-a (tanka črta na dnu videa)
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+### Datoteke za spremembo
+1. `src/components/games/GenericVideoNavodila.tsx` — odstrani naslove, fixed viewport layout, dinamično skaliranje
+2. `src/components/video/VideoPlayer.tsx` — children/overlay slot, dinamični max-height
+3. `src/components/video/VideoControls.tsx` — overlay način za mobile
+4. `src/components/video/VideoProgressBar.tsx` — kompaktni overlay stil
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
