@@ -6,6 +6,7 @@ interface VideoProgressBarProps {
   onSeek: (time: number) => void;
   isSeekingMode: boolean;
   setIsSeekingMode: (seeking: boolean) => void;
+  compact?: boolean;
 }
 
 export function VideoProgressBar({
@@ -13,7 +14,8 @@ export function VideoProgressBar({
   duration,
   onSeek,
   isSeekingMode,
-  setIsSeekingMode
+  setIsSeekingMode,
+  compact = false
 }: VideoProgressBarProps) {
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -50,6 +52,34 @@ export function VideoProgressBar({
 
   if (duration === 0) return null;
 
+  // Compact overlay mode (inside video)
+  if (compact) {
+    return (
+      <div className="flex items-center gap-2 px-1">
+        <span className="text-white text-xs min-w-[32px]">{formatTime(currentTime)}</span>
+        <div 
+          className="relative flex-1 h-1 bg-white/30 rounded-full cursor-pointer"
+          onClick={handleProgressClick}
+          onMouseDown={handleProgressMouseDown}
+          onMouseMove={handleProgressMouseMove}
+          onMouseUp={handleProgressMouseUp}
+          onMouseLeave={handleProgressMouseUp}
+        >
+          <div 
+            className="absolute top-0 left-0 h-full bg-white rounded-full"
+            style={{ width: `${(currentTime / duration) * 100}%` }}
+          />
+          <div 
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-sm cursor-grab active:cursor-grabbing"
+            style={{ left: `calc(${(currentTime / duration) * 100}% - 6px)` }}
+          />
+        </div>
+        <span className="text-white text-xs min-w-[32px] text-right">{formatTime(duration)}</span>
+      </div>
+    );
+  }
+
+  // Standard mode
   return (
     <div className="mb-6 p-4 bg-muted/50 rounded-lg border">
       <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">

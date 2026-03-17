@@ -1,7 +1,4 @@
-// Generic Video Navodila component
-// Replaces 9 individual VideoNavodilaCrka* files
 import Header from "@/components/Header";
-import { Button } from "@/components/ui/button";
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VideoProgressBar } from "@/components/video/VideoProgressBar";
 import { VideoControls } from "@/components/video/VideoControls";
@@ -9,7 +6,7 @@ import { useVideoPlayer } from "@/hooks/useVideoPlayer";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface GenericVideoNavodilaProps {
   title: string;
@@ -21,7 +18,11 @@ interface GenericVideoNavodilaProps {
 export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath = "/video-navodila" }: GenericVideoNavodilaProps) {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [maxVideoHeight, setMaxVideoHeight] = useState<number>(0);
+  const [showOverlay, setShowOverlay] = useState(true);
+  const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
+
   const {
     videoRef,
     isPlaying,
@@ -38,46 +39,68 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     handlers
   } = useVideoPlayer(videoUrl);
 
+  // Calculate available height for video
+  useEffect(() => {
+    const calculateHeight = () => {
+      const headerHeight = 64;
+      // Desktop: controls below ~120px, mobile: overlay so no extra space needed
+      const controlsHeight = isMobile ? 16 : 140;
+      const padding = isMobile ? 16 : 48;
+      const vh = window.visualViewport?.height || window.innerHeight;
+      setMaxVideoHeight(vh - headerHeight - controlsHeight - padding);
+    };
+
+    calculateHeight();
+    window.addEventListener('resize', calculateHeight);
+    window.visualViewport?.addEventListener('resize', calculateHeight);
+    return () => {
+      window.removeEventListener('resize', calculateHeight);
+      window.visualViewport?.removeEventListener('resize', calculateHeight);
+    };
+  }, [isMobile]);
+
+  // Auto-hide overlay on mobile
+  const resetOverlayTimer = useCallback(() => {
+    setShowOverlay(true);
+    if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+    if (isPlaying && isMobile) {
+      overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
+    }
+  }, [isPlaying, isMobile]);
+
+  useEffect(() => {
+    if (isPlaying && isMobile) {
+      resetOverlayTimer();
+    } else {
+      setShowOverlay(true);
+      if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+    }
+    return () => { if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current); };
+  }, [isPlaying, isMobile, resetOverlayTimer]);
+
+  const handleVideoTap = () => {
+    if (isMobile) resetOverlayTimer();
+  };
+
   const handleMobilePlay = async () => {
     await handlers.handlePlay();
-    // Auto-fullscreen on mobile
     if (isMobile) {
-      setTimeout(() => {
-        handlers.handleToggleFullscreen();
-      }, 300);
+      setTimeout(() => handlers.handleToggleFullscreen(), 300);
     }
   };
 
   return (
-    <div className={cn(
-      "bg-dragon-green",
-      isMobile ? "fixed inset-0 overflow-auto flex flex-col" : "min-h-screen"
-    )}>
+    <div className="fixed inset-0 bg-dragon-green flex flex-col overflow-hidden">
       <Header />
-      
-      <div className={cn(
-        "mx-auto w-full",
-        isMobile ? "flex-1 flex flex-col pt-20 pb-24 px-2" : "container max-w-4xl px-4 pt-28 md:pt-32 pb-20"
-      )}>
-        {/* Title Section */}
-        <div className={cn("text-center", isMobile ? "mb-2" : "mb-6")}>
-          <h1 className={cn(
-            "font-bold text-white",
-            isMobile ? "text-2xl mb-1" : "text-4xl md:text-5xl mb-2"
-          )}>
-            Glas {displayLetter}
-          </h1>
-          {!isMobile && (
-            <p className="text-white/80 text-lg mt-2">
-              Poglej video navodila za pravilno izgovorjavo glasu {displayLetter}
-            </p>
-          )}
-        </div>
-        
-        {/* Video - directly on green background */}
-        <div className={cn(
-          isMobile ? "flex-1 flex flex-col justify-center" : ""
-        )}>
+
+      {/* Video area - fills remaining space */}
+      <div
+        ref={containerRef}
+        className="flex-1 flex flex-col items-center justify-center pt-16 pb-2 px-2 md:px-8"
+        onClick={handleVideoTap}
+      >
+        {/* Video container with overlay controls on mobile */}
+        <div className="relative w-full flex items-center justify-center" style={{ maxHeight: maxVideoHeight > 0 ? maxVideoHeight : undefined }}>
           <VideoPlayer
             videoRef={videoRef}
             videoUrl={videoUrl}
@@ -92,34 +115,72 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             onLoadedMetadata={handlers.handleLoadedMetadata}
             onTimeUpdate={handlers.handleTimeUpdate}
             onError={handlers.handleError}
-          />
-          
-          <VideoProgressBar
-            currentTime={currentTime}
-            duration={duration}
-            onSeek={handlers.seekToTime}
-            isSeekingMode={isSeekingMode}
-            setIsSeekingMode={setIsSeekingMode}
-          />
-          
-          <VideoControls
-            isPlaying={isPlaying}
-            isLoading={isLoading}
-            isMuted={isMuted}
-            volume={volume}
-            isFullscreen={isFullscreen}
-            onPlay={isMobile ? handleMobilePlay : handlers.handlePlay}
-            onPause={handlers.handlePause}
-            onStop={handlers.handleStop}
-            onRestart={handlers.handleRestart}
-            onToggleMute={handlers.handleToggleMute}
-            onVolumeChange={handlers.handleVolumeChange}
-            onToggleFullscreen={handlers.handleToggleFullscreen}
-          />
+            maxHeight={maxVideoHeight}
+          >
+            {/* Mobile overlay controls */}
+            {isMobile && (
+              <div
+                className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-300 ${showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              >
+                <div className="bg-black/40 backdrop-blur-sm px-2 py-1.5 rounded-b-lg">
+                  <VideoProgressBar
+                    currentTime={currentTime}
+                    duration={duration}
+                    onSeek={handlers.seekToTime}
+                    isSeekingMode={isSeekingMode}
+                    setIsSeekingMode={setIsSeekingMode}
+                    compact
+                  />
+                  <VideoControls
+                    isPlaying={isPlaying}
+                    isLoading={isLoading}
+                    isMuted={isMuted}
+                    volume={volume}
+                    isFullscreen={isFullscreen}
+                    onPlay={handleMobilePlay}
+                    onPause={handlers.handlePause}
+                    onStop={handlers.handleStop}
+                    onRestart={handlers.handleRestart}
+                    onToggleMute={handlers.handleToggleMute}
+                    onVolumeChange={handlers.handleVolumeChange}
+                    onToggleFullscreen={handlers.handleToggleFullscreen}
+                    overlay
+                  />
+                </div>
+              </div>
+            )}
+          </VideoPlayer>
         </div>
+
+        {/* Desktop controls below video */}
+        {!isMobile && (
+          <div className="w-full max-w-4xl mt-3">
+            <VideoProgressBar
+              currentTime={currentTime}
+              duration={duration}
+              onSeek={handlers.seekToTime}
+              isSeekingMode={isSeekingMode}
+              setIsSeekingMode={setIsSeekingMode}
+            />
+            <VideoControls
+              isPlaying={isPlaying}
+              isLoading={isLoading}
+              isMuted={isMuted}
+              volume={volume}
+              isFullscreen={isFullscreen}
+              onPlay={handlers.handlePlay}
+              onPause={handlers.handlePause}
+              onStop={handlers.handleStop}
+              onRestart={handlers.handleRestart}
+              onToggleMute={handlers.handleToggleMute}
+              onVolumeChange={handlers.handleVolumeChange}
+              onToggleFullscreen={handlers.handleToggleFullscreen}
+            />
+          </div>
+        )}
       </div>
 
-      {/* Floating back button */}
+      {/* Back button */}
       <button
         onClick={() => navigate(backPath)}
         className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg border-2 border-white/50 backdrop-blur-sm flex items-center justify-center transition-all"
