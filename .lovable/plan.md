@@ -1,29 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Preoblikovanje strani Artikulacija po vzoru Video navodila
+## Implementirane spremembe
 
-## Spremembe v `src/pages/ArtikulacijaVaje.tsx`
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-### 1. Podatki o karticah
-Napolni kartice z 9 črkami (C, Č, K, L, R, S, Š, Z, Ž) — enake slike zmajčkov kot na `/video-navodila`. Vsaka kartica vodi na `/govorno-jezikovne-vaje/artikulacija/{urlKey}` (npr. `c`, `ch`, `k`, `l`, `r`, `s`, `sh`, `z`, `zh`).
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 2. Layout — kopija VideoNavodila
-- Zunanji container: `fixed inset-0 overflow-hidden flex flex-col` (mobile) / `min-h-screen` (desktop)
-- `<Header />` na vrhu
-- Naslov "Artikulacija" s rumeno črto pod njim
-- Breadcrumb samo na desktopu
-- Kartice: `grid-cols-3 gap-2` (mobile) / `grid-cols-3 gap-8` (desktop)
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### 3. Kartice — kopija LetterCard iz VideoNavodila
-- Radial gradient ozadje (zlato-oranžno)
-- `aspect-[4/3]` (mobile) / `aspect-video` (desktop)
-- Tekst "Glas {letter}" pod sliko
-- Opis samo na desktopu
+---
 
-### 4. Odstranitve
-- Zelena hero sekcija, DailyStarsBar, FooterSection, embla carousel, signOut logika — vse odstrani
-- Oranžni back gumb ostane enak
+# Popravki preverjanja izgovorjave (implementirano)
 
-### 5. Datoteka
-- `src/pages/ArtikulacijaVaje.tsx` — edina sprememba
+## Implementirane spremembe
 
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
