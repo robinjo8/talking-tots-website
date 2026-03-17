@@ -48,7 +48,7 @@ export default function ArtikulacijaVaje() {
           <img 
             src={letter.image}
             alt={`Glas ${letter.letter}`}
-            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
