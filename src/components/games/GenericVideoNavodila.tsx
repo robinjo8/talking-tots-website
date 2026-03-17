@@ -109,6 +109,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             onTimeUpdate={handlers.handleTimeUpdate}
             onError={handlers.handleError}
             maxHeight={maxVideoHeight}
+            isMobile={isMobile}
           >
             {/* Overlay controls for all devices */}
             <div
