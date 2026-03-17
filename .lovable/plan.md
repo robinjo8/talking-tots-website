@@ -1,28 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Preoblikovanje strani Vaje motorike govoril po vzoru Vizualni prikaz ustnic
+## Implementirane spremembe
 
-## Spremembe v `src/pages/VajeMotorikeGovoril.tsx`
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-### 1. Ozadje
-- Zamenjaj oranžno slikovno ozadje z `bg-dragon-green` (enotna zelena barva kot na referenčni strani)
-- Odstrani `<div>` z `backgroundImage`
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 2. Layout in naslov
-- Dodaj `<Header />` komponento na vrh
-- Dodaj naslovni blok z naslovom "Vaje motorike govoril" in opisom (na desktop) — enak vzorec kot referenčna stran
-- Mobilni container: `fixed inset-0 overflow-auto flex flex-col` z `pt-20 pb-24`
-- Desktop container: `min-h-screen` z `pt-28 md:pt-32 pb-20`
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### 3. Odstranitve
-- Gumbi K L R C S Z Č Š Ž ne obstajajo na tej strani, tako da ni treba ničesar odstraniti
-- Odstrani fullscreen logiko (referenčna stran je ne uporablja)
+---
 
-### 4. Brez sprememb
-- Hiška gumb z DropdownMenu ostane popolnoma enak
-- SequentialExerciseGrid, InfoModal, MemoryExitConfirmationDialog — logika ostane enaka
-- useExerciseProgress ostane enak
+# Popravki preverjanja izgovorjave (implementirano)
 
-### 5. Datoteke
-- `src/pages/VajeMotorikeGovoril.tsx` — edina sprememba
+## Implementirane spremembe
 
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
