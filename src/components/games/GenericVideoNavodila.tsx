@@ -110,6 +110,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter }: Generic
             onToggleFullscreen={handlers.handleToggleFullscreen}
           />
         </div>
+        </div>
       </div>
 
       {/* Floating back button */}
