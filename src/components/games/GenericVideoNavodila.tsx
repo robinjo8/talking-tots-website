@@ -15,6 +15,7 @@ interface GenericVideoNavodilaProps {
   title: string;
   videoUrl: string;
   displayLetter: string;
+  backPath?: string;
 }
 
 export function GenericVideoNavodila({ title, videoUrl, displayLetter }: GenericVideoNavodilaProps) {
