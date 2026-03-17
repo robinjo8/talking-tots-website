@@ -40,16 +40,16 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter }: Generic
   return (
     <div className={cn(
       "bg-dragon-green",
-      isMobile ? "fixed inset-0 overflow-hidden flex flex-col" : "min-h-screen"
+      isMobile ? "fixed inset-0 overflow-auto flex flex-col" : "min-h-screen"
     )}>
       <Header />
       
       <div className={cn(
         "container max-w-4xl mx-auto px-4",
-        isMobile ? "flex-1 flex flex-col overflow-hidden pt-20 pb-2" : "pt-28 md:pt-32 pb-20"
+        isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
       )}>
         {/* Title Section */}
-        <div className={cn("text-center", isMobile ? "mb-2" : "mb-8")}>
+        <div className={cn("text-center", isMobile ? "mb-3" : "mb-8")}>
           <h1 className={cn(
             "font-bold text-white",
             isMobile ? "text-2xl mb-1" : "text-4xl md:text-5xl mb-2"
@@ -65,8 +65,11 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter }: Generic
         
         {/* Video Card */}
         <div className={cn(
+          isMobile ? "flex-1 flex items-center" : ""
+        )}>
+        <div className={cn(
           "bg-background rounded-xl shadow-md border-0",
-          isMobile ? "p-3 flex-1 flex flex-col overflow-hidden" : "p-6 md:p-8"
+          isMobile ? "p-3 w-full max-w-sm mx-auto" : "p-6 md:p-8"
         )}>
           <VideoPlayer
             videoRef={videoRef}
