@@ -5,6 +5,8 @@ import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -165,6 +167,17 @@ const GovornojezicovneVaje = () => {
           )}
         </div>
       </section>
+      
+      {/* Mobile Back Button */}
+      {isMobile && (
+        <Button
+          onClick={() => navigate("/moje-aplikacije")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
+      )}
       
       <FooterSection handleSignOut={handleSignOut} />
     </div>

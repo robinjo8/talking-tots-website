@@ -139,7 +139,7 @@ export default function PonoviPoved() {
         onClick={() => handleLetterClick(letter)}
       >
         {/* Card Image */}
-        <div className={`relative overflow-hidden bg-gradient-to-br ${letter.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+        <div className={`relative overflow-hidden bg-gradient-to-br ${letter.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
           {!isAvailable && (
             <div className="absolute top-2 right-2 bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
               <Lock className="w-3 h-3" />
@@ -150,15 +150,18 @@ export default function PonoviPoved() {
             <img 
               src={letter.image}
               alt={`Glas ${letter.letter}`}
-              className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'} ${!isAvailable ? 'grayscale-[30%]' : ''}`}
+              className={`object-contain group-hover:scale-110 transition-transform duration-300 w-full h-full ${!isAvailable ? 'grayscale-[30%]' : ''}`}
               style={{ mixBlendMode: 'multiply' }}
             />
           </div>
         </div>
 
         {/* Card Content */}
-        <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
-          <h3 className={`text-xl font-bold mb-3 group-hover:text-app-blue transition-colors ${!isAvailable ? 'text-gray-500' : 'text-foreground'}`}>
+        <div className={isMobile ? "p-1.5 text-center" : "p-6"}>
+          <h3 className={isMobile
+            ? `text-xs font-bold group-hover:text-app-blue transition-colors leading-tight ${!isAvailable ? 'text-muted-foreground' : 'text-foreground'}`
+            : `text-xl font-bold mb-3 group-hover:text-app-blue transition-colors ${!isAvailable ? 'text-muted-foreground' : 'text-foreground'}`
+          }>
             {letter.id === 'r-zacetek' ? 'Glas R - začetne vaje' : `Glas ${letter.letter}`}
           </h3>
           {!isMobile && (
@@ -217,7 +220,7 @@ export default function PonoviPoved() {
           <div className="mb-12">
             {isMobile ? (
               /* Mobile: 2-column grid */
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 {ponoviPovedLetters.map(letter => (
                   <LetterCard key={letter.id} letter={letter} />
                 ))}

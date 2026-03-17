@@ -94,7 +94,7 @@ export default function BingoGames() {
           </div>
           
           {selectedChild ? (
-            <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
+            <div className={isMobile ? "grid grid-cols-3 gap-2" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {bingoLetters.map((item) => (
                 <div
                   key={item.id}
@@ -102,21 +102,21 @@ export default function BingoGames() {
                   className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
                 >
                   {/* Card Image */}
-                  <div className={`relative overflow-hidden bg-gradient-to-br ${item.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+                  <div className={`relative overflow-hidden bg-gradient-to-br ${item.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
                     <div className="w-full h-full flex items-center justify-center">
                       <img 
                         src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${item.image}`}
                         alt={item.title}
-                        className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                         style={{ mixBlendMode: 'multiply' }}
                       />
                     </div>
                   </div>
 
                   {/* Card Content */}
-                  <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+                  <div className={isMobile ? "p-1.5 text-center" : "p-6 flex flex-col flex-grow"}>
                     <h3 className={isMobile 
-                      ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
+                      ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight" 
                       : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
                     }>
                       {item.title}

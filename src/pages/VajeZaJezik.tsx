@@ -1,9 +1,15 @@
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { TongueGymGame } from "@/components/games/TongueGymGame";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 // Auth protection is now handled by ProtectedRoute in routes.tsx
 const VajeZaJezik = () => {
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,6 +35,17 @@ const VajeZaJezik = () => {
         
         <TongueGymGame />
       </div>
+
+      {/* Mobile Back Button */}
+      {isMobile && (
+        <Button
+          onClick={() => navigate("/govorno-jezikovne-vaje")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
+      )}
     </div>
   );
 };

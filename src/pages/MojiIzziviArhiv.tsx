@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMonthlyPlan } from "@/hooks/useMonthlyPlan";
 import { useSetTracking, type SetTracking } from "@/hooks/usePlanProgress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, ChevronLeft, ChevronRight, Check, X, Minus } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Check, X, Minus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 
 const MONTH_NAMES = [
   "Januar", "Februar", "Marec", "April", "Maj", "Junij",
@@ -85,6 +87,8 @@ function buildCalendarGrid(year: number, month: number): CalendarDay[][] {
 
 export default function MojiIzziviArhiv() {
   const { selectedChild } = useAuth();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { data: plan, isLoading } = useMonthlyPlan(selectedChild?.id);
   const { data: trackingEntries = [] } = useSetTracking(plan?.id, selectedChild?.id);
 
@@ -267,6 +271,17 @@ export default function MojiIzziviArhiv() {
           </div>
         )}
       </div>
+
+      {/* Mobile Back Button */}
+      {isMobile && (
+        <Button
+          onClick={() => navigate("/moji-izzivi")}
+          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+          size="icon"
+        >
+          <ArrowLeft className="h-6 w-6 text-white" />
+        </Button>
+      )}
     </div>
   );
 }

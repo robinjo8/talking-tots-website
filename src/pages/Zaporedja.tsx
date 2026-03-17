@@ -158,20 +158,23 @@ export default function Zaporedja() {
       onClick={() => handleCardClick(game)}
     >
       {/* Card Image */}
-      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+      <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={game.image}
             alt={`Glas ${game.letter}`}
-            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
       </div>
 
       {/* Card Content */}
-      <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
-        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+      <div className={isMobile ? "p-1.5 text-center" : "p-6"}>
+        <h3 className={isMobile
+          ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight"
+          : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+        }>
           {game.letter === 'R-zacetek' ? 'Glas R - začetne vaje' : `Glas ${game.letter}`}
         </h3>
         {!isMobile && (
@@ -229,7 +232,7 @@ export default function Zaporedja() {
           <div className="mb-12">
             {isMobile ? (
               /* Mobile: 2-column grid */
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 {sequenceGames.map(game => (
                   <LetterCard key={game.id} game={game} />
                 ))}
