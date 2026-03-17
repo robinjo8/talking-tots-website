@@ -1,67 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Redesign: Vizualni prikaz ustnic & Video navodila po vzoru "Kako deluje TomiTalk?"
+## Implementirane spremembe
 
-## Referenčni dizajn
-Sekcija "Kako deluje TomiTalk?" (FeaturesSection) ima:
-- Zeleno ozadje (`bg-dragon-green`) z valovitimi SVG robovi
-- Bele zaobljene kartice (`bg-background rounded-xl shadow-md p-6 min-h-[280px]`)
-- Vsaka kartica: barvna ikona v zaobljenem kvadratu, krepek naslov, opis
-- Carousel z loop, pagination dots (bele pike na zelenem ozadju), puščice na desktopu, brez na mobilni
-- Autoplay s `useCarouselAutoPlay`
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## Spremembe
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 1. `src/pages/VizualniPrikazUstnic.tsx` — popoln redesign
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-Celotna stran dobi zeleno ozadje (`bg-dragon-green`) z valovitimi SVG robovi (kopija iz FeaturesSection). Naslov "Vizualni prikaz ustnic" v beli barvi.
+---
 
-**Kartice (5 kartic za glasove K, L, R, C/S/Z, Č/Š/Ž):**
-- Bela kartica (`bg-background rounded-xl shadow-md p-6`)
-- Zgoraj: slika ustnic (namesto ikone) v zaobljenem okvirju — uporabi obstoječe slike (`Glas_K.png` itd.)
-- Naslov: npr. "Glas K" (krepko)
-- Spodaj: gumb "Zvočna navodila" (ohrani obstoječo logiko `audioUrl`)
-- Flip-card logika se **odstrani** — slika je vedno vidna, klik ni potreben
-- Carousel z loop, pagination dots (bele), puščice na desktopu
-- Uporabi obstoječe komponente: `CarouselNavigation`, `CarouselPagination`
+# Popravki preverjanja izgovorjave (implementirano)
 
-**Mobile:** `fixed inset-0 overflow-hidden` ostane, kartice se prilagodijo velikosti.
-**Desktop:** `min-h-screen`, scrollable.
-**Floating back gumb:** ostane.
+## Implementirane spremembe
 
-### 2. `src/pages/VideoNavodila.tsx` — popoln redesign
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
 
-Enaka struktura: zeleno ozadje, bel naslov "Video navodila", carousel z belimi karticami.
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
 
-**Kartice (9 kartic za glasove S, Z, C, Š, Ž, Č, K, L, R):**
-- Bela kartica z zaobljenim okvirjem
-- Zgoraj: slika zmajčka (obstoječe slike iz bucketa `zmajcki`)
-- Naslov: "Glas S" itd.
-- Opis: obstoječi opisi
-- Klik na kartico navigira na `/video-navodila/{letter}` (ohrani obstoječo logiko)
-- Na desktopu: carousel prikaže 3 kartice hkrati (`lg:basis-1/3 md:basis-1/2`)
-- Na mobilni: 1 kartica
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
 
-**Mobile:** `fixed inset-0 overflow-hidden`, carousel z dots.
-**Desktop:** `min-h-screen`.
-
-### 3. Skupni elementi za obe strani
-- Uporabi obstoječe komponente `CarouselNavigation` in `CarouselPagination` (iz features/)
-- Uporabi `useCarouselAutoPlay` hook za autoplay (opcijsko, lahko brez)
-- Header ostane na vrhu
-- Pagination dots: bele na zelenem ozadju (enako kot na homepage)
-- SVG valovi zgoraj in spodaj za vizualno konsistentnost
-
-### Kaj se odstrani
-- **VizualniPrikazUstnic:** Flip-card CSS logika, `flippedCardId` state — slike so vedno prikazane
-- **VideoNavodila:** Grid layout, BreadcrumbNavigation — zamenjano s carousel
-- Oboje: rumena črtica pod naslovom (zamenjana z zelenim ozadjem)
-
-### Kaj ostane
-- Vse slike (ustnic in zmajčkov)
-- Vsi funkcionalni gumbi (zvočna navodila, navigacija na video stran)
-- Floating back gumb na VizualniPrikazUstnic
-- Navigacija na podstrani pri VideoNavodila
-- Auth check pri VizualniPrikazUstnic
-- Mobile no-scroll layout
-
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
