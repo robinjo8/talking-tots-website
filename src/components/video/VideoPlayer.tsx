@@ -27,6 +27,7 @@ export function VideoPlayer({
   error,
   isMuted,
   maxHeight,
+  isMobile = false,
   children,
   onEnded,
   onPlay,
