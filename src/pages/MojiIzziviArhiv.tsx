@@ -5,9 +5,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMonthlyPlan } from "@/hooks/useMonthlyPlan";
 import { useSetTracking, type SetTracking } from "@/hooks/usePlanProgress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar, ChevronLeft, ChevronRight, Check, X, Minus } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Check, X, Minus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
 
 const MONTH_NAMES = [
   "Januar", "Februar", "Marec", "April", "Maj", "Junij",
