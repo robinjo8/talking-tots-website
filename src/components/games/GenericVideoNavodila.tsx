@@ -80,14 +80,12 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     resetOverlayTimer();
   };
 
-  // Auto-enter fullscreen on mobile when video is ready
-  const hasAutoFullscreened = useRef(false);
+  // Auto-play on mobile when video is ready
+  const hasAutoPlayed = useRef(false);
   useEffect(() => {
-    if (isMobile && !hasAutoFullscreened.current && !isLoading && videoRef.current) {
-      hasAutoFullscreened.current = true;
-      // Small delay to ensure video element is fully ready
+    if (isMobile && !hasAutoPlayed.current && !isLoading && videoRef.current) {
+      hasAutoPlayed.current = true;
       setTimeout(() => {
-        handlers.handleToggleFullscreen();
         handlers.handlePlay();
       }, 300);
     }
