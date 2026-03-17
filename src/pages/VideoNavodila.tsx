@@ -3,6 +3,8 @@ import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const videoLetters = [
   { 
