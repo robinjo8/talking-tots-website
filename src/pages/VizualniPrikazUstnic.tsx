@@ -116,6 +116,26 @@ const VizualniPrikazUstnic = () => {
           )}
         </div>
 
+        {/* Mobile letter navigation buttons */}
+        {isMobile && selectedChild && (
+          <div className="flex flex-wrap gap-2 justify-center mb-3">
+            {soundCards.map((card, i) => (
+              <button
+                key={card.id}
+                onClick={() => { carouselApi?.scrollTo(i); }}
+                className={cn(
+                  "rounded-full px-4 py-1.5 text-sm font-bold transition-all duration-200",
+                  i === currentSlide
+                    ? "bg-white text-dragon-green shadow-sm"
+                    : "bg-white/20 text-white"
+                )}
+              >
+                {card.sounds.join(" ")}
+              </button>
+            ))}
+          </div>
+        )}
+
         {selectedChild ? (
           <div className={cn("w-full mx-auto", isMobile ? "flex-1 flex flex-col overflow-hidden" : "max-w-xl")}>
             <Carousel
