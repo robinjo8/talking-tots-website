@@ -1,7 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
-import { Baby, AlertTriangle, Heart, Home, HelpCircle, BookOpen, ExternalLink } from "lucide-react";
+import { Baby, AlertTriangle, Heart, Home, HelpCircle, BookOpen, ExternalLink, ArrowLeft } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 const LogopedskiKoticek = () => {
   const navigate = useNavigate();
