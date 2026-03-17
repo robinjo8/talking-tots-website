@@ -13,24 +13,6 @@ import { hasPonoviPovedConfig } from "@/data/ponoviPovedConfig";
 // Letter selection cards - using ASCII-safe URL keys for Slovenian diacritics
 const ponoviPovedLetters = [
   {
-    id: "s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Ponovi povedi z glasom S",
-    path: "/govorne-igre/ponovi-poved/s",
-    urlKey: "s"
-  },
-  {
-    id: "z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Ponovi povedi z glasom Z",
-    path: "/govorne-igre/ponovi-poved/z",
-    urlKey: "z"
-  },
-  {
     id: "c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
@@ -38,24 +20,6 @@ const ponoviPovedLetters = [
     description: "Ponovi povedi z glasom C",
     path: "/govorne-igre/ponovi-poved/c",
     urlKey: "c"
-  },
-  {
-    id: "š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Ponovi povedi z glasom Š",
-    path: "/govorne-igre/ponovi-poved/sh",
-    urlKey: "sh"
-  },
-  {
-    id: "ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Ponovi povedi z glasom Ž",
-    path: "/govorne-igre/ponovi-poved/zh",
-    urlKey: "zh"
   },
   {
     id: "č",
@@ -101,7 +65,43 @@ const ponoviPovedLetters = [
     description: "Ponovi povedi z glasom R",
     path: "/govorne-igre/ponovi-poved/r",
     urlKey: "r"
-  }
+  },
+  {
+    id: "s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Ponovi povedi z glasom S",
+    path: "/govorne-igre/ponovi-poved/s",
+    urlKey: "s"
+  },
+  {
+    id: "š",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Ponovi povedi z glasom Š",
+    path: "/govorne-igre/ponovi-poved/sh",
+    urlKey: "sh"
+  },
+  {
+    id: "z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Ponovi povedi z glasom Z",
+    path: "/govorne-igre/ponovi-poved/z",
+    urlKey: "z"
+  },
+  {
+    id: "ž",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Ponovi povedi z glasom Ž",
+    path: "/govorne-igre/ponovi-poved/zh",
+    urlKey: "zh"
+  },
 ];
 
 export default function PonoviPoved() {

@@ -13,43 +13,11 @@ import { getAgeGroup } from "@/utils/ageUtils";
 
 const sequenceGames = [
   {
-    id: "zaporedja-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Uredi zaporedje besed z glasom S",
-    available: true
-  },
-  {
-    id: "zaporedja-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Uredi zaporedje besed z glasom Z",
-    available: true
-  },
-  {
     id: "zaporedja-c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Uredi zaporedje besed z glasom C",
-    available: true
-  },
-  {
-    id: "zaporedja-š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Uredi zaporedje besed z glasom Š",
-    available: true
-  },
-  {
-    id: "zaporedja-ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Uredi zaporedje besed z glasom Ž",
     available: true
   },
   {
@@ -90,6 +58,38 @@ const sequenceGames = [
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Uredi zaporedje besed z glasom R",
+    available: true
+  },
+  {
+    id: "zaporedja-s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Uredi zaporedje besed z glasom S",
+    available: true
+  },
+  {
+    id: "zaporedja-š",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Uredi zaporedje besed z glasom Š",
+    available: true
+  },
+  {
+    id: "zaporedja-z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Uredi zaporedje besed z glasom Z",
+    available: true
+  },
+  {
+    id: "zaporedja-ž",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Uredi zaporedje besed z glasom Ž",
     available: true
   }
 ];

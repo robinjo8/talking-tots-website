@@ -15,48 +15,12 @@ const backgroundImageUrl = `${SUPABASE_URL}/storage/v1/object/public/ozadja/ozad
 
 const memoryGames = [
   { 
-    id: "spomin-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pare slik z glasom S in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-s",
-    available: true
-  },
-  { 
-    id: "spomin-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pare slik z glasom Z in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-z",
-    available: true
-  },
-  { 
     id: "spomin-c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Poišči pare slik z glasom C in nato ponovi besedo",
     path: "/govorne-igre/spomin/spomin-c",
-    available: true
-  },
-  { 
-    id: "spomin-sh",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pare slik z glasom Š in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-sh",
-    available: true
-  },
-  { 
-    id: "spomin-zh",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pare slik z glasom Ž in nato ponovi besedo",
-    path: "/govorne-igre/spomin/spomin-zh",
     available: true
   },
   { 
@@ -104,8 +68,43 @@ const memoryGames = [
     path: "/govorne-igre/spomin/spomin-r",
     available: true
   },
+  { 
+    id: "spomin-s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Poišči pare slik z glasom S in nato ponovi besedo",
+    path: "/govorne-igre/spomin/spomin-s",
+    available: true
+  },
+  { 
+    id: "spomin-sh",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Poišči pare slik z glasom Š in nato ponovi besedo",
+    path: "/govorne-igre/spomin/spomin-sh",
+    available: true
+  },
+  { 
+    id: "spomin-z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Poišči pare slik z glasom Z in nato ponovi besedo",
+    path: "/govorne-igre/spomin/spomin-z",
+    available: true
+  },
+  { 
+    id: "spomin-zh",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Poišči pare slik z glasom Ž in nato ponovi besedo",
+    path: "/govorne-igre/spomin/spomin-zh",
+    available: true
+  },
 ];
-
 export default function SpominGames() {
   const navigate = useNavigate();
   const { user, selectedChild, signOut } = useAuth();

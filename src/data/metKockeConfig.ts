@@ -287,14 +287,14 @@ export function getMetKockeConfig(letter: string): MetKockeLetterConfig | null {
 
 // Seznam črk za selekcijsko stran
 export const metKockeLetters = [
-  { id: "s", letter: "S", title: "Glas S", path: "/govorne-igre/met-kocke/s", gradient: "from-dragon-green/20 to-app-teal/20" },
-  { id: "z", letter: "Z", title: "Glas Z", path: "/govorne-igre/met-kocke/z", gradient: "from-app-teal/20 to-dragon-green/20" },
   { id: "c", letter: "C", title: "Glas C", path: "/govorne-igre/met-kocke/c", gradient: "from-dragon-green/20 to-dragon-green/20" },
-  { id: "sh", letter: "Š", title: "Glas Š", path: "/govorne-igre/met-kocke/sh", gradient: "from-app-blue/20 to-app-purple/20" },
-  { id: "zh", letter: "Ž", title: "Glas Ž", path: "/govorne-igre/met-kocke/zh", gradient: "from-app-purple/20 to-app-blue/20" },
   { id: "ch", letter: "Č", title: "Glas Č", path: "/govorne-igre/met-kocke/ch", gradient: "from-app-blue/20 to-app-teal/20" },
   { id: "k", letter: "K", title: "Glas K", path: "/govorne-igre/met-kocke/k", gradient: "from-app-orange/20 to-app-yellow/20" },
   { id: "l", letter: "L", title: "Glas L", path: "/govorne-igre/met-kocke/l", gradient: "from-app-purple/20 to-app-blue/20" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", path: "/govorne-igre/met-kocke/r-zacetek", gradient: "from-app-purple/20 to-app-teal/20" },
   { id: "r", letter: "R", title: "Glas R", path: "/govorne-igre/met-kocke/r", gradient: "from-app-purple/20 to-app-teal/20" },
+  { id: "s", letter: "S", title: "Glas S", path: "/govorne-igre/met-kocke/s", gradient: "from-dragon-green/20 to-app-teal/20" },
+  { id: "sh", letter: "Š", title: "Glas Š", path: "/govorne-igre/met-kocke/sh", gradient: "from-app-blue/20 to-app-purple/20" },
+  { id: "z", letter: "Z", title: "Glas Z", path: "/govorne-igre/met-kocke/z", gradient: "from-app-teal/20 to-dragon-green/20" },
+  { id: "zh", letter: "Ž", title: "Glas Ž", path: "/govorne-igre/met-kocke/zh", gradient: "from-app-purple/20 to-app-blue/20" },
 ];

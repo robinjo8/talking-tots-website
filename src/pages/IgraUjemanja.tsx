@@ -14,43 +14,11 @@ import { toAsciiUrl } from "@/data/igraUjemanjaConfig";
 
 const matchingGames = [
   {
-    id: "igra-ujemanja-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poveži besedo z glasom S s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poveži besedo z glasom Z s pravo sliko",
-    available: true
-  },
-  {
     id: "igra-ujemanja-c",
     letter: "C",
     gradient: "from-dragon-green/20 to-dragon-green/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
     description: "Poveži besedo z glasom C s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poveži besedo z glasom Š s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poveži besedo z glasom Ž s pravo sliko",
     available: true
   },
   {
@@ -91,6 +59,38 @@ const matchingGames = [
     gradient: "from-app-purple/20 to-app-teal/20",
     image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
     description: "Poveži besedo z glasom R s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-s",
+    letter: "S",
+    gradient: "from-dragon-green/20 to-app-teal/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
+    description: "Poveži besedo z glasom S s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-š",
+    letter: "Š",
+    gradient: "from-app-blue/20 to-app-purple/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
+    description: "Poveži besedo z glasom Š s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-z",
+    letter: "Z",
+    gradient: "from-app-teal/20 to-dragon-green/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
+    description: "Poveži besedo z glasom Z s pravo sliko",
+    available: true
+  },
+  {
+    id: "igra-ujemanja-ž",
+    letter: "Ž",
+    gradient: "from-app-purple/20 to-app-blue/20",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
+    description: "Poveži besedo z glasom Ž s pravo sliko",
     available: true
   }
 ];
