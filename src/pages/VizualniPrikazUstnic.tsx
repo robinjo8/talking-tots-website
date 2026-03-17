@@ -179,9 +179,9 @@ const VizualniPrikazUstnic = () => {
                                 </Button>
                               </div>
                             ) : (
-                              <div className="flex-1 flex flex-col items-center gap-3 p-4">
-                                <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
-                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0" loading="lazy" />
+                              <div className="flex-1 flex flex-col items-center gap-3 p-4 overflow-hidden">
+                                <h3 className="text-lg font-bold text-foreground text-center shrink-0">{card.title}</h3>
+                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[280px]" loading="lazy" />
                                 <div className="flex gap-2 w-full">
                                   <Button variant="outline" size="sm" className="flex-1 gap-2" disabled={!card.audioUrl}>
                                     <Volume2 className="w-4 h-4" />
