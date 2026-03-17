@@ -1,49 +1,26 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Popravki na strani Vizualni prikaz ustnic
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Težave
+1. **Nad barvnim kvadratom** manjka napis "GLAS" / "GLASOVI" z velikimi črkami
+2. **Pod barvnim kvadratom** je nepotrebno besedilo (npr. "Glas K") — odstraniti
+3. **C,S,Z in Č,Š,Ž** — barvni kvadrat je premajhen, črke niso v eni vrstici — razširiti
+4. **Puščice levo/desno** — bele na zelenem, slabo vidne — bela podlaga, zelena puščica
+5. **Č,Š,Ž** — črke nevidne ker `app-red` **ne obstaja** v tailwind konfiguraciji (barva se ne naloži, ostane belo na belem)
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+## Spremembe v `src/pages/VizualniPrikazUstnic.tsx`
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+### 1. Besedilo na kartici
+- Nad barvnim kvadratom dodaj `<p>` z besedilom `GLAS` (za eno črko) ali `GLASOVI` (za več črk), uppercase, večja pisava (`text-xl font-bold text-foreground`)
+- Odstrani `<h3>` z naslovom (npr. "Glas K") in `<p>` s "Klikni za prikaz"
 
----
+### 2. Barvni kvadrat za C,S,Z in Č,Š,Ž
+- Za kartice z več glasovi: razširi kvadrat iz `w-24 h-24` na npr. `w-40 h-20` (ali `px-6 py-4`) da so vse črke v eni vrstici
 
-# Popravki preverjanja izgovorjave (implementirano)
+### 3. Barva za Č,Š,Ž
+- `app-red` ne obstaja v tailwind konfiguraciji — zamenjaj z `from-red-500 to-red-500/80` (ali dodaj `app-red` v config)
 
-## Implementirane spremembe
+### 4. Puščice carousel
+- `CarouselPrevious` in `CarouselNext`: zamenjaj `text-white border-white/30` z `bg-white text-dragon-green border-white hover:bg-white/90 hover:text-dragon-green`
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
-
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
