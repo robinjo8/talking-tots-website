@@ -170,13 +170,12 @@ export default function SpominGames() {
       
       {/* Mobile Back Button */}
       {isMobile && (
-        <Button
+        <button
           onClick={() => navigate("/govorne-igre")}
-          className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
-          size="icon"
+          className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg border-2 border-white/50 backdrop-blur-sm flex items-center justify-center transition-all"
         >
-          <ArrowLeft className="h-6 w-6 text-white" />
-        </Button>
+          <ArrowLeft className="w-7 h-7 text-white" />
+        </button>
       )}
       
       {/* Hero sekcija */}
