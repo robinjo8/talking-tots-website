@@ -90,7 +90,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
-      <Header />
+      
 
       {/* Video area - fills remaining space */}
       <div
