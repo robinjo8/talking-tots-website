@@ -18,7 +18,7 @@ interface GenericVideoNavodilaProps {
   backPath?: string;
 }
 
-export function GenericVideoNavodila({ title, videoUrl, displayLetter }: GenericVideoNavodilaProps) {
+export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath = "/video-navodila" }: GenericVideoNavodilaProps) {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
   
