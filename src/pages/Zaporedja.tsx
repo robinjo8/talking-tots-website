@@ -232,7 +232,7 @@ export default function Zaporedja() {
           <div className="mb-12">
             {isMobile ? (
               /* Mobile: 2-column grid */
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 {sequenceGames.map(game => (
                   <LetterCard key={game.id} game={game} />
                 ))}
