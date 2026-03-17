@@ -187,38 +187,38 @@ const VizualniPrikazUstnic = () => {
                             )}
                           </div>
                         ) : (
-                          /* Desktop: flip card */
-                          <div
-                            className="flip-card cursor-pointer rounded-xl bg-background shadow-md transition-all duration-300 border-0"
-                            style={{ minHeight: cardHeight }}
-                            onClick={() => handleCardClick(card.id)}
-                          >
-                            <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
-                              <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
-                                <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
-                                  <p className="font-bold text-foreground text-2xl tracking-wide">GLAS</p>
-                                  <div className={cn(
-                                    "rounded-2xl flex items-center justify-center shadow-md",
-                                    card.color,
-                                    card.sounds.length > 1
-                                      ? "px-8 py-5 min-w-[200px] h-24"
-                                      : "w-24 h-24"
-                                  )}>
-                                    <span className="font-black text-white whitespace-nowrap text-4xl">
-                                      {card.sounds.join(", ")}
-                                    </span>
-                                  </div>
+                          /* Desktop: same show/hide as mobile */
+                          <div className="rounded-xl bg-background shadow-md" style={{ minHeight: cardHeight }}>
+                            {!isFlipped ? (
+                              <div className="flex flex-col items-center justify-center gap-4 p-8" style={{ minHeight: cardHeight }}>
+                                <p className="font-bold text-foreground text-2xl tracking-wide">GLAS</p>
+                                <div className={cn(
+                                  "rounded-2xl flex items-center justify-center shadow-md",
+                                  card.color,
+                                  card.sounds.length > 1
+                                    ? "px-8 py-5 min-w-[200px] h-24"
+                                    : "w-24 h-24"
+                                )}>
+                                  <span className="font-black text-white whitespace-nowrap text-4xl">
+                                    {card.sounds.join(", ")}
+                                  </span>
                                 </div>
+                                <Button
+                                  variant="outline"
+                                  onClick={() => handleCardClick(card.id)}
+                                >
+                                  PRIKAŽI SLIKO
+                                </Button>
                               </div>
-                              <div className="flip-card-back flex-col p-4 md:p-6 justify-between rounded-xl bg-background shadow-md">
-                                <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
-                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg max-h-[280px]" loading="lazy" />
-                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                            ) : (
+                              <div className="flex flex-col items-center gap-4 p-6" style={{ minHeight: cardHeight }}>
+                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[360px] cursor-pointer" loading="lazy" onClick={() => handleCardClick(card.id)} />
+                                <Button variant="outline" className="w-full gap-2" disabled={!card.audioUrl}>
                                   <Volume2 className="w-4 h-4" />
                                   {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
                                 </Button>
                               </div>
-                            </div>
+                            )}
                           </div>
                         )}
                       </div>
