@@ -14,6 +14,7 @@ import { ArrowLeft } from "lucide-react";
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   console.log('🎯 MojeAplikacije - Selected child:', selectedChild?.name);
 
