@@ -43,7 +43,7 @@ export default function ArtikulacijaVaje() {
       onClick={() => handleLetterClick(letter)}
     >
       {/* Card Image */}
-      <div className={`relative overflow-hidden bg-gradient-to-br ${letter.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+      <div className={`relative overflow-hidden bg-gradient-to-br ${letter.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
         <div className="w-full h-full flex items-center justify-center">
           <img 
             src={letter.image}
