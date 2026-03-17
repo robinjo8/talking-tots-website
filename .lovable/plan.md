@@ -1,49 +1,110 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Mobilna prilagoditev: odstranitev breadcrumbov, oranžen gumb za nazaj, prilagoditev kartic
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Pregled
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+Tri sklope sprememb:
+1. **Odstranitev breadcrumb navigacije na mobilni verziji** — povsod
+2. **Oranžen floating gumb za nazaj** na mobilni verziji na vseh straneh, ki vodi eno stran nazaj v hierarhiji
+3. **Prilagoditev kartic za izbiro glasov** na mobilni verziji po vzoru `/video-navodila` (3-stolpčna mreža, manjše kartice brez opisa)
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+Desktop ostane nespremenjen.
 
 ---
 
-# Popravki preverjanja izgovorjave (implementirano)
+## 1. Odstranitev breadcrumbov na mobilni verziji
 
-## Implementirane spremembe
+Namesto spreminjanja vsakega fajla posebej, spremenim `BreadcrumbNavigation.tsx` — na začetku komponente dodam `useIsMobile()` preverjanje. Če je mobilna naprava, komponenta vrne `null`.
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+**Datoteka:** `src/components/BreadcrumbNavigation.tsx`
+- Uvozi `useIsMobile`
+- Na vrhu `BreadcrumbNavigation()` dodaj: `if (isMobile) return null;`
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+To pokrije vse strani naenkrat (cca 15+ strani), brez posameznega urejanja.
 
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+---
 
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
+## 2. Oranžen floating gumb za nazaj
+
+Strani, ki že imajo ta gumb na mobilni verziji in ga ne potrebujejo spremeniti:
+- `GovorneIgre.tsx` → nazaj na `/moje-aplikacije` ✓
+- `SpominGames.tsx`, `KoloSreceGames.tsx`, `MetKockeGames.tsx`, `BingoGames.tsx`, `KaceLestveGames.tsx`, `PonoviPoved.tsx`, `Labirint.tsx`, `Zaporedja.tsx`, `IgraUjemanja.tsx`, `DrsnaSestavljanka.tsx`, `SestavljankeGames.tsx` → nazaj na `/govorne-igre` ✓
+
+Strani, ki **potrebujejo dodan** oranžen gumb na mobilni verziji:
+
+| Stran | Datoteka | Nazaj na |
+|-------|----------|----------|
+| Govorne vaje | `GovornojezicovneVaje.tsx` | `/moje-aplikacije` |
+| Video navodila (seznam) | `VideoNavodila.tsx` | `/govorno-jezikovne-vaje` |
+| Vizualni prikaz ustnic | `VizualniPrikazUstnic.tsx` | `/govorno-jezikovne-vaje` |
+| Artikulacija vaje | `ArtikulacijaVaje.tsx` | `/govorno-jezikovne-vaje` |
+| Moje aplikacije (Govor) | `MojeAplikacije.tsx` | `/` (domov) |
+| Logopedski nasveti | `LogopedskiKoticek.tsx` | `/` |
+| Moji izzivi arhiv | `MojiIzziviArhiv.tsx` | `/moji-izzivi` |
+| Pogosta vprašanja | `PogostaVprasanja.tsx` | `/logopedski-koticek` |
+| Govorno-jezikovne težave | `GovornoJezikovneTezave.tsx` | `/logopedski-koticek` |
+| Vaje za jezik | `VajeZaJezik.tsx` | `/govorno-jezikovne-vaje` |
+
+Vzorec gumba (enak kot v `GovorneIgre.tsx`):
+```tsx
+{isMobile && (
+  <Button
+    onClick={() => navigate("[parent-path]")}
+    className="fixed bottom-6 left-6 z-50 h-14 w-14 rounded-full bg-app-orange hover:bg-app-orange/90 shadow-lg"
+    size="icon"
+  >
+    <ArrowLeft className="h-6 w-6 text-white" />
+  </Button>
+)}
+```
+
+Za strani pod `/govorno-jezikovne-vaje` (VizualniPrikazUstnic, GenericVideoNavodila) ki že imajo oranžen floating gumb — preverim da kaže na pravilno predhodno stran.
+
+---
+
+## 3. Prilagoditev kartic za izbiro glasov na mobilni verziji
+
+Trenutno večina letter-selection strani na mobilni verziji uporablja `grid-cols-2 gap-4` z `aspect-square` slikami in besedilom pod sliko.
+
+Po vzoru `/video-navodila` spremenimo na mobilni verziji:
+- Mreža: `grid-cols-3 gap-2` namesto `grid-cols-2 gap-4`
+- Slika: `aspect-[4/3]` namesto `aspect-square`
+- Besedilo: manjši padding (`p-1.5`), manjša pisava (`text-xs`), brez opisa
+- Ime: samo naslov (npr. "Glas S") v `text-center`
+
+**Datoteke za spremembo** (letter-selection strani):
+- `SpominGames.tsx`
+- `KoloSreceGames.tsx`
+- `MetKockeGames.tsx`
+- `BingoGames.tsx`
+- `KaceLestveGames.tsx`
+- `PonoviPoved.tsx`
+- `Labirint.tsx`
+- `Zaporedja.tsx`
+- `IgraUjemanja.tsx`
+- `DrsnaSestavljanka.tsx`
+- `SestavljankeGames.tsx`
+- `ArtikulacijaVaje.tsx`
+
+Desktop ostane nespremenjen (3-stolpčna mreža z velikimi karticami).
+
+---
+
+## Povzetek datotek
+
+| # | Datoteka | Sprememba |
+|---|----------|-----------|
+| 1 | `BreadcrumbNavigation.tsx` | Skrij na mobilni (1 vrstica) |
+| 2 | `GovornojezicovneVaje.tsx` | Dodaj back gumb |
+| 3 | `VideoNavodila.tsx` | Dodaj back gumb |
+| 4 | `MojeAplikacije.tsx` | Dodaj back gumb |
+| 5 | `LogopedskiKoticek.tsx` | Dodaj back gumb |
+| 6 | `MojiIzziviArhiv.tsx` | Dodaj back gumb |
+| 7 | `PogostaVprasanja.tsx` | Dodaj back gumb |
+| 8 | `GovornoJezikovneTezave.tsx` | Dodaj back gumb |
+| 9 | `VajeZaJezik.tsx` | Dodaj back gumb |
+| 10 | `ArtikulacijaVaje.tsx` | Dodaj back gumb |
+| 11 | `VizualniPrikazUstnic.tsx` | Popravi back gumb pot |
+| 12-22 | 11 letter-selection strani | Mobilne kartice: 3 stolpci, manjše |
+
