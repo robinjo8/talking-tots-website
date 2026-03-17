@@ -86,17 +86,19 @@ export function VideoControls({
           )}
         </button>
 
-        <button
-          onClick={onToggleFullscreen}
-          disabled={isLoading}
-          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
-        >
-          {isFullscreen ? (
-            <Minimize className="h-4 w-4 md:h-5 md:w-5" />
-          ) : (
-            <Maximize className="h-4 w-4 md:h-5 md:w-5" />
-          )}
-        </button>
+        {!isMobile && (
+          <button
+            onClick={onToggleFullscreen}
+            disabled={isLoading}
+            className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
+          >
+            {isFullscreen ? (
+              <Minimize className="h-4 w-4 md:h-5 md:w-5" />
+            ) : (
+              <Maximize className="h-4 w-4 md:h-5 md:w-5" />
+            )}
+          </button>
+        )}
       </div>
     );
   }

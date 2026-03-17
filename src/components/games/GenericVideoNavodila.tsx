@@ -99,12 +99,12 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
       {/* Video area - fills remaining space */}
       <div
         ref={containerRef}
-        className="flex-1 flex flex-col items-center justify-center pb-0 px-0 md:pb-2 md:px-8"
+        className={`flex-1 flex flex-col ${isMobile ? 'w-full h-full' : 'items-center justify-center pb-2 px-8'}`}
         onClick={handleInteraction}
         onMouseMove={handleInteraction}
       >
         {/* Video container with overlay controls */}
-        <div className="relative w-full flex items-center justify-center" style={{ maxHeight: maxVideoHeight > 0 ? maxVideoHeight : undefined }}>
+        <div className={`relative w-full ${isMobile ? 'h-full' : 'flex items-center justify-center'}`} style={!isMobile && maxVideoHeight > 0 ? { maxHeight: maxVideoHeight } : undefined}>
           <VideoPlayer
             videoRef={videoRef}
             videoUrl={videoUrl}
