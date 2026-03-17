@@ -196,6 +196,7 @@ const VizualniPrikazUstnic = () => {
                             <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
                               <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
                                 <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
+                                  <p className="font-bold text-foreground text-2xl tracking-wide">GLAS</p>
                                   <div className={cn(
                                     "rounded-2xl flex items-center justify-center shadow-md",
                                     card.color,
@@ -207,9 +208,6 @@ const VizualniPrikazUstnic = () => {
                                       {card.sounds.join(", ")}
                                     </span>
                                   </div>
-                                  <p className="font-bold text-foreground text-2xl">
-                                    {card.title}
-                                  </p>
                                 </div>
                               </div>
                               <div className="flip-card-back flex-col p-4 md:p-6 justify-between rounded-xl bg-background shadow-md">
