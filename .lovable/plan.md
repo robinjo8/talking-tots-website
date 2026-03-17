@@ -1,32 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Preoblikovanje mobilne verzije strani Vizualni prikaz ustnic
+## Implementirane spremembe
 
-## Trenutno stanje
-Kartica zavzema skoraj celoten zaslon (`calc(100vh - 210px)`), na sprednjem delu prikaže samo barvni kvadrat s črko. Uporabnik mora swipati med karticami ali klikniti na pike.
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## Spremembe (samo mobilna verzija)
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 1. Gumbi za hitro navigacijo med glasovi
-Pod naslov "Vizualni prikaz ustnic" dodam vrstico gumbov:
-- **K** | **L** | **R** | **C S Z** | **Č Š Ž**
-- Vsak gumb ob kliku scrollne carousel na ustrezno kartico (`carouselApi.scrollTo(index)`)
-- Aktivni gumb (trenutni slide) ima polno belo ozadje, ostali so `white/20` s white tekstom
-- Gumbi so zaobljeni (`rounded-full`), v eni vrstici z `flex-wrap gap-2 justify-center`
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### 2. Manjše kartice z naslovom in gumbom
-Namesto `minHeight: calc(100vh - 210px)` uporabim avtomatsko višino. Kartica na mobilni verziji vsebuje:
-- Barvni kvadrat s črko (manjši)
-- Napis pod njim (npr. "Glas K" ali "Glasovi C, S, Z")
-- Gumb **"PRIKAŽI SLIKO"** ki obrne kartico (namesto klika na celo kartico)
+---
 
-Zadnja stran ostane enaka — slika + zvočni gumb.
+# Popravki preverjanja izgovorjave (implementirano)
 
-### 3. Odstranitev pagination dots na mobilni verziji
-Pike niso več potrebne, ker imamo gumbe za navigacijo zgoraj.
+## Implementirane spremembe
 
-### Datoteka
-Samo `src/pages/VizualniPrikazUstnic.tsx`
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
 
-Desktop ostane nespremenjen.
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
 
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
