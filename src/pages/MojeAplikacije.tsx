@@ -7,6 +7,9 @@ import { FooterSection } from "@/components/FooterSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const MojeAplikacije = () => {
   const { user, selectedChild, signOut } = useAuth();
