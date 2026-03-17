@@ -151,13 +151,6 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
         </div>
       </div>
 
-      {/* Back button */}
-      <button
-        onClick={() => navigate(backPath)}
-        className="fixed bottom-4 left-4 z-50 rounded-full w-16 h-16 bg-gradient-to-r from-amber-400 to-orange-500 shadow-lg border-2 border-white/50 backdrop-blur-sm flex items-center justify-center transition-all"
-      >
-        <ArrowLeft className="w-7 h-7 text-white" />
-      </button>
     </div>
   );
 }
