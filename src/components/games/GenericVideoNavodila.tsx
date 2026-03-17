@@ -121,7 +121,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             <div
               className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-300 ${showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
             >
-              <div className="bg-black/40 backdrop-blur-sm px-2 py-1.5 md:px-4 md:py-2 rounded-b-lg">
+              <div className="bg-black/40 backdrop-blur-sm px-2 py-1.5 md:px-6 md:py-3 rounded-b-lg">
                 <VideoProgressBar
                   currentTime={currentTime}
                   duration={duration}
