@@ -56,9 +56,9 @@ export function VideoProgressBar({
   if (compact) {
     return (
       <div className="flex items-center gap-2 px-1">
-        <span className="text-white text-xs min-w-[32px]">{formatTime(currentTime)}</span>
+        <span className="text-white text-xs md:text-sm min-w-[32px]">{formatTime(currentTime)}</span>
         <div 
-          className="relative flex-1 h-1 bg-white/30 rounded-full cursor-pointer"
+          className="relative flex-1 h-1 md:h-1.5 bg-white/30 rounded-full cursor-pointer"
           onClick={handleProgressClick}
           onMouseDown={handleProgressMouseDown}
           onMouseMove={handleProgressMouseMove}
@@ -70,11 +70,11 @@ export function VideoProgressBar({
             style={{ width: `${(currentTime / duration) * 100}%` }}
           />
           <div 
-            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-sm cursor-grab active:cursor-grabbing"
+            className="absolute top-1/2 -translate-y-1/2 w-3 h-3 md:w-4 md:h-4 bg-white rounded-full shadow-sm cursor-grab active:cursor-grabbing"
             style={{ left: `calc(${(currentTime / duration) * 100}% - 6px)` }}
           />
         </div>
-        <span className="text-white text-xs min-w-[32px] text-right">{formatTime(duration)}</span>
+        <span className="text-white text-xs md:text-sm min-w-[32px] text-right">{formatTime(duration)}</span>
       </div>
     );
   }
