@@ -82,7 +82,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
 
 
   return (
-    <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
+    <div className={`fixed inset-0 flex flex-col overflow-hidden ${isMobile ? 'bg-[hsl(135,45%,33%)]' : 'bg-background'}`}>
       
 
       {/* Video area - fills remaining space */}
