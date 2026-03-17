@@ -43,8 +43,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
   useEffect(() => {
     const calculateHeight = () => {
       const headerHeight = 64;
-      // Desktop: controls below ~120px, mobile: overlay so no extra space needed
-      const controlsHeight = isMobile ? 16 : 140;
+      const controlsHeight = 16;
       const padding = isMobile ? 16 : 48;
       const vh = window.visualViewport?.height || window.innerHeight;
       setMaxVideoHeight(vh - headerHeight - controlsHeight - padding);
@@ -59,27 +58,27 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     };
   }, [isMobile]);
 
-  // Auto-hide overlay on mobile
+  // Auto-hide overlay for all devices
   const resetOverlayTimer = useCallback(() => {
     setShowOverlay(true);
     if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
-    if (isPlaying && isMobile) {
+    if (isPlaying) {
       overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
     }
-  }, [isPlaying, isMobile]);
+  }, [isPlaying]);
 
   useEffect(() => {
-    if (isPlaying && isMobile) {
+    if (isPlaying) {
       resetOverlayTimer();
     } else {
       setShowOverlay(true);
       if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
     }
     return () => { if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current); };
-  }, [isPlaying, isMobile, resetOverlayTimer]);
+  }, [isPlaying, resetOverlayTimer]);
 
-  const handleVideoTap = () => {
-    if (isMobile) resetOverlayTimer();
+  const handleInteraction = () => {
+    resetOverlayTimer();
   };
 
   const handleMobilePlay = async () => {
