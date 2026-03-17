@@ -129,7 +129,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
                   isMuted={isMuted}
                   volume={volume}
                   isFullscreen={isFullscreen}
-                  onPlay={isMobile ? handleMobilePlay : handlers.handlePlay}
+                  onPlay={handlers.handlePlay}
                   onPause={handlers.handlePause}
                   onStop={handlers.handleStop}
                   onRestart={handlers.handleRestart}

@@ -69,7 +69,7 @@ export function VideoPlayer({
       
       <video
         ref={videoRef}
-        className="w-full h-auto object-contain rounded-lg"
+        className={`object-contain rounded-lg ${isMobile ? 'w-full h-full' : 'w-full h-auto'}`}
         style={maxHeight ? { maxHeight: `${maxHeight}px` } : undefined}
         onEnded={onEnded}
         onPlay={onPlay}
