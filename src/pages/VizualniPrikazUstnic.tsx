@@ -138,7 +138,7 @@ const VizualniPrikazUstnic = () => {
         )}
 
         {selectedChild ? (
-          <div className={cn("w-full mx-auto", isMobile ? "" : "max-w-xl")}>
+          <div className={cn("w-full mx-auto", isMobile ? "flex-1 flex items-center" : "max-w-xl")}>
             <Carousel
               setApi={setCarouselApi}
               className="w-full"
