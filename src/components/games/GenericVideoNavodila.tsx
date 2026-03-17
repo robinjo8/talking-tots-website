@@ -1,4 +1,4 @@
-import Header from "@/components/Header";
+
 import { VideoPlayer } from "@/components/video/VideoPlayer";
 import { VideoProgressBar } from "@/components/video/VideoProgressBar";
 import { VideoControls } from "@/components/video/VideoControls";
