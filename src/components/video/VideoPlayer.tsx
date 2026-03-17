@@ -33,7 +33,7 @@ export function VideoPlayer({
   onError
 }: VideoPlayerProps) {
   return (
-    <div className="aspect-video bg-black rounded-lg mb-6 overflow-hidden relative">
+    <div className="relative w-full overflow-hidden rounded-lg mb-4">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
           <div className="flex flex-col items-center gap-2 text-white">
