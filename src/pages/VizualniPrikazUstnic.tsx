@@ -17,6 +17,7 @@ const soundCards = [
     sounds: ["K"],
     image: `${STORAGE_BASE}/Glas_K.png`,
     audioUrl: null as string | null,
+    color: "bg-gradient-to-br from-app-purple to-app-purple/80",
   },
   {
     id: "glas-l",
@@ -24,6 +25,7 @@ const soundCards = [
     sounds: ["L"],
     image: `${STORAGE_BASE}/Glas_L.png`,
     audioUrl: null as string | null,
+    color: "bg-gradient-to-br from-app-blue to-app-blue/80",
   },
   {
     id: "glas-r",
@@ -31,6 +33,7 @@ const soundCards = [
     sounds: ["R"],
     image: `${STORAGE_BASE}/Glas_R.png`,
     audioUrl: null as string | null,
+    color: "bg-gradient-to-br from-app-orange to-app-orange/80",
   },
   {
     id: "glas-c-s-z",
@@ -38,6 +41,7 @@ const soundCards = [
     sounds: ["C", "S", "Z"],
     image: `${STORAGE_BASE}/Glas_SZC.png`,
     audioUrl: null as string | null,
+    color: "bg-gradient-to-br from-app-yellow to-app-yellow/80",
   },
   {
     id: "glas-c-s-z-stresnicki",
@@ -45,6 +49,7 @@ const soundCards = [
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
     audioUrl: null as string | null,
+    color: "bg-gradient-to-br from-app-red to-app-red/80",
   },
 ];
 
@@ -83,11 +88,11 @@ const VizualniPrikazUstnic = () => {
     return null;
   }
 
-  const cardHeight = isMobile ? 'calc(100vh - 200px)' : '525px';
+  const cardHeight = isMobile ? 'calc(100vh - 210px)' : '480px';
 
   return (
     <div className={cn(
-      "bg-background",
+      "bg-dragon-green",
       isMobile ? "fixed inset-0 overflow-hidden flex flex-col" : "min-h-screen"
     )}>
       <Header />
@@ -99,14 +104,13 @@ const VizualniPrikazUstnic = () => {
         {/* Title Section */}
         <div className={cn("text-center", isMobile ? "mb-2" : "mb-8")}>
           <h1 className={cn(
-            "font-bold text-foreground mb-2",
+            "font-bold text-white mb-2",
             isMobile ? "text-2xl" : "text-4xl md:text-5xl"
           )}>
             Vizualni prikaz ustnic
           </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full mb-2"></div>
           {!isMobile && (
-            <p className="text-muted-foreground text-lg">
+            <p className="text-white/80 text-lg mt-2">
               Poglej kako so ustnice postavljene pri izgovorjavi posameznega glasu
             </p>
           )}
@@ -126,26 +130,41 @@ const VizualniPrikazUstnic = () => {
                     <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
                       <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
                         <div
-                          className="flip-card cursor-pointer rounded-xl border border-border bg-card shadow-sm transition-all duration-300"
+                          className="flip-card cursor-pointer rounded-xl bg-background shadow-md transition-all duration-300 border-0"
                           style={{ minHeight: cardHeight }}
                           onClick={() => handleCardClick(card.id)}
                         >
                           <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
-                            <div className="flip-card-front flex-col p-0 overflow-hidden rounded-xl">
-                              <div className="w-full flex-1 bg-gradient-to-br from-muted/40 to-muted/20 flex flex-col items-center justify-center gap-1">
-                                <span className="text-sm font-bold text-muted-foreground opacity-80 uppercase tracking-widest">Glas</span>
-                                <span className={cn(
-                                  "font-black text-foreground drop-shadow-sm",
-                                  isMobile ? "text-4xl" : "text-5xl md:text-6xl"
-                                )}>{card.sounds.join(", ")}</span>
-                              </div>
-                              <div className="w-full bg-card py-3 px-2 flex items-center justify-center border-t border-border">
-                                <span className="text-base font-bold text-foreground text-center leading-tight">Odpri</span>
+                            {/* Front */}
+                            <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
+                              <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
+                                <div className={cn(
+                                  "rounded-2xl flex items-center justify-center shadow-md",
+                                  card.color,
+                                  isMobile ? "w-20 h-20" : "w-24 h-24"
+                                )}>
+                                  <span className={cn(
+                                    "font-black text-white",
+                                    isMobile ? "text-3xl" : "text-4xl"
+                                  )}>
+                                    {card.sounds.join(", ")}
+                                  </span>
+                                </div>
+                                <h3 className={cn(
+                                  "font-bold text-foreground text-center",
+                                  isMobile ? "text-xl" : "text-2xl"
+                                )}>
+                                  {card.title}
+                                </h3>
+                                <p className="text-muted-foreground text-base">
+                                  Klikni za prikaz
+                                </p>
                               </div>
                             </div>
-                            <div className="flip-card-back flex-col p-4 justify-between rounded-xl border border-border bg-card shadow-sm">
+                            {/* Back */}
+                            <div className="flip-card-back flex-col p-4 md:p-6 justify-between rounded-xl bg-background shadow-md">
                               <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
-                              <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[180px]" : "max-h-[312px]")} loading="lazy" />
+                              <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[180px]" : "max-h-[280px]")} loading="lazy" />
                               <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
                                 <Volume2 className="w-4 h-4" />
                                 {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
@@ -160,8 +179,8 @@ const VizualniPrikazUstnic = () => {
               </CarouselContent>
               {!isMobile && (
                 <>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  <CarouselPrevious className="text-white border-white/30 hover:bg-white/20 hover:text-white" />
+                  <CarouselNext className="text-white border-white/30 hover:bg-white/20 hover:text-white" />
                 </>
               )}
             </Carousel>
@@ -178,8 +197,8 @@ const VizualniPrikazUstnic = () => {
                   <span className={cn(
                     "rounded-full transition-all duration-300",
                     i === currentSlide
-                      ? "w-3 h-3 bg-foreground shadow-sm"
-                      : "w-2.5 h-2.5 bg-muted-foreground/40"
+                      ? "w-3 h-3 bg-white shadow-sm"
+                      : "w-2.5 h-2.5 bg-white/40"
                   )} />
                 </button>
               ))}
@@ -187,7 +206,7 @@ const VizualniPrikazUstnic = () => {
           </div>
         ) : (
           <div className="min-h-[400px] flex flex-col items-center justify-center">
-            <p className="text-lg text-destructive">
+            <p className="text-lg text-white">
               Prosimo, dodajte profil otroka v nastavitvah.
             </p>
           </div>
