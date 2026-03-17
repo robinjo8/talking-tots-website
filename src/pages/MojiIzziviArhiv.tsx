@@ -87,6 +87,8 @@ function buildCalendarGrid(year: number, month: number): CalendarDay[][] {
 
 export default function MojiIzziviArhiv() {
   const { selectedChild } = useAuth();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { data: plan, isLoading } = useMonthlyPlan(selectedChild?.id);
   const { data: trackingEntries = [] } = useSetTracking(plan?.id, selectedChild?.id);
 
