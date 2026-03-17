@@ -95,7 +95,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
       {/* Video area - fills remaining space */}
       <div
         ref={containerRef}
-        className="flex-1 flex flex-col items-center justify-center pt-16 pb-2 px-2 md:px-8"
+        className="flex-1 flex flex-col items-center justify-center pb-2 px-2 md:px-8"
         onClick={handleInteraction}
         onMouseMove={handleInteraction}
       >
