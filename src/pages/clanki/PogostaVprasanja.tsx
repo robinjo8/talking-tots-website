@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
 const PogostaVprasanja = () => {
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const faqData = [
     {
       question: "Kaj je TomiTalk in komu je namenjen?",
