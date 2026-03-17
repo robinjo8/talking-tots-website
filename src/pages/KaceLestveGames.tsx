@@ -147,9 +147,9 @@ export default function KaceLestveGames() {
         </div>
       </section>
 
-      <section className="py-12 bg-white min-h-screen">
+      <section className="py-4 md:py-12 bg-white min-h-screen">
         <div className="container max-w-6xl mx-auto px-4">
-          <div className="mb-8">
+          <div className="hidden md:block mb-8">
             <BreadcrumbNavigation />
           </div>
 

@@ -104,17 +104,17 @@ export default function ArtikulacijaVaje() {
       
       {/* Bela sekcija */}
       <section 
-        className="py-12 bg-white min-h-screen" 
+        className="py-4 md:py-12 bg-white min-h-screen" 
         style={{ backgroundColor: 'white' }}
       >
         <div className="container max-w-6xl mx-auto px-4">
           {/* Breadcrumb */}
-          <div className="mb-8">
+          <div className="hidden md:block mb-8">
             <BreadcrumbNavigation />
           </div>
           
           {/* Letters grid */}
-          <div className="mb-12">
+          <div className="mb-4 md:mb-12">
             {isMobile ? (
               /* Mobile: 2-column grid */
               <div className="grid grid-cols-3 gap-2">
