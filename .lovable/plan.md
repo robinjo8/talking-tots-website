@@ -1,49 +1,72 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Nov dizajn za Vizualni prikaz ustnic in Video navodila (posamezna črka)
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Cilj
+Obe strani preoblikujemo po vzoru sekcije "Kako deluje TomiTalk?" — zeleno ozadje (`bg-dragon-green`), bele kartice z barvno ikono, bel naslov, bele pike za navigacijo.
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+**Stran `/video-navodila` (seznam) ostane nespremenjena.**
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+## Vizualni vzorec (iz FeaturesSection)
+- Ozadje: `bg-dragon-green` čez celotno stran
+- Naslov: bel, krepak (`text-white`)
+- Kartica: `bg-background rounded-xl shadow-md p-6 md:p-8`, brez obrobe
+- Znotraj kartice: barvna ikona v zaobljenem kvadratu (`rounded-2xl`), naslov, opis
+- Pike: bele (`bg-white` / `bg-white/40`)
+- Puščice: bele/svetle na zelenem ozadju (samo desktop)
 
 ---
 
-# Popravki preverjanja izgovorjave (implementirano)
+## 1. `src/pages/VizualniPrikazUstnic.tsx`
 
-## Implementirane spremembe
+### Layout
+- Celotna stran dobi `bg-dragon-green` namesto `bg-background`
+- Na mobilni: ohrani `fixed inset-0 overflow-hidden`
+- Na desktopu: `min-h-screen`
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+### Naslov
+- Bel naslov (`text-white`), brez rumene črtice
+- Opis tudi bel (`text-white/80`)
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+### Kartice (carousel, ena naenkrat, BREZ autoplay)
+- Ohrani carousel z `loop: false`, brez avtomatskega premikanja
+- Kartica: `bg-background rounded-xl shadow-md p-6 md:p-8` (kot FeatureItem)
+- Sprednja stran flip kartice: barvna ikona v zaobljenem kvadratu (npr. `bg-gradient-to-br from-app-purple to-app-purple/80 rounded-2xl w-20 h-20`), pod njo naslov glasu (npr. "Glas K"), pod naslovom "Klikni za prikaz"
+- Zadnja stran flip kartice: ohrani sliko artikulacije in gumb za zvok
+- Ohrani flip logiko (klik odpre/zapre)
 
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+### Pike in puščice
+- Pike: bele (`bg-white` / `bg-white/40`) kot v CarouselPagination
+- Desktop puščice: bele/svetle na zelenem ozadju
 
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
+### Floating back gumb
+- Ohrani obstoječega (oranžen, levo spodaj)
+
+---
+
+## 2. `src/components/games/GenericVideoNavodila.tsx`
+
+### Layout
+- Celotna stran dobi `bg-dragon-green` namesto `bg-background`
+- Na mobilni: dodaj `fixed inset-0 overflow-hidden flex flex-col` (no-scroll)
+- Na desktopu: `min-h-screen`
+
+### Naslov
+- Bel naslov (`text-white`), brez rumene črtice
+- Opis bel (`text-white/80`)
+
+### Kartica z videom
+- Ena sama kartica (ni carousela, ni drsanja) — to je že obstoječe obnašanje
+- Kartica: `bg-background rounded-xl shadow-md p-6 md:p-8` (kot FeatureItem), brez obrobe
+- Znotraj: ohrani VideoPlayer, VideoProgressBar, VideoControls — vse funkcionalne gumbe
+
+### Floating back gumb
+- Na mobilni: ohrani obstoječi oranžni back gumb
+- Na desktopu: dodaj back gumb ali ohrani obstoječo navigacijo
+
+---
+
+## Datoteke za spremembo
+1. `src/pages/VizualniPrikazUstnic.tsx` — nov zeleni dizajn, bele kartice, bele pike
+2. `src/components/games/GenericVideoNavodila.tsx` — nov zeleni dizajn, bela kartica z videom
+
