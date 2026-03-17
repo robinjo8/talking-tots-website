@@ -147,47 +147,76 @@ const VizualniPrikazUstnic = () => {
                 {soundCards.map((card) => {
                   const isFlipped = flippedCardId === card.id;
                   return (
-                    <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
+                     <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
                       <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
                         <div
-                          className="flip-card cursor-pointer rounded-xl bg-background shadow-md transition-all duration-300 border-0"
+                          className={cn(
+                            "flip-card rounded-xl bg-background shadow-md transition-all duration-300 border-0",
+                            !isMobile && "cursor-pointer"
+                          )}
                           style={{ minHeight: cardHeight }}
-                          onClick={() => handleCardClick(card.id)}
+                          onClick={() => !isMobile && handleCardClick(card.id)}
                         >
-                          <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
+                          <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: isMobile ? undefined : cardHeight }}>
                             {/* Front */}
-                            <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
-                              <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
-                                <p className={cn(
-                                  "font-bold text-foreground uppercase tracking-wide",
-                                  isMobile ? "text-xl" : "text-2xl"
-                                )}>
-                                  {card.sounds.length > 1 ? "GLASOVI" : "GLAS"}
-                                </p>
+                            <div className={cn(
+                              "flip-card-front flex-col overflow-hidden rounded-xl bg-background",
+                              isMobile ? "p-5" : "p-6 md:p-8"
+                            )}>
+                              <div className={cn(
+                                "w-full flex flex-col items-center gap-3",
+                                !isMobile && "flex-1 justify-center gap-4"
+                              )}>
                                 <div className={cn(
                                   "rounded-2xl flex items-center justify-center shadow-md",
                                   card.color,
                                   card.sounds.length > 1
-                                    ? (isMobile ? "px-6 py-4 min-w-[160px] h-20" : "px-8 py-5 min-w-[200px] h-24")
-                                    : (isMobile ? "w-20 h-20" : "w-24 h-24")
+                                    ? (isMobile ? "px-5 py-3 min-w-[140px]" : "px-8 py-5 min-w-[200px] h-24")
+                                    : (isMobile ? "w-16 h-16" : "w-24 h-24")
                                 )}>
                                   <span className={cn(
                                     "font-black text-white whitespace-nowrap",
-                                    isMobile ? "text-3xl" : "text-4xl"
+                                    isMobile ? "text-2xl" : "text-4xl"
                                   )}>
                                     {card.sounds.join(", ")}
                                   </span>
                                 </div>
+                                <p className={cn(
+                                  "font-bold text-foreground",
+                                  isMobile ? "text-base" : "text-2xl"
+                                )}>
+                                  {card.title}
+                                </p>
+                                {isMobile && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="mt-1 gap-2"
+                                    onClick={(e) => { e.stopPropagation(); handleCardClick(card.id); }}
+                                  >
+                                    PRIKAŽI SLIKO
+                                  </Button>
+                                )}
                               </div>
                             </div>
                             {/* Back */}
-                            <div className="flip-card-back flex-col p-4 md:p-6 justify-between rounded-xl bg-background shadow-md">
+                            <div className={cn(
+                              "flip-card-back flex-col justify-between rounded-xl bg-background shadow-md",
+                              isMobile ? "p-4" : "p-4 md:p-6"
+                            )}>
                               <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
                               <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[180px]" : "max-h-[280px]")} loading="lazy" />
-                              <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
-                                <Volume2 className="w-4 h-4" />
-                                {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
-                              </Button>
+                              <div className="flex gap-2 w-full">
+                                <Button variant="outline" size="sm" className="flex-1 gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                                  <Volume2 className="w-4 h-4" />
+                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                </Button>
+                                {isMobile && (
+                                  <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleCardClick(card.id); }}>
+                                    Nazaj
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
