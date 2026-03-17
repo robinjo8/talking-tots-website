@@ -157,8 +157,11 @@ export default function PonoviPoved() {
         </div>
 
         {/* Card Content */}
-        <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
-          <h3 className={`text-xl font-bold mb-3 group-hover:text-app-blue transition-colors ${!isAvailable ? 'text-gray-500' : 'text-foreground'}`}>
+        <div className={isMobile ? "p-1.5 text-center" : "p-6"}>
+          <h3 className={isMobile
+            ? `text-xs font-bold group-hover:text-app-blue transition-colors leading-tight ${!isAvailable ? 'text-muted-foreground' : 'text-foreground'}`
+            : `text-xl font-bold mb-3 group-hover:text-app-blue transition-colors ${!isAvailable ? 'text-muted-foreground' : 'text-foreground'}`
+          }>
             {letter.id === 'r-zacetek' ? 'Glas R - začetne vaje' : `Glas ${letter.letter}`}
           </h3>
           {!isMobile && (
