@@ -1,6 +1,10 @@
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { TongueGymGame } from "@/components/games/TongueGymGame";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 // Auth protection is now handled by ProtectedRoute in routes.tsx
 const VajeZaJezik = () => {
