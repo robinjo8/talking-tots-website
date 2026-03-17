@@ -117,7 +117,7 @@ export default function ArtikulacijaVaje() {
           <div className="mb-12">
             {isMobile ? (
               /* Mobile: 2-column grid */
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-2">
                 {artikulacijaLetters.map(letter => (
                   <LetterCard key={letter.id} letter={letter} />
                 ))}
