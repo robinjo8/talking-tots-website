@@ -39,7 +39,7 @@ export function VideoPlayer({
   onError
 }: VideoPlayerProps) {
   return (
-    <div className={`relative inline-flex flex-col max-w-full overflow-hidden rounded-lg ${isMobile ? 'w-full h-full bg-[hsl(135,45%,33%)]' : ''}`}>
+    <div className={`relative inline-flex flex-col max-w-full overflow-hidden rounded-lg ${isMobile ? 'w-full h-full bg-white' : ''}`}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
           <div className="flex flex-col items-center gap-2 text-white">
