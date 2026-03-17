@@ -163,7 +163,7 @@ export default function DrsnaSestavljanka() {
           <img 
             src={game.image}
             alt={`Glas ${game.letter}`}
-            className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+            className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
             style={{ mixBlendMode: 'multiply' }}
           />
         </div>
