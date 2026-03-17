@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 const LogopedskiKoticek = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   // NOTE: We do NOT redirect or require auth here!
   // Optionally allow guests and users.
