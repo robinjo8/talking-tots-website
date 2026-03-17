@@ -55,8 +55,11 @@ export default function ArtikulacijaVaje() {
       </div>
 
       {/* Card Content */}
-      <div className={`p-6 ${isMobile ? 'text-center' : ''}`}>
-        <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors">
+      <div className={isMobile ? "p-1.5 text-center" : "p-6"}>
+        <h3 className={isMobile
+          ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight"
+          : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+        }>
           {letter.title}
         </h3>
         {!isMobile && (
