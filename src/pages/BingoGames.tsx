@@ -94,7 +94,7 @@ export default function BingoGames() {
           </div>
           
           {selectedChild ? (
-            <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
+            <div className={isMobile ? "grid grid-cols-3 gap-2" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {bingoLetters.map((item) => (
                 <div
                   key={item.id}
