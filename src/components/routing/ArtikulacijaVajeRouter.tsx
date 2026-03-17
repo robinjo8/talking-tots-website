@@ -1,64 +1,35 @@
-import { useParams, Navigate, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { ArrowLeft } from "lucide-react";
+import { useParams, Navigate } from "react-router-dom";
+import { GenericVideoNavodila } from "@/components/games/GenericVideoNavodila";
 
-const letterMap: Record<string, string> = {
-  c: "C",
-  ch: "Č",
-  k: "K",
-  l: "L",
-  r: "R",
-  s: "S",
-  sh: "Š",
-  z: "Z",
-  zh: "Ž",
+const VIDEO_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video/";
+
+const letterConfig: Record<string, { display: string; file: string }> = {
+  c:  { display: "C", file: "Glas_C.mp4" },
+  ch: { display: "Č", file: "Glas_CH.mp4" },
+  k:  { display: "K", file: "Glas_K.mp4" },
+  l:  { display: "L", file: "Glas_L.mp4" },
+  r:  { display: "R", file: "Glas_R.mp4" },
+  s:  { display: "S", file: "Glas_S.mp4" },
+  sh: { display: "Š", file: "Glas_SH.mp4" },
+  z:  { display: "Z", file: "Glas_Z.mp4" },
+  zh: { display: "Ž", file: "Glas_ZH.mp4" },
 };
 
 export default function ArtikulacijaVajeRouter() {
   const { gameId } = useParams<{ gameId: string }>();
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
 
-  if (!gameId || !letterMap[gameId]) {
+  if (!gameId || !letterConfig[gameId]) {
     return <Navigate to="/govorno-jezikovne-vaje/artikulacija" replace />;
   }
 
-  const displayLetter = letterMap[gameId];
-
-  if (isMobile) {
-    return (
-      <div className="fixed inset-0 overflow-hidden flex flex-col bg-background">
-        <Header />
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-20">
-          <button
-            onClick={() => navigate("/govorno-jezikovne-vaje/artikulacija")}
-            className="absolute top-20 left-4 z-10 flex items-center gap-1 text-sm font-semibold px-3 py-1.5 rounded-full bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-md"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Nazaj
-          </button>
-          <h1 className="text-3xl font-bold text-foreground mb-4">Glas {displayLetter}</h1>
-          <p className="text-muted-foreground text-center">Stran je v pripravi 🚧</p>
-        </div>
-      </div>
-    );
-  }
+  const config = letterConfig[gameId];
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <div className="pt-28 flex flex-col items-center justify-center min-h-[60vh]">
-        <h1 className="text-4xl font-bold text-foreground mb-4">Glas {displayLetter}</h1>
-        <p className="text-muted-foreground">Stran je v pripravi 🚧</p>
-        <button
-          onClick={() => navigate("/govorno-jezikovne-vaje/artikulacija")}
-          className="mt-6 flex items-center gap-2 text-sm font-semibold px-4 py-2 rounded-full bg-gradient-to-r from-orange-400 to-amber-500 text-white shadow-md hover:shadow-lg transition-shadow"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Nazaj na artikulacijo
-        </button>
-      </div>
-    </div>
+    <GenericVideoNavodila
+      title={`Glas ${config.display}`}
+      videoUrl={`${VIDEO_BASE}${config.file}`}
+      displayLetter={config.display}
+      backPath="/govorno-jezikovne-vaje/artikulacija"
+    />
   );
 }

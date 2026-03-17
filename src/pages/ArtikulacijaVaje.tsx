@@ -72,7 +72,7 @@ export default function ArtikulacijaVaje() {
       )}>
         <div className={cn("text-center", isMobile ? "mb-2" : "mb-6")}>
           <h1 className={cn("font-bold text-foreground mb-2", isMobile ? "text-2xl" : "text-4xl md:text-5xl")}>
-            Artikulacija
+            Moji prvi glasovi
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
