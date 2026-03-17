@@ -38,6 +38,16 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     handlers
   } = useVideoPlayer(videoUrl);
 
+  const handleMobilePlay = async () => {
+    await handlers.handlePlay();
+    // Auto-fullscreen on mobile
+    if (isMobile) {
+      setTimeout(() => {
+        handlers.handleToggleFullscreen();
+      }, 300);
+    }
+  };
+
   return (
     <div className={cn(
       "bg-dragon-green",
