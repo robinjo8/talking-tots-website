@@ -107,7 +107,7 @@ export default function BingoGames() {
                       <img 
                         src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${item.image}`}
                         alt={item.title}
-                        className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+                        className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                         style={{ mixBlendMode: 'multiply' }}
                       />
                     </div>
