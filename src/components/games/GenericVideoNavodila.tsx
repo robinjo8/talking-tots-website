@@ -89,16 +89,17 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
   };
 
   return (
-    <div className="fixed inset-0 bg-dragon-green flex flex-col overflow-hidden">
+    <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
       <Header />
 
       {/* Video area - fills remaining space */}
       <div
         ref={containerRef}
         className="flex-1 flex flex-col items-center justify-center pt-16 pb-2 px-2 md:px-8"
-        onClick={handleVideoTap}
+        onClick={handleInteraction}
+        onMouseMove={handleInteraction}
       >
-        {/* Video container with overlay controls on mobile */}
+        {/* Video container with overlay controls */}
         <div className="relative w-full flex items-center justify-center" style={{ maxHeight: maxVideoHeight > 0 ? maxVideoHeight : undefined }}>
           <VideoPlayer
             videoRef={videoRef}
@@ -116,67 +117,38 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             onError={handlers.handleError}
             maxHeight={maxVideoHeight}
           >
-            {/* Mobile overlay controls */}
-            {isMobile && (
-              <div
-                className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-300 ${showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-              >
-                <div className="bg-black/40 backdrop-blur-sm px-2 py-1.5 rounded-b-lg">
-                  <VideoProgressBar
-                    currentTime={currentTime}
-                    duration={duration}
-                    onSeek={handlers.seekToTime}
-                    isSeekingMode={isSeekingMode}
-                    setIsSeekingMode={setIsSeekingMode}
-                    compact
-                  />
-                  <VideoControls
-                    isPlaying={isPlaying}
-                    isLoading={isLoading}
-                    isMuted={isMuted}
-                    volume={volume}
-                    isFullscreen={isFullscreen}
-                    onPlay={handleMobilePlay}
-                    onPause={handlers.handlePause}
-                    onStop={handlers.handleStop}
-                    onRestart={handlers.handleRestart}
-                    onToggleMute={handlers.handleToggleMute}
-                    onVolumeChange={handlers.handleVolumeChange}
-                    onToggleFullscreen={handlers.handleToggleFullscreen}
-                    overlay
-                  />
-                </div>
+            {/* Overlay controls for all devices */}
+            <div
+              className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-300 ${showOverlay ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+            >
+              <div className="bg-black/40 backdrop-blur-sm px-2 py-1.5 md:px-4 md:py-2 rounded-b-lg">
+                <VideoProgressBar
+                  currentTime={currentTime}
+                  duration={duration}
+                  onSeek={handlers.seekToTime}
+                  isSeekingMode={isSeekingMode}
+                  setIsSeekingMode={setIsSeekingMode}
+                  compact
+                />
+                <VideoControls
+                  isPlaying={isPlaying}
+                  isLoading={isLoading}
+                  isMuted={isMuted}
+                  volume={volume}
+                  isFullscreen={isFullscreen}
+                  onPlay={isMobile ? handleMobilePlay : handlers.handlePlay}
+                  onPause={handlers.handlePause}
+                  onStop={handlers.handleStop}
+                  onRestart={handlers.handleRestart}
+                  onToggleMute={handlers.handleToggleMute}
+                  onVolumeChange={handlers.handleVolumeChange}
+                  onToggleFullscreen={handlers.handleToggleFullscreen}
+                  overlay
+                />
               </div>
-            )}
+            </div>
           </VideoPlayer>
         </div>
-
-        {/* Desktop controls below video */}
-        {!isMobile && (
-          <div className="w-full max-w-4xl mt-3">
-            <VideoProgressBar
-              currentTime={currentTime}
-              duration={duration}
-              onSeek={handlers.seekToTime}
-              isSeekingMode={isSeekingMode}
-              setIsSeekingMode={setIsSeekingMode}
-            />
-            <VideoControls
-              isPlaying={isPlaying}
-              isLoading={isLoading}
-              isMuted={isMuted}
-              volume={volume}
-              isFullscreen={isFullscreen}
-              onPlay={handlers.handlePlay}
-              onPause={handlers.handlePause}
-              onStop={handlers.handleStop}
-              onRestart={handlers.handleRestart}
-              onToggleMute={handlers.handleToggleMute}
-              onVolumeChange={handlers.handleVolumeChange}
-              onToggleFullscreen={handlers.handleToggleFullscreen}
-            />
-          </div>
-        )}
       </div>
 
       {/* Back button */}
