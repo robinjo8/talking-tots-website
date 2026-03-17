@@ -76,7 +76,7 @@ export default function GovorneIgre() {
       >
         <div className="container max-w-6xl mx-auto px-4">
           {/* Breadcrumb */}
-          <div className="mb-8">
+          <div className="hidden md:block mb-8">
             <BreadcrumbNavigation />
           </div>
           

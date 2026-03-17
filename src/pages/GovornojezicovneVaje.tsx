@@ -101,7 +101,7 @@ const GovornojezicovneVaje = () => {
       
       {/* Bela sekcija z vajami */}
       <section 
-        className="py-12 bg-white min-h-screen" 
+        className="py-4 md:py-12 bg-white min-h-screen" 
         style={{ backgroundColor: 'white' }}
       >
         <div className="container max-w-6xl mx-auto px-4">
