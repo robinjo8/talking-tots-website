@@ -49,7 +49,7 @@ const soundCards = [
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
     audioUrl: null as string | null,
-    color: "bg-gradient-to-br from-app-red to-app-red/80",
+    color: "bg-gradient-to-br from-app-red to-app-red/80 text-white",
   },
 ];
 
@@ -138,27 +138,26 @@ const VizualniPrikazUstnic = () => {
                             {/* Front */}
                             <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
                               <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
+                                <p className={cn(
+                                  "font-bold text-foreground uppercase tracking-wide",
+                                  isMobile ? "text-xl" : "text-2xl"
+                                )}>
+                                  {card.sounds.length > 1 ? "GLASOVI" : "GLAS"}
+                                </p>
                                 <div className={cn(
                                   "rounded-2xl flex items-center justify-center shadow-md",
                                   card.color,
-                                  isMobile ? "w-20 h-20" : "w-24 h-24"
+                                  card.sounds.length > 1
+                                    ? (isMobile ? "px-6 py-4 min-w-[160px] h-20" : "px-8 py-5 min-w-[200px] h-24")
+                                    : (isMobile ? "w-20 h-20" : "w-24 h-24")
                                 )}>
                                   <span className={cn(
-                                    "font-black text-white",
+                                    "font-black text-white whitespace-nowrap",
                                     isMobile ? "text-3xl" : "text-4xl"
                                   )}>
                                     {card.sounds.join(", ")}
                                   </span>
                                 </div>
-                                <h3 className={cn(
-                                  "font-bold text-foreground text-center",
-                                  isMobile ? "text-xl" : "text-2xl"
-                                )}>
-                                  {card.title}
-                                </h3>
-                                <p className="text-muted-foreground text-base">
-                                  Klikni za prikaz
-                                </p>
                               </div>
                             </div>
                             {/* Back */}
@@ -179,8 +178,8 @@ const VizualniPrikazUstnic = () => {
               </CarouselContent>
               {!isMobile && (
                 <>
-                  <CarouselPrevious className="text-white border-white/30 hover:bg-white/20 hover:text-white" />
-                  <CarouselNext className="text-white border-white/30 hover:bg-white/20 hover:text-white" />
+                  <CarouselPrevious className="bg-white text-dragon-green border-white hover:bg-white/90 hover:text-dragon-green" />
+                  <CarouselNext className="bg-white text-dragon-green border-white hover:bg-white/90 hover:text-dragon-green" />
                 </>
               )}
             </Carousel>
