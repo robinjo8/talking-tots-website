@@ -8,6 +8,7 @@ interface VideoPlayerProps {
   error: string | null;
   isMuted: boolean;
   maxHeight?: number;
+  isMobile?: boolean;
   children?: React.ReactNode;
   onEnded: () => void;
   onPlay: () => void;
