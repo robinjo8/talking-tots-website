@@ -41,60 +41,60 @@ export function VideoControls({
   // Overlay mode (mobile inside video)
   if (overlay) {
     return (
-      <div className="flex justify-center items-center gap-3 py-1">
+      <div className="flex justify-center items-center gap-3 md:gap-5 py-1">
         <button
           onClick={onPlay}
           disabled={isPlaying || isLoading}
-          className="text-white disabled:opacity-40 p-1.5"
+          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
         >
-          <Play className="h-5 w-5" />
+          <Play className="h-5 w-5 md:h-6 md:w-6" />
         </button>
         
         <button
           onClick={onPause}
           disabled={!isPlaying || isLoading}
-          className="text-white disabled:opacity-40 p-1.5"
+          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
         >
-          <Pause className="h-5 w-5" />
+          <Pause className="h-5 w-5 md:h-6 md:w-6" />
         </button>
         
         <button
           onClick={onStop}
           disabled={isLoading}
-          className="text-white disabled:opacity-40 p-1.5"
+          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
         >
-          <Square className="h-4 w-4" />
+          <Square className="h-4 w-4 md:h-5 md:w-5" />
         </button>
         
         <button
           onClick={onRestart}
           disabled={isLoading}
-          className="text-white disabled:opacity-40 p-1.5"
+          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
         >
-          <RotateCcw className="h-4 w-4" />
+          <RotateCcw className="h-4 w-4 md:h-5 md:w-5" />
         </button>
         
         <button
           onClick={onToggleMute}
           disabled={isLoading}
-          className="text-white disabled:opacity-40 p-1.5"
+          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
         >
           {isMuted || volume === 0 ? (
-            <VolumeX className="h-4 w-4" />
+            <VolumeX className="h-4 w-4 md:h-5 md:w-5" />
           ) : (
-            <Volume2 className="h-4 w-4" />
+            <Volume2 className="h-4 w-4 md:h-5 md:w-5" />
           )}
         </button>
 
         <button
           onClick={onToggleFullscreen}
           disabled={isLoading}
-          className="text-white disabled:opacity-40 p-1.5"
+          className="text-white disabled:opacity-40 p-1.5 md:p-2.5"
         >
           {isFullscreen ? (
-            <Minimize className="h-4 w-4" />
+            <Minimize className="h-4 w-4 md:h-5 md:w-5" />
           ) : (
-            <Maximize className="h-4 w-4" />
+            <Maximize className="h-4 w-4 md:h-5 md:w-5" />
           )}
         </button>
       </div>

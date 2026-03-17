@@ -1,24 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Desktop overlay kontrole — povečanje in vizualna izboljšava
+## Implementirane spremembe
 
-## Trenutno stanje
-Kontrole (progress bar + gumbi) SO že znotraj videa kot overlay na vseh napravah. Vendar so na desktopju premajhne — uporabljajo mobilne velikosti ikon (`h-4 w-4`), kar je na velikem zaslonu komaj vidno.
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## Spremembe
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### 1. `VideoControls.tsx` — večje ikone in gumbi na desktopju v overlay načinu
-- Overlay način: na desktopju (`md:`) uporabi večje ikone (`md:h-6 md:w-6`) in večji padding (`md:p-2.5`)
-- Več razmaka med gumbi na desktopju (`md:gap-5`)
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### 2. `VideoProgressBar.tsx` — debelejši progress bar na desktopju
-- Compact način: na desktopju uporabi debelejši trak (`md:h-1.5`), večji drag handle (`md:w-4 md:h-4`), večji tekst (`md:text-sm`)
+---
 
-### 3. `GenericVideoNavodila.tsx` — večji padding overlay traku na desktopju
-- Overlay container: `md:px-6 md:py-3` za več prostora okoli kontrol na desktopju
+# Popravki preverjanja izgovorjave (implementirano)
 
-### Datoteke
-1. `src/components/video/VideoControls.tsx`
-2. `src/components/video/VideoProgressBar.tsx`
-3. `src/components/games/GenericVideoNavodila.tsx`
+## Implementirane spremembe
 
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
