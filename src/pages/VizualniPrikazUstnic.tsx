@@ -178,8 +178,8 @@ const VizualniPrikazUstnic = () => {
               </CarouselContent>
               {!isMobile && (
                 <>
-                  <CarouselPrevious className="text-white border-white/30 hover:bg-white/20 hover:text-white" />
-                  <CarouselNext className="text-white border-white/30 hover:bg-white/20 hover:text-white" />
+                  <CarouselPrevious className="bg-white text-dragon-green border-white hover:bg-white/90 hover:text-dragon-green" />
+                  <CarouselNext className="bg-white text-dragon-green border-white hover:bg-white/90 hover:text-dragon-green" />
                 </>
               )}
             </Carousel>
