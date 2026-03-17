@@ -8,6 +8,7 @@ interface VideoPlayerProps {
   error: string | null;
   isMuted: boolean;
   maxHeight?: number;
+  isMobile?: boolean;
   children?: React.ReactNode;
   onEnded: () => void;
   onPlay: () => void;
@@ -26,6 +27,7 @@ export function VideoPlayer({
   error,
   isMuted,
   maxHeight,
+  isMobile = false,
   children,
   onEnded,
   onPlay,
@@ -37,7 +39,7 @@ export function VideoPlayer({
   onError
 }: VideoPlayerProps) {
   return (
-    <div className="relative inline-flex flex-col max-w-full overflow-hidden rounded-lg">
+    <div className={`relative inline-flex flex-col max-w-full overflow-hidden rounded-lg ${isMobile ? 'w-full h-full' : ''}`}>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
           <div className="flex flex-col items-center gap-2 text-white">
@@ -67,7 +69,7 @@ export function VideoPlayer({
       
       <video
         ref={videoRef}
-        className="w-full h-auto object-contain rounded-lg"
+        className={`object-contain rounded-lg ${isMobile ? 'w-full h-full' : 'w-full h-auto'}`}
         style={maxHeight ? { maxHeight: `${maxHeight}px` } : undefined}
         onEnded={onEnded}
         onPlay={onPlay}

@@ -1,29 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Mobilna verzija video navodil — celozaslonski prikaz brez auto-fullscreen
+## Implementirane spremembe
 
-## Problem
-Na mobilni verziji se ob pritisku Play video samodejno preklopi v native fullscreen (`handleMobilePlay` kliče `handleToggleFullscreen`). Uporabnik želi, da video zapolni celoten zaslon znotraj brskalnika (od vrha do dna) brez native fullscreen-a.
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## Spremembe
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### `GenericVideoNavodila.tsx`
-1. **Odstrani `handleMobilePlay`** — na mobilni verziji uporabi navaden `handlers.handlePlay` namesto `handleMobilePlay` (ki kliče fullscreen)
-2. **Mobilni layout — video čez cel zaslon**: Na mobilni verziji odstrani padding (`px-0`, `pb-0`) in nastavi video container na `w-full h-full` da video zapolni celoten viewport
-3. **`maxVideoHeight` na mobilni = celoten viewport**: Zmanjšaj/odstrani odbitke za padding na mobilni verziji (kontrole so overlay, torej ne rabijo dodatnega prostora)
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### Konkretne spremembe:
-- Vrstica 83-88: Odstrani `handleMobilePlay` funkcijo
-- Vrstica 138: Spremeni `onPlay={isMobile ? handleMobilePlay : handlers.handlePlay}` → `onPlay={handlers.handlePlay}`
-- Vrstica 46: Padding za mobilni nastavi na 0: `const padding = isMobile ? 0 : 48;`
-- Vrstica 45: `controlsHeight` na mobilni nastavi na 0
-- Vrstica 97: Mobilni padding: `pb-0 px-0 md:pb-2 md:px-8`
-- Video element v `VideoPlayer.tsx`: Na mobilni dodaj `w-full h-full object-contain` da zapolni celoten prostor
+---
 
-### `VideoPlayer.tsx`
-- Video element naj na mobilni verziji uporablja `w-full h-full` namesto samo `w-full h-auto`, da se raztegne čez celoten razpoložljiv prostor
+# Popravki preverjanja izgovorjave (implementirano)
 
-### Datoteke
-1. `src/components/games/GenericVideoNavodila.tsx`
-2. `src/components/video/VideoPlayer.tsx`
+## Implementirane spremembe
 
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje

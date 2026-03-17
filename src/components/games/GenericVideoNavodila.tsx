@@ -42,8 +42,8 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
   // Calculate available height for video
   useEffect(() => {
     const calculateHeight = () => {
-      const controlsHeight = 16;
-      const padding = isMobile ? 16 : 48;
+      const controlsHeight = isMobile ? 0 : 16;
+      const padding = isMobile ? 0 : 48;
       const vh = window.visualViewport?.height || window.innerHeight;
       setMaxVideoHeight(vh - controlsHeight - padding);
     };
@@ -80,12 +80,6 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
     resetOverlayTimer();
   };
 
-  const handleMobilePlay = async () => {
-    await handlers.handlePlay();
-    if (isMobile) {
-      setTimeout(() => handlers.handleToggleFullscreen(), 300);
-    }
-  };
 
   return (
     <div className="fixed inset-0 bg-background flex flex-col overflow-hidden">
@@ -94,7 +88,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
       {/* Video area - fills remaining space */}
       <div
         ref={containerRef}
-        className="flex-1 flex flex-col items-center justify-center pb-2 px-2 md:px-8"
+        className="flex-1 flex flex-col items-center justify-center pb-0 px-0 md:pb-2 md:px-8"
         onClick={handleInteraction}
         onMouseMove={handleInteraction}
       >
@@ -115,6 +109,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
             onTimeUpdate={handlers.handleTimeUpdate}
             onError={handlers.handleError}
             maxHeight={maxVideoHeight}
+            isMobile={isMobile}
           >
             {/* Overlay controls for all devices */}
             <div
@@ -135,7 +130,7 @@ export function GenericVideoNavodila({ title, videoUrl, displayLetter, backPath 
                   isMuted={isMuted}
                   volume={volume}
                   isFullscreen={isFullscreen}
-                  onPlay={isMobile ? handleMobilePlay : handlers.handlePlay}
+                  onPlay={handlers.handlePlay}
                   onPause={handlers.handlePause}
                   onStop={handlers.handleStop}
                   onRestart={handlers.handleRestart}
