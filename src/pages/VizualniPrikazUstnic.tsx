@@ -88,21 +88,21 @@ const VizualniPrikazUstnic = () => {
     return null;
   }
 
-  const cardHeight = isMobile ? 'auto' : '480px';
+  const cardHeight = '480px';
 
   return (
     <div className={cn(
       "bg-dragon-green",
-      isMobile ? "fixed inset-0 overflow-hidden flex flex-col" : "min-h-screen"
+      isMobile ? "fixed inset-0 overflow-auto flex flex-col" : "min-h-screen"
     )}>
       <Header />
 
       <div className={cn(
         "container max-w-4xl mx-auto px-4",
-        isMobile ? "flex-1 flex flex-col overflow-hidden pt-20 pb-2" : "pt-28 md:pt-32 pb-20"
+        isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
       )}>
         {/* Title Section */}
-        <div className={cn("text-center", isMobile ? "mb-2" : "mb-8")}>
+        <div className={cn("text-center", isMobile ? "mb-3" : "mb-6")}>
           <h1 className={cn(
             "font-bold text-white mb-2",
             isMobile ? "text-2xl" : "text-4xl md:text-5xl"
@@ -116,18 +116,19 @@ const VizualniPrikazUstnic = () => {
           )}
         </div>
 
-        {/* Mobile letter navigation buttons */}
-        {isMobile && selectedChild && (
-          <div className="flex flex-wrap gap-2 justify-center mb-3">
+        {/* Letter navigation buttons - all devices */}
+        {selectedChild && (
+          <div className="flex flex-wrap gap-2 justify-center mb-4">
             {soundCards.map((card, i) => (
               <button
                 key={card.id}
                 onClick={() => { carouselApi?.scrollTo(i); }}
                 className={cn(
-                  "rounded-full px-4 py-1.5 text-sm font-bold transition-all duration-200",
+                  "rounded-full px-4 py-1.5 font-bold transition-all duration-200",
+                  isMobile ? "text-sm" : "text-base px-5 py-2",
                   i === currentSlide
                     ? "bg-white text-dragon-green shadow-sm"
-                    : "bg-white/20 text-white"
+                    : "bg-white/20 text-white hover:bg-white/30"
                 )}
               >
                 {card.sounds.join(" ")}
@@ -137,89 +138,99 @@ const VizualniPrikazUstnic = () => {
         )}
 
         {selectedChild ? (
-          <div className={cn("w-full mx-auto", isMobile ? "flex-1 flex flex-col overflow-hidden" : "max-w-xl")}>
+          <div className={cn("w-full mx-auto", isMobile ? "" : "max-w-xl")}>
             <Carousel
               setApi={setCarouselApi}
-              className={cn("w-full", isMobile && "flex-1")}
+              className="w-full"
               opts={{ align: "center", loop: false }}
             >
               <CarouselContent className={isMobile ? "" : "-ml-0"}>
                 {soundCards.map((card) => {
                   const isFlipped = flippedCardId === card.id;
                   return (
-                     <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
+                    <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
                       <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
-                        <div
-                          className={cn(
-                            "flip-card rounded-xl bg-background shadow-md transition-all duration-300 border-0",
-                            !isMobile && "cursor-pointer"
-                          )}
-                          style={{ minHeight: cardHeight }}
-                          onClick={() => !isMobile && handleCardClick(card.id)}
-                        >
-                          <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: isMobile ? undefined : cardHeight }}>
-                            {/* Front */}
-                            <div className={cn(
-                              "flip-card-front flex-col overflow-hidden rounded-xl bg-background",
-                              isMobile ? "p-5" : "p-6 md:p-8"
-                            )}>
-                              <div className={cn(
-                                "w-full flex flex-col items-center gap-3",
-                                !isMobile && "flex-1 justify-center gap-4"
-                              )}>
+                        {isMobile ? (
+                          /* Mobile: simple show/hide instead of flip */
+                          <div className="rounded-xl bg-background shadow-md">
+                            {!isFlipped ? (
+                              <div className="flex flex-col items-center gap-3 p-6">
                                 <div className={cn(
                                   "rounded-2xl flex items-center justify-center shadow-md",
                                   card.color,
                                   card.sounds.length > 1
-                                    ? (isMobile ? "px-5 py-3 min-w-[140px]" : "px-8 py-5 min-w-[200px] h-24")
-                                    : (isMobile ? "w-16 h-16" : "w-24 h-24")
+                                    ? "px-5 py-3 min-w-[140px]"
+                                    : "w-16 h-16"
                                 )}>
-                                  <span className={cn(
-                                    "font-black text-white whitespace-nowrap",
-                                    isMobile ? "text-2xl" : "text-4xl"
-                                  )}>
+                                  <span className="font-black text-white whitespace-nowrap text-2xl">
                                     {card.sounds.join(", ")}
                                   </span>
                                 </div>
-                                <p className={cn(
-                                  "font-bold text-foreground",
-                                  isMobile ? "text-base" : "text-2xl"
-                                )}>
+                                <p className="font-bold text-foreground text-base">
                                   {card.title}
                                 </p>
-                                {isMobile && (
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="mt-1 gap-2"
-                                    onClick={(e) => { e.stopPropagation(); handleCardClick(card.id); }}
-                                  >
-                                    PRIKAŽI SLIKO
-                                  </Button>
-                                )}
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="mt-1"
+                                  onClick={() => handleCardClick(card.id)}
+                                >
+                                  PRIKAŽI SLIKO
+                                </Button>
                               </div>
-                            </div>
-                            {/* Back */}
-                            <div className={cn(
-                              "flip-card-back flex-col justify-between rounded-xl bg-background shadow-md",
-                              isMobile ? "p-4" : "p-4 md:p-6"
-                            )}>
-                              <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
-                              <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[180px]" : "max-h-[280px]")} loading="lazy" />
-                              <div className="flex gap-2 w-full">
-                                <Button variant="outline" size="sm" className="flex-1 gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                            ) : (
+                              <div className="flex flex-col items-center gap-3 p-4">
+                                <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
+                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg max-h-[280px]" loading="lazy" />
+                                <div className="flex gap-2 w-full">
+                                  <Button variant="outline" size="sm" className="flex-1 gap-2" disabled={!card.audioUrl}>
+                                    <Volume2 className="w-4 h-4" />
+                                    {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                  </Button>
+                                  <Button variant="outline" size="sm" onClick={() => handleCardClick(card.id)}>
+                                    Nazaj
+                                  </Button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          /* Desktop: flip card */
+                          <div
+                            className="flip-card cursor-pointer rounded-xl bg-background shadow-md transition-all duration-300 border-0"
+                            style={{ minHeight: cardHeight }}
+                            onClick={() => handleCardClick(card.id)}
+                          >
+                            <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
+                              <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
+                                <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
+                                  <div className={cn(
+                                    "rounded-2xl flex items-center justify-center shadow-md",
+                                    card.color,
+                                    card.sounds.length > 1
+                                      ? "px-8 py-5 min-w-[200px] h-24"
+                                      : "w-24 h-24"
+                                  )}>
+                                    <span className="font-black text-white whitespace-nowrap text-4xl">
+                                      {card.sounds.join(", ")}
+                                    </span>
+                                  </div>
+                                  <p className="font-bold text-foreground text-2xl">
+                                    {card.title}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flip-card-back flex-col p-4 md:p-6 justify-between rounded-xl bg-background shadow-md">
+                                <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
+                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg max-h-[280px]" loading="lazy" />
+                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
                                   <Volume2 className="w-4 h-4" />
                                   {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
                                 </Button>
-                                {isMobile && (
-                                  <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleCardClick(card.id); }}>
-                                    Nazaj
-                                  </Button>
-                                )}
                               </div>
                             </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </CarouselItem>
                   );
