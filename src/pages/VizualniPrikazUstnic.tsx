@@ -155,6 +155,7 @@ const VizualniPrikazUstnic = () => {
                           <div className="rounded-xl bg-background shadow-md h-[400px] flex flex-col">
                             {!isFlipped ? (
                               <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
+                                <p className="font-bold text-foreground text-lg tracking-wide">GLAS</p>
                                 <div className={cn(
                                   "rounded-2xl flex items-center justify-center shadow-md",
                                   card.color,
@@ -166,9 +167,6 @@ const VizualniPrikazUstnic = () => {
                                     {card.sounds.join(", ")}
                                   </span>
                                 </div>
-                                <p className="font-bold text-foreground text-base">
-                                  {card.title}
-                                </p>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -180,17 +178,11 @@ const VizualniPrikazUstnic = () => {
                               </div>
                             ) : (
                               <div className="flex-1 flex flex-col items-center gap-3 p-4 overflow-hidden">
-                                <h3 className="text-lg font-bold text-foreground text-center shrink-0">{card.title}</h3>
-                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[280px]" loading="lazy" />
-                                <div className="flex gap-2 w-full">
-                                  <Button variant="outline" size="sm" className="flex-1 gap-2" disabled={!card.audioUrl}>
-                                    <Volume2 className="w-4 h-4" />
-                                    {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
-                                  </Button>
-                                  <Button variant="outline" size="sm" onClick={() => handleCardClick(card.id)}>
-                                    Nazaj
-                                  </Button>
-                                </div>
+                                <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[320px]" loading="lazy" onClick={() => handleCardClick(card.id)} />
+                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl}>
+                                  <Volume2 className="w-4 h-4" />
+                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                </Button>
                               </div>
                             )}
                           </div>
@@ -204,6 +196,7 @@ const VizualniPrikazUstnic = () => {
                             <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
                               <div className="flip-card-front flex-col p-6 md:p-8 overflow-hidden rounded-xl bg-background">
                                 <div className="w-full flex-1 flex flex-col items-center justify-center gap-4">
+                                  <p className="font-bold text-foreground text-2xl tracking-wide">GLAS</p>
                                   <div className={cn(
                                     "rounded-2xl flex items-center justify-center shadow-md",
                                     card.color,
@@ -215,9 +208,6 @@ const VizualniPrikazUstnic = () => {
                                       {card.sounds.join(", ")}
                                     </span>
                                   </div>
-                                  <p className="font-bold text-foreground text-2xl">
-                                    {card.title}
-                                  </p>
                                 </div>
                               </div>
                               <div className="flip-card-back flex-col p-4 md:p-6 justify-between rounded-xl bg-background shadow-md">
