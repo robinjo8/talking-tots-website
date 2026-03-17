@@ -62,6 +62,7 @@ export default {
 				'app-blue': 'hsl(207, 90%, 54%)', // #2196F3  
 				'app-yellow': 'hsl(54, 100%, 62%)', // #FFEB3B
 				'app-purple': 'hsl(291, 64%, 42%)', // #9C27B0
+				'app-red': 'hsl(4, 90%, 58%)', // #F44336
 				'app-teal': 'hsl(174, 100%, 29%)', // #009688
 				'light-cloud': 'hsl(122, 39%, 95%)',
 				'dark-cloud': 'hsl(210, 29%, 24%)',

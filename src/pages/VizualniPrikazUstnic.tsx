@@ -49,7 +49,7 @@ const soundCards = [
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
     audioUrl: null as string | null,
-    color: "bg-gradient-to-br from-app-red to-app-red/80",
+    color: "bg-gradient-to-br from-app-red to-app-red/80 text-white",
   },
 ];
 
