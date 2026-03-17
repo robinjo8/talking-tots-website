@@ -8,6 +8,8 @@ import { ArrowLeft } from "lucide-react";
 
 // Auth protection is now handled by ProtectedRoute in routes.tsx
 const VajeZaJezik = () => {
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
