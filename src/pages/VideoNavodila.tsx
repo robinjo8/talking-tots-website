@@ -1,8 +1,8 @@
 import Header from "@/components/Header";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { useNavigate } from "react-router-dom";
-import useEmblaCarousel from "embla-carousel-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 const videoLetters = [
   { 
@@ -52,22 +52,16 @@ const videoLetters = [
   },
 ];
 
+const toAsciiUrl = (letter: string): string => {
+  return letter.toLowerCase()
+    .replace('č', 'ch')
+    .replace('š', 'sh')
+    .replace('ž', 'zh');
+};
+
 const VideoNavodila = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [emblaRef] = useEmblaCarousel({ 
-    align: 'start',
-    dragFree: true,
-    containScroll: 'trimSnaps'
-  });
-
-  // Pretvorba šumnikov v ASCII za URL
-  const toAsciiUrl = (letter: string): string => {
-    return letter.toLowerCase()
-      .replace('č', 'ch')
-      .replace('š', 'sh')
-      .replace('ž', 'zh');
-  };
 
   const handleLetterClick = (letter: string) => {
     navigate(`/video-navodila/${toAsciiUrl(letter)}`);
@@ -78,8 +72,10 @@ const VideoNavodila = () => {
       className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
       onClick={() => handleLetterClick(letter.letter)}
     >
-      {/* Card Image - Orange gradient background like Kolo sreče */}
-      <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
+      <div className={cn(
+        "relative overflow-hidden",
+        isMobile ? "aspect-[4/3]" : "aspect-video"
+      )}>
         <div 
           className="absolute inset-0"
           style={{
@@ -96,10 +92,9 @@ const VideoNavodila = () => {
         </div>
       </div>
 
-      {/* Card Content */}
-      <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
+      <div className={isMobile ? "p-1.5 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
         <h3 className={isMobile 
-          ? "text-base font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors leading-tight text-center" 
+          ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight text-center" 
           : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
         }>
           Glas {letter.letter}
@@ -114,34 +109,43 @@ const VideoNavodila = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className={cn(
+      "bg-background",
+      isMobile ? "fixed inset-0 overflow-hidden flex flex-col" : "min-h-screen"
+    )}>
       <Header />
       
-      <div className="container max-w-6xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+      <div className={cn(
+        "container max-w-6xl mx-auto px-4",
+        isMobile ? "flex-1 flex flex-col overflow-hidden pt-20 pb-2" : "pt-28 md:pt-32 pb-20"
+      )}>
         {/* Page Title */}
-        <div className="text-center mb-6">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+        <div className={cn("text-center", isMobile ? "mb-2" : "mb-6")}>
+          <h1 className={cn(
+            "font-bold text-foreground mb-2",
+            isMobile ? "text-2xl" : "text-4xl md:text-5xl"
+          )}>
             Video navodila
           </h1>
           <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
         </div>
         
-        {/* Breadcrumb - positioned like LogopedskiKoticek */}
-        <div className="mb-8">
-          <BreadcrumbNavigation />
-        </div>
+        {/* Breadcrumb - only on desktop */}
+        {!isMobile && (
+          <div className="mb-8">
+            <BreadcrumbNavigation />
+          </div>
+        )}
 
-        {/* Letters grid/carousel */}
-        <div className="mb-12">
+        {/* Letters grid */}
+        <div className={isMobile ? "flex-1 overflow-hidden" : "mb-12"}>
           {isMobile ? (
-            /* Mobile: 2-column grid like Kolo sreče */
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-2 h-full content-start">
               {videoLetters.map(letter => (
                 <LetterCard key={letter.letter} letter={letter} />
               ))}
             </div>
           ) : (
-            /* Desktop: Grid layout */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {videoLetters.map(letter => (
                 <LetterCard key={letter.letter} letter={letter} />

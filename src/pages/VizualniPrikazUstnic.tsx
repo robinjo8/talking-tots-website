@@ -83,96 +83,108 @@ const VizualniPrikazUstnic = () => {
     return null;
   }
 
+  const cardHeight = isMobile ? 'calc(100vh - 200px)' : '525px';
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className={cn(
+      "bg-background",
+      isMobile ? "fixed inset-0 overflow-hidden flex flex-col" : "min-h-screen"
+    )}>
       <Header />
 
-      <div className="container max-w-4xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+      <div className={cn(
+        "container max-w-4xl mx-auto px-4",
+        isMobile ? "flex-1 flex flex-col overflow-hidden pt-20 pb-2" : "pt-28 md:pt-32 pb-20"
+      )}>
         {/* Title Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+        <div className={cn("text-center", isMobile ? "mb-2" : "mb-8")}>
+          <h1 className={cn(
+            "font-bold text-foreground mb-2",
+            isMobile ? "text-2xl" : "text-4xl md:text-5xl"
+          )}>
             Vizualni prikaz ustnic
           </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full mb-4"></div>
-          <p className="text-muted-foreground text-lg">
-            Poglej kako so ustnice postavljene pri izgovorjavi posameznega glasu
-          </p>
+          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full mb-2"></div>
+          {!isMobile && (
+            <p className="text-muted-foreground text-lg">
+              Poglej kako so ustnice postavljene pri izgovorjavi posameznega glasu
+            </p>
+          )}
         </div>
 
         {selectedChild ? (
-          <>
-            {/* Carousel */}
-            <div className={cn("w-full mx-auto", isMobile ? "" : "max-w-xl")}>
-              <Carousel
-                setApi={setCarouselApi}
-                className="w-full"
-                opts={{ align: "center", loop: false }}
-              >
-                <CarouselContent className={isMobile ? "" : "-ml-0"}>
-                  {soundCards.map((card) => {
-                    const isFlipped = flippedCardId === card.id;
-                    const cardHeight = isMobile ? '420px' : '525px';
-                    return (
-                      <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
-                        <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
-                          <div
-                            className="flip-card cursor-pointer rounded-xl border border-border bg-card shadow-sm transition-all duration-300"
-                            style={{ minHeight: cardHeight }}
-                            onClick={() => handleCardClick(card.id)}
-                          >
-                            <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
-                              <div className="flip-card-front flex-col p-0 overflow-hidden rounded-xl">
-                                <div className="w-full flex-1 bg-gradient-to-br from-muted/40 to-muted/20 flex flex-col items-center justify-center gap-1">
-                                  <span className="text-sm font-bold text-muted-foreground opacity-80 uppercase tracking-widest">Glas</span>
-                                  <span className="text-5xl md:text-6xl font-black text-foreground drop-shadow-sm">{card.sounds.join(", ")}</span>
-                                </div>
-                                <div className="w-full bg-card py-3 px-2 flex items-center justify-center border-t border-border">
-                                  <span className="text-base font-bold text-foreground text-center leading-tight">Odpri</span>
-                                </div>
+          <div className={cn("w-full mx-auto", isMobile ? "flex-1 flex flex-col overflow-hidden" : "max-w-xl")}>
+            <Carousel
+              setApi={setCarouselApi}
+              className={cn("w-full", isMobile && "flex-1")}
+              opts={{ align: "center", loop: false }}
+            >
+              <CarouselContent className={isMobile ? "" : "-ml-0"}>
+                {soundCards.map((card) => {
+                  const isFlipped = flippedCardId === card.id;
+                  return (
+                    <CarouselItem key={card.id} className={cn(isMobile ? "basis-full flex justify-center" : "pl-0 basis-full flex justify-center")}>
+                      <div className={cn("p-1", isMobile ? "w-full max-w-sm" : "w-full")}>
+                        <div
+                          className="flip-card cursor-pointer rounded-xl border border-border bg-card shadow-sm transition-all duration-300"
+                          style={{ minHeight: cardHeight }}
+                          onClick={() => handleCardClick(card.id)}
+                        >
+                          <div className={`flip-card-inner ${isFlipped ? 'flipped' : ''}`} style={{ minHeight: cardHeight }}>
+                            <div className="flip-card-front flex-col p-0 overflow-hidden rounded-xl">
+                              <div className="w-full flex-1 bg-gradient-to-br from-muted/40 to-muted/20 flex flex-col items-center justify-center gap-1">
+                                <span className="text-sm font-bold text-muted-foreground opacity-80 uppercase tracking-widest">Glas</span>
+                                <span className={cn(
+                                  "font-black text-foreground drop-shadow-sm",
+                                  isMobile ? "text-4xl" : "text-5xl md:text-6xl"
+                                )}>{card.sounds.join(", ")}</span>
                               </div>
-                              <div className="flip-card-back flex-col p-6 justify-between rounded-xl border border-border bg-card shadow-sm">
-                                <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
-                                <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[250px]" : "max-h-[312px]")} loading="lazy" />
-                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
-                                  <Volume2 className="w-4 h-4" />
-                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
-                                </Button>
+                              <div className="w-full bg-card py-3 px-2 flex items-center justify-center border-t border-border">
+                                <span className="text-base font-bold text-foreground text-center leading-tight">Odpri</span>
                               </div>
+                            </div>
+                            <div className="flip-card-back flex-col p-4 justify-between rounded-xl border border-border bg-card shadow-sm">
+                              <h3 className="text-lg font-bold text-foreground text-center">{card.title}</h3>
+                              <img src={card.image} alt={card.title} className={cn("w-full object-contain rounded-lg", isMobile ? "max-h-[180px]" : "max-h-[312px]")} loading="lazy" />
+                              <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl} onClick={(e) => { e.stopPropagation(); }}>
+                                <Volume2 className="w-4 h-4" />
+                                {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                              </Button>
                             </div>
                           </div>
                         </div>
-                      </CarouselItem>
-                    );
-                  })}
-                </CarouselContent>
-                {!isMobile && (
-                  <>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                  </>
-                )}
-              </Carousel>
+                      </div>
+                    </CarouselItem>
+                  );
+                })}
+              </CarouselContent>
+              {!isMobile && (
+                <>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </>
+              )}
+            </Carousel>
 
-              {/* Pagination dots */}
-              <div className="flex justify-center gap-2 mt-6">
-                {soundCards.map((_, i) => (
-                  <button
-                    key={i}
-                    className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
-                    onClick={() => carouselApi?.scrollTo(i)}
-                    aria-label={`Pojdi na kartico ${i + 1}`}
-                  >
-                    <span className={cn(
-                      "rounded-full transition-all duration-300",
-                      i === currentSlide
-                        ? "w-3 h-3 bg-foreground shadow-sm"
-                        : "w-2.5 h-2.5 bg-muted-foreground/40"
-                    )} />
-                  </button>
-                ))}
-              </div>
+            {/* Pagination dots */}
+            <div className={cn("flex justify-center gap-2", isMobile ? "mt-2" : "mt-6")}>
+              {soundCards.map((_, i) => (
+                <button
+                  key={i}
+                  className="w-6 h-6 rounded-full flex items-center justify-center p-0 bg-transparent transition-all duration-300"
+                  onClick={() => carouselApi?.scrollTo(i)}
+                  aria-label={`Pojdi na kartico ${i + 1}`}
+                >
+                  <span className={cn(
+                    "rounded-full transition-all duration-300",
+                    i === currentSlide
+                      ? "w-3 h-3 bg-foreground shadow-sm"
+                      : "w-2.5 h-2.5 bg-muted-foreground/40"
+                  )} />
+                </button>
+              ))}
             </div>
-          </>
+          </div>
         ) : (
           <div className="min-h-[400px] flex flex-col items-center justify-center">
             <p className="text-lg text-destructive">
