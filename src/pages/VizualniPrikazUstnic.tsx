@@ -88,7 +88,7 @@ const VizualniPrikazUstnic = () => {
     return null;
   }
 
-  const cardHeight = isMobile ? 'calc(100vh - 210px)' : '480px';
+  const cardHeight = isMobile ? 'auto' : '480px';
 
   return (
     <div className={cn(
