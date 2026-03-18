@@ -5,6 +5,7 @@ import { useEnhancedProgress } from "./useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import { useGameMode } from "@/contexts/GameModeContext";
 import { SpominConfig } from "@/data/spominConfig";
+import { normalizeAudioUrl } from "@/utils/audioUtils";
 
 export interface MemoryCard {
   id: string;
