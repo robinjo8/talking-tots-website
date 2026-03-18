@@ -5,6 +5,7 @@ import { useEnhancedProgress } from "./useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
 import { useGameMode } from "@/contexts/GameModeContext";
 import { SpominConfig } from "@/data/spominConfig";
+import { normalizeAudioUrl } from "@/utils/audioUtils";
 
 export interface MemoryCard {
   id: string;
@@ -44,7 +45,7 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
       }
       
       console.log(`Fetched ${data?.length || 0} memory cards for ${config.displayLetter}`);
-      return data || [];
+      return (data || []).map((item: any) => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 
