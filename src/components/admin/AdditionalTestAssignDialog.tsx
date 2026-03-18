@@ -201,25 +201,32 @@ export function AdditionalTestAssignDialog({ open, onOpenChange, childId, logope
           />
         </div>
 
-        {/* Letter filter chips */}
-        <div className="flex flex-wrap gap-1.5">
-          <Badge
-            variant={selectedLetterFilter === null ? 'default' : 'outline'}
-            className="cursor-pointer"
-            onClick={() => setSelectedLetterFilter(null)}
-          >
-            Vse
-          </Badge>
-          {letters.map(letter => (
-            <Badge
-              key={letter}
-              variant={selectedLetterFilter === letter ? 'default' : 'outline'}
-              className="cursor-pointer"
-              onClick={() => setSelectedLetterFilter(selectedLetterFilter === letter ? null : letter)}
-            >
-              {letter}
-            </Badge>
-          ))}
+        {/* Letter filter chips - two rows */}
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap gap-1.5">
+            {letters.slice(0, Math.ceil(letters.length / 2)).map(letter => (
+              <Badge
+                key={letter}
+                variant={selectedLetterFilter === letter ? 'default' : 'outline'}
+                className="cursor-pointer"
+                onClick={() => setSelectedLetterFilter(selectedLetterFilter === letter ? null : letter)}
+              >
+                {letter}
+              </Badge>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {letters.slice(Math.ceil(letters.length / 2)).map(letter => (
+              <Badge
+                key={letter}
+                variant={selectedLetterFilter === letter ? 'default' : 'outline'}
+                className="cursor-pointer"
+                onClick={() => setSelectedLetterFilter(selectedLetterFilter === letter ? null : letter)}
+              >
+                {letter}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Selected count + clear */}
