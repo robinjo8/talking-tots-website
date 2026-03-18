@@ -1,44 +1,82 @@
+# Osebni načrt — Set-based sistem (implementirano)
 
+## Implementirane spremembe
 
-# Plan: Popravki dialoga + razdelek "Dodatno preverjanje" na admin strani
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## 1. Popravki `AdditionalTestAssignDialog.tsx`
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-### A) Scroll popravek
-ScrollArea ima `max-h-[400px]`, a problem je verjetno da `DialogContent` z `max-h-[85vh] flex flex-col` ne daje dovolj prostora. Popravim z:
-- Dodam `overflow-hidden` na DialogContent
-- ScrollArea dobi `flex-1 min-h-[200px]` namesto fiksne max-h, da zapolni razpoložljiv prostor
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-### B) Gumb "Počisti"
-- Dodam gumb "Počisti" poleg štetja izbranih besed (vrstica 226-230)
-- Klik pokliče `setSelectedWords(new Set())`
-- Viden samo ko je `selectedWords.size > 0`
+---
 
-## 2. Razdelek "Dodatno preverjanje" na `AdminUserDetail.tsx`
+# Popravki preverjanja izgovorjave (implementirano)
 
-Trenutno stran `/admin/users/{parentId}/{childId}` prikazuje sekcijo "Preverjanje izgovorjave" (vrstice 870-940) z Accordion po sejah.
+## Implementirane spremembe
 
-Dodam **nov Card** razdelek **"Dodatno preverjanje"** pod obstoječim "Preverjanje izgovorjave", z enakim stilom:
-- Ikona + naslov "Dodatno preverjanje"
-- Opis: "Dodeljene besede za dodatno preverjanje izgovorjave"
-- Naloži vse `additional_test_assignments` za tega otroka (`child_id`)
-- Za vsako dodelitev prikaže Accordion vrstico z:
-  - Datum dodelitve
-  - Število besed
-  - Status (dodeljeno / v teku / zaključeno)
-  - Ko je zaključeno: posnetki iz `articulation_test_sessions` (preko `additional_assignment_id`) + ocene
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
 
-### Kako deluje za več dodelitev:
-Vsaka dodelitev logopeda (npr. po Seja-1, po Seja-2) ustvari **ločen zapis** v `additional_test_assignments`. Na admin strani se vsaka dodelitev prikaže kot svoja Accordion vrstica (npr. "Dodatno preverjanje #1 — 15.3.2026 (10 besed)", "Dodatno preverjanje #2 — 18.6.2026 (8 besed)"). Obstoječe "Preverjanje izgovorjave" ostane popolnoma nedotaknjeno.
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
 
-## Spremembe datotek
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
 
-### `src/components/admin/AdditionalTestAssignDialog.tsx`
-- Popravek scrollanja (flex layout fix)
-- Gumb "Počisti" za ponastavitev izbire
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
 
-### `src/pages/admin/AdminUserDetail.tsx`
-- Nov Card razdelek "Dodatno preverjanje" pod obstoječim "Preverjanje izgovorjave"
-- Query za `additional_test_assignments` + `additional_test_words` za child_id
-- Prikaz posnetkov iz povezanih sej (preko `additional_assignment_id`)
+---
 
+# Dodatno preverjanje izgovorjave (implementirano)
+
+## Implementirane spremembe
+
+### 1. DB migracija
+- Nova tabela `additional_test_assignments` za dodelitve dodatnega preverjanja
+- Nova tabela `additional_test_words` za besede v dodelitvi
+- Dodan `additional_assignment_id` stolpec v `articulation_test_sessions`
+- RLS politike za logopede (INSERT/SELECT) in starše (SELECT/UPDATE)
+- Nov enum `additional_test_completed` v `notification_type`
+
+### 2. Admin portal
+- Gumb "Dodeli dodatno preverjanje" na strani pregleda seje (`AdminSessionReview.tsx`)
+- `AdditionalTestAssignDialog.tsx` — dialog z iskalnikom besed iz vseh iger in testa
+- Grupiranje po črkah, checkbox izbira, gumb "Dodeli uporabniku"
+
+### 3. Uporabniški portal
+- Nova kartica "Dodatno preverjanje" v `ActivityOptions.tsx` (vidna samo ko ima otrok aktivno dodelitev)
+- Nova stran `/dodatno-preverjanje` (`DodatnoPreverjanje.tsx`) — enak dizajn kot artikulacijski test
+- `useAdditionalTestAssignment.ts` — preverjanje aktivne dodelitve + nalaganje besed
+- `useAdditionalTestSession.ts` — upravljanje sej za dodatno preverjanje
+
+### 4. Obvestila
+- Ob zaključku dodatnega preverjanja se ustvari obvestilo za logopeda
+- Seja se prikaže v `/admin/pending` za pregled
+
+### 5. Nedotaknjene datoteke
+- `ArtikuacijskiTest.tsx` — brez sprememb
+- `useArticulationTestNew.ts` — se re-uporabi (read-only)
+- `useUserSessionManager.ts` — brez sprememb
+- `articulationTestData.ts` — brez sprememb

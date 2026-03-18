@@ -222,15 +222,23 @@ export function AdditionalTestAssignDialog({ open, onOpenChange, childId, logope
           ))}
         </div>
 
-        {/* Selected count */}
+        {/* Selected count + clear */}
         {selectedWords.size > 0 && (
-          <div className="text-sm text-muted-foreground">
-            Izbrano: <span className="font-medium text-foreground">{selectedWords.size}</span> besed
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>Izbrano: <span className="font-medium text-foreground">{selectedWords.size}</span> besed</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectedWords(new Set())}
+            >
+              Počisti
+            </Button>
           </div>
         )}
 
         {/* Word list */}
-        <ScrollArea className="flex-1 min-h-0 max-h-[400px] border rounded-lg">
+        <ScrollArea className="flex-1 min-h-[200px] border rounded-lg">
           <div className="p-2 space-y-1">
             {filteredWords.map((word) => {
               const wordKey = `${word.letter}:${word.word}`;
