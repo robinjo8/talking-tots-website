@@ -63,7 +63,7 @@ const GovornojezicovneVaje = () => {
       mobileTitle: "VIZUALNI PRIKAZ\nUSTNIC",
       description: "Prikaz pravilnega položaja ustnic pri izgovorjavi določenega glasu. Otrok lahko s pomočjo slike lažje posnema gib ustnic pri glasovih C, Č, R, L, K, S, Š, Z in Ž.",
       path: "/govorno-jezikovne-vaje/vizualni-prikaz-ustnic",
-      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_ustnice.webp",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_ustnice_1.webp",
       imageScale: "90%",
       available: true,
     },
