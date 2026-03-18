@@ -262,8 +262,8 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
     return hasTouch && minDim >= 768 && minDim <= 1200;
   });
   
-  // Use mobile layout for both phones and tablets (landscape-optimized)
-  const useMobileLayout = isMobile || isTablet;
+  // Use mobile layout only for phones; tablets use desktop rectangular layout
+  const useMobileLayout = isTouchDevice;
   
   // Detect landscape orientation on phone (especially iOS where orientation lock doesn't work)
   useEffect(() => {
