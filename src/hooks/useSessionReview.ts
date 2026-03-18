@@ -28,6 +28,7 @@ export interface SessionReviewData {
     sourceType: 'parent' | 'logopedist';
     logopedistChildId: string | null;
     organizationId: string | null;
+    additionalAssignmentId: string | null;
   };
   child: {
     name: string;
@@ -150,95 +151,139 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     }
   }
 
-  // 4. Pridobi posnetke iz Storage - glede na source_type
-  let storagePath: string;
-
-  if (session.source_type === 'logopedist' && session.logopedist_child_id && logopedistId) {
-    // Za organizacijske otroke: logopedist-children/{logopedist_id}/{child_id}/...
-    storagePath = `logopedist-children/${logopedistId}/${session.logopedist_child_id}/Preverjanje-izgovorjave`;
-  } else {
-    // Za parent otroke: {parent_id}/{child_id}/...
-    storagePath = `${session.parent_id}/${session.child_id}/Preverjanje-izgovorjave`;
-  }
-  
-  // Uporabi session_number za določitev pravilne mape posnetkov
-  const sessionNumber = (session as any).session_number || 1;
-  const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
-  
-  // Določi wordsPerLetter glede na total_words
-  const totalWords = session.total_words;
-  const wordsPerLetter = totalWords === 20 ? 1 : 3;
-  
-  console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type, 'total_words:', totalWords, 'wordsPerLetter:', wordsPerLetter);
-
-  // Pridobi posnetke iz mape
+  // 4. Pridobi posnetke - za dodatno preverjanje uporabi articulation_word_results
   let recordings: Recording[] = [];
-  const { data: files, error: filesError } = await supabase.storage
-    .from('uporabniski-profili')
-    .list(targetFolder);
+  const isAdditionalTest = !!session.additional_assignment_id;
 
-  if (filesError) {
-    console.error('Napaka pri pridobivanju posnetkov:', filesError);
-  }
+  if (isAdditionalTest) {
+    // Za dodatno preverjanje: pridobi posnetke iz articulation_word_results s signed URLs
+    const { data: wordResults, error: wordResultsError } = await supabase
+      .from('articulation_word_results')
+      .select('letter, target_word, audio_url, created_at')
+      .eq('session_id', sessionId)
+      .order('created_at', { ascending: true });
 
-  if (files) {
-    // Pridobi signed URLs za vse datoteke vzporedno
-    const audioFiles = files.filter(file => 
-      file.name.endsWith('.webm') || 
-      file.name.endsWith('.mp3') || 
-      file.name.endsWith('.wav') ||
-      file.name.endsWith('.m4a')
-    );
+    if (wordResultsError) {
+      console.error('Napaka pri pridobivanju rezultatov besed:', wordResultsError);
+    }
 
-    const signedUrlPromises = audioFiles.map(async file => {
-      const parsed = parseRecordingFilename(file.name, wordsPerLetter);
-      if (!parsed) return null;
+    if (wordResults && wordResults.length > 0) {
+      // Dedupliciraj - ohrani zadnji posnetek za vsako besedo
+      const dedupMap = new Map<string, typeof wordResults[0]>();
+      wordResults.forEach(r => dedupMap.set(r.target_word, r));
+      const uniqueResults = Array.from(dedupMap.values());
 
-      // Uporabi signed URL za zasebni bucket
-      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-        .from('uporabniski-profili')
-        .createSignedUrl(`${targetFolder}/${file.name}`, 3600); // 1 ura veljavnosti
+      // Pridobi signed URLs vzporedno
+      const signedResults = await Promise.all(
+        uniqueResults.map(async (r, idx) => {
+          const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+            .from('uporabniski-profili')
+            .createSignedUrl(r.audio_url, 3600);
+          if (signedUrlError) {
+            console.error('Napaka pri signed URL:', signedUrlError);
+            return null;
+          }
+          return {
+            letter: r.letter,
+            word: r.target_word,
+            wordIndex: idx,
+            filename: r.audio_url.split('/').pop() || '',
+            url: signedUrlData.signedUrl,
+          };
+        })
+      );
+      recordings = signedResults.filter((r): r is Recording => r !== null);
+    }
+  } else {
+    // Za redno preverjanje: pridobi posnetke iz Storage
+    let storagePath: string;
 
-      if (signedUrlError) {
-        console.error('Napaka pri ustvarjanju signed URL:', signedUrlError);
-        return null;
-      }
+    if (session.source_type === 'logopedist' && session.logopedist_child_id && logopedistId) {
+      storagePath = `logopedist-children/${logopedistId}/${session.logopedist_child_id}/Preverjanje-izgovorjave`;
+    } else {
+      storagePath = `${session.parent_id}/${session.child_id}/Preverjanje-izgovorjave`;
+    }
+    
+    const sessionNumber = (session as any).session_number || 1;
+    const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
+    
+    const totalWords = session.total_words;
+    const wordsPerLetter = totalWords === 20 ? 1 : 3;
+    
+    console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type, 'total_words:', totalWords, 'wordsPerLetter:', wordsPerLetter);
 
-      return {
-        letter: parsed.letter,
-        word: parsed.word, // Zdaj je že pravilna beseda s šumniki
-        wordIndex: parsed.wordIndex,
-        filename: file.name,
-        url: signedUrlData.signedUrl,
-      };
-    });
+    const { data: files, error: filesError } = await supabase.storage
+      .from('uporabniski-profili')
+      .list(targetFolder);
 
-    const results = await Promise.all(signedUrlPromises);
-    recordings = results.filter((r): r is Recording => r !== null);
+    if (filesError) {
+      console.error('Napaka pri pridobivanju posnetkov:', filesError);
+    }
+
+    if (files) {
+      const audioFiles = files.filter(file => 
+        file.name.endsWith('.webm') || 
+        file.name.endsWith('.mp3') || 
+        file.name.endsWith('.wav') ||
+        file.name.endsWith('.m4a')
+      );
+
+      const signedUrlPromises = audioFiles.map(async file => {
+        const parsed = parseRecordingFilename(file.name, wordsPerLetter);
+        if (!parsed) return null;
+
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+          .from('uporabniski-profili')
+          .createSignedUrl(`${targetFolder}/${file.name}`, 3600);
+
+        if (signedUrlError) {
+          console.error('Napaka pri ustvarjanju signed URL:', signedUrlError);
+          return null;
+        }
+
+        return {
+          letter: parsed.letter,
+          word: parsed.word,
+          wordIndex: parsed.wordIndex,
+          filename: file.name,
+          url: signedUrlData.signedUrl,
+        };
+      });
+
+      const results = await Promise.all(signedUrlPromises);
+      recordings = results.filter((r): r is Recording => r !== null);
+    }
   }
 
   // 5. Dedupliciraj posnetke - ohrani samo ZADNJI posnetek za vsak wordIndex
-  // Ker imajo posnetki timestamp v imenu (npr. R-57-ROZA-2026-02-05T10-30-00-123Z.webm),
-  // sortiramo po imenu datoteke (timestamp) in vzamemo zadnjega za vsak wordIndex
   const deduplicatedRecordings = new Map<number, Recording>();
   const sortedByTimestamp = [...recordings].sort((a, b) => 
     a.filename.localeCompare(b.filename)
   );
   sortedByTimestamp.forEach(recording => {
-    // Vedno prepiše s kasnejšim (sortirano naraščajoče po timestampu)
     deduplicatedRecordings.set(recording.wordIndex, recording);
   });
   const uniqueRecordings = Array.from(deduplicatedRecordings.values());
 
   // 6. Grupiraj posnetke po črkah
   const recordingsByLetter = new Map<string, Recording[]>();
-  PHONETIC_ORDER.forEach(letter => recordingsByLetter.set(letter, []));
 
-  uniqueRecordings.forEach(recording => {
-    const letterRecordings = recordingsByLetter.get(recording.letter) || [];
-    letterRecordings.push(recording);
-    recordingsByLetter.set(recording.letter, letterRecordings);
-  });
+  if (isAdditionalTest) {
+    // Za dodatno preverjanje: uporabi črke iz dejanskih posnetkov
+    uniqueRecordings.forEach(recording => {
+      const letterRecordings = recordingsByLetter.get(recording.letter) || [];
+      letterRecordings.push(recording);
+      recordingsByLetter.set(recording.letter, letterRecordings);
+    });
+  } else {
+    // Za redno preverjanje: inicializiraj vse črke iz PHONETIC_ORDER
+    PHONETIC_ORDER.forEach(letter => recordingsByLetter.set(letter, []));
+    uniqueRecordings.forEach(recording => {
+      const letterRecordings = recordingsByLetter.get(recording.letter) || [];
+      letterRecordings.push(recording);
+      recordingsByLetter.set(recording.letter, letterRecordings);
+    });
+  }
 
   // Sortiraj posnetke znotraj vsake črke po wordIndex
   recordingsByLetter.forEach((recs, letter) => {
@@ -279,6 +324,7 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
       sourceType: (session.source_type as 'parent' | 'logopedist') || 'parent',
       logopedistChildId: session.logopedist_child_id || null,
       organizationId: session.organization_id || null,
+      additionalAssignmentId: session.additional_assignment_id || null,
     },
     child: {
       name: childData.name,

@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -69,6 +70,31 @@ export function AdditionalTestSection({ childId }: Props) {
     enabled: sessionIds.length > 0,
   });
 
+  // Pre-fetch signed URLs for audio recordings
+  const allRecordings = Object.values(sessionRecordings || {}).flat();
+  const [signedAudioUrls, setSignedAudioUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (allRecordings.length === 0) return;
+    const paths = allRecordings
+      .filter(r => r?.audio_url)
+      .map(r => r.audio_url);
+    const uniquePaths = [...new Set(paths)];
+    
+    Promise.all(
+      uniquePaths.map(async (path) => {
+        const { data } = await supabase.storage
+          .from('uporabniski-profili')
+          .createSignedUrl(path, 3600);
+        return { path, url: data?.signedUrl || '' };
+      })
+    ).then(results => {
+      const map: Record<string, string> = {};
+      results.forEach(r => { if (r.url) map[r.path] = r.url; });
+      setSignedAudioUrls(map);
+    });
+  }, [JSON.stringify(sessionIds)]);
+
   if (isLoading) {
     return (
       <Card>
@@ -91,8 +117,7 @@ export function AdditionalTestSection({ childId }: Props) {
   };
 
   const getAudioUrl = (audioPath: string) => {
-    const { data } = supabase.storage.from('posnetki').getPublicUrl(audioPath);
-    return data?.publicUrl || '';
+    return signedAudioUrls[audioPath] || '';
   };
 
   const getImageUrl = (imagePath: string) => {

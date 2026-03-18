@@ -25,6 +25,7 @@ export interface TestSessionData {
   word_count: number;
   session_number: number;
   total_words: number | null;
+  additional_assignment_id: string | null;
 }
 
 export interface ChildGroup {
@@ -64,7 +65,7 @@ export function useAdminTests() {
       // 1. Get all test sessions
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed, session_number, total_words')
+        .select('id, status, submitted_at, reviewed_at, completed_at, child_id, parent_id, assigned_to, source_type, logopedist_child_id, organization_id, is_completed, session_number, total_words, additional_assignment_id')
         .order('submitted_at', { ascending: false });
 
       if (sessionsError) {
@@ -190,6 +191,7 @@ export function useAdminTests() {
           word_count: wordCount,
           session_number: session.session_number ?? 1,
           total_words: session.total_words ?? null,
+          additional_assignment_id: session.additional_assignment_id || null,
         };
       });
 
