@@ -80,3 +80,26 @@
 - `useArticulationTestNew.ts` — se re-uporabi (read-only)
 - `useUserSessionManager.ts` — brez sprememb
 - `articulationTestData.ts` — brez sprememb
+
+---
+
+# Admin razlikovanje rednega in dodatnega preverjanja (implementirano)
+
+## Implementirane spremembe
+
+### 1. Dodano `additional_assignment_id` v hooke
+- `useMyReviews.ts` — dodan v interface in select query
+- `useAdminTests.ts` — dodan v interface in select query
+
+### 2. Prikaz vrste testa na "Moji pregledi"
+- `AdminMyReviews.tsx` — badge "Dodatno preverjanje" (amber) ali "Preverjanje izgovorjave" v tabeli in mobilnih karticah
+- Dodan stolpec "Vrsta" v desktop tabeli
+
+### 3. Popravek predvajanja zvoka v AdditionalTestSection
+- Zamenjano `posnetki` bucket (public URL) z `uporabniski-profili` bucket (signed URL)
+- Pre-fetch signed URLs z `createSignedUrl()` v useEffect
+
+### 4. Pregled seje za dodatno preverjanje
+- `useSessionReview.ts` — za seje z `additional_assignment_id` uporabi `articulation_word_results` namesto parsanja imen datotek iz storage
+- Dinamično grupiranje po črkah iz dejanskih rezultatov
+- Dodan `additionalAssignmentId` v `SessionReviewData`
