@@ -238,7 +238,7 @@ export function AdditionalTestAssignDialog({ open, onOpenChange, childId, logope
         )}
 
         {/* Word list */}
-        <ScrollArea className="flex-1 min-h-0 max-h-[400px] border rounded-lg">
+        <ScrollArea className="flex-1 min-h-[200px] border rounded-lg">
           <div className="p-2 space-y-1">
             {filteredWords.map((word) => {
               const wordKey = `${word.letter}:${word.word}`;

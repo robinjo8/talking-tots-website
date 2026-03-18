@@ -939,6 +939,9 @@ export default function AdminUserDetail() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Additional Test Assignments Section */}
+                {childId && <AdditionalTestSection childId={childId} />}
               </div>
 
               {/* Right Column: Reports Section - height aligned with left column */}
