@@ -15,6 +15,8 @@ export function ActivityOptions() {
   const navigate = useNavigate();
   const { isTestAvailable, nextTestDate, lastCompletedAt } = useArticulationTestStatus();
   const { planId, isSubscribed } = useSubscriptionContext();
+  const { selectedChild } = useAuth();
+  const { hasActiveAssignment } = useAdditionalTestAssignment(selectedChild?.id);
   
   const isPro = planId === 'pro';
   
