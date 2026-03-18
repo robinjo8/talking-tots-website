@@ -20,7 +20,8 @@ export const useArticulationTestNew = (
   maxWords?: number,
   sessionId?: string,  // DB session UUID for word results
   wordsPerLetter: number = 3,  // 1 for age group 3-4, 3 for all others
-  autoPlayEnabled: boolean = true  // Controls whether auto-play audio is active
+  autoPlayEnabled: boolean = true,  // Controls whether auto-play audio is active
+  customWordData?: { letter: string; words: { text: string; image: string; audio?: string; acceptedVariants?: string[] }[] }[]
 ) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
@@ -54,7 +55,11 @@ export const useArticulationTestNew = (
   }, [fixedSessionNumber]);
 
   // Sort articulation data by phonetic order and filter words per letter
+  // When customWordData is provided, use it as-is (preserve assigned order)
   const sortedArticulationData = useMemo(() => {
+    if (customWordData && customWordData.length > 0) {
+      return customWordData;
+    }
     return [...articulationData]
       .sort((a, b) => {
         const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
@@ -67,7 +72,7 @@ export const useArticulationTestNew = (
         ...group,
         words: group.words.slice(0, wordsPerLetter),
       }));
-  }, [wordsPerLetter]);
+  }, [wordsPerLetter, customWordData]);
 
   // Total words across all letters
   const totalWordsAll = sortedArticulationData.reduce(
