@@ -14,6 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
+      additional_test_assignments: {
+        Row: {
+          assigned_by: string
+          child_id: string
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          session_id: string | null
+          status: string
+        }
+        Insert: {
+          assigned_by: string
+          child_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          session_id?: string | null
+          status?: string
+        }
+        Update: {
+          assigned_by?: string
+          child_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          session_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "additional_test_assignments_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "additional_test_assignments_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "additional_test_assignments_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+        ]
+      }
+      additional_test_words: {
+        Row: {
+          assignment_id: string
+          audio: string | null
+          id: string
+          image: string
+          letter: string | null
+          sort_order: number | null
+          word: string
+        }
+        Insert: {
+          assignment_id: string
+          audio?: string | null
+          id?: string
+          image: string
+          letter?: string | null
+          sort_order?: number | null
+          word: string
+        }
+        Update: {
+          assignment_id?: string
+          audio?: string | null
+          id?: string
+          image?: string
+          letter?: string | null
+          sort_order?: number | null
+          word?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "additional_test_words_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "additional_test_assignments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_permissions: {
         Row: {
           expires_at: string | null
@@ -251,6 +341,7 @@ export type Database = {
       }
       articulation_test_sessions: {
         Row: {
+          additional_assignment_id: string | null
           assigned_at: string | null
           assigned_to: string | null
           child_id: string | null
@@ -273,6 +364,7 @@ export type Database = {
           total_words: number | null
         }
         Insert: {
+          additional_assignment_id?: string | null
           assigned_at?: string | null
           assigned_to?: string | null
           child_id?: string | null
@@ -295,6 +387,7 @@ export type Database = {
           total_words?: number | null
         }
         Update: {
+          additional_assignment_id?: string | null
           assigned_at?: string | null
           assigned_to?: string | null
           child_id?: string | null
@@ -317,6 +410,13 @@ export type Database = {
           total_words?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "articulation_test_sessions_additional_assignment_id_fkey"
+            columns: ["additional_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "additional_test_assignments"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "articulation_test_sessions_assigned_to_fkey"
             columns: ["assigned_to"]
@@ -2104,6 +2204,7 @@ export type Database = {
         | "reminder"
         | "completed_report"
         | "system"
+        | "additional_test_completed"
       organization_type: "internal" | "school" | "kindergarten" | "private"
       report_status: "draft" | "submitted" | "revised"
       test_session_status: "pending" | "assigned" | "in_review" | "completed"
@@ -2244,6 +2345,7 @@ export const Constants = {
         "reminder",
         "completed_report",
         "system",
+        "additional_test_completed",
       ],
       organization_type: ["internal", "school", "kindergarten", "private"],
       report_status: ["draft", "submitted", "revised"],
