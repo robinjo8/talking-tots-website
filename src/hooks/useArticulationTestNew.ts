@@ -166,7 +166,7 @@ export const useArticulationTestNew = (
 
   // Auto-play word audio 1 second after image loads (only when autoPlayEnabled)
   useEffect(() => {
-    if (!autoPlayEnabled || !currentData?.word.audio || loading) return;
+    if (!autoPlayEnabled || !currentData?.word.audio || loading || sortedArticulationData.length === 0) return;
 
     const timer = setTimeout(() => {
       playWordAudio();
