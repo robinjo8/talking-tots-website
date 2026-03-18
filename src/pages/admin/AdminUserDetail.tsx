@@ -52,6 +52,7 @@ import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { generateReportPdf } from '@/utils/generateReportPdf';
 import { Badge } from '@/components/ui/badge';
+import { AdditionalTestSection } from '@/components/admin/AdditionalTestSection';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
