@@ -140,7 +140,7 @@ export default function AdminLogin() {
   };
 
   const handleMfaVerified = () => {
-    setMfaVerified(true);
+    setMfaVerified(true, mfaUserId);
     navigate('/admin');
   };
 
