@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { WordData } from "@/data/artikulacijaVajeConfig";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface GenericWheelGameProps {
   letter: string;
