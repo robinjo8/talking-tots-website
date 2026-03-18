@@ -20,6 +20,7 @@ import { useWordProgress } from '@/hooks/useWordProgress';
 import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface GenericMetKockeGameProps {
   letter: string;
