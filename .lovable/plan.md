@@ -1,82 +1,46 @@
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+Cilj: odpraviti napako, kjer je beseda pravilna (npr. BRADA), slika pa ostane PAJEK.
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+1) Natančna analiza (potrjeno s podatki)
+- Preveril sem aktivno dodelitev za otroka `c3940422-e5ce-44b4-a2e4-f73c11323776`:
+  - assignment: `7934e1da-7f55-4a90-80ba-ec9b1df3c584` (status `in_progress`)
+  - session: `7c3aaa10-c762-431a-b42c-2645369ef6c4` (current_word_index `0`, total_words `4`)
+- Preveril sem dodeljene besede v `additional_test_words`:
+  - `BRADA -> brada1.webp`
+  - `BRESKEV -> breskev1.webp`
+  - `BREZA -> breza1.webp`
+  - `BRIKETI -> briketi1.webp`
+- Preveril sem storage objekte v bucketu `slike`: datoteke `brada1.webp`, `breskev1.webp`, `breza1.webp`, `briketi1.webp`, `pajek1.webp` obstajajo in imajo različne `eTag`/velikosti (torej niso ista datoteka).
+- Zaključek: baza in dodelitev sta pravilni; problem je v frontend življenjskem ciklu (state/data-source preklop), ne v “napačno shranjenih besedah”.
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+2) Verjeten dejanski vzrok v kodi
+- `DodatnoPreverjanje` hook `useArticulationTestNew` zažene že pred dokončanim nalaganjem custom besed.
+- Hook ima fallback na privzeti `articulationData` (prva beseda = PAJEK) in takoj nastavi `imageUrl` na pajek.
+- Ko custom besede prispejo, se besedilo preklopi pravilno (BRADA …), medtem ko je `imageUrl` lahko ostanek začetne fallback faze.
+- Prejšnji popravek (dependency array) zmanjšuje možnost napake, ne odpravi pa robustno “fallback-first” scenarija.
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+3) Plan popravka (implementacija)
+- Datoteka: `src/pages/DodatnoPreverjanje.tsx`
+  1. Uvesti “word-data ready” gate in preprečiti inicializacijo artikulacijskega hooka z default naborom.
+  2. Hook za test mountati šele, ko so dodeljene besede dejansko naložene (`assignment` + `assignedWords.length > 0`).
+  3. Če ni besed: jasen empty-state (“Ni dodeljenih besed”) namesto fallback na standardni test.
 
----
+- Datoteka: `src/hooks/useArticulationTestNew.ts`
+  4. Odstraniti implicitni fallback pri “custom režimu”:
+     - če je caller v custom načinu, hook ne sme nikoli preklopiti na `articulationData`.
+  5. Medijski del vezati na dejanski ključ trenutne besede:
+     - image effect dependency: `currentData?.word.image` (ne le indeks/večji objekt)
+     - audio effect dependency: `currentData?.word.audio` + pogoji predvajanja
+  6. Ob preklopu data source resetirati medijski state (`imageUrl`, `loading`, `hasRecorded`, morebiten pending autoplay timer), da se ne prenaša “PAJEK” iz starega source-a.
 
-# Popravki preverjanja izgovorjave (implementirano)
+4) Validacija po popravku
+- Korak A: v adminu potrditi dodelitev (BRADA, BRESKEV, BREZA, BRIKETI).
+- Korak B: v uporabniškem portalu odpreti “Dodatno preverjanje”:
+  - 1. kartica: BRADA + pravilna slika `brada1.webp`
+  - naprej: BRESKEV/BREZA/BRIKETI + pravilne slike.
+- Korak C: refresh/resume testa (current_word_index > 0) in potrditi, da se prikaže pravilna slika za resume besedo.
+- Korak D: hiter regression check, da standardni `artikulacijski-test` še vedno začne na PAJEK (tam je to pravilno).
 
-## Implementirane spremembe
-
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
-
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
-
----
-
-# Dodatno preverjanje izgovorjave (implementirano)
-
-## Implementirane spremembe
-
-### 1. DB migracija
-- Nova tabela `additional_test_assignments` za dodelitve dodatnega preverjanja
-- Nova tabela `additional_test_words` za besede v dodelitvi
-- Dodan `additional_assignment_id` stolpec v `articulation_test_sessions`
-- RLS politike za logopede (INSERT/SELECT) in starše (SELECT/UPDATE)
-- Nov enum `additional_test_completed` v `notification_type`
-
-### 2. Admin portal
-- Gumb "Dodeli dodatno preverjanje" na strani pregleda seje (`AdminSessionReview.tsx`)
-- `AdditionalTestAssignDialog.tsx` — dialog z iskalnikom besed iz vseh iger in testa
-- Grupiranje po črkah, checkbox izbira, gumb "Dodeli uporabniku"
-
-### 3. Uporabniški portal
-- Nova kartica "Dodatno preverjanje" v `ActivityOptions.tsx` (vidna samo ko ima otrok aktivno dodelitev)
-- Nova stran `/dodatno-preverjanje` (`DodatnoPreverjanje.tsx`) — enak dizajn kot artikulacijski test
-- `useAdditionalTestAssignment.ts` — preverjanje aktivne dodelitve + nalaganje besed
-- `useAdditionalTestSession.ts` — upravljanje sej za dodatno preverjanje
-
-### 4. Obvestila
-- Ob zaključku dodatnega preverjanja se ustvari obvestilo za logopeda
-- Seja se prikaže v `/admin/pending` za pregled
-
-### 5. Nedotaknjene datoteke
-- `ArtikuacijskiTest.tsx` — brez sprememb
-- `useArticulationTestNew.ts` — se re-uporabi (read-only)
-- `useUserSessionManager.ts` — brez sprememb
-- `articulationTestData.ts` — brez sprememb
+5) Pričakovani rezultat
+- Dodatno preverjanje bo prikazovalo izključno slike, ki so bile dodeljene v `additional_test_words`.
+- Ne bo več možno, da bi prvi prikaz “podedoval” sliko iz privzetega testa.
