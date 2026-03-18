@@ -17,6 +17,7 @@ export function ArticulationTestProfileSection() {
   const navigate = useNavigate();
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
+  const [isResettingAdditional, setIsResettingAdditional] = useState(false);
 
   const handleReset = async () => {
     const success = await resetTest();
@@ -24,6 +25,66 @@ export function ArticulationTestProfileSection() {
       toast.success("Test izgovorjave je bil ponastavljen.");
     } else {
       toast.error("Napaka pri ponastavitvi testa.");
+    }
+  };
+
+  const handleResetAdditionalTest = async () => {
+    if (!selectedChild?.id) {
+      toast.error("Najprej izberite otroka.");
+      return;
+    }
+    setIsResettingAdditional(true);
+    try {
+      // Find all additional test assignments for this child
+      const { data: assignments, error: fetchErr } = await supabase
+        .from('additional_test_assignments')
+        .select('id')
+        .eq('child_id', selectedChild.id);
+
+      if (fetchErr) {
+        console.error('Error fetching assignments:', fetchErr);
+        toast.error("Napaka pri ponastavitvi dodatnega preverjanja.");
+        return;
+      }
+
+      if (!assignments || assignments.length === 0) {
+        toast.info("Ni dodatnih preverjanj za ponastavitev.");
+        return;
+      }
+
+      const assignmentIds = assignments.map(a => a.id);
+
+      // Reset linked articulation_test_sessions (set additional_assignment_id to null)
+      const { error: sessionErr } = await supabase
+        .from('articulation_test_sessions')
+        .update({ additional_assignment_id: null, status: 'pending', is_completed: false })
+        .in('additional_assignment_id', assignmentIds);
+
+      if (sessionErr) {
+        console.error('Error resetting sessions:', sessionErr);
+      }
+
+      // Delete sessions that were created specifically for additional tests
+      const { data: additionalSessions } = await supabase
+        .from('articulation_test_sessions')
+        .select('id')
+        .in('additional_assignment_id', assignmentIds);
+
+      // Reset assignment status back to assigned
+      for (const assignmentId of assignmentIds) {
+        await supabase
+          .from('additional_test_assignments')
+          .update({ status: 'assigned', completed_at: null, session_id: null })
+          .eq('id', assignmentId);
+      }
+
+      toast.success(`Dodatno preverjanje ponastavljen (${assignments.length} dodelitev).`);
+      await refetch();
+    } catch (err) {
+      console.error('Error resetting additional test:', err);
+      toast.error("Napaka pri ponastavitvi dodatnega preverjanja.");
+    } finally {
+      setIsResettingAdditional(false);
     }
   };
 
@@ -201,6 +262,20 @@ export function ArticulationTestProfileSection() {
             >
               <RotateCcw className="h-4 w-4 mr-2" />
               Ponastavi test (za testiranje)
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetAdditionalTest}
+              disabled={isResettingAdditional}
+              className="w-full justify-start text-muted-foreground hover:text-destructive hover:border-destructive"
+            >
+              {isResettingAdditional ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RotateCcw className="h-4 w-4 mr-2" />
+              )}
+              Ponastavi dodatno preverjanje
             </Button>
           </div>
         </div>
