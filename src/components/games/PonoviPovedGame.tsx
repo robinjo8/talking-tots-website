@@ -40,6 +40,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 type GamePhase = "start" | "word" | "sentence" | "complete";
 
