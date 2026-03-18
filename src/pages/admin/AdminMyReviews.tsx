@@ -116,16 +116,26 @@ function ReviewCard({
     <Card className="mb-3">
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <Baby className="h-4 w-4 text-muted-foreground" />
-              <span className="font-medium">{session.child_name}</span>
-              <StatusBadge 
-                status={session.status} 
-                reviewedAt={session.reviewed_at}
-                completedAt={session.completed_at}
-              />
-            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <Baby className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">{session.child_name}</span>
+                {session.additional_assignment_id ? (
+                  <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">
+                    <ListChecks className="h-3 w-3 mr-1" />
+                    Dodatno
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-xs">
+                    Preverjanje
+                  </Badge>
+                )}
+                <StatusBadge 
+                  status={session.status} 
+                  reviewedAt={session.reviewed_at}
+                  completedAt={session.completed_at}
+                />
+              </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               {source.isOrganization ? (
                 <Building2 className="h-3 w-3" />
