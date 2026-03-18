@@ -53,7 +53,7 @@ const GovornojezicovneVaje = () => {
       mobileTitle: "MOJI PRVI\nGLASOVI",
       description: "Zabavna animacija, ki otroke uči prepoznavati in posnemati glasove. Barviti liki in interaktivni prizori spodbujajo poslušanje, ponavljanje in igro z glasovi.",
       path: "/govorno-jezikovne-vaje/artikulacija",
-      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajce_prvi glasovi.webp",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajce_prvi glasovi_1.webp",
       imageScale: "90%",
       available: true,
     },
