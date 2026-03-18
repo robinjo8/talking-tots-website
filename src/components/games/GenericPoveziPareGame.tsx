@@ -23,6 +23,7 @@ import {
 import { PoveziPareConfig } from '@/data/poveziPareConfig';
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface Props {
   config: PoveziPareConfig;
