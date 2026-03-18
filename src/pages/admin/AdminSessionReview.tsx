@@ -12,6 +12,8 @@ import { sl } from 'date-fns/locale';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { AdditionalTestAssignDialog } from '@/components/admin/AdditionalTestAssignDialog';
+import { ClipboardPlus } from 'lucide-react';
 
 export default function AdminSessionReview() {
   const { sessionId } = useParams<{ sessionId: string }>();
