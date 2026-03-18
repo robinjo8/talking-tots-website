@@ -35,6 +35,8 @@ export function GenericPoveziPareGame({ config }: Props) {
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
