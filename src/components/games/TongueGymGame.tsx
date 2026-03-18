@@ -14,6 +14,7 @@ import {
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface TongueExercise {
   id: number;
