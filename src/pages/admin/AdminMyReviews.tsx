@@ -400,6 +400,7 @@ export default function AdminMyReviews() {
                     <TableRow>
                       <TableHead>Uporabnik</TableHead>
                       <TableHead>Otrok</TableHead>
+                      <TableHead>Vrsta</TableHead>
                       <TableHead>Starost</TableHead>
                       <TableHead>Spol</TableHead>
                       <TableHead>Status</TableHead>
