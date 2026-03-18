@@ -189,13 +189,9 @@ const DodatnoPreverjanje = () => {
     undefined,
     totalWordCount > 0 ? totalWordCount : undefined,
     sessionInfo?.sessionId,
-    // For additional test, we use 1 word per letter since words are custom
-    // But the hook uses articulationTestData... We need to handle this differently
-    // Actually the hook's word list comes from articulationTestData which is fixed.
-    // We can't reuse the hook directly for custom words.
-    // Let's set wordsPerLetter to the max and use maxWords to limit
     3,
-    testStarted
+    testStarted,
+    customArticulationData.length > 0 ? customArticulationData : undefined
   );
 
   // Check for existing session on mount

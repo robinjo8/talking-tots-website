@@ -55,7 +55,11 @@ export const useArticulationTestNew = (
   }, [fixedSessionNumber]);
 
   // Sort articulation data by phonetic order and filter words per letter
+  // When customWordData is provided, use it as-is (preserve assigned order)
   const sortedArticulationData = useMemo(() => {
+    if (customWordData && customWordData.length > 0) {
+      return customWordData;
+    }
     return [...articulationData]
       .sort((a, b) => {
         const indexA = PHONETIC_ORDER.indexOf(a.letter.toUpperCase());
@@ -68,7 +72,7 @@ export const useArticulationTestNew = (
         ...group,
         words: group.words.slice(0, wordsPerLetter),
       }));
-  }, [wordsPerLetter]);
+  }, [wordsPerLetter, customWordData]);
 
   // Total words across all letters
   const totalWordsAll = sortedArticulationData.reduce(
