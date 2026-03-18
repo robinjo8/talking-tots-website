@@ -156,7 +156,7 @@ export const useArticulationTestNew = (
     };
 
     fetchImage();
-  }, [currentWordIndex]);
+  }, [currentWordIndex, sortedArticulationData]);
 
   // Auto-play word audio 1 second after image loads (only when autoPlayEnabled)
   useEffect(() => {
