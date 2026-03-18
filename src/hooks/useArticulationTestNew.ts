@@ -57,7 +57,9 @@ export const useArticulationTestNew = (
   // Sort articulation data by phonetic order and filter words per letter
   // When customWordData is provided, use it as-is (preserve assigned order)
   const sortedArticulationData = useMemo(() => {
-    if (customWordData && customWordData.length > 0) {
+    // When customWordData is provided (even empty array), NEVER fall back to default data.
+    // This prevents showing "Pajek" images when custom words are still loading.
+    if (customWordData !== undefined) {
       return customWordData;
     }
     return [...articulationData]
@@ -132,7 +134,11 @@ export const useArticulationTestNew = (
   // Fetch image when word changes
   useEffect(() => {
     const fetchImage = async () => {
-      if (!currentData) return;
+      if (!currentData || sortedArticulationData.length === 0) {
+        setImageUrl(null);
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       setHasRecorded(false);
@@ -160,7 +166,7 @@ export const useArticulationTestNew = (
 
   // Auto-play word audio 1 second after image loads (only when autoPlayEnabled)
   useEffect(() => {
-    if (!autoPlayEnabled || !currentData?.word.audio || loading) return;
+    if (!autoPlayEnabled || !currentData?.word.audio || loading || sortedArticulationData.length === 0) return;
 
     const timer = setTimeout(() => {
       playWordAudio();
