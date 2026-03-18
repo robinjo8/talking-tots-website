@@ -261,11 +261,24 @@ export default function AdminSessionReview() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <SessionReviewHeader
-        childName={data.child.name}
-        childAge={data.child.age}
-        childGender={data.child.gender}
-      />
+      <div className="flex items-start justify-between">
+        <SessionReviewHeader
+          childName={data.child.name}
+          childAge={data.child.age}
+          childGender={data.child.gender}
+        />
+        {data.session.childId && logopedistProfile && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAssignDialog(true)}
+            className="gap-2 shrink-0"
+          >
+            <ClipboardPlus className="h-4 w-4" />
+            Dodeli dodatno preverjanje
+          </Button>
+        )}
+      </div>
 
       {/* Info za read-only način z gumbom Popravi */}
       {isReadOnly && (
