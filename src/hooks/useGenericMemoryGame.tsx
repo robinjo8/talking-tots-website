@@ -45,7 +45,7 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
       }
       
       console.log(`Fetched ${data?.length || 0} memory cards for ${config.displayLetter}`);
-      return data || [];
+      return (data || []).map(item => ({ ...item, audio_url: normalizeAudioUrl(item.audio_url) }));
     }
   });
 
