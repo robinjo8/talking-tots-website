@@ -1,4 +1,3 @@
-
 # Osebni načrt — Set-based sistem (implementirano)
 
 ## Implementirane spremembe
@@ -47,3 +46,37 @@
 - Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
 - Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
 - Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
+
+---
+
+# Dodatno preverjanje izgovorjave (implementirano)
+
+## Implementirane spremembe
+
+### 1. DB migracija
+- Nova tabela `additional_test_assignments` za dodelitve dodatnega preverjanja
+- Nova tabela `additional_test_words` za besede v dodelitvi
+- Dodan `additional_assignment_id` stolpec v `articulation_test_sessions`
+- RLS politike za logopede (INSERT/SELECT) in starše (SELECT/UPDATE)
+- Nov enum `additional_test_completed` v `notification_type`
+
+### 2. Admin portal
+- Gumb "Dodeli dodatno preverjanje" na strani pregleda seje (`AdminSessionReview.tsx`)
+- `AdditionalTestAssignDialog.tsx` — dialog z iskalnikom besed iz vseh iger in testa
+- Grupiranje po črkah, checkbox izbira, gumb "Dodeli uporabniku"
+
+### 3. Uporabniški portal
+- Nova kartica "Dodatno preverjanje" v `ActivityOptions.tsx` (vidna samo ko ima otrok aktivno dodelitev)
+- Nova stran `/dodatno-preverjanje` (`DodatnoPreverjanje.tsx`) — enak dizajn kot artikulacijski test
+- `useAdditionalTestAssignment.ts` — preverjanje aktivne dodelitve + nalaganje besed
+- `useAdditionalTestSession.ts` — upravljanje sej za dodatno preverjanje
+
+### 4. Obvestila
+- Ob zaključku dodatnega preverjanja se ustvari obvestilo za logopeda
+- Seja se prikaže v `/admin/pending` za pregled
+
+### 5. Nedotaknjene datoteke
+- `ArtikuacijskiTest.tsx` — brez sprememb
+- `useArticulationTestNew.ts` — se re-uporabi (read-only)
+- `useUserSessionManager.ts` — brez sprememb
+- `articulationTestData.ts` — brez sprememb
