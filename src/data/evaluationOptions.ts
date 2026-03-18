@@ -139,7 +139,7 @@ export const RATING_SCALE: RatingLevel[] = [
 ];
 
 // Parsanje imena datoteke posnetka
-export function parseRecordingFilename(filename: string): {
+export function parseRecordingFilename(filename: string, wordsPerLetter: number = 3): {
   letter: string;
   wordIndex: number;
   word: string;
@@ -151,11 +151,10 @@ export function parseRecordingFilename(filename: string): {
   const wordIndex = parseInt(match[2], 10);
   
   // Uporabi wordIndex za določitev prave črke (obide sanitizacijo imen datotek)
-  // Npr. Ž se sanitizira v Z, ampak wordIndex 57-59 pravilno mapirata na Ž
-  const actualLetter = getLetterFromWordIndex(wordIndex);
+  const actualLetter = getLetterFromWordIndex(wordIndex, wordsPerLetter);
   
   // Uporabi wordIndex za pravilno ime besede (s šumniki)
-  const actualWord = getWordFromWordIndex(wordIndex);
+  const actualWord = getWordFromWordIndex(wordIndex, wordsPerLetter);
   
   return {
     letter: actualLetter,
