@@ -365,6 +365,16 @@ export default function AdminSessionReview() {
         onConfirm={handleTakeoverCase}
         isLoading={isTakingOver}
       />
+
+      {/* Dialog za dodelitev dodatnega preverjanja */}
+      {data.session.childId && logopedistProfile && (
+        <AdditionalTestAssignDialog
+          open={showAssignDialog}
+          onOpenChange={setShowAssignDialog}
+          childId={data.session.childId}
+          logopedistProfileId={logopedistProfile.id}
+        />
+      )}
     </div>
   );
 }
