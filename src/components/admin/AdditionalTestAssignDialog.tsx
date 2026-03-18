@@ -233,7 +233,7 @@ export function AdditionalTestAssignDialog({ open, onOpenChange, childId, logope
         {/* Selected count + clear */}
         {selectedWords.size > 0 && (
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>Izbrano: <span className="font-medium text-foreground">{selectedWords.size}</span> besed</span>
+            <span>Izbrano: <span className="font-medium text-foreground">{Array.from(selectedWords).map(key => key.split(':')[1]?.toUpperCase()).join(', ')}</span></span>
             <Button
               variant="ghost"
               size="sm"
