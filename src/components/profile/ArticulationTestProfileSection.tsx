@@ -263,6 +263,20 @@ export function ArticulationTestProfileSection() {
               <RotateCcw className="h-4 w-4 mr-2" />
               Ponastavi test (za testiranje)
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetAdditionalTest}
+              disabled={isResettingAdditional}
+              className="w-full justify-start text-muted-foreground hover:text-destructive hover:border-destructive"
+            >
+              {isResettingAdditional ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <RotateCcw className="h-4 w-4 mr-2" />
+              )}
+              Ponastavi dodatno preverjanje
+            </Button>
           </div>
         </div>
       </div>
