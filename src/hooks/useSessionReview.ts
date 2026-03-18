@@ -324,6 +324,7 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
       sourceType: (session.source_type as 'parent' | 'logopedist') || 'parent',
       logopedistChildId: session.logopedist_child_id || null,
       organizationId: session.organization_id || null,
+      additionalAssignmentId: session.additional_assignment_id || null,
     },
     child: {
       name: childData.name,
