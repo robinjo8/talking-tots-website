@@ -83,6 +83,8 @@ export function GenericMetKockeGame({
   } = useWordProgress(displayLetter, wordsList);
   const { checkForNewTrophy } = useTrophyContext();
   const { recordExerciseCompletion } = useEnhancedProgress();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
 
   // Audio playback
   const playAudio = useCallback((url: string) => {
