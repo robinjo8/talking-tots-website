@@ -35,53 +35,21 @@ export function ArticulationTestProfileSection() {
     }
     setIsResettingAdditional(true);
     try {
-      // Find all additional test assignments for this child
-      const { data: assignments, error: fetchErr } = await supabase
-        .from('additional_test_assignments')
-        .select('id')
-        .eq('child_id', selectedChild.id);
+      const response = await supabase.functions.invoke("reset-additional-test", {
+        body: { childId: selectedChild.id },
+      });
 
-      if (fetchErr) {
-        console.error('Error fetching assignments:', fetchErr);
+      if (response.error) {
+        console.error("Reset additional test error:", response.error);
         toast.error("Napaka pri ponastavitvi dodatnega preverjanja.");
-        return;
-      }
-
-      if (!assignments || assignments.length === 0) {
+      } else if (response.data?.deleted === 0) {
         toast.info("Ni dodatnih preverjanj za ponastavitev.");
-        return;
+      } else {
+        toast.success(`Dodatno preverjanje ponastavljen (${response.data.deleted} dodelitev).`);
+        await refetch();
       }
-
-      const assignmentIds = assignments.map(a => a.id);
-
-      // Reset linked articulation_test_sessions (set additional_assignment_id to null)
-      const { error: sessionErr } = await supabase
-        .from('articulation_test_sessions')
-        .update({ additional_assignment_id: null, status: 'pending', is_completed: false })
-        .in('additional_assignment_id', assignmentIds);
-
-      if (sessionErr) {
-        console.error('Error resetting sessions:', sessionErr);
-      }
-
-      // Delete sessions that were created specifically for additional tests
-      const { data: additionalSessions } = await supabase
-        .from('articulation_test_sessions')
-        .select('id')
-        .in('additional_assignment_id', assignmentIds);
-
-      // Reset assignment status back to assigned
-      for (const assignmentId of assignmentIds) {
-        await supabase
-          .from('additional_test_assignments')
-          .update({ status: 'assigned', completed_at: null, session_id: null })
-          .eq('id', assignmentId);
-      }
-
-      toast.success(`Dodatno preverjanje ponastavljen (${assignments.length} dodelitev).`);
-      await refetch();
     } catch (err) {
-      console.error('Error resetting additional test:', err);
+      console.error("Error resetting additional test:", err);
       toast.error("Napaka pri ponastavitvi dodatnega preverjanja.");
     } finally {
       setIsResettingAdditional(false);
