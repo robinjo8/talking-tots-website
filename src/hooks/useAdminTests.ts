@@ -191,6 +191,7 @@ export function useAdminTests() {
           word_count: wordCount,
           session_number: session.session_number ?? 1,
           total_words: session.total_words ?? null,
+          additional_assignment_id: session.additional_assignment_id || null,
         };
       });
 

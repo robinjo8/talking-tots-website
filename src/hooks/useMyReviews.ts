@@ -161,6 +161,7 @@ export function useMyReviews() {
           organization_name: organization?.name || null,
           logopedist_first_name: logopedistProfile?.first_name || null,
           logopedist_last_name: logopedistProfile?.last_name || null,
+          additional_assignment_id: session.additional_assignment_id || null,
         };
       });
 
