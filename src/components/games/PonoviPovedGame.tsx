@@ -239,6 +239,8 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const { selectedChild } = useAuth();
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
   const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
   const [isLandscape, setIsLandscape] = useState(false);
