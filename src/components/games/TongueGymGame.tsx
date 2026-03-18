@@ -164,7 +164,7 @@ export function TongueGymGame() {
 
   const handleClaimStar = async () => {
     // Save progress with 3 stars for completing all exercises
-    recordExerciseCompletion('vaje_za_jezik', 3);
+    recordExerciseCompletion('vaje_za_jezik', 3, logopedistChildId);
     
     // Check for trophy after short delay
     await new Promise(resolve => setTimeout(resolve, 500));
