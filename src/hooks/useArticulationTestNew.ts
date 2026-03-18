@@ -156,7 +156,7 @@ export const useArticulationTestNew = (
     };
 
     fetchImage();
-  }, [currentWordIndex]);
+  }, [currentWordIndex, sortedArticulationData]);
 
   // Auto-play word audio 1 second after image loads (only when autoPlayEnabled)
   useEffect(() => {
@@ -167,7 +167,7 @@ export const useArticulationTestNew = (
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [currentWordIndex, loading, autoPlayEnabled]);
+  }, [currentWordIndex, loading, autoPlayEnabled, sortedArticulationData]);
 
   // Play word audio function
   const playWordAudio = useCallback(() => {
