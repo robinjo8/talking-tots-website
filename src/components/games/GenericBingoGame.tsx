@@ -44,6 +44,8 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Track window size for dynamic scaling
