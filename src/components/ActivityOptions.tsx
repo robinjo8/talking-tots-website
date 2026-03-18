@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Crown } from "lucide-react";
 import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
+import { useAdditionalTestAssignment } from "@/hooks/useAdditionalTestAssignment";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { sl } from "date-fns/locale";
