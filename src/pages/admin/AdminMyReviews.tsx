@@ -423,7 +423,18 @@ export default function AdminMyReviews() {
                           </TableCell>
                           <TableCell>{session.child_name}</TableCell>
                           <TableCell>
-                            {session.child_age ? `${session.child_age} let` : '-'}
+                            {session.additional_assignment_id ? (
+                              <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs whitespace-nowrap">
+                                <ListChecks className="h-3 w-3 mr-1" />
+                                Dodatno preverjanje
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="text-xs whitespace-nowrap">
+                                Preverjanje izgovorjave
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
                           </TableCell>
                           <TableCell>{formatGender(session.child_gender)}</TableCell>
                           <TableCell>
