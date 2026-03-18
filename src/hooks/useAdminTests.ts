@@ -25,6 +25,7 @@ export interface TestSessionData {
   word_count: number;
   session_number: number;
   total_words: number | null;
+  additional_assignment_id: string | null;
 }
 
 export interface ChildGroup {
