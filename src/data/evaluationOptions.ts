@@ -14,23 +14,36 @@ const sortedArticulationData = [...articulationData].sort((a, b) => {
 });
 
 // Dinamično mapiranje wordIndex → črka iz fonetično sortiranih podatkov
-const wordIndexToLetterMap = new Map<number, string>();
-const wordIndexToWordMap = new Map<number, string>();
-let currentIndex = 0;
-sortedArticulationData.forEach(letterData => {
-  letterData.words.forEach(word => {
-    wordIndexToLetterMap.set(currentIndex, letterData.letter);
-    wordIndexToWordMap.set(currentIndex, word.text);
-    currentIndex++;
+// wordsPerLetter=3 (60 besed) in wordsPerLetter=1 (20 besed)
+function buildWordIndexMaps(wordsPerLetter: number) {
+  const letterMap = new Map<number, string>();
+  const wordMap = new Map<number, string>();
+  let currentIdx = 0;
+  sortedArticulationData.forEach(letterData => {
+    const wordsToUse = letterData.words.slice(0, wordsPerLetter);
+    wordsToUse.forEach(word => {
+      letterMap.set(currentIdx, letterData.letter);
+      wordMap.set(currentIdx, word.text);
+      currentIdx++;
+    });
   });
-});
-
-export function getLetterFromWordIndex(wordIndex: number): string {
-  return wordIndexToLetterMap.get(wordIndex) || 'X';
+  return { letterMap, wordMap };
 }
 
-export function getWordFromWordIndex(wordIndex: number): string {
-  return wordIndexToWordMap.get(wordIndex) || 'NEZNANO';
+// Pre-built maps for both modes
+const maps3 = buildWordIndexMaps(3);
+const maps1 = buildWordIndexMaps(1);
+
+function getMaps(wordsPerLetter: number) {
+  return wordsPerLetter === 1 ? maps1 : maps3;
+}
+
+export function getLetterFromWordIndex(wordIndex: number, wordsPerLetter: number = 3): string {
+  return getMaps(wordsPerLetter).letterMap.get(wordIndex) || 'X';
+}
+
+export function getWordFromWordIndex(wordIndex: number, wordsPerLetter: number = 3): string {
+  return getMaps(wordsPerLetter).wordMap.get(wordIndex) || 'NEZNANO';
 }
 
 export interface EvaluationOption {
