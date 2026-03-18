@@ -111,19 +111,24 @@ const GovornojezicovneVaje = () => {
           </div>
           
           {selectedChild ? (
-            <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 gap-8"}>
+            <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {exerciseTypes.map(exercise => (
                 <div key={exercise.id} className="flex h-full">
                   <div
                     className={cn(
-                      "bg-white rounded-xl shadow-lg border border-gray-200 hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col w-full",
+                      "bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group flex flex-col w-full",
                       !exercise.available && "opacity-50 cursor-not-allowed"
                     )}
                     onClick={() => exercise.available && navigate(exercise.path)}
                   >
                     {/* Card Image */}
                     <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-                      <div className="absolute inset-0 bg-white" />
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
+                        }}
+                      />
                       <div className="absolute inset-0 flex items-center justify-center p-2">
                         <img 
                           src={exercise.image}
@@ -137,19 +142,17 @@ const GovornojezicovneVaje = () => {
                       </div>
                     </div>
 
-                    <div className="border-t border-border" />
-
                     {/* Card Content */}
-                    <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-4 flex flex-col flex-grow"}>
+                    <div className={isMobile ? "p-3 flex flex-col flex-grow" : "p-6 flex flex-col flex-grow"}>
                       <h3 className={isMobile 
                         ? "text-sm font-bold text-foreground mb-1 group-hover:text-app-blue transition-colors text-center whitespace-pre-line" 
-                        : "text-lg font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors"
+                        : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors min-h-[3.5rem] flex items-center"
                       }>
                         {isMobile ? exercise.mobileTitle : exercise.title}
                       </h3>
                       <p className={isMobile 
                         ? "text-xs text-muted-foreground line-clamp-3"
-                        : "text-sm text-muted-foreground leading-relaxed"
+                        : "text-sm text-muted-foreground leading-relaxed line-clamp-3"
                       }>
                         {exercise.description}
                       </p>
