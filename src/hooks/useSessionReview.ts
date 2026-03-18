@@ -165,7 +165,11 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
   const sessionNumber = (session as any).session_number || 1;
   const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
   
-  console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type);
+  // Določi wordsPerLetter glede na total_words
+  const totalWords = session.total_words;
+  const wordsPerLetter = totalWords === 20 ? 1 : 3;
+  
+  console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type, 'total_words:', totalWords, 'wordsPerLetter:', wordsPerLetter);
 
   // Pridobi posnetke iz mape
   let recordings: Recording[] = [];
