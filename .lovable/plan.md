@@ -1,82 +1,34 @@
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Problem Analysis
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+The bug: when "Dodatno preverjanje" loads, the word text shows correctly (e.g., "BRADA") but the image shows "Pajek" (spider) — the first word from the standard articulation test.
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+**Root cause**: In `useArticulationTestNew.ts`, the image-fetching `useEffect` (line ~111) only depends on `currentWordIndex`. When the component first mounts:
 
----
+1. `customWordData` is `undefined` (words are still loading from DB)
+2. The hook falls back to standard `articulationData` → first word is "Pajek"
+3. Image for "Pajek" is fetched and displayed
+4. When `customWordData` arrives, `sortedArticulationData` updates, word text updates (re-render)
+5. But `currentWordIndex` is still `0`, so the image `useEffect` does NOT re-run
+6. Result: correct word text, wrong image
 
-# Popravki preverjanja izgovorjave (implementirano)
+## Fix
 
-## Implementirane spremembe
+**File: `src/hooks/useArticulationTestNew.ts`**
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+Add `sortedArticulationData` to the dependency array of the image-fetching `useEffect` (around line 111). This ensures the image re-fetches when the word data source changes.
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+Change:
+```ts
+}, [currentWordIndex]);
+```
+To:
+```ts
+}, [currentWordIndex, sortedArticulationData]);
+```
 
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+Similarly, the auto-play audio `useEffect` (around line 130) should also depend on `sortedArticulationData` to ensure correct audio plays.
 
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
+This is a one-line fix in the dependency array that resolves the stale image/audio when custom word data loads asynchronously.
 
----
-
-# Dodatno preverjanje izgovorjave (implementirano)
-
-## Implementirane spremembe
-
-### 1. DB migracija
-- Nova tabela `additional_test_assignments` za dodelitve dodatnega preverjanja
-- Nova tabela `additional_test_words` za besede v dodelitvi
-- Dodan `additional_assignment_id` stolpec v `articulation_test_sessions`
-- RLS politike za logopede (INSERT/SELECT) in starše (SELECT/UPDATE)
-- Nov enum `additional_test_completed` v `notification_type`
-
-### 2. Admin portal
-- Gumb "Dodeli dodatno preverjanje" na strani pregleda seje (`AdminSessionReview.tsx`)
-- `AdditionalTestAssignDialog.tsx` — dialog z iskalnikom besed iz vseh iger in testa
-- Grupiranje po črkah, checkbox izbira, gumb "Dodeli uporabniku"
-
-### 3. Uporabniški portal
-- Nova kartica "Dodatno preverjanje" v `ActivityOptions.tsx` (vidna samo ko ima otrok aktivno dodelitev)
-- Nova stran `/dodatno-preverjanje` (`DodatnoPreverjanje.tsx`) — enak dizajn kot artikulacijski test
-- `useAdditionalTestAssignment.ts` — preverjanje aktivne dodelitve + nalaganje besed
-- `useAdditionalTestSession.ts` — upravljanje sej za dodatno preverjanje
-
-### 4. Obvestila
-- Ob zaključku dodatnega preverjanja se ustvari obvestilo za logopeda
-- Seja se prikaže v `/admin/pending` za pregled
-
-### 5. Nedotaknjene datoteke
-- `ArtikuacijskiTest.tsx` — brez sprememb
-- `useArticulationTestNew.ts` — se re-uporabi (read-only)
-- `useUserSessionManager.ts` — brez sprememb
-- `articulationTestData.ts` — brez sprememb
