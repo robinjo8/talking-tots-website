@@ -31,6 +31,25 @@ interface AdminAuthContextType {
 }
 
 const MFA_SESSION_KEY = 'tomitalk_mfa_verified';
+const MFA_EXPIRY_MS = 4 * 60 * 60 * 1000; // 4 hours
+
+function getMfaStatus(currentUserId?: string): boolean {
+  try {
+    const raw = sessionStorage.getItem(MFA_SESSION_KEY);
+    if (!raw) return false;
+    const data = JSON.parse(raw);
+    if (!data.userId || !data.verifiedAt) return false;
+    if (currentUserId && data.userId !== currentUserId) return false;
+    if (Date.now() - data.verifiedAt > MFA_EXPIRY_MS) {
+      sessionStorage.removeItem(MFA_SESSION_KEY);
+      return false;
+    }
+    return true;
+  } catch {
+    sessionStorage.removeItem(MFA_SESSION_KEY);
+    return false;
+  }
+}
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
 
@@ -42,14 +61,12 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const [mfaVerified, setMfaVerifiedState] = useState<boolean>(() => {
-    return sessionStorage.getItem(MFA_SESSION_KEY) === 'true';
-  });
+  const [mfaVerified, setMfaVerifiedState] = useState<boolean>(false);
 
-  const setMfaVerified = (verified: boolean) => {
+  const setMfaVerified = (verified: boolean, userId?: string) => {
     setMfaVerifiedState(verified);
-    if (verified) {
-      sessionStorage.setItem(MFA_SESSION_KEY, 'true');
+    if (verified && userId) {
+      sessionStorage.setItem(MFA_SESSION_KEY, JSON.stringify({ userId, verifiedAt: Date.now() }));
     } else {
       sessionStorage.removeItem(MFA_SESSION_KEY);
     }
