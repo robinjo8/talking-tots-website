@@ -1,49 +1,30 @@
 
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
+# Problem: MFA bypass pri admin prijavi
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Vzrok
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+MFA stanje je shranjeno v `sessionStorage` kot preprost boolean (`tomitalk_mfa_verified = 'true'`), brez vezave na uporabnika ali časovni žig. To pomeni:
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+1. **Ni vezano na user ID** — če se uporabnik A verificira, se odjavi, in se uporabnik B prijavi v istem zavihku, je flag morda še vedno prisoten (čeprav signOut ga briše, obstaja tveganje pri race conditions)
+2. **Ni časovne omejitve** — če se uporabnik verificira in nato osveži stran (F5), `sessionStorage` ohrani flag. Supabase auth token se samodejno obnovi, uporabnik pa obide MFA
+3. **`sessionStorage` preživi osvežitve strani** — flag ostane dokler se zavihek ne zapre
 
----
+## Rešitev
 
-# Popravki preverjanja izgovorjave (implementirano)
+### `src/contexts/AdminAuthContext.tsx`
 
-## Implementirane spremembe
+1. **Shrani user ID skupaj z MFA flagom** — namesto golega `'true'`, shrani JSON: `{ userId: "...", verifiedAt: timestamp }`
+2. **Preveri ob inicializaciji**, da se `userId` ujema s trenutnim uporabnikom
+3. **Dodaj časovno omejitev** (npr. 4 ure) — po preteku se zahteva nova MFA verifikacija
+4. **Ob auth state change `SIGNED_IN`** — preveri ali se user ID ujema s shranjenim; če ne, ponastavi MFA na `false`
 
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
+Spremembe:
+- `MFA_SESSION_KEY` vrednost postane JSON objekt namesto `'true'`
+- `setMfaVerified(true)` shrani `{ userId, verifiedAt: Date.now() }`
+- Inicializacija `mfaVerified` stanja preveri ujemanje userId IN da ni preteklo 4 ure
+- V `onAuthStateChange` callbacku: če se user ID spremeni, ponastavi MFA
+- `signOut` ostane enak (briše sessionStorage)
 
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+Ta sprememba je omejena na eno datoteko in ne vpliva na ostalo logiko.
 
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
