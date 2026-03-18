@@ -39,7 +39,7 @@ export function useMyReviews() {
       // 1. Get sessions assigned to current logopedist
       const { data: sessions, error: sessionsError } = await supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, assigned_at, reviewed_at, completed_at, child_id, parent_id, source_type, logopedist_child_id, organization_id')
+        .select('id, status, submitted_at, assigned_at, reviewed_at, completed_at, child_id, parent_id, source_type, logopedist_child_id, organization_id, additional_assignment_id')
         .eq('assigned_to', profile.id)
         .in('status', ['assigned', 'in_review', 'completed'])
         .order('assigned_at', { ascending: false });
