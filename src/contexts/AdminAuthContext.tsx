@@ -23,7 +23,7 @@ interface AdminAuthContextType {
   isLogopedist: boolean;
   isSuperAdmin: boolean;
   mfaVerified: boolean;
-  setMfaVerified: (verified: boolean) => void;
+  setMfaVerified: (verified: boolean, userId?: string) => void;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, firstName: string, lastName: string, organizationId: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
