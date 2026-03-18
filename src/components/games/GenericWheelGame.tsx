@@ -90,7 +90,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
 
   const handleStarClaimed = async () => {
     setStarClaimed(true);
-    recordExerciseCompletion(`kolo-besed-${letter}`);
+    recordExerciseCompletion(`kolo-besed-${letter}`, 1, logopedistChildId);
     setTimeout(() => {
       setShowBravoDialog(false);
       setStarClaimed(false);

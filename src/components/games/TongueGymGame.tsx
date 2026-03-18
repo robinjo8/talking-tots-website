@@ -94,6 +94,19 @@ export function TongueGymGame() {
   const { playAudio } = useAudioPlayback();
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  
+  // Import dynamically to avoid issues when not in GameModeProvider
+  const [logopedistChildId, setLogopedistChildId] = useState<string | undefined>(undefined);
+  useEffect(() => {
+    try {
+      // This component may not always be wrapped in GameModeProvider
+      const { useGameMode } = require('@/contexts/GameModeContext');
+      const gameMode = useGameMode();
+      if (gameMode.mode === 'logopedist' && gameMode.logopedistChildId) {
+        setLogopedistChildId(gameMode.logopedistChildId);
+      }
+    } catch { /* not in game mode context */ }
+  }, []);
 
   const currentCard = tongueExercises[currentExercise];
   const progress = (completedExercises.size / tongueExercises.length) * 100;

@@ -112,7 +112,7 @@ export function GenericPoveziPareGame({ config }: Props) {
 
   const handleStarClaimed = async () => {
     // Record star to Supabase
-    recordGameCompletion('matching', `povezi-pare-${config.letter}`);
+    recordGameCompletion('matching', `povezi-pare-${config.letter}`, logopedistChildId);
     setShowNewGameButton(true);
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));

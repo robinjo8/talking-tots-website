@@ -136,7 +136,7 @@ export function GenericMetKockeGame({
   // Star claim handler
   const handleClaimStar = useCallback(async () => {
     // Record star to Supabase
-    recordExerciseCompletion(`smesne-povedi-${letter}`);
+    recordExerciseCompletion(`smesne-povedi-${letter}`, 1, logopedistChildId);
     if (selectedBitje !== null) {
       incrementProgress(bitje[selectedBitje].word);
     }

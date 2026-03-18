@@ -211,16 +211,6 @@ export default function AdminChildProgress() {
         </Collapsible>
       </Card>
 
-      {/* Action button */}
-      <div className="flex justify-center">
-        <Button
-          size="lg"
-          onClick={() => navigate(`/admin/children/${childId}/workspace`)}
-          className="bg-dragon-green hover:bg-dragon-green/90"
-        >
-          Začni delo z {child.name}
-        </Button>
-      </div>
     </div>
   );
 }

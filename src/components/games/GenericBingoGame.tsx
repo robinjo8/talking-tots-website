@@ -152,7 +152,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   };
 
   const handleStarClaimed = async () => {
-    recordExerciseCompletion(exerciseId);
+    recordExerciseCompletion(exerciseId, 1, logopedistChildId);
     setStarClaimed(true);
     setShowCongratulations(false);
     setShowNewGameButton(true);

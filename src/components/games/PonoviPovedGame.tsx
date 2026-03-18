@@ -1206,7 +1206,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
             <Button
               onClick={async () => {
                 // Shrani napredek s poenotenim sistemom
-                recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+                recordExerciseCompletion(`ponovi-poved-${config.letter}`, 1, logopedistChildId);
                 onGameComplete?.();
                 
                 // Preveri za nov pokal
