@@ -191,7 +191,7 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     );
 
     const signedUrlPromises = audioFiles.map(async file => {
-      const parsed = parseRecordingFilename(file.name);
+      const parsed = parseRecordingFilename(file.name, wordsPerLetter);
       if (!parsed) return null;
 
       // Uporabi signed URL za zasebni bucket
