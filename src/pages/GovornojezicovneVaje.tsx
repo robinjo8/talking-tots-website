@@ -73,7 +73,7 @@ const GovornojezicovneVaje = () => {
       mobileTitle: "VIDEO\nNAVODILA",
       description: "Video navodila logopeda za pravilno izgovorjavo posameznih glasov. Kratki posnetki prikazujejo položaj govoril in tehniko izgovorjave.",
       path: "/video-navodila",
-      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video navodila.webp",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_video navodila_1.webp",
       imageScale: "90%",
       available: true,
     },
