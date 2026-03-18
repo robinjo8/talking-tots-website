@@ -20,7 +20,8 @@ export const useArticulationTestNew = (
   maxWords?: number,
   sessionId?: string,  // DB session UUID for word results
   wordsPerLetter: number = 3,  // 1 for age group 3-4, 3 for all others
-  autoPlayEnabled: boolean = true  // Controls whether auto-play audio is active
+  autoPlayEnabled: boolean = true,  // Controls whether auto-play audio is active
+  customWordData?: { letter: string; words: { text: string; image: string; audio?: string; acceptedVariants?: string[] }[] }[]
 ) => {
   // Start from startIndex (default 0, or 57 for testing with Ž only)
   const [currentWordIndex, setCurrentWordIndex] = useState(startIndex);
