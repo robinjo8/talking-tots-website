@@ -57,7 +57,9 @@ export const useArticulationTestNew = (
   // Sort articulation data by phonetic order and filter words per letter
   // When customWordData is provided, use it as-is (preserve assigned order)
   const sortedArticulationData = useMemo(() => {
-    if (customWordData && customWordData.length > 0) {
+    // When customWordData is provided (even empty array), NEVER fall back to default data.
+    // This prevents showing "Pajek" images when custom words are still loading.
+    if (customWordData !== undefined) {
       return customWordData;
     }
     return [...articulationData]

@@ -191,7 +191,7 @@ const DodatnoPreverjanje = () => {
     sessionInfo?.sessionId,
     3,
     testStarted,
-    customArticulationData.length > 0 ? customArticulationData : undefined
+    customArticulationData // Always pass custom data array (even if empty) to prevent fallback to default test
   );
 
   // Check for existing session on mount
