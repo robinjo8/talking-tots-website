@@ -202,25 +202,26 @@ export function AdditionalTestAssignDialog({ open, onOpenChange, childId, logope
         </div>
 
         {/* Letter filter chips - two rows */}
+        {/* Letter filter chips - two rows */}
         <div className="space-y-1.5">
-          <div className="flex flex-wrap gap-1.5">
-            {letters.slice(0, Math.ceil(letters.length / 2)).map(letter => (
+          <div className="grid grid-cols-10 gap-1.5">
+            {letters.slice(0, 10).map(letter => (
               <Badge
                 key={letter}
                 variant={selectedLetterFilter === letter ? 'default' : 'outline'}
-                className="cursor-pointer"
+                className="cursor-pointer justify-center"
                 onClick={() => setSelectedLetterFilter(selectedLetterFilter === letter ? null : letter)}
               >
                 {letter}
               </Badge>
             ))}
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {letters.slice(Math.ceil(letters.length / 2)).map(letter => (
+          <div className="grid grid-cols-10 gap-1.5">
+            {letters.slice(10).map(letter => (
               <Badge
                 key={letter}
                 variant={selectedLetterFilter === letter ? 'default' : 'outline'}
-                className="cursor-pointer"
+                className="cursor-pointer justify-center"
                 onClick={() => setSelectedLetterFilter(selectedLetterFilter === letter ? null : letter)}
               >
                 {letter}
