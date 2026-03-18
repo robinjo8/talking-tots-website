@@ -43,7 +43,7 @@ const GovornojezicovneVaje = () => {
       mobileTitle: "VAJE MOTORIKE\nGOVORIL",
       description: "Vaje motorike govoril so namenjene razgibavanju govoril – ust, ustnic, jezika. Hkrati gibljemo tudi nekatere druge dele obraza in ust, ki so vključeni v govor in tudi negovorne aktivnosti.",
       path: "/govorno-jezikovne-vaje/vaje-motorike-govoril",
-      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje govoril.webp",
+      image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_vaje govoril_1.webp",
       imageScale: "90%",
       available: true,
     },
