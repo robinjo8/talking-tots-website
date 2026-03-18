@@ -167,7 +167,7 @@ export const useArticulationTestNew = (
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [currentWordIndex, loading, autoPlayEnabled]);
+  }, [currentWordIndex, loading, autoPlayEnabled, sortedArticulationData]);
 
   // Play word audio function
   const playWordAudio = useCallback(() => {
