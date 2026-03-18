@@ -28,6 +28,7 @@ export interface SessionReviewData {
     sourceType: 'parent' | 'logopedist';
     logopedistChildId: string | null;
     organizationId: string | null;
+    additionalAssignmentId: string | null;
   };
   child: {
     name: string;
