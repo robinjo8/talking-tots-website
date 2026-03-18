@@ -134,7 +134,11 @@ export const useArticulationTestNew = (
   // Fetch image when word changes
   useEffect(() => {
     const fetchImage = async () => {
-      if (!currentData) return;
+      if (!currentData || sortedArticulationData.length === 0) {
+        setImageUrl(null);
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       setHasRecorded(false);
