@@ -86,6 +86,7 @@ const Labirint = lazy(() => import("@/pages/Labirint"));
 const KoloSreceGames = lazy(() => import("@/pages/KoloSreceGames"));
 const BingoGames = lazy(() => import("@/pages/BingoGames"));
 const ArtikuacijskiTest = lazy(() => import("@/pages/ArtikuacijskiTest"));
+const DodatnoPreverjanje = lazy(() => import("@/pages/DodatnoPreverjanje"));
 const MojiIzzivi = lazy(() => import("@/pages/MojiIzzivi"));
 const MojiIzziviArhiv = lazy(() => import("@/pages/MojiIzziviArhiv"));
 const VideoNavodila = lazy(() => import("@/pages/VideoNavodila"));
