@@ -23,6 +23,7 @@ export interface MyReviewSession {
   organization_name: string | null;
   logopedist_first_name: string | null;
   logopedist_last_name: string | null;
+  additional_assignment_id: string | null;
 }
 
 export function useMyReviews() {
