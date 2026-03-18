@@ -222,10 +222,18 @@ export function AdditionalTestAssignDialog({ open, onOpenChange, childId, logope
           ))}
         </div>
 
-        {/* Selected count */}
+        {/* Selected count + clear */}
         {selectedWords.size > 0 && (
-          <div className="text-sm text-muted-foreground">
-            Izbrano: <span className="font-medium text-foreground">{selectedWords.size}</span> besed
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <span>Izbrano: <span className="font-medium text-foreground">{selectedWords.size}</span> besed</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => setSelectedWords(new Set())}
+            >
+              Počisti
+            </Button>
           </div>
         )}
 
