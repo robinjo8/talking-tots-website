@@ -2,6 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Lock, Crown } from "lucide-react";
 import { useArticulationTestStatus } from "@/hooks/useArticulationTestStatus";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
+import { useAdditionalTestAssignment } from "@/hooks/useAdditionalTestAssignment";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { sl } from "date-fns/locale";
@@ -13,6 +15,8 @@ export function ActivityOptions() {
   const navigate = useNavigate();
   const { isTestAvailable, nextTestDate, lastCompletedAt } = useArticulationTestStatus();
   const { planId, isSubscribed } = useSubscriptionContext();
+  const { selectedChild } = useAuth();
+  const { hasActiveAssignment } = useAdditionalTestAssignment(selectedChild?.id);
   
   const isPro = planId === 'pro';
   
@@ -54,7 +58,17 @@ export function ActivityOptions() {
       gradient: 'from-app-purple/20 to-app-teal/20',
       badge: '🎯',
       url: '/artikulacijski-test'
-    }
+    },
+    // Conditionally add "Dodatno preverjanje" card
+    ...(hasActiveAssignment ? [{
+      id: 'additional-test',
+      title: 'Dodatno preverjanje',
+      description: 'Dodatno preverjanje izgovorjave po naročilu logopeda.',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_4.png',
+      gradient: 'from-app-orange/20 to-app-yellow/20',
+      badge: '🎯',
+      url: '/dodatno-preverjanje'
+    }] : []),
   ];
 
   const handleActivityClick = (activity: typeof activities[0]) => {

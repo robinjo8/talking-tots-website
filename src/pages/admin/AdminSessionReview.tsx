@@ -12,6 +12,8 @@ import { sl } from 'date-fns/locale';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
+import { AdditionalTestAssignDialog } from '@/components/admin/AdditionalTestAssignDialog';
+import { ClipboardPlus } from 'lucide-react';
 
 export default function AdminSessionReview() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -31,6 +33,7 @@ export default function AdminSessionReview() {
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [showTakeoverDialog, setShowTakeoverDialog] = useState(false);
   const [isTakingOver, setIsTakingOver] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
@@ -258,11 +261,24 @@ export default function AdminSessionReview() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <SessionReviewHeader
-        childName={data.child.name}
-        childAge={data.child.age}
-        childGender={data.child.gender}
-      />
+      <div className="flex items-start justify-between">
+        <SessionReviewHeader
+          childName={data.child.name}
+          childAge={data.child.age}
+          childGender={data.child.gender}
+        />
+        {data.session.childId && logopedistProfile && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAssignDialog(true)}
+            className="gap-2 shrink-0"
+          >
+            <ClipboardPlus className="h-4 w-4" />
+            Dodeli dodatno preverjanje
+          </Button>
+        )}
+      </div>
 
       {/* Info za read-only način z gumbom Popravi */}
       {isReadOnly && (
@@ -349,6 +365,16 @@ export default function AdminSessionReview() {
         onConfirm={handleTakeoverCase}
         isLoading={isTakingOver}
       />
+
+      {/* Dialog za dodelitev dodatnega preverjanja */}
+      {data.session.childId && logopedistProfile && (
+        <AdditionalTestAssignDialog
+          open={showAssignDialog}
+          onOpenChange={setShowAssignDialog}
+          childId={data.session.childId}
+          logopedistProfileId={logopedistProfile.id}
+        />
+      )}
     </div>
   );
 }

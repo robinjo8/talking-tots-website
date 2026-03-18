@@ -86,6 +86,7 @@ const Labirint = lazy(() => import("@/pages/Labirint"));
 const KoloSreceGames = lazy(() => import("@/pages/KoloSreceGames"));
 const BingoGames = lazy(() => import("@/pages/BingoGames"));
 const ArtikuacijskiTest = lazy(() => import("@/pages/ArtikuacijskiTest"));
+const DodatnoPreverjanje = lazy(() => import("@/pages/DodatnoPreverjanje"));
 const MojiIzzivi = lazy(() => import("@/pages/MojiIzzivi"));
 const MojiIzziviArhiv = lazy(() => import("@/pages/MojiIzziviArhiv"));
 const VideoNavodila = lazy(() => import("@/pages/VideoNavodila"));
@@ -184,6 +185,7 @@ export function AppRoutes() {
       <Route path="/artikulacija" element={<ProtectedLazyRoute><ArtIzgovorjavaPage /></ProtectedLazyRoute>} />
       <Route path="/artikulacija/:letter" element={<ProtectedLazyRoute><ArtIzgovorjavaPage /></ProtectedLazyRoute>} />
       <Route path="/artikulacijski-test" element={<ProtectedLazyRoute><ArtikuacijskiTest /></ProtectedLazyRoute>} />
+      <Route path="/dodatno-preverjanje" element={<ProtectedLazyRoute><DodatnoPreverjanje /></ProtectedLazyRoute>} />
       
       {/* Govorne igre */}
       <Route path="/govorne-igre" element={<ProtectedLazyRoute><GovorneIgre /></ProtectedLazyRoute>} />
