@@ -155,6 +155,8 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        const mfaValid = getMfaStatus(session.user.id);
+        setMfaVerifiedState(mfaValid);
         fetchLogopedistProfile(session.user.id);
       } else {
         setIsProfileLoading(false);
