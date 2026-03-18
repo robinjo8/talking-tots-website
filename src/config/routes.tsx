@@ -185,6 +185,7 @@ export function AppRoutes() {
       <Route path="/artikulacija" element={<ProtectedLazyRoute><ArtIzgovorjavaPage /></ProtectedLazyRoute>} />
       <Route path="/artikulacija/:letter" element={<ProtectedLazyRoute><ArtIzgovorjavaPage /></ProtectedLazyRoute>} />
       <Route path="/artikulacijski-test" element={<ProtectedLazyRoute><ArtikuacijskiTest /></ProtectedLazyRoute>} />
+      <Route path="/dodatno-preverjanje" element={<ProtectedLazyRoute><DodatnoPreverjanje /></ProtectedLazyRoute>} />
       
       {/* Govorne igre */}
       <Route path="/govorne-igre" element={<ProtectedLazyRoute><GovorneIgre /></ProtectedLazyRoute>} />

@@ -58,7 +58,17 @@ export function ActivityOptions() {
       gradient: 'from-app-purple/20 to-app-teal/20',
       badge: '🎯',
       url: '/artikulacijski-test'
-    }
+    },
+    // Conditionally add "Dodatno preverjanje" card
+    ...(hasActiveAssignment ? [{
+      id: 'additional-test',
+      title: 'Dodatno preverjanje',
+      description: 'Dodatno preverjanje izgovorjave po naročilu logopeda.',
+      image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_artikulacija_4.png',
+      gradient: 'from-app-orange/20 to-app-yellow/20',
+      badge: '🎯',
+      url: '/dodatno-preverjanje'
+    }] : []),
   ];
 
   const handleActivityClick = (activity: typeof activities[0]) => {

@@ -33,6 +33,7 @@ export default function AdminSessionReview() {
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [showTakeoverDialog, setShowTakeoverDialog] = useState(false);
   const [isTakingOver, setIsTakingOver] = useState(false);
+  const [showAssignDialog, setShowAssignDialog] = useState(false);
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
