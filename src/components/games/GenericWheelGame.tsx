@@ -68,6 +68,8 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
   const { checkForNewTrophy } = useTrophyContext();
   const { recordExerciseCompletion } = useEnhancedProgress();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
 
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
   const handleConfirmExit = () => { navigate(backPath); };
