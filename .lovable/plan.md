@@ -1,44 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-## Kako deluje trenutno (in zakaj je narobe za 20 besed)
+## Implementirane spremembe
 
-**60-besedni test (deluje pravilno):**
-- wordIndex 0 → P/PAJEK, 1 → P/OPICA, 2 → P/REP, 3 → B/BIK, 4 → B/OBLAK, ...
-- V datoteki posnetka je zapisan ta isti wordIndex (npr. `P-0-PAJEK-...webm`, `P-1-OPICA-...webm`)
-- Pregled pravilno mapira nazaj
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-**20-besedni test (problem):**
-- Tu je `wordsPerLetter = 1`, torej vsak glas ima samo 1 besedo
-- wordIndex gre: 0 → PAJEK, 1 → BIK, 2 → MED, 3 → TORBA, ...
-- Datoteke se shranijo kot `P-0-PAJEK-...webm`, `B-1-BIK-...webm`, `M-2-MED-...webm`
-- **Problem:** `parseRecordingFilename` vedno uporablja 60-besedno mapiranje, kjer je wordIndex 1 = OPICA (druga beseda glasu P), ne BIK (glas B). Zato se BIK prikaže pod glasom P kot "OPICA".
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-## Kako bo delovalo po popravku
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-Za 20-besedni test se bo v pregledu za vsak glas prikazala samo 1 beseda (pravilna):
-- Glas P → PAJEK
-- Glas B → BIK
-- Glas M → MED
-- itd.
+---
 
-Posnetki se bodo pravilno razvrstili pod prave glasove glede na `total_words` iz seje.
+# Popravki preverjanja izgovorjave (implementirano)
 
-## Vpliv na 60-besedni test
+## Implementirane spremembe
 
-**Nič se ne bo pokvarilo.** Sprememba je zasnovana tako:
-- Funkcije `getLetterFromWordIndex` in `parseRecordingFilename` dobijo opcijski parameter `wordsPerLetter` s privzeto vrednostjo `3`
-- Vsi obstoječi klici brez tega parametra bodo delovali identično kot doslej
-- Samo v `useSessionReview.ts` se bo iz seje prebralo `total_words` in na podlagi tega posredovalo `wordsPerLetter = 1` (za 20 besed) ali `3` (za 60 besed)
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
 
-## Spremembe
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
 
-### 1. `src/data/evaluationOptions.ts`
-- Zgradim **dva** mapiranja: eno za `wordsPerLetter=3` (obstoječe, 60 besed) in eno za `wordsPerLetter=1` (20 besed, samo prva beseda vsakega glasu)
-- Funkciji `getLetterFromWordIndex(wordIndex, wordsPerLetter?)` in `getWordFromWordIndex(wordIndex, wordsPerLetter?)` sprejmeta opcijski parameter (privzeto 3)
-- `parseRecordingFilename(filename, wordsPerLetter?)` posreduje parameter naprej
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
 
-### 2. `src/hooks/useSessionReview.ts`
-- Iz seje prebere `total_words` (že obstaja v bazi)
-- Izračuna `wordsPerLetter = (total_words === 20) ? 1 : 3`
-- Posreduje v `parseRecordingFilename` pri parsanju imen datotek
-
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
