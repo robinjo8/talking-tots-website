@@ -23,6 +23,7 @@ import {
 import { PoveziPareConfig } from '@/data/poveziPareConfig';
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface Props {
   config: PoveziPareConfig;
@@ -34,6 +35,8 @@ export function GenericPoveziPareGame({ config }: Props) {
   const isMobile = useIsMobile();
   const { recordGameCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
   const [gameKey, setGameKey] = useState(0);
   const [showInstructions, setShowInstructions] = useState(false);
   const [showCompletion, setShowCompletion] = useState(false);
@@ -109,7 +112,7 @@ export function GenericPoveziPareGame({ config }: Props) {
 
   const handleStarClaimed = async () => {
     // Record star to Supabase
-    recordGameCompletion('matching', `povezi-pare-${config.letter}`);
+    recordGameCompletion('matching', `povezi-pare-${config.letter}`, logopedistChildId);
     setShowNewGameButton(true);
     // Check for trophy after claiming star
     await new Promise(resolve => setTimeout(resolve, 500));

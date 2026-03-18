@@ -40,6 +40,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { InstructionsModal } from "@/components/puzzle/InstructionsModal";
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 type GamePhase = "start" | "word" | "sentence" | "complete";
 
@@ -238,6 +239,8 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
   const { selectedChild } = useAuth();
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
   const audioRef = useRef<HTMLAudioElement>(null);
   const isMobile = useIsMobile();
   const [isLandscape, setIsLandscape] = useState(false);
@@ -1203,7 +1206,7 @@ export function PonoviPovedGame({ config, backPath = '/govorne-igre/ponovi-poved
             <Button
               onClick={async () => {
                 // Shrani napredek s poenotenim sistemom
-                recordExerciseCompletion(`ponovi-poved-${config.letter}`);
+                recordExerciseCompletion(`ponovi-poved-${config.letter}`, 1, logopedistChildId);
                 onGameComplete?.();
                 
                 // Preveri za nov pokal

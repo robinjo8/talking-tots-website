@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { BingoWordData } from "@/data/artikulacijaVajeConfig";
 import { LipsImageButton } from "@/components/games/LipsImageButton";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface GenericBingoGameProps {
   letter: string;
@@ -43,6 +44,8 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   const [windowSize, setWindowSize] = useState({ width: 0, height: 0 });
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Track window size for dynamic scaling
@@ -149,7 +152,7 @@ export function GenericBingoGame({ letter, displayLetter, title, wordsData, exer
   };
 
   const handleStarClaimed = async () => {
-    recordExerciseCompletion(exerciseId);
+    recordExerciseCompletion(exerciseId, 1, logopedistChildId);
     setStarClaimed(true);
     setShowCongratulations(false);
     setShowNewGameButton(true);

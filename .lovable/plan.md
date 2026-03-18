@@ -1,42 +1,49 @@
 
+# Osebni načrt — Set-based sistem (implementirano)
 
-# Fix: Napredek se ne beleži pri nekaterih igrah v admin načinu + odstrani gumb "Začni delo" s strani progress
+## Implementirane spremembe
 
-## Problem
-Gumb "Začni delo" na obeh straneh (/admin/children in /admin/children/:id/progress) vodi na isto stran (workspace). Problem ni v navigaciji, ampak v tem, da **6 od 13 iger/vaj ne posreduje `logopedistChildId`** pri shranjevanju napredka. Te igre kličejo `recordExerciseCompletion(id)` ali `recordGameCompletion(type, subtype)` brez tretjega parametra, zato se napredek shrani brez `logopedist_child_id` in se ne prikaže na strani progress.
+### 1. DB migracija
+- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
+- Dodan `set_number` stolpec v `plan_activity_completions`
+- Dodan `expires_at` stolpec v `child_monthly_plans`
+- RLS politike za starše in logopede
 
-## Igre, ki jih je treba popraviti (6 komponent)
+### 2. Edge function `generate-monthly-plan`
+- 90 dni → 30 sklopov
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- Motorika frekvenca se preračuna v "vsak N-ti sklop"
+- `expires_at` nastavljeno na 90 dni
 
-| Komponenta | Datoteka | Manjka |
-|---|---|---|
-| GenericBingoGame | `src/components/games/GenericBingoGame.tsx` | `useGameMode` + posredovanje `logopedistChildId` |
-| GenericWheelGame | `src/components/games/GenericWheelGame.tsx` | isto |
-| GenericMetKockeGame | `src/components/games/GenericMetKockeGame.tsx` | isto |
-| TongueGymGame | `src/components/games/TongueGymGame.tsx` | isto |
-| GenericPoveziPareGame | `src/components/games/GenericPoveziPareGame.tsx` | isto |
-| PonoviPovedGame | `src/components/games/PonoviPovedGame.tsx` | isto |
+### 3. Frontend
+- `useMonthlyPlan.ts` — novi tipi (PlanSet)
+- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
+- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
+- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
+- `PlanSetCard.tsx` — nova komponenta za sklop
+- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
 
-## Spremembe
+---
 
-### 1. Pri vseh 6 komponentah dodaj isto logiko kot jo imajo delujoče igre:
-```tsx
-import { useGameMode } from "@/contexts/GameModeContext";
-// ...
-const gameMode = useGameMode();
-// ...
-const logopedistChildId = gameMode.mode === 'logopedist' 
-  ? gameMode.logopedistChildId 
-  : undefined;
-recordExerciseCompletion(exerciseId, 1, logopedistChildId);
-// ali
-recordGameCompletion('matching', subtype, logopedistChildId);
-```
+# Popravki preverjanja izgovorjave (implementirano)
 
-### 2. Odstrani gumb "Začni delo" s strani progress
-V `src/pages/admin/AdminChildProgress.tsx` odstrani celoten razdelek z gumbom "Začni delo z {child.name}" na dnu strani (vrstice ~170-178).
+## Implementirane spremembe
 
-## Vpliv
-- Obstoječe delujoče igre (7 komponent) ostanejo nespremenjene
-- V uporabniškem načinu (parent) se `logopedistChildId` posreduje kot `undefined`, kar je enako kot sedanje obnašanje - brez vpliva
-- Stran progress bo samo prikazovala napredek, brez gumba za začetek dela
+### 1. Edge function `transcribe-articulation` — filtri
+- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
+- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
+- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
+- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
+- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
 
+### 2. Čiščenje `articulationTestData.ts`
+- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
+
+### 3. Prikaz napak
+- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
+- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
+
+### 4. Samodejno predvajanje zvoka
+- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
+- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
+- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje

@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { WordData } from "@/data/artikulacijaVajeConfig";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface GenericWheelGameProps {
   letter: string;
@@ -67,6 +68,8 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
   const { isSpinning, rotation, selectedWord, selectedIndex, showResult, spinWheel, resetWheel, closeResult } = useFortuneWheel({ wordsData });
   const { checkForNewTrophy } = useTrophyContext();
   const { recordExerciseCompletion } = useEnhancedProgress();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
 
   const handleBack = () => { setMenuOpen(false); setShowExitConfirmation(true); };
   const handleConfirmExit = () => { navigate(backPath); };
@@ -87,7 +90,7 @@ export function GenericWheelGame({ letter, displayLetter, title, wordsData, back
 
   const handleStarClaimed = async () => {
     setStarClaimed(true);
-    recordExerciseCompletion(`kolo-besed-${letter}`);
+    recordExerciseCompletion(`kolo-besed-${letter}`, 1, logopedistChildId);
     setTimeout(() => {
       setShowBravoDialog(false);
       setStarClaimed(false);

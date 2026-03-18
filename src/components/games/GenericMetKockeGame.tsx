@@ -20,6 +20,7 @@ import { useWordProgress } from '@/hooks/useWordProgress';
 import { useEnhancedProgress } from '@/hooks/useEnhancedProgress';
 import { LipsImageButton } from "@/components/games/LipsImageButton";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface GenericMetKockeGameProps {
   letter: string;
@@ -82,6 +83,8 @@ export function GenericMetKockeGame({
   } = useWordProgress(displayLetter, wordsList);
   const { checkForNewTrophy } = useTrophyContext();
   const { recordExerciseCompletion } = useEnhancedProgress();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
 
   // Audio playback
   const playAudio = useCallback((url: string) => {
@@ -133,7 +136,7 @@ export function GenericMetKockeGame({
   // Star claim handler
   const handleClaimStar = useCallback(async () => {
     // Record star to Supabase
-    recordExerciseCompletion(`smesne-povedi-${letter}`);
+    recordExerciseCompletion(`smesne-povedi-${letter}`, 1, logopedistChildId);
     if (selectedBitje !== null) {
       incrementProgress(bitje[selectedBitje].word);
     }

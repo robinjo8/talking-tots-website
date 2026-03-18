@@ -14,6 +14,7 @@ import {
 import { useAudioPlayback } from "@/hooks/useAudioPlayback";
 import { useEnhancedProgress } from "@/hooks/useEnhancedProgress";
 import { useTrophyContext } from "@/contexts/TrophyContext";
+import { useGameMode } from "@/contexts/GameModeContext";
 
 interface TongueExercise {
   id: number;
@@ -94,6 +95,8 @@ export function TongueGymGame() {
   const { playAudio } = useAudioPlayback();
   const { recordExerciseCompletion } = useEnhancedProgress();
   const { checkForNewTrophy } = useTrophyContext();
+  const gameMode = useGameMode();
+  const logopedistChildId = gameMode.mode === 'logopedist' ? gameMode.logopedistChildId : undefined;
 
   const currentCard = tongueExercises[currentExercise];
   const progress = (completedExercises.size / tongueExercises.length) * 100;
@@ -161,7 +164,7 @@ export function TongueGymGame() {
 
   const handleClaimStar = async () => {
     // Save progress with 3 stars for completing all exercises
-    recordExerciseCompletion('vaje_za_jezik', 3);
+    recordExerciseCompletion('vaje_za_jezik', 3, logopedistChildId);
     
     // Check for trophy after short delay
     await new Promise(resolve => setTimeout(resolve, 500));
