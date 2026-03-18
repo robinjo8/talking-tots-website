@@ -70,27 +70,6 @@ export function AdditionalTestSection({ childId }: Props) {
     enabled: sessionIds.length > 0,
   });
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!assignments || assignments.length === 0) return null;
-
-  const statusLabel = (s: string) => {
-    switch (s) {
-      case 'assigned': return { label: 'Dodeljeno', variant: 'secondary' as const };
-      case 'in_progress': return { label: 'V teku', variant: 'default' as const };
-      case 'completed': return { label: 'Zaključeno', variant: 'outline' as const };
-      default: return { label: s, variant: 'secondary' as const };
-    }
-  };
-
   // Pre-fetch signed URLs for audio recordings
   const allRecordings = Object.values(sessionRecordings || {}).flat();
   const [signedAudioUrls, setSignedAudioUrls] = useState<Record<string, string>>({});
@@ -115,6 +94,27 @@ export function AdditionalTestSection({ childId }: Props) {
       setSignedAudioUrls(map);
     });
   }, [JSON.stringify(sessionIds)]);
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-8">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!assignments || assignments.length === 0) return null;
+
+  const statusLabel = (s: string) => {
+    switch (s) {
+      case 'assigned': return { label: 'Dodeljeno', variant: 'secondary' as const };
+      case 'in_progress': return { label: 'V teku', variant: 'default' as const };
+      case 'completed': return { label: 'Zaključeno', variant: 'outline' as const };
+      default: return { label: s, variant: 'secondary' as const };
+    }
+  };
 
   const getAudioUrl = (audioPath: string) => {
     return signedAudioUrls[audioPath] || '';
