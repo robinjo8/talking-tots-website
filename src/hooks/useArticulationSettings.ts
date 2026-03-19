@@ -32,6 +32,7 @@ const SIMILARITY_THRESHOLDS: Record<DifficultyLevel, Record<number, number>> = {
 export const useArticulationSettings = () => {
   const [difficulty, setDifficultyState] = useState<DifficultyLevel>("srednja");
   const [recordingDuration, setRecordingDurationState] = useState<RecordingDuration>(4);
+  const [wordCountOverrides, setWordCountOverridesState] = useState<Record<string, WordCount>>({});
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -44,6 +45,9 @@ export const useArticulationSettings = () => {
         }
         if (settings.recordingDuration && [3, 4, 5].includes(settings.recordingDuration)) {
           setRecordingDurationState(settings.recordingDuration);
+        }
+        if (settings.wordCountOverrides) {
+          setWordCountOverridesState(settings.wordCountOverrides);
         }
       }
     } catch (error) {
