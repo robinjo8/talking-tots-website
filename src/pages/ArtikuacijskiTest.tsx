@@ -40,6 +40,7 @@ const ArtikuacijskiTest = () => {
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showInitialSettings, setShowInitialSettings] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
