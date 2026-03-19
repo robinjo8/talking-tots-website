@@ -105,17 +105,12 @@ const ArticulationTestInfoDialog = ({
           className="flex-1 min-h-0 overflow-auto"
         >
           <div className="px-6 py-4 space-y-6 text-sm leading-relaxed">
-            {childName && wordCount && (
-              <p className="font-bold text-destructive text-base">
-                Za otroka {childName} ste izbrali {wordCount} besed za preverjanje izgovorjave.
-              </p>
-            )}
-            <section>
-              <h3 className="font-bold text-base mb-2">Kaj je preverjanje izgovorjave?</h3>
-              <p className="text-muted-foreground">
-                Preverjanje izgovorjave je kratek in preprost preizkus, pri katerem otrok poimenuje slike oziroma izgovarja izbrane besede. Namen preizkusa je preveriti, kako otrok izgovarja posamezne glasove slovenskega jezika.
-              </p>
-            </section>
+            <p className="text-muted-foreground">
+              Pred vami je preprost govorni preizkus, pri katerem otrok poimenuje slike oziroma izgovarja izbrane besede. S preizkusom se preverja, kako otrok izgovarja posamezne glasove slovenskega jezika.
+            </p>
+            <p className="text-muted-foreground font-medium">
+              Pomembno je, da je otrok pred samim preverjanjem spočit.
+            </p>
 
             <section>
               <h3 className="font-bold text-base mb-2">Kaj se preverja?</h3>
@@ -128,7 +123,7 @@ const ArticulationTestInfoDialog = ({
                 Preverjanje izgovorjave vključuje 60 skrbno izbranih besed, razporejenih po soglasnikih (brez samoglasnikov), kar omogoča enakomerno in ciljno oceno otrokove izgovorjave.
               </p>
               <p className="text-muted-foreground mt-2">
-                Za otroke v starostni skupini 3–4 let je na voljo prilagojena različica s 20 besedami (1 beseda na glas), ki je krajša in manj obremenjujoča.
+                Za otroke v starostni skupini 3–4 let je na voljo prilagojena krajša različica z 20 besedami (1 beseda na glas), ki je krajša in manj obremenjujoča. Krajšo obliko priporočamo tudi za otroke s posebnostmi v razvoju.
               </p>
             </section>
 
@@ -142,9 +137,6 @@ const ArticulationTestInfoDialog = ({
                 <li>posnetke pregleda logoped,</li>
                 <li>na podlagi poslušanja pripravi strokovno poročilo o otrokovi izgovorjavi.</li>
               </ul>
-              <p className="text-muted-foreground mt-2">
-                Preverjanje je zasnovano tako, da je za otroka kratko, enostavno in brez pritiska.
-              </p>
             </section>
 
             <section>
@@ -154,9 +146,9 @@ const ArticulationTestInfoDialog = ({
               </p>
               <p className="text-muted-foreground font-medium mt-2">Stopnja zahtevnosti:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
-                <li><strong>Nizka</strong> – bolj popustljivo ocenjevanje izgovorjave</li>
-                <li><strong>Srednja</strong> (privzeto, priporočeno) – uravnotežena nastavitev za večino otrok</li>
-                <li><strong>Visoka</strong> – strožje ocenjevanje izgovorjave</li>
+                <li><strong>Nizka</strong> – več tolerance do napak pri izgovorjavi</li>
+                <li><strong>Srednja</strong> (privzeto, priporočeno)</li>
+                <li><strong>Visoka</strong> – manj tolerance do napak pri izgovorjavi</li>
               </ul>
               <p className="text-muted-foreground font-medium mt-2">Čas snemanja:</p>
               <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
@@ -182,14 +174,8 @@ const ArticulationTestInfoDialog = ({
 
             <section>
               <h3 className="font-bold text-base mb-2">Kako pogosto se preverjanje izvaja?</h3>
-              <p className="text-muted-foreground mb-2">Priporočamo, da se preverjanje izgovorjave opravi:</p>
-              <ul className="list-disc list-inside text-muted-foreground space-y-1 ml-2">
-                <li>ob prvem začetku uporabe aplikacije,</li>
-                <li>nato periodično (na vsake tri mesece),</li>
-                <li>vedno, ko želimo preveriti napredek ali spremembe v izgovorjavi.</li>
-              </ul>
-              <p className="text-muted-foreground mt-2">
-                Pogostost izvajanja je prilagodljiva in odvisna od otrokovega tempa razvoja.
+              <p className="text-muted-foreground">
+                Priporočamo, da se preverjanje izgovorjave opravi ob prvem začetku uporabe aplikacije. Nato se preverjanja opravljajo periodično (na vsake tri mesece). V kolikor bo logoped potreboval dodatne informacije, boste dobili prošnjo za ponovitev preverjanja.
               </p>
             </section>
 
@@ -216,6 +202,9 @@ const ArticulationTestInfoDialog = ({
               </ul>
               <p className="text-muted-foreground mt-2">
                 Najpomembneje je, da se otrok počuti sproščeno in varno.
+              </p>
+              <p className="text-muted-foreground mt-2">
+                Med izvedbo preverjanja priporočamo prisotnost odrasle osebe, saj je rezultat preverjanja odvisen od kakovosti izgovorjave posameznih besed. Še posebej je to pomembno pri izvedbi preverjanja z nizko zahtevnostjo oziroma pri krajši izvedbi preverjanja.
               </p>
             </section>
 
