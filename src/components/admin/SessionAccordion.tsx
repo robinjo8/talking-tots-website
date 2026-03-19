@@ -45,6 +45,7 @@ export function SessionAccordion({
   isCompleting,
   hasUnsavedChanges,
   isReadOnly,
+  letterOrder,
 }: SessionAccordionProps) {
   
 
