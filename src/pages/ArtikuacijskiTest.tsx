@@ -309,7 +309,7 @@ const ArtikuacijskiTest = () => {
         onClose={() => setShowInstructionsDialog(false)}
       />
 
-      {/* Settings Dialog */}
+      {/* Settings Dialog (mid-test, no word count) */}
       <ArticulationSettingsDialog
         open={showSettingsDialog}
         onClose={() => setShowSettingsDialog(false)}
@@ -322,6 +322,26 @@ const ArtikuacijskiTest = () => {
         onWordCountChange={(count) => {
           if (childId) setWordCountOverride(childId, count);
         }}
+      />
+
+      {/* Initial Settings Dialog (before first test, with word count) */}
+      <ArticulationSettingsDialog
+        open={showInitialSettings}
+        onClose={async () => {
+          setShowInitialSettings(false);
+          await initializeSession();
+          setTestStarted(true);
+        }}
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
+        recordingDuration={recordingDuration}
+        onRecordingDurationChange={setRecordingDuration}
+        childAge={childAge}
+        wordCount={wordsPerLetter === 1 ? 20 : 60}
+        onWordCountChange={(count) => {
+          if (childId) setWordCountOverride(childId, count);
+        }}
+        isInitialSetup={true}
       />
 
       {/* Resume Dialog */}

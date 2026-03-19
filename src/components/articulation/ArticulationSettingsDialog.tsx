@@ -246,7 +246,7 @@ const ArticulationSettingsDialog = ({
 
           <div className="flex justify-end">
             <Button onClick={onClose} className="bg-teal-500 hover:bg-teal-600">
-              Shrani
+              {isInitialSetup ? "Potrdi in začni" : "Shrani"}
             </Button>
           </div>
         </DialogContent>
