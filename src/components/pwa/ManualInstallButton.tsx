@@ -298,7 +298,13 @@ export function ManualInstallButton() {
                         <InstructionStep step={3} title="Potrdi namestitev" />
                       </>
                     )}
-                  </div>
+                   </div>
+
+                  {!isIOSDevice && (
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      Če te možnosti ne najdeš, poišči v meniju brskalnika možnost "Dodaj na začetni zaslon" ali "Namesti aplikacijo".
+                    </p>
+                  )}
 
                   {/* App icon preview */}
                   <div className="mt-5 p-3 bg-muted/50 rounded-xl flex items-center gap-3">
