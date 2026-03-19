@@ -230,7 +230,8 @@ export function ManualInstallButton() {
                       <div>
                         <h3 className="text-lg font-semibold">Namesti TomiTalk</h3>
                         <p className="text-sm text-muted-foreground">
-                          {isIOSDevice ? 'Navodila za iPhone / iPad' : 'Navodila za Android'}
+                          {isIOSDevice ? 'Navodila za iPhone / iPad' : `Navodila za ${browser.label}`}
+                        </p>
                         </p>
                       </div>
                     </div>
