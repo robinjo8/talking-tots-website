@@ -3,16 +3,16 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const gameLetters = [
-  { id: "s", title: "Glas S (sredina/konec)", description: "Igraj kače in lestve in vadi glas S", image: "zmajcek_crka_S.png" },
-  { id: "z", title: "Glas Z (sredina/konec)", description: "Igraj kače in lestve in vadi glas Z", image: "zmajcek_crka_Z.png" },
-  { id: "c", title: "Glas C (sredina/konec)", description: "Igraj kače in lestve in vadi glas C", image: "zmajcek_crka_C.png" },
-  { id: "sh", title: "Glas Š (sredina/konec)", description: "Igraj kače in lestve in vadi glas Š", image: "zmajcek_crka_SH.png" },
-  { id: "zh", title: "Glas Ž (sredina/konec)", description: "Igraj kače in lestve in vadi glas Ž", image: "zmajcek_crka_ZH.png" },
-  { id: "ch", title: "Glas Č (sredina/konec)", description: "Igraj kače in lestve in vadi glas Č", image: "zmajcek_crka_CH.png" },
-  { id: "k", title: "Glas K (sredina/konec)", description: "Igraj kače in lestve in vadi glas K", image: "zmajcek_crka_K.png" },
-  { id: "l", title: "Glas L (sredina/konec)", description: "Igraj kače in lestve in vadi glas L", image: "zmajcek_crka_L.png" },
-  { id: "r-zacetek", title: "Glas R - začetne vaje", description: "Igraj kače in lestve in vadi glas R - začetne vaje", image: "zmajcek_crka_R.png" },
-  { id: "r", title: "Glas R (sredina/konec)", description: "Igraj kače in lestve in vadi glas R", image: "zmajcek_crka_R.png" },
+  { id: "c", title: "Glas C", description: "Igraj zabavno pot in vadi izgovorjavo glasu C na sredini in koncu besed", image: "zmajcek_crka_C.png", gradient: "radial-gradient(ellipse at center, hsl(142, 60%, 95%) 0%, hsl(142, 50%, 88%) 30%, hsl(142, 45%, 78%) 60%, hsl(142, 40%, 68%) 100%)" },
+  { id: "ch", title: "Glas Č", description: "Igraj zabavno pot in vadi izgovorjavo glasu Č na sredini in koncu besed", image: "zmajcek_crka_CH.png", gradient: "radial-gradient(ellipse at center, hsl(213, 60%, 95%) 0%, hsl(213, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)" },
+  { id: "k", title: "Glas K", description: "Igraj zabavno pot in vadi izgovorjavo glasu K na sredini in koncu besed", image: "zmajcek_crka_K.png", gradient: "radial-gradient(ellipse at center, hsl(38, 100%, 95%) 0%, hsl(38, 90%, 88%) 30%, hsl(45, 85%, 78%) 60%, hsl(45, 80%, 68%) 100%)" },
+  { id: "l", title: "Glas L", description: "Igraj zabavno pot in vadi izgovorjavo glasu L na sredini in koncu besed", image: "zmajcek_crka_L.png", gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(213, 45%, 78%) 60%, hsl(213, 40%, 68%) 100%)" },
+  { id: "r-zacetek", title: "Glas R - začetne vaje", description: "Igraj zabavno pot in vadi izgovorjavo glasu R z začetnimi vajami", image: "zmajcek_crka_R.png", gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)" },
+  { id: "r", title: "Glas R", description: "Igraj zabavno pot in vadi izgovorjavo glasu R na sredini in koncu besed", image: "zmajcek_crka_R.png", gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)" },
+  { id: "s", title: "Glas S", description: "Igraj zabavno pot in vadi izgovorjavo glasu S na sredini in koncu besed", image: "zmajcek_crka_S.png", gradient: "radial-gradient(ellipse at center, hsl(142, 60%, 95%) 0%, hsl(142, 50%, 88%) 30%, hsl(174, 45%, 78%) 60%, hsl(174, 40%, 68%) 100%)" },
+  { id: "sh", title: "Glas Š", description: "Igraj zabavno pot in vadi izgovorjavo glasu Š na sredini in koncu besed", image: "zmajcek_crka_SH.png", gradient: "radial-gradient(ellipse at center, hsl(213, 60%, 95%) 0%, hsl(213, 50%, 88%) 30%, hsl(271, 45%, 78%) 60%, hsl(271, 40%, 68%) 100%)" },
+  { id: "z", title: "Glas Z", description: "Igraj zabavno pot in vadi izgovorjavo glasu Z na sredini in koncu besed", image: "zmajcek_crka_Z.png", gradient: "radial-gradient(ellipse at center, hsl(174, 60%, 95%) 0%, hsl(174, 50%, 88%) 30%, hsl(142, 45%, 78%) 60%, hsl(142, 40%, 68%) 100%)" },
+  { id: "zh", title: "Glas Ž", description: "Igraj zabavno pot in vadi izgovorjavo glasu Ž na sredini in koncu besed", image: "zmajcek_crka_ZH.png", gradient: "radial-gradient(ellipse at center, hsl(271, 60%, 95%) 0%, hsl(271, 50%, 88%) 30%, hsl(213, 45%, 78%) 60%, hsl(213, 40%, 68%) 100%)" },
 ];
 
 export default function AdminKaceLestveGames() {
@@ -21,16 +21,16 @@ export default function AdminKaceLestveGames() {
   const isMobile = useIsMobile();
 
   return (
-    <AdminGameWrapper title="Kače in lestve - izberi glas" backPath={`/admin/children/${childId}/games`}>
-      <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
+    <AdminGameWrapper title="Zabavna pot - izberi glas" backPath={`/admin/children/${childId}/games`}>
+      <div className={isMobile ? "grid grid-cols-3 gap-2" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
         {gameLetters.map((item) => (
           <div
             key={item.id}
             onClick={() => navigate(`/admin/children/${childId}/games/kace/${item.id}`)}
-            className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-border"
+            className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
           >
-            <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-              <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)" }} />
+            <div className={isMobile ? "relative aspect-[4/3] overflow-hidden" : "relative aspect-video overflow-hidden"}>
+              <div className="absolute inset-0" style={{ background: item.gradient }} />
               <div className="relative w-full h-full flex items-center justify-center">
                 <img
                   src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${item.image}`}
@@ -40,9 +40,18 @@ export default function AdminKaceLestveGames() {
                 />
               </div>
             </div>
-            <div className={isMobile ? "p-3 text-center" : "p-4"}>
-              <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">{item.title}</h3>
-              {!isMobile && <p className="text-sm text-muted-foreground">{item.description}</p>}
+            <div className={isMobile ? "p-1.5 text-center" : "p-6 flex flex-col flex-grow"}>
+              <h3 className={isMobile 
+                ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight" 
+                : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+              }>
+                {item.title}
+              </h3>
+              {!isMobile && (
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                  {item.description}
+                </p>
+              )}
             </div>
           </div>
         ))}

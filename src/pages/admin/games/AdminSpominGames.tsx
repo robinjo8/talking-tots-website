@@ -3,76 +3,16 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 
 const memoryGames = [
-  { 
-    id: "spomin-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pare slik z glasom S in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pare slik z glasom Z in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-c",
-    letter: "C",
-    gradient: "from-dragon-green/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poišči pare slik z glasom C in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-sh",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pare slik z glasom Š in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-zh",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pare slik z glasom Ž in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-ch",
-    letter: "Č",
-    gradient: "from-app-blue/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poišči pare slik z glasom Č in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-k",
-    letter: "K",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poišči pare slik z glasom K in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-l",
-    letter: "L",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poišči pare slik z glasom L in nato ponovi besedo",
-  },
-  { 
-    id: "spomin-r-zacetek",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pare slik z glasom R - začetne vaje",
-  },
-  { 
-    id: "spomin-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pare slik z glasom R in nato ponovi besedo",
-  },
+  { id: "spomin-c", letter: "C", title: "Glas C", description: "Poišči pare slik z glasom C in nato ponovi besedo", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
+  { id: "spomin-ch", letter: "Č", title: "Glas Č", description: "Poišči pare slik z glasom Č in nato ponovi besedo", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png" },
+  { id: "spomin-k", letter: "K", title: "Glas K", description: "Poišči pare slik z glasom K in nato ponovi besedo", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
+  { id: "spomin-l", letter: "L", title: "Glas L", description: "Poišči pare slik z glasom L in nato ponovi besedo", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png" },
+  { id: "spomin-r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Poišči pare slik z glasom R in nato ponovi besedo - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
+  { id: "spomin-r", letter: "R", title: "Glas R", description: "Poišči pare slik z glasom R in nato ponovi besedo", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
+  { id: "spomin-s", letter: "S", title: "Glas S", description: "Poišči pare slik z glasom S in nato ponovi besedo", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png" },
+  { id: "spomin-sh", letter: "Š", title: "Glas Š", description: "Poišči pare slik z glasom Š in nato ponovi besedo", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png" },
+  { id: "spomin-z", letter: "Z", title: "Glas Z", description: "Poišči pare slik z glasom Z in nato ponovi besedo", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
+  { id: "spomin-zh", letter: "Ž", title: "Glas Ž", description: "Poišči pare slik z glasom Ž in nato ponovi besedo", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png" },
 ];
 
 export default function AdminSpominGames() {
@@ -80,41 +20,37 @@ export default function AdminSpominGames() {
   const { childId } = useParams<{ childId: string }>();
   const isMobile = useIsMobile();
 
-  const handleLetterClick = (gameId: string) => {
-    navigate(`/admin/children/${childId}/games/spomin/${gameId}`);
-  };
-
   return (
     <AdminGameWrapper 
       title="Spomin - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
-      <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
+      <div className={isMobile ? "grid grid-cols-3 gap-2" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
         {memoryGames.map((game) => (
           <div
             key={game.id}
-            className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-gray-200"
-            onClick={() => handleLetterClick(game.id)}
+            onClick={() => navigate(`/admin/children/${childId}/games/spomin/${game.id}`)}
+            className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
           >
-            {/* Card Image */}
-            <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-square' : 'aspect-video'}`}>
+            <div className={`relative overflow-hidden bg-gradient-to-br ${game.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
               <div className="w-full h-full flex items-center justify-center">
                 <img 
-                  src={game.image}
-                  alt={`Glas ${game.letter}`}
-                  className={`object-contain group-hover:scale-110 transition-transform duration-300 ${isMobile ? 'w-[80%] h-[80%]' : 'w-full h-full'}`}
+                  src={`https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/${game.image}`}
+                  alt={game.title}
+                  className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                   style={{ mixBlendMode: 'multiply' }}
                 />
               </div>
             </div>
-
-            {/* Card Content */}
-            <div className={`p-4 ${isMobile ? 'text-center' : ''}`}>
-              <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-app-blue transition-colors">
-                {game.id === 'spomin-r-zacetek' ? 'Glas R - začetne vaje' : `Glas ${game.letter}`}
+            <div className={isMobile ? "p-1.5 text-center" : "p-6 flex flex-col flex-grow"}>
+              <h3 className={isMobile 
+                ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight" 
+                : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+              }>
+                {game.title}
               </h3>
               {!isMobile && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                   {game.description}
                 </p>
               )}

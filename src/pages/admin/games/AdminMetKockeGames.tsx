@@ -28,21 +28,15 @@ export default function AdminMetKockeGames() {
       title="Smešne povedi - izberi glas"
       backPath={`/admin/children/${childId}/games`}
     >
-      <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
+      <div className={isMobile ? "grid grid-cols-3 gap-2" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
         {metKockeLetters.map((item) => (
           <div
             key={item.id}
             onClick={() => navigate(`/admin/children/${childId}/games/met-kocke/${item.id}`)}
-            className="bg-card rounded-xl shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden group border border-border"
+            className="bg-white rounded-xl shadow-xl border border-gray-200 hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 cursor-pointer overflow-hidden group"
           >
-            <div className={isMobile ? "relative aspect-square overflow-hidden" : "relative aspect-video overflow-hidden"}>
-              <div 
-                className="absolute inset-0"
-                style={{
-                  background: 'radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)'
-                }}
-              />
-              <div className="relative w-full h-full flex items-center justify-center">
+            <div className={`relative overflow-hidden bg-gradient-to-br ${item.gradient} ${isMobile ? 'aspect-[4/3]' : 'aspect-video'}`}>
+              <div className="w-full h-full flex items-center justify-center">
                 <img 
                   src={`${SUPABASE_URL}/zmajcki/${letterToImage[item.id] || 'zmajcek_crka_R.png'}`}
                   alt={item.title}
@@ -51,12 +45,15 @@ export default function AdminMetKockeGames() {
                 />
               </div>
             </div>
-            <div className={isMobile ? "p-3 text-center" : "p-4"}>
-              <h3 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+            <div className={isMobile ? "p-1.5 text-center" : "p-6 flex flex-col flex-grow"}>
+              <h3 className={isMobile 
+                ? "text-xs font-bold text-foreground group-hover:text-app-blue transition-colors leading-tight" 
+                : "text-xl font-bold text-foreground mb-3 group-hover:text-app-blue transition-colors"
+              }>
                 {item.title}
               </h3>
               {!isMobile && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
+                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
                   Vrzi kocko in sestavi smešne povedi z glasom {item.letter}
                 </p>
               )}
