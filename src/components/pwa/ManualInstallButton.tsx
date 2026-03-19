@@ -232,7 +232,6 @@ export function ManualInstallButton() {
                         <p className="text-sm text-muted-foreground">
                           {isIOSDevice ? 'Navodila za iPhone / iPad' : `Navodila za ${browser.label}`}
                         </p>
-                        </p>
                       </div>
                     </div>
                     <Button
