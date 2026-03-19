@@ -261,8 +261,8 @@ export function ManualInstallButton() {
                           step={2}
                           title='Izberi "Dodaj na začetni zaslon"'
                           icon={
-                            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                              <Plus className="h-5 w-5 text-green-500" />
+                            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                              <Plus className="h-5 w-5 text-accent-foreground" />
                             </div>
                           }
                           subtitle="Pomakni se navzdol v meniju, da najdeš to možnost"
