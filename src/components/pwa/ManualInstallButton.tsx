@@ -277,23 +277,23 @@ export function ManualInstallButton() {
                       <>
                         <InstructionStep
                           step={1}
-                          title="Odpri meni brskalnika"
+                          title={browser.steps.step1}
                           icon={
                             <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
                               <Menu className="h-5 w-5 text-foreground" />
                             </div>
                           }
-                          subtitle="Tri pike zgoraj desno"
+                          subtitle={browser.steps.step1Subtitle}
                         />
                         <InstructionStep
                           step={2}
-                          title='Izberi "Namesti aplikacijo"'
+                          title={browser.steps.step2}
                           icon={
-                            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                              <Download className="h-5 w-5 text-green-500" />
+                            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                              <Download className="h-5 w-5 text-accent-foreground" />
                             </div>
                           }
-                          subtitle='Ali "Dodaj na začetni zaslon"'
+                          subtitle={browser.steps.step2Subtitle}
                         />
                         <InstructionStep step={3} title="Potrdi namestitev" />
                       </>
