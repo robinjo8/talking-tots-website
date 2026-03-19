@@ -289,11 +289,9 @@ const ArtikuacijskiTest = () => {
       {/* Info Dialog */}
       <ArticulationTestInfoDialog
         open={showInfoDialog}
-        onClose={async () => {
-          // Initialize session when user confirms and closes dialog
-          await initializeSession();
+        onClose={() => {
           setShowInfoDialog(false);
-          setTestStarted(true);
+          setShowInitialSettings(true);
         }}
         childName={childName}
         wordCount={totalWordCount}
