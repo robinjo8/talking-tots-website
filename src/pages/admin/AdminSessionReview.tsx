@@ -258,17 +258,26 @@ export default function AdminSessionReview() {
 
   // Ali je to zaključen pregled, ki ni v načinu urejanja?
   const isReadOnly = data.session.status === 'completed' && !isEditMode;
+  const isAdditionalTest = !!data.session.additionalAssignmentId;
+  const letterOrder = isAdditionalTest ? Array.from(data.recordingsByLetter.keys()) : undefined;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <SessionReviewHeader
-          childName={data.child.name}
-          childAge={data.child.age}
-          childGender={data.child.gender}
-        />
-        {data.session.childId && logopedistProfile && (
+        <div className="flex items-center gap-3">
+          <SessionReviewHeader
+            childName={data.child.name}
+            childAge={data.child.age}
+            childGender={data.child.gender}
+          />
+          {isAdditionalTest && (
+            <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
+              Dodatno preverjanje
+            </Badge>
+          )}
+        </div>
+        {data.session.childId && logopedistProfile && !isAdditionalTest && (
           <Button
             variant="outline"
             size="sm"
