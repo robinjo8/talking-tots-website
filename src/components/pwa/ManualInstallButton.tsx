@@ -6,6 +6,90 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
+// Browser detection for tailored install instructions
+function detectBrowser(): { name: string; label: string; steps: { step1: string; step1Icon: string; step1Subtitle: string; step2: string; step2Subtitle: string } } {
+  const ua = navigator.userAgent;
+  
+  if (/SamsungBrowser/i.test(ua)) return {
+    name: 'samsung',
+    label: 'Samsung Internet',
+    steps: {
+      step1: 'Pritisni meni',
+      step1Icon: 'hamburger',
+      step1Subtitle: 'Ikona ☰ spodaj desno',
+      step2: 'Izberi "Dodaj stran na"',
+      step2Subtitle: 'Nato izberi "Začetni zaslon"',
+    },
+  };
+  if (/HuaweiBrowser/i.test(ua)) return {
+    name: 'huawei',
+    label: 'Huawei Browser',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ spodaj na sredini',
+      step2: 'Izberi "Dodaj na začetni zaslon"',
+      step2Subtitle: '',
+    },
+  };
+  if (/OPR|Opera/i.test(ua)) return {
+    name: 'opera',
+    label: 'Opera',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ spodaj desno',
+      step2: 'Izberi "Začetni zaslon"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  if (/Edg|Edge/i.test(ua)) return {
+    name: 'edge',
+    label: 'Microsoft Edge',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots-horizontal',
+      step1Subtitle: 'Ikona ··· spodaj na sredini',
+      step2: 'Izberi "Dodaj na telefon"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  if (/FxiOS|Firefox/i.test(ua)) return {
+    name: 'firefox',
+    label: 'Firefox',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ spodaj desno',
+      step2: 'Izberi "Namesti"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  if (/Chrome/i.test(ua) && !/Edg|OPR|SamsungBrowser|HuaweiBrowser|UCBrowser/i.test(ua)) return {
+    name: 'chrome',
+    label: 'Chrome',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ zgoraj desno',
+      step2: 'Izberi "Namesti aplikacijo"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  // Fallback
+  return {
+    name: 'other',
+    label: 'brskalnik',
+    steps: {
+      step1: 'Odpri meni brskalnika',
+      step1Icon: 'menu',
+      step1Subtitle: 'Poišči ikono menija (⋮ ali ☰ ali ···)',
+      step2: 'Izberi "Dodaj na začetni zaslon"',
+      step2Subtitle: 'Ali "Namesti aplikacijo"',
+    },
+  };
+}
+
 export function ManualInstallButton() {
   const {
     promptInstall, isInstalled, isStandalone, isIOSDevice, isAndroidDevice,
@@ -19,6 +103,8 @@ export function ManualInstallButton() {
   const isGamePage = window.location.pathname.includes('/govorne-igre/');
   const isModernIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || isModernIPad;
+
+  const browser = detectBrowser();
 
   if (isInstalled || isStandalone || isGamePage || !isMobile || !canInstall) return null;
 
@@ -144,7 +230,7 @@ export function ManualInstallButton() {
                       <div>
                         <h3 className="text-lg font-semibold">Namesti TomiTalk</h3>
                         <p className="text-sm text-muted-foreground">
-                          {isIOSDevice ? 'Navodila za iPhone / iPad' : 'Navodila za Android'}
+                          {isIOSDevice ? 'Navodila za iPhone / iPad' : `Navodila za ${browser.label}`}
                         </p>
                       </div>
                     </div>
@@ -165,8 +251,8 @@ export function ManualInstallButton() {
                           step={1}
                           title="Pritisni gumb za deljenje"
                           icon={
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                              <Share className="h-5 w-5 text-blue-500" />
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <Share className="h-5 w-5 text-primary" />
                             </div>
                           }
                           subtitle="Gumb je na dnu zaslona (kvadrat s puščico navzgor)"
@@ -175,8 +261,8 @@ export function ManualInstallButton() {
                           step={2}
                           title='Izberi "Dodaj na začetni zaslon"'
                           icon={
-                            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                              <Plus className="h-5 w-5 text-green-500" />
+                            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                              <Plus className="h-5 w-5 text-accent-foreground" />
                             </div>
                           }
                           subtitle="Pomakni se navzdol v meniju, da najdeš to možnost"
@@ -191,28 +277,34 @@ export function ManualInstallButton() {
                       <>
                         <InstructionStep
                           step={1}
-                          title="Odpri meni brskalnika"
+                          title={browser.steps.step1}
                           icon={
                             <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
                               <Menu className="h-5 w-5 text-foreground" />
                             </div>
                           }
-                          subtitle="Tri pike zgoraj desno"
+                          subtitle={browser.steps.step1Subtitle}
                         />
                         <InstructionStep
                           step={2}
-                          title='Izberi "Namesti aplikacijo"'
+                          title={browser.steps.step2}
                           icon={
-                            <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center">
-                              <Download className="h-5 w-5 text-green-500" />
+                            <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
+                              <Download className="h-5 w-5 text-accent-foreground" />
                             </div>
                           }
-                          subtitle='Ali "Dodaj na začetni zaslon"'
+                          subtitle={browser.steps.step2Subtitle}
                         />
                         <InstructionStep step={3} title="Potrdi namestitev" />
                       </>
                     )}
-                  </div>
+                   </div>
+
+                  {!isIOSDevice && (
+                    <p className="text-xs text-muted-foreground mt-2 italic">
+                      Če te možnosti ne najdeš, poišči v meniju brskalnika možnost "Dodaj na začetni zaslon" ali "Namesti aplikacijo".
+                    </p>
+                  )}
 
                   {/* App icon preview */}
                   <div className="mt-5 p-3 bg-muted/50 rounded-xl flex items-center gap-3">
@@ -257,8 +349,8 @@ export function ManualInstallButton() {
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                        <ExternalLink className="h-6 w-6 text-blue-500" />
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <ExternalLink className="h-6 w-6 text-primary" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">Odpri v Safari</h3>
@@ -290,7 +382,7 @@ export function ManualInstallButton() {
                     >
                       {linkCopied ? (
                         <>
-                          <Check className="h-4 w-4 mr-2 text-green-500" />
+                          <Check className="h-4 w-4 mr-2 text-accent-foreground" />
                           Povezava kopirana!
                         </>
                       ) : (
