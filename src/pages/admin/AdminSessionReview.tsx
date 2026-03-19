@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { AdditionalTestAssignDialog } from '@/components/admin/AdditionalTestAssignDialog';
 import { ClipboardPlus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminSessionReview() {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -257,17 +258,26 @@ export default function AdminSessionReview() {
 
   // Ali je to zaključen pregled, ki ni v načinu urejanja?
   const isReadOnly = data.session.status === 'completed' && !isEditMode;
+  const isAdditionalTest = !!data.session.additionalAssignmentId;
+  const letterOrder = isAdditionalTest ? Array.from(data.recordingsByLetter.keys()) : undefined;
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <SessionReviewHeader
-          childName={data.child.name}
-          childAge={data.child.age}
-          childGender={data.child.gender}
-        />
-        {data.session.childId && logopedistProfile && (
+        <div className="flex items-center gap-3">
+          <SessionReviewHeader
+            childName={data.child.name}
+            childAge={data.child.age}
+            childGender={data.child.gender}
+          />
+          {isAdditionalTest && (
+            <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
+              Dodatno preverjanje
+            </Badge>
+          )}
+        </div>
+        {data.session.childId && logopedistProfile && !isAdditionalTest && (
           <Button
             variant="outline"
             size="sm"
@@ -316,10 +326,10 @@ export default function AdminSessionReview() {
         </div>
       )}
 
-      {/* Sejin - trenutno samo Seja-1 z dejanskimi podatki */}
+      {/* Sejin - za dodatno preverjanje samo 1 seja, sicer 5 */}
       <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map(sessionNum => {
-          const hasSessionData = sessionNum === 1; // Trenutno samo Seja-1 ima podatke
+        {(isAdditionalTest ? [1] : [1, 2, 3, 4, 5]).map(sessionNum => {
+          const hasSessionData = sessionNum === 1;
           
           return (
             <SessionAccordion
@@ -338,6 +348,7 @@ export default function AdminSessionReview() {
               isCompleting={isCompleting}
               hasUnsavedChanges={hasSessionData ? hasUnsavedChanges : false}
               isReadOnly={isReadOnly}
+              letterOrder={hasSessionData ? letterOrder : undefined}
             />
           );
         })}

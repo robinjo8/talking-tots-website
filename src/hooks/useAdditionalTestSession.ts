@@ -181,12 +181,6 @@ export const useAdditionalTestSession = () => {
           .single();
 
         if (logopedist) {
-          const { data: child } = await supabase
-            .from('children')
-            .select('name, age')
-            .eq('id', sessionInfo.sessionId ? '' : '')
-            .single();
-
           // Get child info from the session
           const { data: sessionData } = await supabase
             .from('articulation_test_sessions')

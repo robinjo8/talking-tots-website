@@ -27,6 +27,7 @@ interface SessionAccordionProps {
   isCompleting?: boolean;
   hasUnsavedChanges: boolean;
   isReadOnly?: boolean;
+  letterOrder?: string[];
 }
 
 export function SessionAccordion({
@@ -44,6 +45,7 @@ export function SessionAccordion({
   isCompleting,
   hasUnsavedChanges,
   isReadOnly,
+  letterOrder,
 }: SessionAccordionProps) {
   
 
@@ -126,7 +128,7 @@ export function SessionAccordion({
             <div className="space-y-3">
               {/* Letter accordions - only one open at a time */}
               <Accordion type="single" collapsible className="w-full space-y-3">
-                {PHONETIC_ORDER.map(letter => {
+                {(letterOrder || PHONETIC_ORDER).map(letter => {
                   const recordings = recordingsByLetter.get(letter) || [];
                   const evaluation = evaluations.get(letter) || { selectedOptions: [], comment: '', rating: undefined };
 
