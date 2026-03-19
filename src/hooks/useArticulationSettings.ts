@@ -32,6 +32,7 @@ const SIMILARITY_THRESHOLDS: Record<DifficultyLevel, Record<number, number>> = {
 export const useArticulationSettings = () => {
   const [difficulty, setDifficultyState] = useState<DifficultyLevel>("srednja");
   const [recordingDuration, setRecordingDurationState] = useState<RecordingDuration>(4);
+  const [wordCountOverrides, setWordCountOverridesState] = useState<Record<string, WordCount>>({});
 
   // Load settings from localStorage on mount
   useEffect(() => {
@@ -44,6 +45,9 @@ export const useArticulationSettings = () => {
         }
         if (settings.recordingDuration && [3, 4, 5].includes(settings.recordingDuration)) {
           setRecordingDurationState(settings.recordingDuration);
+        }
+        if (settings.wordCountOverrides) {
+          setWordCountOverridesState(settings.wordCountOverrides);
         }
       }
     } catch (error) {
@@ -161,26 +165,26 @@ export const useArticulationSettings = () => {
     return `pred ${diffDays} ${diffDays === 1 ? "dnevom" : diffDays < 5 ? "dnevi" : "dnevi"}`;
   }, []);
 
-  // Get word count override for a specific child
+  // Get word count override for a specific child (reactive)
   const getWordCountOverride = useCallback((childId: string): WordCount | null => {
-    try {
-      const stored = localStorage.getItem(SETTINGS_KEY);
-      if (stored) {
-        const settings: ArticulationSettings = JSON.parse(stored);
-        if (settings.wordCountOverrides && settings.wordCountOverrides[childId]) {
-          return settings.wordCountOverrides[childId];
-        }
-      }
-      return null;
-    } catch (error) {
-      console.error("Error loading word count override:", error);
-      return null;
-    }
-  }, []);
+    return wordCountOverrides[childId] || null;
+  }, [wordCountOverrides]);
 
-  // Set word count override for a specific child
+  // Set word count override for a specific child (updates state + localStorage)
   const setWordCountOverride = useCallback((childId: string, count: WordCount) => {
     try {
+      // Update reactive state
+      setWordCountOverridesState(prev => {
+        const next = { ...prev };
+        if (count === 60) {
+          delete next[childId];
+        } else {
+          next[childId] = count;
+        }
+        return next;
+      });
+
+      // Persist to localStorage
       const stored = localStorage.getItem(SETTINGS_KEY);
       const settings: ArticulationSettings = stored
         ? JSON.parse(stored)
@@ -191,7 +195,6 @@ export const useArticulationSettings = () => {
       }
       
       if (count === 60) {
-        // Remove override when switching back to default
         delete settings.wordCountOverrides[childId];
       } else {
         settings.wordCountOverrides[childId] = count;
