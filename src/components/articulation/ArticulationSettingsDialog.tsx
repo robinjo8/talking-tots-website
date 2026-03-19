@@ -121,15 +121,24 @@ const ArticulationSettingsDialog = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent className="sm:max-w-2xl">
+      <Dialog open={open} onOpenChange={(isOpen) => {
+        if (!isOpen && !isInitialSetup) onClose();
+      }}>
+        <DialogContent 
+          className="sm:max-w-2xl"
+          onPointerDownOutside={isInitialSetup ? (e) => e.preventDefault() : undefined}
+          onEscapeKeyDown={isInitialSetup ? (e) => e.preventDefault() : undefined}
+          hideCloseButton={isInitialSetup}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Nastavitve preverjanja
+              {isInitialSetup ? "Nastavitve pred začetkom preverjanja" : "Nastavitve preverjanja"}
             </DialogTitle>
             <DialogDescription>
-              Izberite zahtevnost preverjanja, čas snemanja in število besed.
+              {isInitialSetup 
+                ? "Pred začetkom preverjanja izberite zahtevnost, čas snemanja in število besed."
+                : "Izberite zahtevnost preverjanja in čas snemanja."}
             </DialogDescription>
           </DialogHeader>
 
