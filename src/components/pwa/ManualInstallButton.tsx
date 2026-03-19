@@ -6,6 +6,90 @@ import { Card, CardContent } from '@/components/ui/card';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 
+// Browser detection for tailored install instructions
+function detectBrowser(): { name: string; label: string; steps: { step1: string; step1Icon: string; step1Subtitle: string; step2: string; step2Subtitle: string } } {
+  const ua = navigator.userAgent;
+  
+  if (/SamsungBrowser/i.test(ua)) return {
+    name: 'samsung',
+    label: 'Samsung Internet',
+    steps: {
+      step1: 'Pritisni meni',
+      step1Icon: 'hamburger',
+      step1Subtitle: 'Ikona ☰ spodaj desno',
+      step2: 'Izberi "Dodaj stran na"',
+      step2Subtitle: 'Nato izberi "Začetni zaslon"',
+    },
+  };
+  if (/HuaweiBrowser/i.test(ua)) return {
+    name: 'huawei',
+    label: 'Huawei Browser',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ spodaj na sredini',
+      step2: 'Izberi "Dodaj na začetni zaslon"',
+      step2Subtitle: '',
+    },
+  };
+  if (/OPR|Opera/i.test(ua)) return {
+    name: 'opera',
+    label: 'Opera',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ spodaj desno',
+      step2: 'Izberi "Začetni zaslon"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  if (/Edg|Edge/i.test(ua)) return {
+    name: 'edge',
+    label: 'Microsoft Edge',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots-horizontal',
+      step1Subtitle: 'Ikona ··· spodaj na sredini',
+      step2: 'Izberi "Dodaj na telefon"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  if (/FxiOS|Firefox/i.test(ua)) return {
+    name: 'firefox',
+    label: 'Firefox',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ spodaj desno',
+      step2: 'Izberi "Namesti"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  if (/Chrome/i.test(ua) && !/Edg|OPR|SamsungBrowser|HuaweiBrowser|UCBrowser/i.test(ua)) return {
+    name: 'chrome',
+    label: 'Chrome',
+    steps: {
+      step1: 'Pritisni tri pike',
+      step1Icon: 'dots',
+      step1Subtitle: 'Ikona ⋮ zgoraj desno',
+      step2: 'Izberi "Namesti aplikacijo"',
+      step2Subtitle: 'Ali "Dodaj na začetni zaslon"',
+    },
+  };
+  // Fallback
+  return {
+    name: 'other',
+    label: 'brskalnik',
+    steps: {
+      step1: 'Odpri meni brskalnika',
+      step1Icon: 'menu',
+      step1Subtitle: 'Poišči ikono menija (⋮ ali ☰ ali ···)',
+      step2: 'Izberi "Dodaj na začetni zaslon"',
+      step2Subtitle: 'Ali "Namesti aplikacijo"',
+    },
+  };
+}
+
 export function ManualInstallButton() {
   const {
     promptInstall, isInstalled, isStandalone, isIOSDevice, isAndroidDevice,
@@ -19,6 +103,8 @@ export function ManualInstallButton() {
   const isGamePage = window.location.pathname.includes('/govorne-igre/');
   const isModernIPad = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || isModernIPad;
+
+  const browser = detectBrowser();
 
   if (isInstalled || isStandalone || isGamePage || !isMobile || !canInstall) return null;
 
