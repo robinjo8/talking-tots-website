@@ -1,105 +1,79 @@
-# Osebni načrt — Set-based sistem (implementirano)
 
-## Implementirane spremembe
 
-### 1. DB migracija
-- Nova tabela `plan_set_tracking` za beleženje stanja sklopov
-- Dodan `set_number` stolpec v `plan_activity_completions`
-- Dodan `expires_at` stolpec v `child_monthly_plans`
-- RLS politike za starše in logopede
+## Celostni pregled: Preverjanje izgovorjave + Dodatno preverjanje
 
-### 2. Edge function `generate-monthly-plan`
-- 90 dni → 30 sklopov
-- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
-- Motorika frekvenca se preračuna v "vsak N-ti sklop"
-- `expires_at` nastavljeno na 90 dni
+### Kako trenutno deluje
 
-### 3. Frontend
-- `useMonthlyPlan.ts` — novi tipi (PlanSet)
-- `usePlanProgress.ts` — set tracking, 24h expiry, 1 sklop/dan
-- `MojiIzzivi.tsx` — prikaz trenutnega sklopa, progress bar, auto-renew
-- `MojiIzziviArhiv.tsx` — koledarski prikaz zgodovine
-- `PlanSetCard.tsx` — nova komponenta za sklop
-- `AdminOsebniNacrt.tsx` — napredek otroka s statistiko
+**1. Redno preverjanje izgovorjave (uporabniški portal)**
+- Uporabnik odpre `/artikulacijski-test`, izbere nastavitve (20 ali 60 besed, zahtevnost)
+- `useArticulationTestNew` naloži 20 glasov × wordsPerLetter besed iz `articulationData`
+- `useUserSessionManager` ustvari/nadaljuje sejo v `articulation_test_sessions`
+- Ob snemanju `useTranscription` pošlje audio na edge funkcijo `transcribe-articulation`, ki shrani posnetek v Storage (`uporabniski-profili/{userId}/{childId}/Preverjanje-izgovorjave/Seja-{n}/`) in rezultat v `articulation_word_results`
+- Ob zaključku se seja označi kot `is_completed = true`, status `pending`
+- **Deluje pravilno.**
 
----
+**2. Dodatno preverjanje (uporabniški portal)**
+- Logoped dodeli besede prek `AdditionalTestAssignDialog` → `additional_test_assignments` + `additional_test_words`
+- Na uporabniškem portalu se prikaže kartica "Dodatno preverjanje" (`ActivityOptions.tsx`)
+- Uporabnik odpre `/dodatno-preverjanje`, `useAdditionalTestSession` ustvari sejo z `additional_assignment_id`
+- `useArticulationTestNew` prejme `customWordData` iz dodeljenih besed
+- Snemanje in transkripcija delujeta enako kot pri rednem testu
+- Ob zaključku se seja in assignment označita kot completed
+- **Deluje pravilno** (po popravku slik).
 
-# Popravki preverjanja izgovorjave (implementirano)
+**3. Admin stran — Moji pregledi (`/admin/my-reviews`)**
+- `useMyReviews` pridobi seje dodeljene logopedu, vključno z `additional_assignment_id`
+- UI prikazuje badge "Dodatno" ali "Preverjanje" za razlikovanje
+- **Deluje pravilno.**
 
-## Implementirane spremembe
-
-### 1. Edge function `transcribe-articulation` — filtri
-- **Profanity filter**: Seznam prepovedanih besed (SLO + EN), nikoli ne vrne kletvic uporabniku
-- **Filter dolžine**: Če Whisper vrne >2 besedi → zavrnitev (halucinacija)
-- **Filter relevantnosti**: Če podobnost < 0.25 s ciljno besedo → zavrnitev
-- Za zavrnjene rezultate se nikoli ne pošlje surova transkripcija na klienta (pošlje se prazen string)
-- Zavrnjeni rezultati se logirajo v DB z matchType `rejected_profanity/too_many_words/irrelevant`
-
-### 2. Čiščenje `articulationTestData.ts`
-- Odstranjena varianta "HIŠKA" pri HIŠA (ni legitimna fonetična variacija)
-
-### 3. Prikaz napak
-- Namesto "Slišano: [surova transkripcija]" se prikaže: "BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE"
-- Nikoli se ne prikaže surova Whisper transkripcija uporabniku
-
-### 4. Samodejno predvajanje zvoka
-- Ob prikazu nove besede se po 1 sekundi samodejno predvaja zvočni posnetek besede
-- Gumb "Izgovori besedo" je onemogočen med predvajanjem (`isAudioPlaying`)
-- Dodan gumb zvočnika (Volume2) nad record gumbom za ponovno predvajanje
+**4. Admin stran — Pregled seje (`/admin/tests/{sessionId}`)**
+- `useSessionReview` pravilno loči med rednim in dodatnim testom za pridobivanje posnetkov (signed URLs iz `articulation_word_results` za dodatno, Storage listing za redno)
+- **Tu pa sta dva KRITIČNA problema:**
 
 ---
 
-# Dodatno preverjanje izgovorjave (implementirano)
+### Ugotovljene težave
 
-## Implementirane spremembe
+#### BUG 1 (KRITIČEN): SessionAccordion prikaže 5 sej in 20 glasov za dodatno preverjanje
 
-### 1. DB migracija
-- Nova tabela `additional_test_assignments` za dodelitve dodatnega preverjanja
-- Nova tabela `additional_test_words` za besede v dodelitvi
-- Dodan `additional_assignment_id` stolpec v `articulation_test_sessions`
-- RLS politike za logopede (INSERT/SELECT) in starše (SELECT/UPDATE)
-- Nov enum `additional_test_completed` v `notification_type`
+`AdminSessionReview.tsx` (vrstica 321) vedno prikaže 5 sej (`[1,2,3,4,5].map(...)`) — tudi za dodatno preverjanje, ki ima samo 1 sejo. Poleg tega `SessionAccordion.tsx` (vrstica 129) vedno iterira čez `PHONETIC_ORDER` (vseh 20 glasov), namesto da prikaže samo glasove iz dejanskih posnetkov. Za dodatno preverjanje z npr. 4 besedami (vse na glas B) bi logoped videl 20 praznih glasov in 4 prazne seje.
 
-### 2. Admin portal
-- Gumb "Dodeli dodatno preverjanje" na strani pregleda seje (`AdminSessionReview.tsx`)
-- `AdditionalTestAssignDialog.tsx` — dialog z iskalnikom besed iz vseh iger in testa
-- Grupiranje po črkah, checkbox izbira, gumb "Dodeli uporabniku"
+**Popravek:**
+- V `AdminSessionReview.tsx`: ko je `data.session.additionalAssignmentId` nastavljen, prikaži samo 1 sejo (brez Seja-2…5)
+- V `SessionAccordion.tsx` ali `AdminSessionReview.tsx`: posreduj dejanski seznam glasov (iz `recordingsByLetter.keys()`) namesto fiksnega `PHONETIC_ORDER`, ko gre za dodatno preverjanje
 
-### 3. Uporabniški portal
-- Nova kartica "Dodatno preverjanje" v `ActivityOptions.tsx` (vidna samo ko ima otrok aktivno dodelitev)
-- Nova stran `/dodatno-preverjanje` (`DodatnoPreverjanje.tsx`) — enak dizajn kot artikulacijski test
-- `useAdditionalTestAssignment.ts` — preverjanje aktivne dodelitve + nalaganje besed
-- `useAdditionalTestSession.ts` — upravljanje sej za dodatno preverjanje
+#### BUG 2 (SREDNJE KRITIČEN): Naslov pregleda ne razlikuje tipa testa
 
-### 4. Obvestila
-- Ob zaključku dodatnega preverjanja se ustvari obvestilo za logopeda
-- Seja se prikaže v `/admin/pending` za pregled
+`AdminSessionReview.tsx` ne prikaže nikjer ali gre za "Preverjanje izgovorjave" ali "Dodatno preverjanje". Logoped ne ve kakšen test pregleduje.
 
-### 5. Nedotaknjene datoteke
-- `ArtikuacijskiTest.tsx` — brez sprememb
-- `useArticulationTestNew.ts` — se re-uporabi (read-only)
-- `useUserSessionManager.ts` — brez sprememb
-- `articulationTestData.ts` — brez sprememb
+**Popravek:**
+- Dodati naslov/badge na vrhu review strani ki jasno razlikuje tip testa
+
+#### BUG 3 (MANJŠI): completeSession pošlje napačno notifikacijo
+
+V `useAdditionalTestSession.ts` (vrstica 187) je prazen query za child: `.eq('id', sessionInfo.sessionId ? '' : '')` — to nikoli ne vrne rezultata. Sicer je child name nato pravilno pridobljen iz sessionData, vendar je mrtva koda ki jemlje čas.
+
+#### BUG 4 (MANJŠI): Audio URL-ji v AdditionalTestSection se morda ne osvežijo pravilno
+
+`useEffect` dependency je `JSON.stringify(sessionIds)` — to deluje, ampak je fragilen pristop. Če se `sessionRecordings` spremenijo brez spremembe sessionIds, se signed URLs ne osvežijo. V praksi to ni kritično, ker se sessionIds ne spreminjajo brez polne osvežitve.
 
 ---
 
-# Admin razlikovanje rednega in dodatnega preverjanja (implementirano)
+### Plan popravkov
 
-## Implementirane spremembe
+**Datoteka: `src/pages/admin/AdminSessionReview.tsx`**
+1. Preveriti `data.session.additionalAssignmentId` — če je nastavljen:
+   - Prikazati samo 1 sejo namesto 5
+   - Dodati naslov "Dodatno preverjanje" z badge-om na vrhu
+   - Skriti gumb "Dodeli dodatno preverjanje" (ne smeš dodeliti dodatnega preverjanja iz dodatnega preverjanja)
+2. Posredovati seznam glasov iz `recordingsByLetter` v `SessionAccordion`
 
-### 1. Dodano `additional_assignment_id` v hooke
-- `useMyReviews.ts` — dodan v interface in select query
-- `useAdminTests.ts` — dodan v interface in select query
+**Datoteka: `src/components/admin/SessionAccordion.tsx`**
+3. Dodati prop `letterOrder?: string[]` — ko je podan, uporabi ta seznam namesto `PHONETIC_ORDER`
+4. Ko je `letterOrder` podan, iterirati samo čez te glasove
 
-### 2. Prikaz vrste testa na "Moji pregledi"
-- `AdminMyReviews.tsx` — badge "Dodatno preverjanje" (amber) ali "Preverjanje izgovorjave" v tabeli in mobilnih karticah
-- Dodan stolpec "Vrsta" v desktop tabeli
+**Datoteka: `src/hooks/useAdditionalTestSession.ts`**
+5. Odstraniti mrtvo kodo za pridobivanje child na vrstici 186-188
 
-### 3. Popravek predvajanja zvoka v AdditionalTestSection
-- Zamenjano `posnetki` bucket (public URL) z `uporabniski-profili` bucket (signed URL)
-- Pre-fetch signed URLs z `createSignedUrl()` v useEffect
+Skupaj ~5 sprememb v 3 datotekah. Jedro popravka je v AdminSessionReview + SessionAccordion.
 
-### 4. Pregled seje za dodatno preverjanje
-- `useSessionReview.ts` — za seje z `additional_assignment_id` uporabi `articulation_word_results` namesto parsanja imen datotek iz storage
-- Dinamično grupiranje po črkah iz dejanskih rezultatov
-- Dodan `additionalAssignmentId` v `SessionReviewData`
