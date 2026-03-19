@@ -349,8 +349,8 @@ export function ManualInstallButton() {
                 <CardContent className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-blue-500/10 rounded-lg flex items-center justify-center">
-                        <ExternalLink className="h-6 w-6 text-blue-500" />
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <ExternalLink className="h-6 w-6 text-primary" />
                       </div>
                       <div>
                         <h3 className="text-lg font-semibold">Odpri v Safari</h3>
