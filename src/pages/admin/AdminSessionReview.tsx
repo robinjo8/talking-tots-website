@@ -14,6 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { AdditionalTestAssignDialog } from '@/components/admin/AdditionalTestAssignDialog';
 import { ClipboardPlus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default function AdminSessionReview() {
   const { sessionId } = useParams<{ sessionId: string }>();
