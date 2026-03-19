@@ -287,10 +287,9 @@ export default function AdminArtikulacijskiTest() {
       {/* Info Dialog */}
       <ArticulationTestInfoDialog
         open={showInfoDialog}
-        onClose={async () => {
-          await initializeSession();
+        onClose={() => {
           setShowInfoDialog(false);
-          setTestStarted(true);
+          setShowInitialSettings(true);
         }}
         onBack={() => navigate(`/admin/children/${childId}/workspace`)}
         childName={child?.name}
