@@ -74,7 +74,12 @@ export function formatCombinedRecommendationText(
   // Part 1: Letters
   if (letters.length > 0) {
     const letterParts = letters.map(l => {
-      const posText = l.position === 'start' ? 'na začetku besed' : l.position === 'initial-exercises' ? '(začetne vaje)' : 'na sredini/koncu besed';
+      const positions = l.positions || [l.position || 'start'];
+      const posParts: string[] = [];
+      if (positions.includes('start')) posParts.push('na začetku besed');
+      if (positions.includes('middle-end')) posParts.push('na sredini/koncu besed');
+      if (positions.includes('initial-exercises')) posParts.push('(začetne vaje)');
+      const posText = posParts.join(' in ');
       return `glas ${l.letter} ${posText}`;
     });
     if (letterParts.length === 1) {

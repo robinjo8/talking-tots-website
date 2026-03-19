@@ -8,16 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
 
-const ALL_LETTERS = [
-  'P', 'B', 'M', 'T', 'D', 'K', 'G', 'N', 'H', 'V',
-  'J', 'F', 'L', 'S', 'Z', 'C', 'Š', 'Ž', 'Č', 'R'
-];
+const ALL_LETTERS = ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'];
 
 export interface RecommendedLetter {
   letter: string;
-  position: 'start' | 'middle-end' | 'initial-exercises';
+  positions: ('start' | 'middle-end' | 'initial-exercises')[];
 }
 
 interface LetterSelectorProps {
@@ -30,7 +27,11 @@ export function formatRecommendedLettersText(letters: RecommendedLetter[]): stri
   if (letters.length === 0) return '';
   
   const parts = letters.map(l => {
-    const posText = l.position === 'start' ? 'na začetku besed' : l.position === 'initial-exercises' ? '(začetne vaje)' : 'na sredini/koncu besed';
+    const posParts: string[] = [];
+    if (l.positions.includes('start')) posParts.push('na začetku besed');
+    if (l.positions.includes('middle-end')) posParts.push('na sredini/koncu besed');
+    if (l.positions.includes('initial-exercises')) posParts.push('(začetne vaje)');
+    const posText = posParts.join(' in ');
     return `glas ${l.letter} ${posText}`;
   });
   
@@ -41,13 +42,19 @@ export function formatRecommendedLettersText(letters: RecommendedLetter[]): stri
   return `Priporočamo igre in vaje za ${allButLast.join(', ')} in za ${last}.`;
 }
 
-// Legacy support: convert string[] to RecommendedLetter[] for old reports
-export function convertLegacyLetters(letters: string[] | RecommendedLetter[]): RecommendedLetter[] {
+// Legacy support: convert old format (string[] or {letter, position}) to new {letter, positions[]}
+export function convertLegacyLetters(letters: string[] | { letter: string; position?: string; positions?: string[] }[]): RecommendedLetter[] {
   if (letters.length === 0) return [];
   if (typeof letters[0] === 'string') {
-    return (letters as string[]).map(l => ({ letter: l, position: 'start' as const }));
+    return (letters as string[]).map(l => ({ letter: l, positions: ['start' as const] }));
   }
-  return letters as RecommendedLetter[];
+  const typed = letters as { letter: string; position?: string; positions?: string[] }[];
+  return typed.map(l => {
+    if (l.positions && Array.isArray(l.positions)) {
+      return { letter: l.letter, positions: l.positions as RecommendedLetter['positions'] };
+    }
+    return { letter: l.letter, positions: [l.position as 'start' | 'middle-end' | 'initial-exercises' || 'start'] };
+  });
 }
 
 // Legacy support: format text from string[] (used in old PDF generation)
@@ -62,12 +69,9 @@ export function formatRecommendedLettersTextLegacy(letters: string[]): string {
 }
 
 export function LetterSelector({ selectedLetters, onLettersChange, hidePreview = false }: LetterSelectorProps) {
-  const toggleLetter = (letter: string) => {
-    const existing = selectedLetters.find(l => l.letter === letter);
-    if (existing) {
-      onLettersChange(selectedLetters.filter(l => l.letter !== letter));
-    } else {
-      onLettersChange([...selectedLetters, { letter, position: 'start' }]);
+  const addLetter = (letter: string) => {
+    if (!selectedLetters.some(l => l.letter === letter)) {
+      onLettersChange([...selectedLetters, { letter, positions: ['start'] }]);
     }
   };
 
@@ -75,10 +79,17 @@ export function LetterSelector({ selectedLetters, onLettersChange, hidePreview =
     onLettersChange(selectedLetters.filter(l => l.letter !== letter));
   };
 
-  const changePosition = (letter: string, position: 'start' | 'middle-end' | 'initial-exercises') => {
-    onLettersChange(selectedLetters.map(l => 
-      l.letter === letter ? { ...l, position } : l
-    ));
+  const togglePosition = (letter: string, position: 'start' | 'middle-end' | 'initial-exercises') => {
+    onLettersChange(selectedLetters.map(l => {
+      if (l.letter !== letter) return l;
+      const has = l.positions.includes(position);
+      if (has) {
+        // Don't allow removing the last position
+        if (l.positions.length <= 1) return l;
+        return { ...l, positions: l.positions.filter(p => p !== position) };
+      }
+      return { ...l, positions: [...l.positions, position] };
+    }));
   };
 
   // Available letters (not yet selected)
@@ -90,7 +101,7 @@ export function LetterSelector({ selectedLetters, onLettersChange, hidePreview =
     <div className="space-y-2">
       <Select
         value=""
-        onValueChange={(val) => toggleLetter(val)}
+        onValueChange={(val) => addLetter(val)}
       >
         <SelectTrigger className="w-[200px] h-8 text-sm">
           <SelectValue placeholder="Izberi glas" />
@@ -105,9 +116,9 @@ export function LetterSelector({ selectedLetters, onLettersChange, hidePreview =
       </Select>
 
       {selectedLetters.length > 0 && (
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex flex-col gap-2">
           {selectedLetters.map(item => (
-            <div key={item.letter} className="flex items-center gap-1">
+            <div key={item.letter} className="flex items-center gap-2 flex-wrap">
               <Badge 
                 variant="secondary" 
                 className="gap-1 cursor-pointer hover:bg-destructive/10 min-w-[2.5rem] justify-center"
@@ -116,21 +127,31 @@ export function LetterSelector({ selectedLetters, onLettersChange, hidePreview =
                 {item.letter}
                 <X className="h-3 w-3" />
               </Badge>
-              <Select
-                value={item.position}
-                onValueChange={(val) => changePosition(item.letter, val as 'start' | 'middle-end' | 'initial-exercises')}
-              >
-                <SelectTrigger className={cn("h-7 text-xs px-2", item.letter === 'R' ? "w-[160px]" : "w-[140px]")}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="start">Začetek</SelectItem>
-                  <SelectItem value="middle-end">Sredina/konec</SelectItem>
-                  {item.letter === 'R' && (
-                    <SelectItem value="initial-exercises">Začetne vaje</SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                  <Checkbox
+                    checked={item.positions.includes('start')}
+                    onCheckedChange={() => togglePosition(item.letter, 'start')}
+                  />
+                  Začetek
+                </label>
+                <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                  <Checkbox
+                    checked={item.positions.includes('middle-end')}
+                    onCheckedChange={() => togglePosition(item.letter, 'middle-end')}
+                  />
+                  Sredina/konec
+                </label>
+                {item.letter === 'R' && (
+                  <label className="flex items-center gap-1.5 text-xs cursor-pointer">
+                    <Checkbox
+                      checked={item.positions.includes('initial-exercises')}
+                      onCheckedChange={() => togglePosition(item.letter, 'initial-exercises')}
+                    />
+                    Začetne vaje
+                  </label>
+                )}
+              </div>
             </div>
           ))}
         </div>
