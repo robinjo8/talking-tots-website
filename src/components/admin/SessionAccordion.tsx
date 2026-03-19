@@ -27,6 +27,7 @@ interface SessionAccordionProps {
   isCompleting?: boolean;
   hasUnsavedChanges: boolean;
   isReadOnly?: boolean;
+  letterOrder?: string[];
 }
 
 export function SessionAccordion({
