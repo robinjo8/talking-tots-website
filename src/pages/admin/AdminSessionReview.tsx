@@ -326,10 +326,10 @@ export default function AdminSessionReview() {
         </div>
       )}
 
-      {/* Sejin - trenutno samo Seja-1 z dejanskimi podatki */}
+      {/* Sejin - za dodatno preverjanje samo 1 seja, sicer 5 */}
       <div className="space-y-4">
-        {[1, 2, 3, 4, 5].map(sessionNum => {
-          const hasSessionData = sessionNum === 1; // Trenutno samo Seja-1 ima podatke
+        {(isAdditionalTest ? [1] : [1, 2, 3, 4, 5]).map(sessionNum => {
+          const hasSessionData = sessionNum === 1;
           
           return (
             <SessionAccordion
@@ -348,6 +348,7 @@ export default function AdminSessionReview() {
               isCompleting={isCompleting}
               hasUnsavedChanges={hasSessionData ? hasUnsavedChanges : false}
               isReadOnly={isReadOnly}
+              letterOrder={hasSessionData ? letterOrder : undefined}
             />
           );
         })}
