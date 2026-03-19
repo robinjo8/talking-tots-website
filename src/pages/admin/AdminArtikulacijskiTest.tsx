@@ -54,6 +54,7 @@ export default function AdminArtikulacijskiTest() {
   const [showInfoDialog, setShowInfoDialog] = useState(true);
   const [showInstructionsDialog, setShowInstructionsDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showInitialSettings, setShowInitialSettings] = useState(false);
   const [showResumeDialog, setShowResumeDialog] = useState(false);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
@@ -286,10 +287,9 @@ export default function AdminArtikulacijskiTest() {
       {/* Info Dialog */}
       <ArticulationTestInfoDialog
         open={showInfoDialog}
-        onClose={async () => {
-          await initializeSession();
+        onClose={() => {
           setShowInfoDialog(false);
-          setTestStarted(true);
+          setShowInitialSettings(true);
         }}
         onBack={() => navigate(`/admin/children/${childId}/workspace`)}
         childName={child?.name}
@@ -314,7 +314,7 @@ export default function AdminArtikulacijskiTest() {
         onClose={() => setShowInstructionsDialog(false)}
       />
 
-      {/* Settings Dialog */}
+      {/* Settings Dialog (mid-test, no word count) */}
       <ArticulationSettingsDialog
         open={showSettingsDialog}
         onClose={() => setShowSettingsDialog(false)}
@@ -327,6 +327,26 @@ export default function AdminArtikulacijskiTest() {
         onWordCountChange={(count) => {
           if (childId) setWordCountOverride(childId, count);
         }}
+      />
+
+      {/* Initial Settings Dialog (before first test, with word count) */}
+      <ArticulationSettingsDialog
+        open={showInitialSettings}
+        onClose={async () => {
+          setShowInitialSettings(false);
+          await initializeSession();
+          setTestStarted(true);
+        }}
+        difficulty={difficulty}
+        onDifficultyChange={setDifficulty}
+        recordingDuration={recordingDuration}
+        onRecordingDurationChange={setRecordingDuration}
+        childAge={childAge}
+        wordCount={wordsPerLetter === 1 ? 20 : 60}
+        onWordCountChange={(count) => {
+          if (childId) setWordCountOverride(childId, count);
+        }}
+        isInitialSetup={true}
       />
 
       {/* Resume Dialog */}

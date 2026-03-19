@@ -24,6 +24,8 @@ interface ArticulationSettingsDialogProps {
   childAge?: number;
   wordCount?: WordCount;
   onWordCountChange?: (value: WordCount) => void;
+  // When true, shows word count selection and uses non-dismissable mode
+  isInitialSetup?: boolean;
 }
 
 const difficultyOptions: {
@@ -89,11 +91,13 @@ const ArticulationSettingsDialog = ({
   childAge,
   wordCount,
   onWordCountChange,
+  isInitialSetup = false,
 }: ArticulationSettingsDialogProps) => {
   const [showReducedConfirm, setShowReducedConfirm] = useState(false);
   const [showStandardConfirm, setShowStandardConfirm] = useState(false);
   
-  const showWordCount = childAge !== undefined && childAge >= 5 && onWordCountChange;
+  // Word count is only visible during initial setup (before first test), never mid-test
+  const showWordCount = isInitialSetup && childAge !== undefined && childAge >= 5 && onWordCountChange;
 
   const handleWordCountSelect = (value: WordCount) => {
     if (value === wordCount) return;
@@ -117,15 +121,24 @@ const ArticulationSettingsDialog = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-        <DialogContent className="sm:max-w-2xl">
+      <Dialog open={open} onOpenChange={(isOpen) => {
+        if (!isOpen && !isInitialSetup) onClose();
+      }}>
+        <DialogContent 
+          className="sm:max-w-2xl"
+          onPointerDownOutside={isInitialSetup ? (e) => e.preventDefault() : undefined}
+          onEscapeKeyDown={isInitialSetup ? (e) => e.preventDefault() : undefined}
+          hideCloseButton={isInitialSetup}
+        >
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Settings className="w-5 h-5" />
-              Nastavitve preverjanja
+              {isInitialSetup ? "Nastavitve pred začetkom preverjanja" : "Nastavitve preverjanja"}
             </DialogTitle>
             <DialogDescription>
-              Izberite zahtevnost preverjanja, čas snemanja in število besed.
+              {isInitialSetup 
+                ? "Pred začetkom preverjanja izberite zahtevnost, čas snemanja in število besed."
+                : "Izberite zahtevnost preverjanja in čas snemanja."}
             </DialogDescription>
           </DialogHeader>
 
@@ -233,7 +246,7 @@ const ArticulationSettingsDialog = ({
 
           <div className="flex justify-end">
             <Button onClick={onClose} className="bg-teal-500 hover:bg-teal-600">
-              Shrani
+              {isInitialSetup ? "Potrdi in začni" : "Shrani"}
             </Button>
           </div>
         </DialogContent>
