@@ -91,11 +91,13 @@ const ArticulationSettingsDialog = ({
   childAge,
   wordCount,
   onWordCountChange,
+  isInitialSetup = false,
 }: ArticulationSettingsDialogProps) => {
   const [showReducedConfirm, setShowReducedConfirm] = useState(false);
   const [showStandardConfirm, setShowStandardConfirm] = useState(false);
   
-  const showWordCount = childAge !== undefined && childAge >= 5 && onWordCountChange;
+  // Word count is only visible during initial setup (before first test), never mid-test
+  const showWordCount = isInitialSetup && childAge !== undefined && childAge >= 5 && onWordCountChange;
 
   const handleWordCountSelect = (value: WordCount) => {
     if (value === wordCount) return;
