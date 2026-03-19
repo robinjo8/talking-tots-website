@@ -24,6 +24,8 @@ interface ArticulationSettingsDialogProps {
   childAge?: number;
   wordCount?: WordCount;
   onWordCountChange?: (value: WordCount) => void;
+  // When true, shows word count selection and uses non-dismissable mode
+  isInitialSetup?: boolean;
 }
 
 const difficultyOptions: {
