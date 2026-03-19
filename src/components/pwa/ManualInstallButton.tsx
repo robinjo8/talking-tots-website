@@ -251,8 +251,8 @@ export function ManualInstallButton() {
                           step={1}
                           title="Pritisni gumb za deljenje"
                           icon={
-                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
-                              <Share className="h-5 w-5 text-blue-500" />
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                              <Share className="h-5 w-5 text-primary" />
                             </div>
                           }
                           subtitle="Gumb je na dnu zaslona (kvadrat s puščico navzgor)"
