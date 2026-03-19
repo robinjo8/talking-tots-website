@@ -74,7 +74,7 @@ export function formatCombinedRecommendationText(
   // Part 1: Letters
   if (letters.length > 0) {
     const letterParts = letters.map(l => {
-      const positions = l.positions || [l.position || 'start'];
+      const positions = (l as any).positions || [(l as any).position || 'start'];
       const posParts: string[] = [];
       if (positions.includes('start')) posParts.push('na začetku besed');
       if (positions.includes('middle-end')) posParts.push('na sredini/koncu besed');
