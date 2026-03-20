@@ -20,6 +20,7 @@ export default function AdminLogin() {
   const [mfaEmail, setMfaEmail] = useState('');
   const { signIn, user, isLogopedist, isLoading: authLoading, signOut, mfaVerified, setMfaVerified } = useAdminAuth();
   const navigate = useNavigate();
+  const mfaAttempted = useRef(false);
 
   useEffect(() => {
     if (authLoading) return;
