@@ -31,7 +31,8 @@ export default function AdminLogin() {
     }
 
     // User is already logged in as logopedist but MFA not yet verified - auto-trigger MFA
-    if (user && isLogopedist && !mfaVerified && !mfaStep && !isLoading) {
+    if (user && isLogopedist && !mfaVerified && !mfaStep && !isLoading && !mfaAttempted.current) {
+      mfaAttempted.current = true;
       const autoTriggerMfa = async () => {
         setIsLoading(true);
         try {
@@ -41,18 +42,22 @@ export default function AdminLogin() {
 
           if (mfaError || !mfaData?.success) {
             console.error('Auto MFA send error:', mfaError, mfaData);
-            toast.error(mfaData?.error || 'Napaka pri pošiljanju potrditvene kode');
-            setIsLoading(false);
-            return;
+            // Still show MFA step - code may have been sent despite error
+            toast.info('Vnesite potrditveno kodo ali zahtevajte novo');
+          } else {
+            toast.info('Potrditvena koda je bila poslana na vaš email');
           }
 
           setMfaUserId(user.id);
           setMfaEmail(user.email || '');
           setMfaStep(true);
-          toast.info('Potrditvena koda je bila poslana na vaš email');
         } catch (err) {
           console.error('Auto MFA trigger error:', err);
-          toast.error('Napaka pri pošiljanju potrditvene kode');
+          // Still show MFA step to avoid being stuck
+          setMfaUserId(user.id);
+          setMfaEmail(user.email || '');
+          setMfaStep(true);
+          toast.info('Vnesite potrditveno kodo ali zahtevajte novo');
         } finally {
           setIsLoading(false);
         }
