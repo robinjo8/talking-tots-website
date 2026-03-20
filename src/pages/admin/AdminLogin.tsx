@@ -151,6 +151,7 @@ export default function AdminLogin() {
   };
 
   const handleMfaCancel = async () => {
+    mfaAttempted.current = false;
     setMfaStep(false);
     setMfaUserId('');
     setMfaEmail('');
