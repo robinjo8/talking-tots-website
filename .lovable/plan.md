@@ -2,48 +2,45 @@
 
 ## Problem
 
-Gumb "Izbriši" pod "Shranjena poročila" prikaže uspešno obvestilo, vendar datoteka **ni dejansko izbrisana**. 
+Ko shranite poročilo kot `.txt`, se strukturirani podatki (izbrani glasovi, motorika, video navodila) shranijo **samo kot besedilo** v stavku "Priporočamo igre in vaje za glas R..." znotraj sekcije PREDLOG ZA IGRE IN VAJE. 
 
-### Vzrok
+Ko naložite `.txt` nazaj:
+1. **Ni zapisa v bazi** — `logopedist_reports` zapis se ustvari šele ob generiranju PDF-ja, zato iskanje v bazi ne vrne rezultata
+2. **Celoten tekst** (vključno z generirano poved) se naloži v polje `predlogVaj` → to povzroči **podvajanje** (generirani stavek + ponovna izbira glasov)
+3. Strukturirani izbirniki (glasovi, motorika, video) ostanejo prazni → validacija sproži napako
 
-RLS politike za bucket `uporabniski-profili` na `storage.objects`:
-- **SELECT** → logopedi imajo dostop (migracija `20260116092422`)
-- **INSERT** → logopedi lahko nalagajo v mapo `Porocila` ✅
-- **UPDATE** → logopedi lahko posodabljajo v mapi `Porocila` ✅  
-- **DELETE** → **NI POLITIKE** za logopede ❌
+## Rešitev
 
-Supabase Storage `.remove()` **ne vrne napake** pri RLS zavrnitvi — vrne prazen rezultat. Zato koda misli, da je brisanje uspelo, prikaže "Poročilo izbrisano", nato `refetchReports()` ponovno naloži (nezbrisano) datoteko.
+Ob shranjevanju `.txt` datoteke dodati **JSON metapodatke** na konec datoteke, ločene z markerjem. Ob nalaganju jih razčleniti in pravilno nastaviti.
 
-### Popravek
+### Spremembe
 
-**1. Nova SQL migracija** — dodaj DELETE politiko za logopede:
+**1. `src/components/admin/ReportTemplateEditor.tsx` — `generateReportText()`**
 
-```sql
-CREATE POLICY "Logopedists can delete reports in Porocila folder"
-ON storage.objects
-FOR DELETE
-TO authenticated
-USING (
-  bucket_id = 'uporabniski-profili'
-  AND public.is_logopedist(auth.uid())
-  AND (storage.foldername(name))[3] = 'Porocila'
-);
+Na konec besedila dodati JSON blok s strukturiranimi podatki:
+
+```
+───METADATA───
+{"letters":[{"letter":"R","positions":["start","middle-end","initial-exercises"]}],"motorika":{"type":"weekly"},"videoLetters":["R"],"predlogVaj":"moje dodatne opombe"}
 ```
 
-**2. Boljša detekcija napake v `AdminUserDetail.tsx`** — po `.remove()` preveri, ali je datoteka res izbrisana, preden prikaže uspešno obvestilo:
+Polje `predlogVaj` v besedilnem delu ostane sestavljeno samo iz `combinedText` (brez uporabnikovih dodatnih opomb — te gredo v metadata JSON).
 
-```typescript
-const { data, error } = await supabase.storage
-  .from('uporabniski-profili')
-  .remove([report.path]);
-if (error) throw error;
-// Preveri, ali je bila datoteka dejansko izbrisana
-if (!data || data.length === 0) {
-  throw new Error('Datoteka ni bila izbrisana — preverite dovoljenja');
-}
-```
+**2. `src/pages/admin/AdminUserDetail.tsx` — `handleEditReport()`**
+
+- Razčleni JSON metapodatke iz `.txt` datoteke (marker `───METADATA───`)
+- Nastavi `recommendedLetters`, `motorikaFrequency`, `motorikaCustomCount`, `motorikaCustomUnit`, `recommendedVideoLetters` iz JSON-a
+- Nastavi `predlogVaj` iz JSON polja `predlogVaj` (samo uporabnikove dodatne opombe, NE generirani stavek)
+- Če metadata ni prisotna (stare datoteke), uporabi obstoječi fallback z iskanjem v bazi
+
+**3. `src/pages/admin/AdminLogopedistChildDetail.tsx`** — enaka sprememba kot #2
+
+**4. `handleSaveReport()` v obeh datotekah**
+
+Posodobiti `generateReportText` klic, da vključi metadata (ali pa se metadata doda neposredno v save logiko).
 
 ### Obseg
-- 1 nova SQL migracija (ena CREATE POLICY)
-- 1 manjša sprememba v `src/pages/admin/AdminUserDetail.tsx` (boljša validacija rezultata brisanja)
+- `src/components/admin/ReportTemplateEditor.tsx` — posodobi `generateReportText()` z metadata blokom
+- `src/pages/admin/AdminUserDetail.tsx` — posodobi `handleEditReport()` za parsanje metadat + `handleSaveReport()` za pravilno besedilo
+- `src/pages/admin/AdminLogopedistChildDetail.tsx` — enake spremembe
 
