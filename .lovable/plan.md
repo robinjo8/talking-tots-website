@@ -2,71 +2,48 @@
 
 ## Problem
 
-Ko naložite shranjeno poročilo (bodisi .txt osnutek ali PDF), se tekstovna polja (anamneza, ugotovitve, opombe) pravilno naložijo, **strukturirani podatki pa ne**:
-- Priporočeni glasovi (recommendedLetters)
-- Frekvenca motorike (motorikaFrequency)
-- Video navodila (recommendedVideoLetters)
+Gumb "Izbriši" pod "Shranjena poročila" prikaže uspešno obvestilo, vendar datoteka **ni dejansko izbrisana**. 
 
 ### Vzrok
 
-V `AdminUserDetail.tsx` obstajata **dve poti nalaganja**:
+RLS politike za bucket `uporabniski-profili` na `storage.objects`:
+- **SELECT** → logopedi imajo dostop (migracija `20260116092422`)
+- **INSERT** → logopedi lahko nalagajo v mapo `Porocila` ✅
+- **UPDATE** → logopedi lahko posodabljajo v mapi `Porocila` ✅  
+- **DELETE** → **NI POLITIKE** za logopede ❌
 
-1. **`handleEditGeneratedReport`** (klik na PDF) → poišče zapis v bazi in pravilno naloži vse podatke vključno s strukturiranimi polji iz `report_details`
-2. **`handleEditReport`** (klik na .txt osnutek, vrstica 635) → razčleni **samo besedilo** iz .txt datoteke z regexom. **Ne naloži** `recommendedLetters`, `motorikaFrequency`, `recommendedVideoLetters`.
-
-Ko uporabnik klikne uredi na .txt osnutku, se kliče pot #2, ki ne obnovi strukturiranih podatkov → pri generiranju PDF validacija javi napako "Izberite vsaj en glas".
+Supabase Storage `.remove()` **ne vrne napake** pri RLS zavrnitvi — vrne prazen rezultat. Zato koda misli, da je brisanje uspelo, prikaže "Poročilo izbrisano", nato `refetchReports()` ponovno naloži (nezbrisano) datoteko.
 
 ### Popravek
 
-**Datoteka: `src/pages/admin/AdminUserDetail.tsx`**
+**1. Nova SQL migracija** — dodaj DELETE politiko za logopede:
 
-V funkciji `handleEditReport` (vrstica 635) po razčlenjevanju besedila dodati iskanje v bazi `logopedist_reports` po `session_id` ali po datumu, da se naložijo tudi strukturirani podatki (`report_details`):
-
-```typescript
-const handleEditReport = async (file: StorageFile) => {
-  // ... obstoječe razčlenjevanje teksta ...
-
-  // Poišči pripadajoč zapis v bazi za strukturirane podatke
-  const { data: reportsData } = await supabase
-    .from('logopedist_reports')
-    .select('*')
-    .eq('logopedist_id', logopedistProfile?.id)
-    // Match by session or by date pattern in filename
-    .order('created_at', { ascending: false })
-    .limit(5);
-
-  // Find matching report by filename date
-  const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})/);
-  const matchingReport = reportsData?.find(r => {
-    if (r.pdf_url && dateMatch) {
-      return r.pdf_url.includes(dateMatch[1]);
-    }
-    return false;
-  });
-
-  if (matchingReport) {
-    const reportDetails = matchingReport.report_details as any;
-    const recLetters = matchingReport.recommended_letters as string[] | null;
-    const letters = reportDetails?.letters 
-      ? reportDetails.letters 
-      : convertLegacyLetters(recLetters || []);
-    
-    // Posodobi tudi strukturirane podatke
-    setReportData(prev => ({
-      ...prev,
-      recommendedLetters: letters,
-      motorikaFrequency: reportDetails?.motorika?.type || prev.motorikaFrequency,
-      motorikaCustomCount: reportDetails?.motorika?.count ?? prev.motorikaCustomCount,
-      motorikaCustomUnit: reportDetails?.motorika?.unit || prev.motorikaCustomUnit,
-      recommendedVideoLetters: reportDetails?.videoLetters || prev.recommendedVideoLetters,
-    }));
-  }
-};
+```sql
+CREATE POLICY "Logopedists can delete reports in Porocila folder"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'uporabniski-profili'
+  AND public.is_logopedist(auth.uid())
+  AND (storage.foldername(name))[3] = 'Porocila'
+);
 ```
 
-**Enaka sprememba v `AdminLogopedistChildDetail.tsx`** — če ima enak vzorec z .txt nalaganjem.
+**2. Boljša detekcija napake v `AdminUserDetail.tsx`** — po `.remove()` preveri, ali je datoteka res izbrisana, preden prikaže uspešno obvestilo:
+
+```typescript
+const { data, error } = await supabase.storage
+  .from('uporabniski-profili')
+  .remove([report.path]);
+if (error) throw error;
+// Preveri, ali je bila datoteka dejansko izbrisana
+if (!data || data.length === 0) {
+  throw new Error('Datoteka ni bila izbrisana — preverite dovoljenja');
+}
+```
 
 ### Obseg
-- `src/pages/admin/AdminUserDetail.tsx` — dopolni `handleEditReport` z iskanjem strukturiranih podatkov v bazi
-- Preveri `AdminLogopedistChildDetail.tsx` za enak vzorec
+- 1 nova SQL migracija (ena CREATE POLICY)
+- 1 manjša sprememba v `src/pages/admin/AdminUserDetail.tsx` (boljša validacija rezultata brisanja)
 
