@@ -44,7 +44,7 @@ import {
 import { DocumentPreview } from '@/components/admin/DocumentPreview';
 import { EvaluationSummary } from '@/components/admin/EvaluationSummary';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ReportTemplateEditor, generateReportText, ReportData } from '@/components/admin/ReportTemplateEditor';
+import { ReportTemplateEditor, generateReportText, ReportData, parseReportMetadata, stripMetadata } from '@/components/admin/ReportTemplateEditor';
 import { RecommendedLetter, convertLegacyLetters } from '@/components/admin/LetterSelector';
 import { MotorikaFrequencyType, MotorikaCustomUnit } from '@/components/admin/MotorikaFrequencySelector';
 import { useAdminAuth } from '@/contexts/AdminAuthContext';
