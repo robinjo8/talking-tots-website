@@ -518,56 +518,74 @@ export default function AdminLogopedistChildDetail() {
     
     try {
       const response = await fetch(url);
-      const text = await response.text();
+      const rawText = await response.text();
+      
+      const metadata = parseReportMetadata(rawText);
+      const text = stripMetadata(rawText);
       
       const anamenzaMatch = text.match(/ANAMNEZA:\s*([\s\S]*?)(?=═{5,}|UGOTOVITVE:|$)/);
       const ugotovitveMatch = text.match(/UGOTOVITVE:\s*([\s\S]*?)(?=═{5,}|PREDLOG ZA (IGRE IN )?VAJE:|$)/);
-      const predlogMatch = text.match(/PREDLOG ZA (IGRE IN )?VAJE:\s*([\s\S]*?)(?=═{5,}|OPOMBE:|$)/);
       const opombeMatch = text.match(/OPOMBE:\s*([\s\S]*?)(?=═{5,}|Poročilo izdelal|$)/);
 
-      setReportData(prev => ({
-        ...prev,
-        anamneza: anamenzaMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
-        ugotovitve: ugotovitveMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
-        predlogVaj: predlogMatch?.[2]?.trim().replace('(ni vnosa)', '') || '',
-        opombe: opombeMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
-      }));
+      if (metadata) {
+        setReportData(prev => ({
+          ...prev,
+          anamneza: anamenzaMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+          ugotovitve: ugotovitveMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+          predlogVaj: metadata.predlogVaj || '',
+          opombe: opombeMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+          recommendedLetters: metadata.letters || [],
+          motorikaFrequency: metadata.motorika?.type || null,
+          motorikaCustomCount: metadata.motorika?.count ?? null,
+          motorikaCustomUnit: metadata.motorika?.unit || null,
+          recommendedVideoLetters: metadata.videoLetters || [],
+        }));
+      } else {
+        const predlogMatch = text.match(/PREDLOG ZA (IGRE IN )?VAJE:\s*([\s\S]*?)(?=═{5,}|OPOMBE:|$)/);
 
-      // Look up matching report in DB to restore structured data (letters, motorika, video)
-      if (logopedistProfile?.id) {
-        const { data: reportsData } = await supabase
-          .from('logopedist_reports')
-          .select('*')
-          .eq('logopedist_id', logopedistProfile.id)
-          .order('created_at', { ascending: false })
-          .limit(10);
+        setReportData(prev => ({
+          ...prev,
+          anamneza: anamenzaMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+          ugotovitve: ugotovitveMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+          predlogVaj: predlogMatch?.[2]?.trim().replace('(ni vnosa)', '') || '',
+          opombe: opombeMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
+        }));
 
-        if (reportsData && reportsData.length > 0) {
-          const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})/);
-          const matchingReport = reportsData.find(r => {
-            if (dateMatch) {
-              const createdDate = r.created_at?.substring(0, 10);
-              if (createdDate === dateMatch[1]) return true;
-              if (r.pdf_url?.includes(dateMatch[1])) return true;
+        if (logopedistProfile?.id) {
+          const { data: reportsData } = await supabase
+            .from('logopedist_reports')
+            .select('*')
+            .eq('logopedist_id', logopedistProfile.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+          if (reportsData && reportsData.length > 0) {
+            const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})/);
+            const matchingReport = reportsData.find(r => {
+              if (dateMatch) {
+                const createdDate = r.created_at?.substring(0, 10);
+                if (createdDate === dateMatch[1]) return true;
+                if (r.pdf_url?.includes(dateMatch[1])) return true;
+              }
+              return false;
+            });
+
+            if (matchingReport) {
+              const reportDetails = (matchingReport as any).report_details as any;
+              const recLetters = (matchingReport as any).recommended_letters as string[] | null;
+              const letters = reportDetails?.letters
+                ? reportDetails.letters
+                : convertLegacyLetters(recLetters || []);
+
+              setReportData(prev => ({
+                ...prev,
+                recommendedLetters: letters,
+                motorikaFrequency: reportDetails?.motorika?.type || prev.motorikaFrequency,
+                motorikaCustomCount: reportDetails?.motorika?.count ?? prev.motorikaCustomCount,
+                motorikaCustomUnit: reportDetails?.motorika?.unit || prev.motorikaCustomUnit,
+                recommendedVideoLetters: reportDetails?.videoLetters || prev.recommendedVideoLetters,
+              }));
             }
-            return false;
-          });
-
-          if (matchingReport) {
-            const reportDetails = (matchingReport as any).report_details as any;
-            const recLetters = (matchingReport as any).recommended_letters as string[] | null;
-            const letters = reportDetails?.letters
-              ? reportDetails.letters
-              : convertLegacyLetters(recLetters || []);
-
-            setReportData(prev => ({
-              ...prev,
-              recommendedLetters: letters,
-              motorikaFrequency: reportDetails?.motorika?.type || prev.motorikaFrequency,
-              motorikaCustomCount: reportDetails?.motorika?.count ?? prev.motorikaCustomCount,
-              motorikaCustomUnit: reportDetails?.motorika?.unit || prev.motorikaCustomUnit,
-              recommendedVideoLetters: reportDetails?.videoLetters || prev.recommendedVideoLetters,
-            }));
           }
         }
       }
