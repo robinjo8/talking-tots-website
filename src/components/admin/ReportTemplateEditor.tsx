@@ -379,6 +379,36 @@ export function ReportTemplateEditor({
 }
 
 // Helper function to generate full report text from structured data
+export const METADATA_MARKER = '───METADATA───';
+
+export interface ReportMetadata {
+  letters: RecommendedLetter[];
+  motorika: {
+    type: MotorikaFrequencyType;
+    count: number | null;
+    unit: MotorikaCustomUnit;
+  };
+  videoLetters: string[];
+  predlogVaj: string;
+}
+
+export function parseReportMetadata(text: string): ReportMetadata | null {
+  const markerIndex = text.indexOf(METADATA_MARKER);
+  if (markerIndex === -1) return null;
+  try {
+    const jsonStr = text.substring(markerIndex + METADATA_MARKER.length).trim();
+    return JSON.parse(jsonStr) as ReportMetadata;
+  } catch {
+    return null;
+  }
+}
+
+export function stripMetadata(text: string): string {
+  const markerIndex = text.indexOf(METADATA_MARKER);
+  if (markerIndex === -1) return text;
+  return text.substring(0, markerIndex).trimEnd();
+}
+
 export function generateReportText(data: ReportData): string {
   const formatGender = (gender: string | null) => {
     if (!gender) return 'Ni podatka';
@@ -402,7 +432,20 @@ export function generateReportText(data: ReportData): string {
     data.motorikaCustomUnit,
     data.recommendedVideoLetters || [],
   );
+  // Only the generated recommendation text goes in the visible part
   const predlogContent = [combinedText, data.predlogVaj].filter(Boolean).join('\n') || '(ni vnosa)';
+
+  // Build metadata JSON
+  const metadata: ReportMetadata = {
+    letters: data.recommendedLetters || [],
+    motorika: {
+      type: data.motorikaFrequency,
+      count: data.motorikaCustomCount,
+      unit: data.motorikaCustomUnit,
+    },
+    videoLetters: data.recommendedVideoLetters || [],
+    predlogVaj: data.predlogVaj || '',
+  };
 
   return `LOGOPEDSKO POROČILO – TomiTalk
 
@@ -446,6 +489,9 @@ ${data.opombe || '(ni vnosa)'}
 To poročilo je informativne narave in ne predstavlja zdravniškega izvida 
 ali uradne medicinske diagnoze. Namenjeno je podpori govorno-jezikovnega 
 razvoja otroka v okviru aplikacije TomiTalk.
+
+${METADATA_MARKER}
+${JSON.stringify(metadata)}
 `;
 }
 
