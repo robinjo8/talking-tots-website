@@ -656,6 +656,46 @@ export default function AdminUserDetail() {
         predlogVaj: predlogMatch?.[2]?.trim().replace('(ni vnosa)', '') || '',
         opombe: opombeMatch?.[1]?.trim().replace('(ni vnosa)', '') || '',
       }));
+
+      // Look up matching report in DB to restore structured data (letters, motorika, video)
+      if (logopedistProfile?.id) {
+        const { data: reportsData } = await supabase
+          .from('logopedist_reports')
+          .select('*')
+          .eq('logopedist_id', logopedistProfile.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (reportsData && reportsData.length > 0) {
+          const dateMatch = file.name.match(/(\d{4}-\d{2}-\d{2})/);
+          const matchingReport = reportsData.find(r => {
+            // Match by date in filename vs pdf_url or created_at
+            if (dateMatch) {
+              const createdDate = r.created_at?.substring(0, 10);
+              if (createdDate === dateMatch[1]) return true;
+              if (r.pdf_url?.includes(dateMatch[1])) return true;
+            }
+            return false;
+          });
+
+          if (matchingReport) {
+            const reportDetails = (matchingReport as any).report_details as any;
+            const recLetters = (matchingReport as any).recommended_letters as string[] | null;
+            const letters = reportDetails?.letters
+              ? reportDetails.letters
+              : convertLegacyLetters(recLetters || []);
+
+            setReportData(prev => ({
+              ...prev,
+              recommendedLetters: letters,
+              motorikaFrequency: reportDetails?.motorika?.type || prev.motorikaFrequency,
+              motorikaCustomCount: reportDetails?.motorika?.count ?? prev.motorikaCustomCount,
+              motorikaCustomUnit: reportDetails?.motorika?.unit || prev.motorikaCustomUnit,
+              recommendedVideoLetters: reportDetails?.videoLetters || prev.recommendedVideoLetters,
+            }));
+          }
+        }
+      }
       
       toast.success('Poročilo naloženo za urejanje');
     } catch (err) {
