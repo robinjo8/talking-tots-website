@@ -208,9 +208,8 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
     
     const totalWords = session.total_words;
-    const wordsPerLetter = totalWords === 20 ? 1 : 3;
     
-    console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type, 'total_words:', totalWords, 'wordsPerLetter:', wordsPerLetter);
+    console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type, 'total_words:', totalWords);
 
     const { data: files, error: filesError } = await supabase.storage
       .from('uporabniski-profili')
@@ -227,6 +226,10 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
         file.name.endsWith('.wav') ||
         file.name.endsWith('.m4a')
       );
+
+      // Varnostna mreža: če je dejansko število datotek ≤ 20 in total_words = 60, uporabi wordsPerLetter=1
+      const wordsPerLetter = (totalWords === 20 || (totalWords === 60 && audioFiles.length <= 20)) ? 1 : 3;
+      console.log('wordsPerLetter:', wordsPerLetter, 'audioFiles:', audioFiles.length);
 
       const signedUrlPromises = audioFiles.map(async file => {
         const parsed = parseRecordingFilename(file.name, wordsPerLetter);

@@ -335,6 +335,13 @@ export default function AdminArtikulacijskiTest() {
         onClose={async () => {
           setShowInitialSettings(false);
           await initializeSession();
+          // Posodobi total_words v bazi, ker se je morda spremenil po izbiri nastavitev
+          if (sessionInfo?.sessionId) {
+            await supabase
+              .from('articulation_test_sessions')
+              .update({ total_words: totalWordCount })
+              .eq('id', sessionInfo.sessionId);
+          }
           setTestStarted(true);
         }}
         difficulty={difficulty}
