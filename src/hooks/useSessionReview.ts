@@ -208,7 +208,7 @@ async function fetchSessionReviewData(sessionId: string): Promise<SessionReviewD
     const targetFolder = `${storagePath}/Seja-${sessionNumber}`;
     
     const totalWords = session.total_words;
-    const wordsPerLetter = totalWords === 20 ? 1 : 3;
+    const wordsPerLetterDefault = totalWords === 20 ? 1 : 3;
     
     console.log('Nalagam posnetke iz mape:', targetFolder, 'session_number:', sessionNumber, 'source_type:', session.source_type, 'total_words:', totalWords, 'wordsPerLetter:', wordsPerLetter);
 
