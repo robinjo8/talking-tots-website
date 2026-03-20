@@ -1131,18 +1131,23 @@ export default function AdminUserDetail() {
                               <Button 
                                 variant="ghost" 
                                 size="sm"
-                                onClick={() => handleViewDocument(report)}
-                                title="Odpri v novem oknu"
+                                className="text-destructive hover:text-destructive"
+                                onClick={async () => {
+                                  try {
+                                    const { error } = await supabase.storage
+                                      .from('uporabniski-profili')
+                                      .remove([report.path]);
+                                    if (error) throw error;
+                                    toast.success('Poročilo izbrisano');
+                                    await refetchReports();
+                                  } catch (err) {
+                                    console.error('Error deleting report:', err);
+                                    toast.error('Napaka pri brisanju poročila');
+                                  }
+                                }}
+                                title="Izbriši"
                               >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm"
-                                onClick={() => handleDownloadDocument(report)}
-                                title="Prenesi"
-                              >
-                                <Download className="h-4 w-4" />
+                                <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
