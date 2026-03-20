@@ -1134,10 +1134,13 @@ export default function AdminUserDetail() {
                                 className="text-destructive hover:text-destructive"
                                 onClick={async () => {
                                   try {
-                                    const { error } = await supabase.storage
+                                    const { data, error } = await supabase.storage
                                       .from('uporabniski-profili')
                                       .remove([report.path]);
                                     if (error) throw error;
+                                    if (!data || data.length === 0) {
+                                      throw new Error('Datoteka ni bila izbrisana — preverite dovoljenja');
+                                    }
                                     toast.success('Poročilo izbrisano');
                                     await refetchReports();
                                   } catch (err) {
