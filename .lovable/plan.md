@@ -2,45 +2,129 @@
 
 ## Problem
 
-Ko shranite poročilo kot `.txt`, se strukturirani podatki (izbrani glasovi, motorika, video navodila) shranijo **samo kot besedilo** v stavku "Priporočamo igre in vaje za glas R..." znotraj sekcije PREDLOG ZA IGRE IN VAJE. 
+Edge funkcija `generate-monthly-plan` ne generira osebnega načrta, ker:
 
-Ko naložite `.txt` nazaj:
-1. **Ni zapisa v bazi** — `logopedist_reports` zapis se ustvari šele ob generiranju PDF-ja, zato iskanje v bazi ne vrne rezultata
-2. **Celoten tekst** (vključno z generirano poved) se naloži v polje `predlogVaj` → to povzroči **podvajanje** (generirani stavek + ponovna izbira glasov)
-3. Strukturirani izbirniki (glasovi, motorika, video) ostanejo prazni → validacija sproži napako
+1. **Format podatkov:** Baza shrani `positions: ["start", "middle-end"]` (niz), funkcija pričakuje `position: "start"` (string) → `lp.position` je `undefined` → nobena igra ni izbrana → "No target letters"
+2. **Manjkajoče igre:** Drsna igra sploh ni v kodi; Ponovi poved in Smešne povedi manjkata v START naboru
+3. **Napačna logika za middle-end:** Trenutno middle-end vključuje VSE igre (start + middle-end), moral bi pa vključevati SAMO 4 igre
+4. **Ni podpore za `initial-exercises`:** R začetne vaje pozicija ni implementirana
 
-## Rešitev
+---
 
-Ob shranjevanju `.txt` datoteke dodati **JSON metapodatke** na konec datoteke, ločene z markerjem. Ob nalaganju jih razčleniti in pravilno nastaviti.
+## Celotna pravila generiranja osebnega načrta
 
-### Spremembe
+### Struktura
+- 30 sklopov (sets), ne koledarskih dni
+- Vsak sklop: 5 aktivnosti (1 motorika + 4 igre ALI 5 iger)
+- 1 sklop na dan, poteče po 90 dneh
+- Znotraj sklopa se ista igra (gameId) NE ponovi
 
-**1. `src/components/admin/ReportTemplateEditor.tsx` — `generateReportText()`**
+### Motorika
+- **daily** = vsak sklop
+- **weekly** = vsak 7. sklop (0, 7, 14, 21, 28)
+- **monthly** = samo 1. sklop
+- **custom** = razpršeno po sklopih glede na count/unit
 
-Na konec besedila dodati JSON blok s strukturiranimi podatki:
+### Nabori iger glede na pozicijo
 
+**Začetek (start)** → 9 iger:
+| Igra | gameId | URL vzorec |
+|------|--------|-----------|
+| Kolo besed | kolo-srece | /govorne-igre/kolo-srece/{urlKey} |
+| Igra ujemanja | igra-ujemanja | /govorne-igre/igra-ujemanja/{urlKey}{ageKey} |
+| Zaporedja | zaporedja | /govorne-igre/zaporedja/{urlKey}{ageKey} |
+| Spomin | spomin | /govorne-igre/spomin/spomin-{urlKey} |
+| Drsna igra | drsna-sestavljanka | /govorne-igre/drsna-sestavljanka/{urlKey}{ageKey} |
+| Labirint | labirint | /govorne-igre/labirint/{urlKey} |
+| Sestavljanke | sestavljanke | /govorne-igre/sestavljanke/{urlKey}{ageKey} |
+| Ponovi poved | ponovi-poved | /govorne-igre/ponovi-poved/{urlKey} |
+| Smešne povedi | met-kocke | /govorne-igre/met-kocke/{urlKey} |
+
+**Sredina/konec (middle-end)** → 4 igre:
+| Igra | gameId | URL vzorec |
+|------|--------|-----------|
+| Zabavna pot | kace | /govorne-igre/kace/{urlKey} |
+| Bingo | bingo | /govorne-igre/bingo/{urlKey} |
+| Ponovi poved | ponovi-poved | /govorne-igre/ponovi-poved/{urlKey} |
+| Smešne povedi | met-kocke | /govorne-igre/met-kocke/{urlKey} |
+
+**Začetek + Sredina/konec (obe izbrani za isti glas)** → 11 iger (unija brez podvajanja):
+Vse igre iz obeh tabel.
+
+**R - začetne vaje (initial-exercises)** → 11 iger (vse), URL ključ = `r-zacetek` namesto `r`
+
+### Starostne igre
+Sestavljanke, Zaporedja, Igra ujemanja in Drsna igra imajo starostni sufiks: "" (3-4), "56" (5-6), "78" (7-8), "910" (9-10)
+
+---
+
+## Spremembe
+
+### 1 datoteka: `supabase/functions/generate-monthly-plan/index.ts`
+
+**a) Redefiniraj nabore iger (vrstice 28-46):**
+
+```typescript
+const START_GAMES = [
+  { name: "Kolo besed", gameId: "kolo-srece", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
+  { name: "Spomin", gameId: "spomin", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
+  { name: "Labirint", gameId: "labirint", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
+  { name: "Ponovi poved", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
+  { name: "Smešne povedi", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
+];
+
+const START_AGE_GAMES = [
+  { name: "Sestavljanke", gameId: "sestavljanke", pathTemplate: "/govorne-igre/sestavljanke/{urlKey}{ageKey}" },
+  { name: "Zaporedja", gameId: "zaporedja", pathTemplate: "/govorne-igre/zaporedja/{urlKey}{ageKey}" },
+  { name: "Igra ujemanja", gameId: "igra-ujemanja", pathTemplate: "/govorne-igre/igra-ujemanja/{urlKey}{ageKey}" },
+  { name: "Drsna igra", gameId: "drsna-sestavljanka", pathTemplate: "/govorne-igre/drsna-sestavljanka/{urlKey}{ageKey}" },
+];
+
+const MIDDLE_END_GAMES = [
+  { name: "Zabavna pot", gameId: "kace", pathTemplate: "/govorne-igre/kace/{urlKey}" },
+  { name: "Bingo", gameId: "bingo", pathTemplate: "/govorne-igre/bingo/{urlKey}" },
+  { name: "Ponovi poved", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
+  { name: "Smešne povedi", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
+];
 ```
-───METADATA───
-{"letters":[{"letter":"R","positions":["start","middle-end","initial-exercises"]}],"motorika":{"type":"weekly"},"videoLetters":["R"],"predlogVaj":"moje dodatne opombe"}
+
+**b) Posodobi `LetterPosition` interface (vrstica 78-81):**
+Dodaj `"initial-exercises"` kot veljavno pozicijo.
+
+**c) Posodobi `buildGameCombinations` (vrstice 96-119):**
+- `position === "start"` → `START_GAMES + START_AGE_GAMES` (9 iger)
+- `position === "middle-end"` → samo `MIDDLE_END_GAMES` (4 igre) — NE več vseh iger
+- `position === "initial-exercises"` → vse 11 iger, URL ključ = `r-zacetek`
+- Dedup po `gameId` znotraj iste črke (Ponovi poved in Smešne povedi so v obeh naborih)
+
+**d) Posodobi parsanje `reportDetails.letters` (vrstice 347-351):**
+Pretvori `positions` niz v posamezne `LetterPosition` zapise:
+```typescript
+if (reportDetails?.letters && Array.isArray(reportDetails.letters)) {
+  for (const lp of reportDetails.letters) {
+    const posArray = lp.positions || [lp.position || "start"];
+    for (const pos of posArray) {
+      letterPositions.push({ letter: lp.letter, position: pos });
+    }
+  }
+}
 ```
 
-Polje `predlogVaj` v besedilnem delu ostane sestavljeno samo iz `combinedText` (brez uporabnikovih dodatnih opomb — te gredo v metadata JSON).
+**e) Posodobi deduplikacijo (vrstice 375-381):**
+Dedup po `letter+position` namesto samo `letter`:
+```typescript
+const seen = new Set<string>();
+letterPositions = letterPositions.filter(lp => {
+  const key = `${lp.letter}:${lp.position}`;
+  if (seen.has(key)) return false;
+  seen.add(key);
+  return true;
+});
+```
 
-**2. `src/pages/admin/AdminUserDetail.tsx` — `handleEditReport()`**
+**f) V `buildGameCombinations` dedup po `gameId` za isti glas:**
+Ko ima en glas obe poziciji (start + middle-end), se ustvari unija vseh 11 iger brez podvajanja Ponovi poved in Smešne povedi.
 
-- Razčleni JSON metapodatke iz `.txt` datoteke (marker `───METADATA───`)
-- Nastavi `recommendedLetters`, `motorikaFrequency`, `motorikaCustomCount`, `motorikaCustomUnit`, `recommendedVideoLetters` iz JSON-a
-- Nastavi `predlogVaj` iz JSON polja `predlogVaj` (samo uporabnikove dodatne opombe, NE generirani stavek)
-- Če metadata ni prisotna (stare datoteke), uporabi obstoječi fallback z iskanjem v bazi
-
-**3. `src/pages/admin/AdminLogopedistChildDetail.tsx`** — enaka sprememba kot #2
-
-**4. `handleSaveReport()` v obeh datotekah**
-
-Posodobiti `generateReportText` klic, da vključi metadata (ali pa se metadata doda neposredno v save logiko).
-
-### Obseg
-- `src/components/admin/ReportTemplateEditor.tsx` — posodobi `generateReportText()` z metadata blokom
-- `src/pages/admin/AdminUserDetail.tsx` — posodobi `handleEditReport()` za parsanje metadat + `handleSaveReport()` za pravilno besedilo
-- `src/pages/admin/AdminLogopedistChildDetail.tsx` — enake spremembe
+### Po implementaciji
+Ponovna generacija PDF-ja za testnega otroka bo sprožila nov načrt.
 
