@@ -889,6 +889,7 @@ export default function AdminUserDetail() {
                               <span className="text-sm truncate">{report.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
+                              <GeneratePlanButton reportFileName={report.name} childId={childId} />
                               <Button 
                                 variant="ghost" 
                                 size="sm"
