@@ -424,8 +424,9 @@ serve(async (req) => {
     // Deduplicate
     const seen = new Set<string>();
     letterPositions = letterPositions.filter(lp => {
-      if (seen.has(lp.letter)) return false;
-      seen.add(lp.letter);
+      const key = `${lp.letter}:${lp.position}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
 
