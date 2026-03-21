@@ -80,7 +80,7 @@ function formatDate(d: Date): string {
 
 interface LetterPosition {
   letter: string;
-  position: "start" | "middle-end";
+  position: "start" | "middle-end" | "initial-exercises";
 }
 
 interface GameDef {
