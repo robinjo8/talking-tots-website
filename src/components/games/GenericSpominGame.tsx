@@ -128,12 +128,12 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
 
   // Show BRAVO dialog when game completes (after last pair dialog closes)
   useEffect(() => {
-    if (gameCompleted && !showNewGameButton) {
+    if (gameCompleted && !showNewGameButton && !showPairDialog) {
       // Small delay for smooth transition after pair dialog closes
       const timer = setTimeout(() => setShowBravoDialog(true), 500);
       return () => clearTimeout(timer);
     }
-  }, [gameCompleted, showNewGameButton]);
+  }, [gameCompleted, showNewGameButton, showPairDialog]);
 
   const handleBravoClose = async () => {
     await handleClaimStar();
