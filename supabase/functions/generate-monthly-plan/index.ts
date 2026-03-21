@@ -438,34 +438,45 @@ serve(async (req) => {
       return true;
     });
 
-    const targetLetters = letterPositions.map(lp => lp.letter);
+    const targetLetters = [...new Set(letterPositions.map(lp => lp.letter))];
 
-    if (targetLetters.length === 0) {
-      console.log("No target letters found, skipping plan generation");
-      return new Response(JSON.stringify({ message: "No target letters, plan not generated" }), {
-        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    // Build position-aware description per letter
+    const positionLabels: Record<string, string> = {
+      "start": "na začetku besed",
+      "middle-end": "na sredini in koncu besed",
+      "initial-exercises": "začetne vaje",
+    };
+
+    const letterDescriptions: string[] = [];
+    for (const letter of targetLetters) {
+      const positions = letterPositions
+        .filter(lp => lp.letter === letter)
+        .map(lp => positionLabels[lp.position] || lp.position);
+      const uniquePositions = [...new Set(positions)];
+      if (uniquePositions.length > 0) {
+        const lastPos = uniquePositions.pop()!;
+        const posText = uniquePositions.length > 0 
+          ? uniquePositions.join(", ") + " ter " + lastPos
+          : lastPos;
+        letterDescriptions.push(`glas ${letter} (${posText})`);
+      } else {
+        letterDescriptions.push(`glas ${letter}`);
+      }
     }
 
-    const now = new Date();
-    const startDateStr = formatDate(now);
-    // expires_at = 90 days from now (safety net)
-    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
-
-    const combinations = buildGameCombinations(letterPositions, ageGroup);
-    const sets = generateSetBasedPlan(TOTAL_SETS, combinations, motorikaConfig);
-
-    console.log(`Generated ${sets.length} sets with ${combinations.length} game combinations`);
+    let lettersFormatted: string;
+    if (letterDescriptions.length === 1) {
+      lettersFormatted = letterDescriptions[0];
+    } else if (letterDescriptions.length === 2) {
+      lettersFormatted = letterDescriptions.join(" in ");
+    } else {
+      lettersFormatted = letterDescriptions.slice(0, -1).join(", ") + " in " + letterDescriptions[letterDescriptions.length - 1];
+    }
 
     const childNameCapitalized = child.name.charAt(0).toUpperCase() + child.name.slice(1);
     const isFemale = ["female", "F", "f"].includes(child.gender || "");
     const vadil = isFemale ? "vadila" : "vadil";
     const sampion = isFemale ? "prava šampionka" : "pravi šampion";
-    const lettersFormatted = targetLetters.length === 1 
-      ? `glas ${targetLetters[0]}` 
-      : targetLetters.length === 2 
-        ? `glasova ${targetLetters[0]} in ${targetLetters[1]}` 
-        : `glasove ${targetLetters.slice(0, -1).join(", ")} in ${targetLetters[targetLetters.length - 1]}`;
     const summary = `Hej ${childNameCapitalized}! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš ${vadil} ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in igrice! Zbiraj zvezdice in postani ${sampion}!`;
 
     // Archive any existing active/generating plans
