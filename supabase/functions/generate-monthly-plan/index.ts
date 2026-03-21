@@ -100,23 +100,64 @@ function buildGameCombinations(letterPositions: LetterPosition[], ageGroup: stri
   const ageKey = getAgeKey(ageGroup);
   const combinations: GameCombination[] = [];
 
+  // Group positions by letter to handle combined start + middle-end
+  const letterPositionMap = new Map<string, Set<string>>();
   for (const lp of letterPositions) {
     if (!SUPPORTED_LETTERS.includes(lp.letter)) continue;
-    const urlKey = LETTER_URL_MAP[lp.letter];
+    if (!letterPositionMap.has(lp.letter)) {
+      letterPositionMap.set(lp.letter, new Set());
+    }
+    letterPositionMap.get(lp.letter)!.add(lp.position);
+  }
 
-    let games: GameDef[];
-    if (lp.position === "start") {
-      games = [...START_GAMES, ...START_AGE_GAMES];
-    } else {
-      games = [...START_GAMES, ...START_AGE_GAMES, ...MIDDLE_END_GAMES];
+  for (const [letter, positions] of letterPositionMap) {
+    const hasStart = positions.has("start");
+    const hasMiddleEnd = positions.has("middle-end");
+    const hasInitialExercises = positions.has("initial-exercises");
+
+    // Determine URL key: initial-exercises for R uses r-zacetek
+    const baseUrlKey = LETTER_URL_MAP[letter];
+
+    // Build game list based on positions
+    let games: GameDef[] = [];
+    const addedGameIds = new Set<string>();
+
+    const addGames = (gamesToAdd: GameDef[]) => {
+      for (const g of gamesToAdd) {
+        if (!addedGameIds.has(g.gameId)) {
+          addedGameIds.add(g.gameId);
+          games.push(g);
+        }
+      }
+    };
+
+    if (hasInitialExercises) {
+      // All games with r-zacetek URL
+      addGames(START_GAMES);
+      addGames(START_AGE_GAMES);
+      addGames(MIDDLE_END_GAMES);
+    } else if (hasStart && hasMiddleEnd) {
+      // Union of all games (11 unique)
+      addGames(START_GAMES);
+      addGames(START_AGE_GAMES);
+      addGames(MIDDLE_END_GAMES);
+    } else if (hasStart) {
+      addGames(START_GAMES);
+      addGames(START_AGE_GAMES);
+    } else if (hasMiddleEnd) {
+      addGames(MIDDLE_END_GAMES);
     }
 
+    const urlKey = hasInitialExercises ? "r-zacetek" : baseUrlKey;
+
+    const allAgeGameIds = new Set(START_AGE_GAMES.map(g => g.gameId));
+
     for (const game of games) {
-      const isAgeGame = START_AGE_GAMES.some((g) => g.gameId === game.gameId);
+      const isAgeGame = allAgeGameIds.has(game.gameId);
       const path = game.pathTemplate
         .replace("{urlKey}", urlKey)
         .replace("{ageKey}", isAgeGame ? ageKey : "");
-      combinations.push({ gameId: game.gameId, gameName: game.name, letter: lp.letter, path });
+      combinations.push({ gameId: game.gameId, gameName: game.name, letter, path });
     }
   }
   return combinations;
