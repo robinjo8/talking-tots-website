@@ -30,12 +30,15 @@ const START_GAMES = [
   { name: "Kolo besed", gameId: "kolo-srece", pathTemplate: "/govorne-igre/kolo-srece/{urlKey}" },
   { name: "Spomin", gameId: "spomin", pathTemplate: "/govorne-igre/spomin/spomin-{urlKey}" },
   { name: "Labirint", gameId: "labirint", pathTemplate: "/govorne-igre/labirint/{urlKey}" },
+  { name: "Ponovi poved", gameId: "ponovi-poved", pathTemplate: "/govorne-igre/ponovi-poved/{urlKey}" },
+  { name: "Smešne povedi", gameId: "met-kocke", pathTemplate: "/govorne-igre/met-kocke/{urlKey}" },
 ];
 
 const START_AGE_GAMES = [
   { name: "Sestavljanke", gameId: "sestavljanke", pathTemplate: "/govorne-igre/sestavljanke/{urlKey}{ageKey}" },
   { name: "Zaporedja", gameId: "zaporedja", pathTemplate: "/govorne-igre/zaporedja/{urlKey}{ageKey}" },
   { name: "Igra ujemanja", gameId: "igra-ujemanja", pathTemplate: "/govorne-igre/igra-ujemanja/{urlKey}{ageKey}" },
+  { name: "Drsna igra", gameId: "drsna-sestavljanka", pathTemplate: "/govorne-igre/drsna-sestavljanka/{urlKey}{ageKey}" },
 ];
 
 const MIDDLE_END_GAMES = [
@@ -77,7 +80,7 @@ function formatDate(d: Date): string {
 
 interface LetterPosition {
   letter: string;
-  position: "start" | "middle-end";
+  position: "start" | "middle-end" | "initial-exercises";
 }
 
 interface GameDef {
@@ -97,23 +100,64 @@ function buildGameCombinations(letterPositions: LetterPosition[], ageGroup: stri
   const ageKey = getAgeKey(ageGroup);
   const combinations: GameCombination[] = [];
 
+  // Group positions by letter to handle combined start + middle-end
+  const letterPositionMap = new Map<string, Set<string>>();
   for (const lp of letterPositions) {
     if (!SUPPORTED_LETTERS.includes(lp.letter)) continue;
-    const urlKey = LETTER_URL_MAP[lp.letter];
+    if (!letterPositionMap.has(lp.letter)) {
+      letterPositionMap.set(lp.letter, new Set());
+    }
+    letterPositionMap.get(lp.letter)!.add(lp.position);
+  }
 
-    let games: GameDef[];
-    if (lp.position === "start") {
-      games = [...START_GAMES, ...START_AGE_GAMES];
-    } else {
-      games = [...START_GAMES, ...START_AGE_GAMES, ...MIDDLE_END_GAMES];
+  for (const [letter, positions] of letterPositionMap) {
+    const hasStart = positions.has("start");
+    const hasMiddleEnd = positions.has("middle-end");
+    const hasInitialExercises = positions.has("initial-exercises");
+
+    // Determine URL key: initial-exercises for R uses r-zacetek
+    const baseUrlKey = LETTER_URL_MAP[letter];
+
+    // Build game list based on positions
+    let games: GameDef[] = [];
+    const addedGameIds = new Set<string>();
+
+    const addGames = (gamesToAdd: GameDef[]) => {
+      for (const g of gamesToAdd) {
+        if (!addedGameIds.has(g.gameId)) {
+          addedGameIds.add(g.gameId);
+          games.push(g);
+        }
+      }
+    };
+
+    if (hasInitialExercises) {
+      // All games with r-zacetek URL
+      addGames(START_GAMES);
+      addGames(START_AGE_GAMES);
+      addGames(MIDDLE_END_GAMES);
+    } else if (hasStart && hasMiddleEnd) {
+      // Union of all games (11 unique)
+      addGames(START_GAMES);
+      addGames(START_AGE_GAMES);
+      addGames(MIDDLE_END_GAMES);
+    } else if (hasStart) {
+      addGames(START_GAMES);
+      addGames(START_AGE_GAMES);
+    } else if (hasMiddleEnd) {
+      addGames(MIDDLE_END_GAMES);
     }
 
+    const urlKey = hasInitialExercises ? "r-zacetek" : baseUrlKey;
+
+    const allAgeGameIds = new Set(START_AGE_GAMES.map(g => g.gameId));
+
     for (const game of games) {
-      const isAgeGame = START_AGE_GAMES.some((g) => g.gameId === game.gameId);
+      const isAgeGame = allAgeGameIds.has(game.gameId);
       const path = game.pathTemplate
         .replace("{urlKey}", urlKey)
         .replace("{ageKey}", isAgeGame ? ageKey : "");
-      combinations.push({ gameId: game.gameId, gameName: game.name, letter: lp.letter, path });
+      combinations.push({ gameId: game.gameId, gameName: game.name, letter, path });
     }
   }
   return combinations;
@@ -345,7 +389,12 @@ serve(async (req) => {
     let motorikaConfig: MotorikaConfig = { type: "daily" };
 
     if (reportDetails?.letters && Array.isArray(reportDetails.letters)) {
-      letterPositions = reportDetails.letters;
+      for (const lp of reportDetails.letters) {
+        const posArray: string[] = lp.positions || (lp.position ? [lp.position] : ["start"]);
+        for (const pos of posArray) {
+          letterPositions.push({ letter: lp.letter, position: pos as LetterPosition["position"] });
+        }
+      }
     } else if (report.recommended_letters && Array.isArray(report.recommended_letters)) {
       letterPositions = report.recommended_letters.map((l: string) => ({ letter: l, position: "start" as const }));
     }
@@ -375,8 +424,9 @@ serve(async (req) => {
     // Deduplicate
     const seen = new Set<string>();
     letterPositions = letterPositions.filter(lp => {
-      if (seen.has(lp.letter)) return false;
-      seen.add(lp.letter);
+      const key = `${lp.letter}:${lp.position}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
 
