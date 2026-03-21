@@ -389,7 +389,12 @@ serve(async (req) => {
     let motorikaConfig: MotorikaConfig = { type: "daily" };
 
     if (reportDetails?.letters && Array.isArray(reportDetails.letters)) {
-      letterPositions = reportDetails.letters;
+      for (const lp of reportDetails.letters) {
+        const posArray: string[] = lp.positions || (lp.position ? [lp.position] : ["start"]);
+        for (const pos of posArray) {
+          letterPositions.push({ letter: lp.letter, position: pos as LetterPosition["position"] });
+        }
+      }
     } else if (report.recommended_letters && Array.isArray(report.recommended_letters)) {
       letterPositions = report.recommended_letters.map((l: string) => ({ letter: l, position: "start" as const }));
     }
