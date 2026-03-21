@@ -53,6 +53,7 @@ import { sl } from 'date-fns/locale';
 import { generateReportPdf } from '@/utils/generateReportPdf';
 import { Badge } from '@/components/ui/badge';
 import { AdditionalTestSection } from '@/components/admin/AdditionalTestSection';
+import { GeneratePlanButton } from '@/components/admin/GeneratePlanButton';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
@@ -888,6 +889,7 @@ export default function AdminUserDetail() {
                               <span className="text-sm truncate">{report.name}</span>
                             </div>
                             <div className="flex items-center gap-1">
+                              <GeneratePlanButton reportFileName={report.name} childId={childId} />
                               <Button 
                                 variant="ghost" 
                                 size="sm"
