@@ -1,38 +1,29 @@
 
 
-## Analiza
+## Problem
 
-Iz baze vidim:
-- **Testni otrok** (report `0348d835...`) — ima `positions: ["start", "middle-end", "initial-exercises"]` ampak **nima načrta** (plan_id = null)
-- Več drugih reportov tudi nima načrtov (nekateri nimajo niti child_id)
-- **Lea** in **Tristan** že imata aktivne načrte
+Ko najdeš zadnji par, se hkrati prikažeta **oba** dialoga:
+1. `MemoryPairDialog` (za ponovitev besede)
+2. `BRAVO!` dialog (za zvezdico)
 
-## Najoptimalnejša rešitev (2 dela)
+To se zgodi ker `useEffect` na vrstici 130 sproži BRAVO dialog 500ms po `gameCompleted = true`, ne glede na to ali je pair dialog še odprt.
 
-### Del 1: Takojšnja generacija manjkajočih načrtov
+## Popravek
 
-Uporabim `supabase--curl_edge_functions` za direkten klic edge funkcije s service role ključem za vsak report brez načrta. To deluje brez JWT uporabnika.
+### `src/components/games/GenericSpominGame.tsx` (vrstica 130-136)
 
-**Problem:** Edge funkcija trenutno zahteva `getClaims()` — moram dodati alternativno avtorizacijo za service role klic (preverjanje `SUPABASE_SERVICE_ROLE_KEY` v Authorization headerju).
+Dodaj pogoj `!showPairDialog` v useEffect, da se BRAVO dialog prikaže šele **po zaprtju pair dialoga**:
 
-### Del 2: Admin gumb "Generiraj načrt" (dolgoročno)
+```typescript
+useEffect(() => {
+    if (gameCompleted && !showNewGameButton && !showPairDialog) {
+      const timer = setTimeout(() => setShowBravoDialog(true), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameCompleted, showNewGameButton, showPairDialog]);
+```
 
-Dodam gumb v admin portal (AdminUserDetail, AdminLogopedistChildDetail) pri vsakem poročilu, ki nima načrta. Gumb pokliče `generate-monthly-plan` z admin JWT. Tako v prihodnosti nikoli več ne bo manjkajočih načrtov.
+To zagotovi da uporabnik najprej ponovi besedo v pair dialogu, nato se ta zapre, in šele potem se prikaže BRAVO dialog z gumbom "VZEMI ZVEZDICO".
 
-## Spremembe
-
-### 1. `supabase/functions/generate-monthly-plan/index.ts`
-- Dodaj alternativno avtorizacijo: če `Authorization: Bearer <token>` ne uspe s `getClaims()`, preveri ali je token enak `SUPABASE_SERVICE_ROLE_KEY` — če da, dovoli dostop brez user ID-ja (admin override)
-- To omogoča klic iz admin orodij in curl brez uporabniškega JWT
-
-### 2. `src/pages/admin/AdminUserDetail.tsx`
-- Dodaj gumb "Generiraj načrt" ob vsakem poročilu, ki nima aktivnega načrta
-- Klic `supabase.functions.invoke('generate-monthly-plan', { body: { reportId } })`
-
-### 3. `src/pages/admin/AdminLogopedistChildDetail.tsx`
-- Enak gumb "Generiraj načrt" kot zgoraj
-
-### 4. Po deploymentu
-- Pokličem edge funkcijo za report `0348d835-fa1e-484c-8243-522b928666d7` (Testni otrok)
-- Preverim loge da je načrt uspešno generiran
+**1 datoteka, 1 vrstica spremenjena.**
 
