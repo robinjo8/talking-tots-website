@@ -479,6 +479,14 @@ serve(async (req) => {
     const sampion = isFemale ? "prava šampionka" : "pravi šampion";
     const summary = `Hej ${childNameCapitalized}! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš ${vadil} ${lettersFormatted}. Vsak dan te čakajo nove pustolovščine – vaje za jezik in igrice! Zbiraj zvezdice in postani ${sampion}!`;
 
+    // Build game combinations and generate sets
+    const combinations = buildGameCombinations(letterPositions, ageGroup);
+    const sets = generateSetBasedPlan(TOTAL_SETS, combinations, motorikaConfig);
+
+    const now = new Date();
+    const startDateStr = formatDate(now);
+    const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
+
     // Archive any existing active/generating plans
     await supabase
       .from("child_monthly_plans")
