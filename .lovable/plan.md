@@ -2,36 +2,31 @@
 
 ## Problem
 
-The `targetLetters` array on line 441 is built from all letter-position pairs, so if a child has R at 3 positions (start, middle-end, initial-exercises), it produces `[R, R, R]`, resulting in the nonsensical "glasove R, R in R".
+Edge function `generate-monthly-plan` crashes with **`ReferenceError: sets is not defined`** (visible in logs). Three variables are missing between the summary generation (line 480) and the insert (line 489):
 
-## Solution
+1. **`sets`** — `generateSetBasedPlan()` is defined but never called
+2. **`now`**, **`startDateStr`**, **`expiresAt`** — never declared
 
-Replace the simple letter listing with a descriptive summary that includes **what positions** each letter needs practice at -- mirroring what the logoped marked in the report.
+The previous edit that added position-aware descriptions likely removed or never included these critical lines.
 
-### Changes in `supabase/functions/generate-monthly-plan/index.ts`
+## Fix
 
-**1. Deduplicate `targetLetters` (line 441):**
+Add the missing code between line 480 (after `summary`) and line 482 (before archive):
+
 ```typescript
-const targetLetters = [...new Set(letterPositions.map(lp => lp.letter))];
+// Build game combinations and generate sets
+const combinations = buildGameCombinations(letterPositions, ageGroup);
+const sets = generateSetBasedPlan(TOTAL_SETS, combinations, motorikaConfig);
+
+const now = new Date();
+const startDateStr = formatDate(now);
+const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
 ```
 
-**2. Replace the summary generation (lines 460-469) with position-aware text:**
+### File: `supabase/functions/generate-monthly-plan/index.ts`
+- Insert 6 lines after line 480 (after `summary` const, before the archive block)
+- Redeploy the edge function
+- Re-generate the plan for Testni otrok to verify it works
 
-Build a human-readable description per letter, e.g.:
-- R with positions start, middle-end, initial-exercises → "glas R (na začetku, na sredini in koncu besed ter začetne vaje)"
-- S with position start → "glas S (na začetku besed)"
-- L with position middle-end → "glas L (na sredini in koncu besed)"
-
-Position labels:
-- `start` → "na začetku besed"
-- `middle-end` → "na sredini in koncu besed"  
-- `initial-exercises` → "začetne vaje"
-
-Example output: *"Hej Testni Otrok! Pripravili smo ti zabaven načrt vaj in iger, s katerimi boš vadil glas R (na začetku, na sredini in koncu besed ter začetne vaje). Vsak dan te čakajo..."*
-
-With multiple letters: *"...s katerimi boš vadila glasova S (na začetku besed) in R (na sredini in koncu besed)."*
-
-**3. Redeploy the edge function.**
-
-**4. Re-generate the plan for Testni otrok** to get the corrected summary.
+This is a single insertion of missing variable declarations — no other changes needed.
 
