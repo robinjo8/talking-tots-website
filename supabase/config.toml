@@ -51,3 +51,6 @@ verify_jwt = false
 [functions.reset-articulation-test]
 verify_jwt = false
 
+[functions.award-stickers]
+verify_jwt = false
+
