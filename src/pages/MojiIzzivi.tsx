@@ -15,7 +15,7 @@ import {
   completeSet,
   expireSet,
   isSetExpired,
-  hasCompletedSetToday,
+  getNextSetNumber,
   getTodayDateStr,
   type SetTracking,
 } from "@/hooks/usePlanProgress";
@@ -68,27 +68,15 @@ export default function MojiIzzivi() {
   }, [trackingEntries]);
 
   const completedSetsCount = useMemo(() => {
-    return trackingEntries.filter(e => e.status === "completed").length;
+    return trackingEntries.filter(e => e.status === "completed" || e.status === "expired").length;
   }, [trackingEntries]);
 
   const allSetsCompleted = completedSetsCount >= totalSets;
 
-  const todayAlreadyDone = useMemo(() => {
-    return hasCompletedSetToday(trackingEntries);
-  }, [trackingEntries]);
-
-  // Find the next set number to work on
+  // Find the next set number to work on (linear: always max + 1)
   const nextSetNumber = useMemo(() => {
     if (!isSetBased) return null;
-    const skipSetNums = new Set(
-      trackingEntries
-        .filter(e => e.status === "completed" || e.status === "active")
-        .map(e => e.set_number)
-    );
-    for (let i = 1; i <= totalSets; i++) {
-      if (!skipSetNums.has(i)) return i;
-    }
-    return null;
+    return getNextSetNumber(trackingEntries, totalSets);
   }, [trackingEntries, totalSets, isSetBased]);
 
   // Get the current set data
@@ -171,7 +159,21 @@ export default function MojiIzzivi() {
     await startSet(plan.id, selectedChild.id, nextSetNumber);
     await refetchTracking();
     setIsProcessing(false);
-  }, [plan?.id, selectedChild?.id, nextSetNumber]);
+
+    // Trigger plan renewal when starting the last set
+    if (nextSetNumber === totalSets && plan.report_id) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          supabase.functions.invoke("generate-monthly-plan", {
+            body: { reportId: plan.report_id, mode: "renewal" },
+          }).catch(err => console.error("Error pre-generating renewal plan:", err));
+        }
+      } catch (err) {
+        console.error("Error triggering renewal:", err);
+      }
+    }
+  }, [plan?.id, selectedChild?.id, nextSetNumber, totalSets, plan?.report_id]);
 
   // Check for returning from a game
   useEffect(() => {
@@ -317,18 +319,6 @@ export default function MojiIzzivi() {
                 <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets} sklopov je opravljenih!</h2>
                 <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
                 <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
-              </motion.div>
-            ) : todayAlreadyDone && !activeTracking ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-12 text-center bg-accent/10 rounded-2xl border border-accent/20"
-              >
-                <div className="text-4xl mb-4">🌟</div>
-                <h2 className="text-xl font-bold mb-2">Odlično opravljeno!</h2>
-                <p className="text-muted-foreground">
-                  Danes si že opravil sklop. Naslednji sklop te čaka jutri!
-                </p>
               </motion.div>
             ) : activeTracking && currentSetData ? (
               <PlanSetCard
