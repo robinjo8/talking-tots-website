@@ -1,59 +1,40 @@
 
 
-## Popravek logike sklopov + vizualna nadgradnja za otroke + admin pregled
+## Čiščenje podatkov za "Testni otrok" + gumb za izbris dodatnega preverjanja
 
-### Problem
-1. `nextSetNumber` preskoči potekle sklope (otrok ne more ponoviti sklopa 1)
-2. `startSet` ne podpira ponovnega zagona poteklega sklopa
-3. Gumb "Začni sklop" je preprost, brez otroški privlačne animacije
-4. Admin portal nima pregleda otrokovega arhiva sklopov
+### 1. Izbris podatkov za otroka "Testni otrok" (child_id: `c3940422-e5ce-44b4-a2e4-f73c11323776`)
 
-### Spremembe
+Podatki v bazi:
+- 1x `child_monthly_plans` (osebni načrt, status: active)
+- 2x `plan_set_tracking` (sledenje sklopov)
+- 1x `plan_activity_completions` (opravljene aktivnosti)
+- 1x `additional_test_assignments` (status: completed, session_id: `7c3aaa10-...`)
+- Povezane `additional_test_words` za ta assignment
+- Povezana seja `7c3aaa10-...` in morebitni `articulation_word_results` / `articulation_evaluations`
 
-#### 1. `src/hooks/usePlanProgress.ts` — popravek logike
-- **`nextSetNumber` premik v hook ali popravek v MojiIzzivi**: preskoči samo `completed` in `active` sklope (ne `expired`)
-- **`startSet`**: če obstaja `expired` zapis za ta sklop, ga posodobi nazaj na `active` (update namesto insert), ponastavi `expired_at` na null in `total_stars` na 0
+Vse to izbrišem z SQL migracijo (service role), v pravilnem vrstnem redu:
+1. `plan_activity_completions` → 2. `plan_set_tracking` → 3. `child_monthly_plans`
+4. `articulation_word_results` za sejo → 5. `articulation_evaluations` za sejo
+6. `additional_test_words` → 7. `additional_test_assignments`
+8. `articulation_test_sessions` za sejo
 
-#### 2. `src/pages/MojiIzzivi.tsx` — vizualna nadgradnja
-- Popravek `nextSetNumber` logike: `filter(e => e.status === "completed" || e.status === "active")`
-- Nov state `showUnboxAnimation` za animacijo odpiranja paketa
-- Ko otrok klikne "Odpri sklop":
-  1. Prikaže se animiran "paket" (gift box) z barvitim gradient ozadjem
-  2. Ob kliku se paket "odpre" s framer-motion animacijo (scale + rotate)
-  3. Konfeti/zvezdice se razletijo (CSS particles ali canvas-confetti)
-  4. Po 1.5s se prikažejo kartice aktivnosti s staggered fade-in
-- Gumb za začetek: velik, barvit, otrokom prijazen (gradient oranžno-rumena, zaobljeni robovi, ikona darila, velik tekst)
+### 2. Gumb za izbris dodatnega preverjanja v `AdditionalTestSection.tsx`
 
-#### 3. Nova komponenta `src/components/plan/SetUnboxAnimation.tsx`
-- Animirana škatla/paket z zvezdami
-- Framer-motion: začetno stanje = zaprta škatla, klik = odpiranje + confetti
-- Po animaciji pokliče `onComplete` callback ki sproži `handleStartSet`
+Dodam rdeč "Izbriši" gumb v vsak accordion item, ki pokliče edge funkcijo `reset-additional-test`. Ker ta edge funkcija trenutno preverja `parent_id` (deluje samo za starše), jo razširim, da podpira tudi logopedistov klic:
 
-#### 4. Admin portal — pregled otrokovega arhiva
-- Nova komponenta `src/components/admin/ChildPlanArchive.tsx`:
-  - Prikaže koledar (podoben MojiIzziviArhiv) z barvnimi dnevi
-  - Statistika: skupno opravljenih sklopov, skupno zvezdic, povprečje zvezdic/sklop
-  - Seznam sklopov z aktivnostmi (katere igre je odigral)
-- Vključitev v `AdminLogopedistChildDetail.tsx` kot nov accordion razdelek "Osebni načrt — arhiv"
-- Prebere `plan_set_tracking` in `plan_activity_completions` za ta `child_id` (potreben query z logopedist_children -> child mapping ali direkten ID)
+**Edge funkcija `reset-additional-test/index.ts`:**
+- Dodam opcijsko polje `adminOverride: true` v body
+- Če je `adminOverride`, preveri ali je klicatelj logopedist (prek `logopedist_profiles`)
+- Preveri ali je otrok dodeljen temu logopedu (prek `logopedist_children`) ALI pa je super admin
+- Obstoječa logika brisanja ostane enaka
 
-#### 5. RLS politike (če potrebno)
-- Preveriti ali logopedisti lahko berejo `plan_set_tracking` in `plan_activity_completions` — če ne, dodati SELECT politike za logopediste
-
-### Tehnični koraki
-1. Popravek `startSet` v `usePlanProgress.ts` (upsert logika za expired)
-2. Popravek `nextSetNumber` v `MojiIzzivi.tsx`
-3. Ustvari `SetUnboxAnimation.tsx` komponento
-4. Posodobi `MojiIzzivi.tsx` z novo animacijo in otroški gumbom
-5. Ustvari `ChildPlanArchive.tsx` za admin portal
-6. Dodaj razdelek v `AdminLogopedistChildDetail.tsx`
-7. Po potrebi dodaj RLS politike za logopedistov dostop do tracking tabel
+**`AdditionalTestSection.tsx`:**
+- Dodam `onReset` prop ali pa neposredno klic edge funkcije
+- Rdeč gumb "Izbriši" z confirm dialogom
+- Po uspešnem brisanju invalidira query cache
 
 ### Datoteke
-- `src/hooks/usePlanProgress.ts` — startSet popravek
-- `src/pages/MojiIzzivi.tsx` — nextSetNumber + animacija
-- `src/components/plan/SetUnboxAnimation.tsx` — nova
-- `src/components/admin/ChildPlanArchive.tsx` — nova
-- `src/pages/admin/AdminLogopedistChildDetail.tsx` — nov accordion
-- Morebitna DB migracija za RLS
+- `supabase/migrations/...` — SQL za čiščenje podatkov testnega otroka
+- `supabase/functions/reset-additional-test/index.ts` — razširitev za admin klic
+- `src/components/admin/AdditionalTestSection.tsx` — dodan gumb za izbris
 
