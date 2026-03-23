@@ -31,6 +31,7 @@ export const useArticulationTestNew = (
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wasAutoPlayDisabled = useRef(true);
   const [sessionNumber, setSessionNumber] = useState<number | null>(fixedSessionNumber ?? null);
   const [sessionInitialized, setSessionInitialized] = useState(fixedSessionNumber ? true : false);
   const [transcriptionResult, setTranscriptionResult] = useState<{
@@ -168,9 +169,15 @@ export const useArticulationTestNew = (
   useEffect(() => {
     if (!autoPlayEnabled || !currentData?.word.audio || loading || sortedArticulationData.length === 0) return;
 
+    const isFirstPlay = wasAutoPlayDisabled.current;
+    if (isFirstPlay) {
+      wasAutoPlayDisabled.current = false;
+    }
+
+    const delay = isFirstPlay ? 1500 : 1000;
     const timer = setTimeout(() => {
       playWordAudio();
-    }, 1000);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [currentWordIndex, loading, autoPlayEnabled, sortedArticulationData]);
