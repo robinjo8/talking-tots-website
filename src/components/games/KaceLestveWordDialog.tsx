@@ -239,7 +239,7 @@ export function KaceLestveWordDialog({
           {/* Header */}
           {isSnakeChallenge ? (
             <div className="text-center">
-              <h2 className="text-lg font-bold text-red-500">IZZIV NA KAČI!</h2>
+              <h2 className="text-lg font-bold text-red-500">TOMIJEV IZZIV!</h2>
               <p className="text-sm text-muted-foreground">Izgovori besedo</p>
             </div>
           ) : (
