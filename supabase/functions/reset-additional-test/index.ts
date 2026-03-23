@@ -34,7 +34,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    const { childId } = await req.json();
+    const { childId, adminOverride } = await req.json();
     if (!childId) {
       return new Response(JSON.stringify({ error: "childId is required" }), {
         status: 400,
@@ -47,22 +47,50 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Verify child belongs to this parent
-    const { data: child, error: childError } = await supabase
-      .from("children")
-      .select("id, parent_id")
-      .eq("id", childId)
-      .eq("parent_id", userId)
-      .maybeSingle();
+    // Verify authorization
+    if (adminOverride) {
+      // Check if caller is a logopedist or super admin
+      const { data: logProfile } = await supabase
+        .from("logopedist_profiles")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
 
-    if (childError || !child) {
-      return new Response(
-        JSON.stringify({ error: "Child not found or not yours" }),
-        {
-          status: 403,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
+      const { data: adminPerm } = await supabase
+        .from("admin_permissions")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("role", "super_admin")
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (!logProfile && !adminPerm) {
+        return new Response(
+          JSON.stringify({ error: "Not authorized as admin/logopedist" }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+    } else {
+      // Parent flow: verify child belongs to this parent
+      const { data: child, error: childError } = await supabase
+        .from("children")
+        .select("id, parent_id")
+        .eq("id", childId)
+        .eq("parent_id", userId)
+        .maybeSingle();
+
+      if (childError || !child) {
+        return new Response(
+          JSON.stringify({ error: "Child not found or not yours" }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
     }
 
     // 1. Find all additional test assignments for this child

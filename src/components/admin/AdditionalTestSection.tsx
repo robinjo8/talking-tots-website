@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { ClipboardList, Play, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ClipboardList, Play, Loader2, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
+import { toast } from 'sonner';
 
 interface AdditionalAssignment {
   id: string;
@@ -22,6 +25,9 @@ interface Props {
 }
 
 export function AdditionalTestSection({ childId }: Props) {
+  const queryClient = useQueryClient();
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+
   const { data: assignments, isLoading } = useQuery({
     queryKey: ['additional-assignments-detail', childId],
     queryFn: async () => {
@@ -33,7 +39,6 @@ export function AdditionalTestSection({ childId }: Props) {
 
       if (error || !data) return [];
 
-      // Fetch words for each assignment
       const ids = data.map(a => a.id);
       const { data: allWords } = await supabase
         .from('additional_test_words')
@@ -95,6 +100,31 @@ export function AdditionalTestSection({ childId }: Props) {
     });
   }, [JSON.stringify(sessionIds)]);
 
+  const handleDeleteAll = async () => {
+    setIsDeletingAll(true);
+    try {
+      const response = await supabase.functions.invoke("reset-additional-test", {
+        body: { childId, adminOverride: true },
+      });
+
+      if (response.error) {
+        console.error("Delete additional test error:", response.error);
+        toast.error("Napaka pri brisanju dodatnega preverjanja.");
+      } else if (response.data?.deleted === 0) {
+        toast.info("Ni dodatnih preverjanj za brisanje.");
+      } else {
+        toast.success(`Izbrisano ${response.data.deleted} dodelitev dodatnega preverjanja.`);
+        queryClient.invalidateQueries({ queryKey: ['additional-assignments-detail', childId] });
+        queryClient.invalidateQueries({ queryKey: ['additional-session-recordings'] });
+      }
+    } catch (err) {
+      console.error("Error deleting additional test:", err);
+      toast.error("Napaka pri brisanju dodatnega preverjanja.");
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <Card>
@@ -116,9 +146,7 @@ export function AdditionalTestSection({ childId }: Props) {
     }
   };
 
-  const getAudioUrl = (audioPath: string) => {
-    return signedAudioUrls[audioPath] || '';
-  };
+  const getAudioUrl = (audioPath: string) => signedAudioUrls[audioPath] || '';
 
   const getImageUrl = (imagePath: string) => {
     const { data } = supabase.storage.from('slike').getPublicUrl(imagePath);
@@ -128,9 +156,33 @@ export function AdditionalTestSection({ childId }: Props) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-2">
-          <ClipboardList className="h-5 w-5 text-primary" />
-          <CardTitle>Dodatno preverjanje</CardTitle>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 text-primary" />
+            <CardTitle>Dodatno preverjanje</CardTitle>
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" disabled={isDeletingAll}>
+                {isDeletingAll ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : <Trash2 className="h-4 w-4 mr-1" />}
+                Izbriši vse
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Izbriši vsa dodatna preverjanja?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  To bo trajno izbrisalo vsa dodatna preverjanja ({assignments.length} dodelitev), vključno s posnetki in rezultati. Tega dejanja ni mogoče razveljaviti.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Prekliči</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAll} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Izbriši
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         <CardDescription>
           Dodeljene besede za dodatno preverjanje izgovorjave
@@ -161,7 +213,6 @@ export function AdditionalTestSection({ childId }: Props) {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4 pt-2">
-                    {/* Letters */}
                     {letters.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         <span className="text-sm text-muted-foreground mr-1">Črke:</span>
@@ -171,7 +222,6 @@ export function AdditionalTestSection({ childId }: Props) {
                       </div>
                     )}
 
-                    {/* Words grid */}
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                       {assignment.words.map(word => (
                         <div key={word.id} className="flex items-center gap-2 p-2 rounded-lg border bg-muted/30">
@@ -186,7 +236,6 @@ export function AdditionalTestSection({ childId }: Props) {
                       ))}
                     </div>
 
-                    {/* Recordings if completed */}
                     {recordings.length > 0 && (
                       <div className="space-y-2 border-t pt-3">
                         <p className="text-sm font-medium text-muted-foreground">Posnetki:</p>
