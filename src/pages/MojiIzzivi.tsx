@@ -79,9 +79,13 @@ export default function MojiIzzivi() {
   // Find the next set number to work on
   const nextSetNumber = useMemo(() => {
     if (!isSetBased) return null;
-    const completedOrTracked = new Set(trackingEntries.map(e => e.set_number));
+    const skipSetNums = new Set(
+      trackingEntries
+        .filter(e => e.status === "completed" || e.status === "active")
+        .map(e => e.set_number)
+    );
     for (let i = 1; i <= totalSets; i++) {
-      if (!completedOrTracked.has(i)) return i;
+      if (!skipSetNums.has(i)) return i;
     }
     return null;
   }, [trackingEntries, totalSets, isSetBased]);
