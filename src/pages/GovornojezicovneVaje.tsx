@@ -151,8 +151,8 @@ const GovornojezicovneVaje = () => {
                         {isMobile ? exercise.mobileTitle : exercise.title}
                       </h3>
                       <p className={isMobile 
-                        ? "text-xs text-muted-foreground line-clamp-3"
-                        : "text-sm text-muted-foreground leading-relaxed line-clamp-3"
+                        ? "text-xs text-muted-foreground"
+                        : "text-sm text-muted-foreground leading-relaxed"
                       }>
                         {exercise.description}
                       </p>
