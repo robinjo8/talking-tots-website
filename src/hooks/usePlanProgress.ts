@@ -314,8 +314,8 @@ export function isSetExpired(startedAt: string): boolean {
 export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
   const todayStr = getTodayDateStr();
   return trackingEntries.some(entry => {
-    if (entry.status === "active") return false;
-    const dateStr = entry.completed_at || entry.expired_at || entry.started_at;
+    if (entry.status !== "completed") return false;
+    const dateStr = entry.completed_at || entry.started_at;
     return dateStr.startsWith(todayStr);
   });
 }
