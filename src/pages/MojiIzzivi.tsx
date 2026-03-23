@@ -68,27 +68,15 @@ export default function MojiIzzivi() {
   }, [trackingEntries]);
 
   const completedSetsCount = useMemo(() => {
-    return trackingEntries.filter(e => e.status === "completed").length;
+    return trackingEntries.filter(e => e.status === "completed" || e.status === "expired").length;
   }, [trackingEntries]);
 
   const allSetsCompleted = completedSetsCount >= totalSets;
 
-  const todayAlreadyDone = useMemo(() => {
-    return hasCompletedSetToday(trackingEntries);
-  }, [trackingEntries]);
-
-  // Find the next set number to work on
+  // Find the next set number to work on (linear: always max + 1)
   const nextSetNumber = useMemo(() => {
     if (!isSetBased) return null;
-    const skipSetNums = new Set(
-      trackingEntries
-        .filter(e => e.status === "completed" || e.status === "active")
-        .map(e => e.set_number)
-    );
-    for (let i = 1; i <= totalSets; i++) {
-      if (!skipSetNums.has(i)) return i;
-    }
-    return null;
+    return getNextSetNumber(trackingEntries, totalSets);
   }, [trackingEntries, totalSets, isSetBased]);
 
   // Get the current set data
