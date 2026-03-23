@@ -487,44 +487,159 @@ serve(async (req) => {
     const startDateStr = formatDate(now);
     const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
-    // Archive any existing active/generating plans
-    await supabase
+    // Check for existing active/generating or orphaned archived plan
+    const { data: existingPlans } = await supabase
       .from("child_monthly_plans")
-      .update({ status: "archived" })
+      .select("id, status")
       .eq("child_id", childId)
-      .in("status", ["active", "generating"]);
+      .in("status", ["active", "generating"])
+      .order("created_at", { ascending: false })
+      .limit(1);
 
-    const planData = {
-      summary, 
-      sets, 
-      targetLetters, 
-      childAge, 
-      ageGroup, 
-      totalSets: TOTAL_SETS,
-    };
+    let existingPlan = existingPlans?.[0] || null;
 
-    const { data: planRecord, error: planInsertError } = await supabase
-      .from("child_monthly_plans")
-      .insert({
-        child_id: childId,
-        report_id: reportId,
-        month: now.getMonth() + 1,
-        year: now.getFullYear(),
-        start_date: startDateStr,
-        end_date: null, // No fixed end date for set-based plans
-        focus_letters: targetLetters,
-        status: "active",
-        plan_data: planData,
-        expires_at: expiresAt,
-      })
-      .select("id")
-      .single();
+    // Orphan recovery: if no active plan, check for archived plan with progress
+    if (!existingPlan) {
+      const { data: archivedPlans } = await supabase
+        .from("child_monthly_plans")
+        .select("id, status")
+        .eq("child_id", childId)
+        .eq("status", "archived")
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-    if (planInsertError || !planRecord) {
-      console.error("Failed to create plan record:", planInsertError);
-      return new Response(JSON.stringify({ error: "Failed to create plan record" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      if (archivedPlans?.[0]) {
+        const { count } = await supabase
+          .from("plan_set_tracking")
+          .select("id", { count: "exact", head: true })
+          .eq("plan_id", archivedPlans[0].id)
+          .eq("child_id", childId);
+
+        if (count && count > 0) {
+          console.log(`Orphan recovery: reactivating archived plan ${archivedPlans[0].id} with ${count} tracked sets`);
+          existingPlan = archivedPlans[0];
+        }
+      }
+    }
+
+    let planRecord: { id: string } | null = null;
+
+    if (mode === "renewal") {
+      // Renewal mode: archive old, create new (used when 30/30 completed)
+      if (existingPlan) {
+        await supabase
+          .from("child_monthly_plans")
+          .update({ status: "archived" })
+          .eq("id", existingPlan.id);
+      }
+
+      const { data: newPlan, error: planInsertError } = await supabase
+        .from("child_monthly_plans")
+        .insert({
+          child_id: childId,
+          report_id: reportId,
+          month: now.getMonth() + 1,
+          year: now.getFullYear(),
+          start_date: startDateStr,
+          end_date: null,
+          focus_letters: targetLetters,
+          status: "active",
+          plan_data: planData,
+          expires_at: expiresAt,
+        })
+        .select("id")
+        .single();
+
+      if (planInsertError || !newPlan) {
+        console.error("Failed to create plan record:", planInsertError);
+        return new Response(JSON.stringify({ error: "Failed to create plan record" }), {
+          status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      planRecord = newPlan;
+    } else {
+      // report_update mode: update in-place if existing, else create new
+      if (existingPlan) {
+        // Preserve completed/in-progress sets, update plan data for future sets
+        // Get completed set numbers to preserve their activity data
+        const { data: trackingData } = await supabase
+          .from("plan_set_tracking")
+          .select("set_number, status")
+          .eq("plan_id", existingPlan.id)
+          .eq("child_id", childId);
+
+        const completedOrActiveSetNums = new Set(
+          (trackingData || []).map(t => t.set_number)
+        );
+
+        // Get existing plan data to preserve completed sets
+        const { data: existingPlanFull } = await supabase
+          .from("child_monthly_plans")
+          .select("plan_data")
+          .eq("id", existingPlan.id)
+          .single();
+
+        const existingPlanData = existingPlanFull?.plan_data as any;
+        const existingSets = existingPlanData?.sets || [];
+
+        // Merge: keep old set data for tracked sets, use new data for untouched sets
+        const mergedSets = sets.map((newSet: PlanSet) => {
+          if (completedOrActiveSetNums.has(newSet.setNumber)) {
+            const oldSet = existingSets.find((s: any) => s.setNumber === newSet.setNumber);
+            return oldSet || newSet;
+          }
+          return newSet;
+        });
+
+        const mergedPlanData = { ...planData, sets: mergedSets };
+
+        const { error: updateError } = await supabase
+          .from("child_monthly_plans")
+          .update({
+            report_id: reportId,
+            focus_letters: targetLetters,
+            plan_data: mergedPlanData,
+            status: "active", // reactivate if archived (orphan recovery)
+            updated_at: new Date().toISOString(),
+            expires_at: expiresAt,
+          })
+          .eq("id", existingPlan.id);
+
+        if (updateError) {
+          console.error("Failed to update plan:", updateError);
+          return new Response(JSON.stringify({ error: "Failed to update plan" }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        planRecord = { id: existingPlan.id };
+        console.log(`Plan updated in-place: ${existingPlan.id} (preserved ${completedOrActiveSetNums.size} tracked sets)`);
+      } else {
+        // No existing plan at all — create new
+        const { data: newPlan, error: planInsertError } = await supabase
+          .from("child_monthly_plans")
+          .insert({
+            child_id: childId,
+            report_id: reportId,
+            month: now.getMonth() + 1,
+            year: now.getFullYear(),
+            start_date: startDateStr,
+            end_date: null,
+            focus_letters: targetLetters,
+            status: "active",
+            plan_data: planData,
+            expires_at: expiresAt,
+          })
+          .select("id")
+          .single();
+
+        if (planInsertError || !newPlan) {
+          console.error("Failed to create plan record:", planInsertError);
+          return new Response(JSON.stringify({ error: "Failed to create plan record" }), {
+            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        planRecord = newPlan;
+      }
     }
 
     console.log(`30-set plan generated for ${child.name} (${planRecord.id})`);
