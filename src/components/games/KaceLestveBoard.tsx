@@ -485,7 +485,7 @@ export function KaceLestveBoard({ players, activePlayerIdx = 0, onAvatarLanded, 
               }}
             >
               <img
-                src={`${SUPABASE_URL}/zmajcki/${idx === 0 ? 'Zmajcek_modra_figura_1.webp' : 'Zmajcek_rdeca_figura_1.webp'}`}
+                src={`${SUPABASE_URL}/zmajcki/${player.avatarUrl}`}
                 alt={player.name}
                 className="w-full h-full object-contain"
                 style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))' }}
