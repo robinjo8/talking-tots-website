@@ -18,6 +18,7 @@ import {
   Pencil,
   Sparkles,
   Trash2,
+  TrendingUp,
 } from 'lucide-react';
 import { useLogopedistChildStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useLogopedistChildStorageFiles';
 import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
