@@ -5,38 +5,44 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface GeneratePlanButtonProps {
+  reportId?: string;
   reportFileName: string;
   childId?: string;
 }
 
-export function GeneratePlanButton({ reportFileName, childId }: GeneratePlanButtonProps) {
+export function GeneratePlanButton({ reportId: propReportId, reportFileName, childId }: GeneratePlanButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [hasPlan, setHasPlan] = useState<boolean | null>(null);
-  const [reportId, setReportId] = useState<string | null>(null);
+  const [resolvedReportId, setResolvedReportId] = useState<string | null>(propReportId || null);
 
   useEffect(() => {
     async function checkPlan() {
-      // Find report by pdf_url matching the file name
-      const { data: reports } = await supabase
-        .from('logopedist_reports')
-        .select('id')
-        .ilike('pdf_url', `%${reportFileName}%`)
-        .order('created_at', { ascending: false })
-        .limit(1);
+      let rId = propReportId || null;
 
-      const report = reports?.[0];
-      if (!report) {
+      if (!rId) {
+        // Fallback: find report by exact pdf_url match
+        const { data: reports } = await supabase
+          .from('logopedist_reports')
+          .select('id')
+          .eq('pdf_url', reportFileName)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        rId = reports?.[0]?.id || null;
+      }
+
+      if (!rId) {
         setHasPlan(true); // No report record = hide button
         return;
       }
 
-      setReportId(report.id);
+      setResolvedReportId(rId);
 
       // Check if this report already has an active plan
       const { data: plans } = await supabase
         .from('child_monthly_plans')
         .select('id')
-        .eq('report_id', report.id)
+        .eq('report_id', rId)
         .in('status', ['active', 'generating'])
         .limit(1);
 
@@ -44,16 +50,16 @@ export function GeneratePlanButton({ reportFileName, childId }: GeneratePlanButt
     }
 
     checkPlan();
-  }, [reportFileName, childId]);
+  }, [propReportId, reportFileName, childId]);
 
   if (hasPlan === null || hasPlan === true) return null;
 
   const handleGenerate = async () => {
-    if (!reportId) return;
+    if (!resolvedReportId) return;
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-monthly-plan', {
-        body: { reportId },
+        body: { reportId: resolvedReportId, mode: 'report_update' },
       });
 
       if (error) throw error;
