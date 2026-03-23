@@ -240,7 +240,7 @@ export default function MojiIzzivi() {
         if (!session) return;
 
         await supabase.functions.invoke("generate-monthly-plan", {
-          body: { reportId: plan.report_id },
+          body: { reportId: plan.report_id, mode: "renewal" },
         });
 
         queryClient.invalidateQueries({ queryKey: ["monthly-plan", selectedChild?.id] });

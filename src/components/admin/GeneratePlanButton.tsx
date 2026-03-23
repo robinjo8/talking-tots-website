@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface GeneratePlanButtonProps {
+  reportId?: string;
   reportFileName: string;
   childId?: string;
 }

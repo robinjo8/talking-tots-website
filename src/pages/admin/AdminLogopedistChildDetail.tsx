@@ -383,14 +383,25 @@ export default function AdminLogopedistChildDetail() {
       } else {
         toast.success(editingReportName ? 'Popravljeno poročilo shranjeno' : 'PDF poročilo generirano in shranjeno');
         
-        // Fire-and-forget: generate monthly plan
+        // Generate/update monthly plan
         if (insertedReport?.id) {
-          supabase.functions.invoke('generate-monthly-plan', {
-            body: { reportId: insertedReport.id }
-          }).then(res => {
-            if (res.error) console.error('Monthly plan generation failed:', res.error);
-            else console.log('Monthly plan generation triggered');
-          });
+          try {
+            const { data: planRes, error: planError } = await supabase.functions.invoke('generate-monthly-plan', {
+              body: { reportId: insertedReport.id, mode: 'report_update' }
+            });
+            if (planError) {
+              console.error('Monthly plan generation failed:', planError);
+              toast.error('Osebni načrt ni bil ustvarjen/posodobljen');
+            } else if (planRes?.error) {
+              console.error('Monthly plan generation error:', planRes.error);
+              toast.error('Napaka pri generiranju osebnega načrta');
+            } else {
+              toast.success('Osebni načrt ustvarjen/posodobljen');
+            }
+          } catch (e) {
+            console.error('Monthly plan invoke error:', e);
+            toast.error('Napaka pri klicu generiranja osebnega načrta');
+          }
         }
       }
 
