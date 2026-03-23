@@ -1,40 +1,27 @@
 
 
-## Čiščenje podatkov za "Testni otrok" + gumb za izbris dodatnega preverjanja
+## Linearna logika sklopov — implementirano
 
-### 1. Izbris podatkov za otroka "Testni otrok" (child_id: `c3940422-e5ce-44b4-a2e4-f73c11323776`)
+### Spremembe
 
-Podatki v bazi:
-- 1x `child_monthly_plans` (osebni načrt, status: active)
-- 2x `plan_set_tracking` (sledenje sklopov)
-- 1x `plan_activity_completions` (opravljene aktivnosti)
-- 1x `additional_test_assignments` (status: completed, session_id: `7c3aaa10-...`)
-- Povezane `additional_test_words` za ta assignment
-- Povezana seja `7c3aaa10-...` in morebitni `articulation_word_results` / `articulation_evaluations`
+1. **`usePlanProgress.ts`**:
+   - `startSet` poenostavljen — samo insert, brez upsert logike za expired sklope
+   - Odstranjena `hasCompletedSetToday` — ni več dnevne omejitve
+   - Dodana `getNextSetNumber` — linearna progresija: `max(set_number) + 1`
 
-Vse to izbrišem z SQL migracijo (service role), v pravilnem vrstnem redu:
-1. `plan_activity_completions` → 2. `plan_set_tracking` → 3. `child_monthly_plans`
-4. `articulation_word_results` za sejo → 5. `articulation_evaluations` za sejo
-6. `additional_test_words` → 7. `additional_test_assignments`
-8. `articulation_test_sessions` za sejo
+2. **`MojiIzzivi.tsx`**:
+   - `nextSetNumber` uporablja `getNextSetNumber` (linearno napredovanje)
+   - `completedSetsCount` vključuje tudi `expired` sklope (oba štejeta kot "opravljeno")
+   - Odstranjen blok "Danes si že opravil sklop"
+   - Pri odpiranju zadnjega sklopa (30) se v ozadju sproži `generate-monthly-plan` z `mode: "renewal"`
 
-### 2. Gumb za izbris dodatnega preverjanja v `AdditionalTestSection.tsx`
+3. **Edge funkcija `generate-monthly-plan`** — brez sprememb, `renewal` mode že pravilno arhivira star plan in ustvari novega z 30 seti.
 
-Dodam rdeč "Izbriši" gumb v vsak accordion item, ki pokliče edge funkcijo `reset-additional-test`. Ker ta edge funkcija trenutno preverja `parent_id` (deluje samo za starše), jo razširim, da podpira tudi logopedistov klic:
+### Logika
 
-**Edge funkcija `reset-additional-test/index.ts`:**
-- Dodam opcijsko polje `adminOverride: true` v body
-- Če je `adminOverride`, preveri ali je klicatelj logopedist (prek `logopedist_profiles`)
-- Preveri ali je otrok dodeljen temu logopedu (prek `logopedist_children`) ALI pa je super admin
-- Obstoječa logika brisanja ostane enaka
-
-**`AdditionalTestSection.tsx`:**
-- Dodam `onReset` prop ali pa neposredno klic edge funkcije
-- Rdeč gumb "Izbriši" z confirm dialogom
-- Po uspešnem brisanju invalidira query cache
-
-### Datoteke
-- `supabase/migrations/...` — SQL za čiščenje podatkov testnega otroka
-- `supabase/functions/reset-additional-test/index.ts` — razširitev za admin klic
-- `src/components/admin/AdditionalTestSection.tsx` — dodan gumb za izbris
-
+```
+Sklop 1: odpri → 24h → arhiviraj → Sklop 2
+Sklop 2: odpri → 24h → arhiviraj → Sklop 3
+...
+Sklop 30: odpri (sproži generacijo novega plana) → 24h → arhiviraj → nov plan
+```
