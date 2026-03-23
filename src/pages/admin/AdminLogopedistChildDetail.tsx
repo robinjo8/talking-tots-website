@@ -1034,6 +1034,22 @@ export default function AdminLogopedistChildDetail() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Personal Plan Archive Section */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <CardTitle>Osebni načrt — arhiv</CardTitle>
+              </div>
+              <CardDescription>
+                Pregled opravljenih sklopov in napredka otroka
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChildPlanArchive childId={childId!} />
+            </CardContent>
+          </Card>
         </>
       )}
     </div>
