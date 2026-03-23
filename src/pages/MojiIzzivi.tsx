@@ -159,7 +159,21 @@ export default function MojiIzzivi() {
     await startSet(plan.id, selectedChild.id, nextSetNumber);
     await refetchTracking();
     setIsProcessing(false);
-  }, [plan?.id, selectedChild?.id, nextSetNumber]);
+
+    // Trigger plan renewal when starting the last set
+    if (nextSetNumber === totalSets && plan.report_id) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          supabase.functions.invoke("generate-monthly-plan", {
+            body: { reportId: plan.report_id, mode: "renewal" },
+          }).catch(err => console.error("Error pre-generating renewal plan:", err));
+        }
+      } catch (err) {
+        console.error("Error triggering renewal:", err);
+      }
+    }
+  }, [plan?.id, selectedChild?.id, nextSetNumber, totalSets, plan?.report_id]);
 
   // Check for returning from a game
   useEffect(() => {
