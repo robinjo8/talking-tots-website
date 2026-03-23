@@ -1,52 +1,59 @@
 
 
-## Problem
+## Popravek logike sklopov + vizualna nadgradnja za otroke + admin pregled
 
-Set 1 was started on March 21, expired after 24h, and `expired_at` is `2026-03-23` (today). The function `hasCompletedSetToday()` (line 314-321 in `usePlanProgress.ts`) treats **any** non-active entry dated today as "done" — including **expired** sets. This causes:
+### Problem
+1. `nextSetNumber` preskoči potekle sklope (otrok ne more ponoviti sklopa 1)
+2. `startSet` ne podpira ponovnega zagona poteklega sklopa
+3. Gumb "Začni sklop" je preprost, brez otroški privlačne animacije
+4. Admin portal nima pregleda otrokovega arhiva sklopov
 
-1. User visits `/moji-izzivi` → set 1 is auto-expired (24h passed)
-2. `hasCompletedSetToday()` returns `true` because `expired_at` is today
-3. UI shows "Odlično opravljeno! Danes si že opravil sklop." even though the user never completed it
-4. User is blocked from starting set 2 until tomorrow
+### Spremembe
 
-The archive page also shows "Čas je potekel — 1 zvezdic zbranih" which is technically correct but the main page messaging is wrong.
+#### 1. `src/hooks/usePlanProgress.ts` — popravek logike
+- **`nextSetNumber` premik v hook ali popravek v MojiIzzivi**: preskoči samo `completed` in `active` sklope (ne `expired`)
+- **`startSet`**: če obstaja `expired` zapis za ta sklop, ga posodobi nazaj na `active` (update namesto insert), ponastavi `expired_at` na null in `total_stars` na 0
 
-## Root Cause
+#### 2. `src/pages/MojiIzzivi.tsx` — vizualna nadgradnja
+- Popravek `nextSetNumber` logike: `filter(e => e.status === "completed" || e.status === "active")`
+- Nov state `showUnboxAnimation` za animacijo odpiranja paketa
+- Ko otrok klikne "Odpri sklop":
+  1. Prikaže se animiran "paket" (gift box) z barvitim gradient ozadjem
+  2. Ob kliku se paket "odpre" s framer-motion animacijo (scale + rotate)
+  3. Konfeti/zvezdice se razletijo (CSS particles ali canvas-confetti)
+  4. Po 1.5s se prikažejo kartice aktivnosti s staggered fade-in
+- Gumb za začetek: velik, barvit, otrokom prijazen (gradient oranžno-rumena, zaobljeni robovi, ikona darila, velik tekst)
 
-```typescript
-// Current — treats expired as "done today"
-export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
-  const todayStr = getTodayDateStr();
-  return trackingEntries.some(entry => {
-    if (entry.status === "active") return false;  // skips active, but NOT expired
-    const dateStr = entry.completed_at || entry.expired_at || entry.started_at;
-    return dateStr.startsWith(todayStr);
-  });
-}
-```
+#### 3. Nova komponenta `src/components/plan/SetUnboxAnimation.tsx`
+- Animirana škatla/paket z zvezdami
+- Framer-motion: začetno stanje = zaprta škatla, klik = odpiranje + confetti
+- Po animaciji pokliče `onComplete` callback ki sproži `handleStartSet`
 
-An expired set means the user **didn't finish** — they should be allowed to start the next set immediately, not be blocked until tomorrow.
+#### 4. Admin portal — pregled otrokovega arhiva
+- Nova komponenta `src/components/admin/ChildPlanArchive.tsx`:
+  - Prikaže koledar (podoben MojiIzziviArhiv) z barvnimi dnevi
+  - Statistika: skupno opravljenih sklopov, skupno zvezdic, povprečje zvezdic/sklop
+  - Seznam sklopov z aktivnostmi (katere igre je odigral)
+- Vključitev v `AdminLogopedistChildDetail.tsx` kot nov accordion razdelek "Osebni načrt — arhiv"
+- Prebere `plan_set_tracking` in `plan_activity_completions` za ta `child_id` (potreben query z logopedist_children -> child mapping ali direkten ID)
 
-## Fix
+#### 5. RLS politike (če potrebno)
+- Preveriti ali logopedisti lahko berejo `plan_set_tracking` in `plan_activity_completions` — če ne, dodati SELECT politike za logopediste
 
-### 1. `src/hooks/usePlanProgress.ts` — `hasCompletedSetToday()`
+### Tehnični koraki
+1. Popravek `startSet` v `usePlanProgress.ts` (upsert logika za expired)
+2. Popravek `nextSetNumber` v `MojiIzzivi.tsx`
+3. Ustvari `SetUnboxAnimation.tsx` komponento
+4. Posodobi `MojiIzzivi.tsx` z novo animacijo in otroški gumbom
+5. Ustvari `ChildPlanArchive.tsx` za admin portal
+6. Dodaj razdelek v `AdminLogopedistChildDetail.tsx`
+7. Po potrebi dodaj RLS politike za logopedistov dostop do tracking tabel
 
-Change to only count **completed** entries (not expired):
-
-```typescript
-export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
-  const todayStr = getTodayDateStr();
-  return trackingEntries.some(entry => {
-    if (entry.status !== "completed") return false;
-    const dateStr = entry.completed_at || entry.started_at;
-    return dateStr.startsWith(todayStr);
-  });
-}
-```
-
-This single change fixes both issues:
-- Expired sets no longer block the user from starting the next set
-- "Odlično opravljeno" only shows when a set was actually completed with 10 stars today
-
-No other files need changes. The archive page display is correct as-is (it correctly shows expired sets with partial stars).
+### Datoteke
+- `src/hooks/usePlanProgress.ts` — startSet popravek
+- `src/pages/MojiIzzivi.tsx` — nextSetNumber + animacija
+- `src/components/plan/SetUnboxAnimation.tsx` — nova
+- `src/components/admin/ChildPlanArchive.tsx` — nova
+- `src/pages/admin/AdminLogopedistChildDetail.tsx` — nov accordion
+- Morebitna DB migracija za RLS
 
