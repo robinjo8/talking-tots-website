@@ -299,15 +299,15 @@ export function isSetExpired(startedAt: string): boolean {
 }
 
 /**
- * Check if any set was completed or expired today (to enforce 1 set/day limit).
+ * Get the next set number (linear progression — always max + 1).
  */
-export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
-  const todayStr = getTodayDateStr();
-  return trackingEntries.some(entry => {
-    if (entry.status !== "completed") return false;
-    const dateStr = entry.completed_at || entry.started_at;
-    return dateStr.startsWith(todayStr);
-  });
+export function getNextSetNumber(trackingEntries: SetTracking[], totalSets: number): number | null {
+  if (trackingEntries.length === 0) return 1;
+  const maxSetNumber = Math.max(...trackingEntries.map(e => e.set_number));
+  const hasActive = trackingEntries.some(e => e.status === "active");
+  if (hasActive) return null; // active set exists, no next set
+  const next = maxSetNumber + 1;
+  return next <= totalSets ? next : null;
 }
 
 /**
