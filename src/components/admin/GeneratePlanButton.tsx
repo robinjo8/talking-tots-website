@@ -55,11 +55,11 @@ export function GeneratePlanButton({ reportId: propReportId, reportFileName, chi
   if (hasPlan === null || hasPlan === true) return null;
 
   const handleGenerate = async () => {
-    if (!reportId) return;
+    if (!resolvedReportId) return;
     setIsGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-monthly-plan', {
-        body: { reportId },
+        body: { reportId: resolvedReportId, mode: 'report_update' },
       });
 
       if (error) throw error;
