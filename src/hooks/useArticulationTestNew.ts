@@ -169,9 +169,15 @@ export const useArticulationTestNew = (
   useEffect(() => {
     if (!autoPlayEnabled || !currentData?.word.audio || loading || sortedArticulationData.length === 0) return;
 
+    const isFirstPlay = wasAutoPlayDisabled.current;
+    if (isFirstPlay) {
+      wasAutoPlayDisabled.current = false;
+    }
+
+    const delay = isFirstPlay ? 1500 : 1000;
     const timer = setTimeout(() => {
       playWordAudio();
-    }, 1000);
+    }, delay);
 
     return () => clearTimeout(timer);
   }, [currentWordIndex, loading, autoPlayEnabled, sortedArticulationData]);
