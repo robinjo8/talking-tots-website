@@ -487,6 +487,15 @@ serve(async (req) => {
     const startDateStr = formatDate(now);
     const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
+    const planData = {
+      summary, 
+      sets, 
+      targetLetters, 
+      childAge, 
+      ageGroup, 
+      totalSets: TOTAL_SETS,
+    };
+
     // Check for existing active/generating or orphaned archived plan
     const { data: existingPlans } = await supabase
       .from("child_monthly_plans")
