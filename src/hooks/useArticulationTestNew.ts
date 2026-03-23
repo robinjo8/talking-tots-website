@@ -31,6 +31,7 @@ export const useArticulationTestNew = (
   const [isTestComplete, setIsTestComplete] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wasAutoPlayDisabled = useRef(true);
   const [sessionNumber, setSessionNumber] = useState<number | null>(fixedSessionNumber ?? null);
   const [sessionInitialized, setSessionInitialized] = useState(fixedSessionNumber ? true : false);
   const [transcriptionResult, setTranscriptionResult] = useState<{
