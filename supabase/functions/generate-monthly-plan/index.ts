@@ -325,7 +325,7 @@ serve(async (req) => {
 
     console.log(`Request authorized (serviceRole: ${isServiceRoleCall})`);
 
-    const { reportId } = await req.json();
+    const { reportId, mode = "report_update" } = await req.json();
     if (!reportId) {
       return new Response(JSON.stringify({ error: "reportId is required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
