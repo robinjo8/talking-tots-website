@@ -136,6 +136,7 @@ const InfoGovor = lazy(() => import("@/pages/InfoGovor"));
 const InfoJezik = lazy(() => import("@/pages/InfoJezik"));
 const InfoMojaStran = lazy(() => import("@/pages/InfoMojaStran"));
 const Klepet = lazy(() => import("@/pages/Klepet"));
+const Album = lazy(() => import("@/pages/Album"));
 
 export function AppRoutes() {
   return (
