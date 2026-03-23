@@ -80,7 +80,7 @@ const games = [
     id: "ponovi-poved",
     title: "PONOVI POVED",
     description: "Ponovi povedi in vadi izgovorjavo glasov na začetku, na sredini in na koncu.",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_1.webp",
+    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/ponovi_poved_1.webp",
     customBackground: "radial-gradient(ellipse at center, hsl(45, 100%, 95%) 0%, hsl(42, 100%, 90%) 30%, hsl(38, 90%, 80%) 60%, hsl(35, 85%, 70%) 100%)",
     imageScale: "85%"
   },
