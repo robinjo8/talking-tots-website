@@ -246,6 +246,7 @@ export function AppRoutes() {
       <Route path="/video-navodila/:letter" element={<ProtectedLazyRoute><VideoNavodilaRouter /></ProtectedLazyRoute>} />
       <Route path="/pomoc-chat" element={<ProtectedLazyRoute><PomocChat /></ProtectedLazyRoute>} />
       <Route path="/klepet" element={<ProtectedLazyRoute><Klepet /></ProtectedLazyRoute>} />
+      <Route path="/album" element={<ProtectedLazyRoute><Album /></ProtectedLazyRoute>} />
       
       {/* Informational pages - lazy */}
       <Route path="/logopedski-koticek" element={<LazyRoute><LogopedskiKoticek /></LazyRoute>} />
