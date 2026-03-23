@@ -20,6 +20,7 @@ import {
   type SetTracking,
 } from "@/hooks/usePlanProgress";
 import { PlanSetCard } from "@/components/plan/PlanSetCard";
+import { SetUnboxAnimation } from "@/components/plan/SetUnboxAnimation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
