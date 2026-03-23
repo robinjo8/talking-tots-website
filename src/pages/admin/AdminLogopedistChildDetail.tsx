@@ -18,6 +18,7 @@ import {
   Pencil,
   Sparkles,
   Trash2,
+  TrendingUp,
 } from 'lucide-react';
 import { useLogopedistChildStorageFiles, StorageFile, SessionRecordings } from '@/hooks/useLogopedistChildStorageFiles';
 import { useLogopedistChild } from '@/hooks/useLogopedistChildren';
@@ -40,6 +41,7 @@ import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { generateReportPdf } from '@/utils/generateReportPdf';
 import { GeneratePlanButton } from '@/components/admin/GeneratePlanButton';
+import { ChildPlanArchive } from '@/components/admin/ChildPlanArchive';
 
 export default function AdminLogopedistChildDetail() {
   const { childId } = useParams<{ childId: string }>();
@@ -1033,6 +1035,22 @@ export default function AdminLogopedistChildDetail() {
               </CardContent>
             </Card>
           </div>
+
+          {/* Personal Plan Archive Section */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-primary" />
+                <CardTitle>Osebni načrt — arhiv</CardTitle>
+              </div>
+              <CardDescription>
+                Pregled opravljenih sklopov in napredka otroka
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChildPlanArchive childId={childId!} />
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

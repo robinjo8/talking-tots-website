@@ -208,6 +208,41 @@ export async function startSet(
   childId: string,
   setNumber: number
 ): Promise<SetTracking | null> {
+  // Check if an expired entry already exists for this set
+  const { data: existing } = await supabase
+    .from("plan_set_tracking")
+    .select("*")
+    .eq("plan_id", planId)
+    .eq("child_id", childId)
+    .eq("set_number", setNumber)
+    .single();
+
+  if (existing) {
+    if ((existing as any).status === "expired") {
+      // Reset expired set to active
+      const { data: updated, error: updateError } = await supabase
+        .from("plan_set_tracking")
+        .update({
+          status: "active",
+          started_at: new Date().toISOString(),
+          expired_at: null,
+          total_stars: 0,
+        } as any)
+        .eq("id", existing.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Error restarting expired set:", updateError);
+        return null;
+      }
+      return updated as unknown as SetTracking;
+    }
+    // Already active or completed
+    return existing as unknown as SetTracking;
+  }
+
+  // Create new tracking entry
   const { data, error } = await supabase
     .from("plan_set_tracking")
     .insert({
@@ -220,17 +255,6 @@ export async function startSet(
     .single();
 
   if (error) {
-    if (error.code === "23505") {
-      // Already exists, fetch it
-      const { data: existing } = await supabase
-        .from("plan_set_tracking")
-        .select("*")
-        .eq("plan_id", planId)
-        .eq("child_id", childId)
-        .eq("set_number", setNumber)
-        .single();
-      return existing as unknown as SetTracking | null;
-    }
     console.error("Error starting set:", error);
     return null;
   }
