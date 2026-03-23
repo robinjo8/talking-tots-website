@@ -40,6 +40,7 @@ import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { generateReportPdf } from '@/utils/generateReportPdf';
 import { GeneratePlanButton } from '@/components/admin/GeneratePlanButton';
+import { ChildPlanArchive } from '@/components/admin/ChildPlanArchive';
 
 export default function AdminLogopedistChildDetail() {
   const { childId } = useParams<{ childId: string }>();
