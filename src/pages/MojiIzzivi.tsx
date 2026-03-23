@@ -15,7 +15,7 @@ import {
   completeSet,
   expireSet,
   isSetExpired,
-  hasCompletedSetToday,
+  getNextSetNumber,
   getTodayDateStr,
   type SetTracking,
 } from "@/hooks/usePlanProgress";
