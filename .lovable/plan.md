@@ -1,32 +1,19 @@
+## Plan Generation - Robustified (implemented 2026-03-23)
 
+### Changes made
 
-## Problem
+1. **Edge function `generate-monthly-plan`**: 
+   - Added `mode` parameter: `report_update` (default) preserves progress, `renewal` creates fresh plan
+   - Orphan recovery: reactivates archived plans that have existing progress
+   - In-place update: when plan exists, merges new sets while keeping tracked sets intact
+   - No more archive-first pattern — existing plan stays active until new one is confirmed
 
-Edge function `generate-monthly-plan` crashes with **`ReferenceError: sets is not defined`** (visible in logs). Three variables are missing between the summary generation (line 480) and the insert (line 489):
+2. **Admin frontend** (`AdminUserDetail`, `AdminLogopedistChildDetail`):
+   - Changed from fire-and-forget to `await` with proper success/error toasts
+   - Passes `mode: 'report_update'` explicitly
 
-1. **`sets`** — `generateSetBasedPlan()` is defined but never called
-2. **`now`**, **`startDateStr`**, **`expiresAt`** — never declared
+3. **`MojiIzzivi.tsx`**: Passes `mode: 'renewal'` for auto-renewal after 30/30
 
-The previous edit that added position-aware descriptions likely removed or never included these critical lines.
+4. **`GeneratePlanButton`**: Uses exact `pdf_url` match instead of fuzzy `ilike`, accepts optional `reportId` prop
 
-## Fix
-
-Add the missing code between line 480 (after `summary`) and line 482 (before archive):
-
-```typescript
-// Build game combinations and generate sets
-const combinations = buildGameCombinations(letterPositions, ageGroup);
-const sets = generateSetBasedPlan(TOTAL_SETS, combinations, motorikaConfig);
-
-const now = new Date();
-const startDateStr = formatDate(now);
-const expiresAt = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString();
-```
-
-### File: `supabase/functions/generate-monthly-plan/index.ts`
-- Insert 6 lines after line 480 (after `summary` const, before the archive block)
-- Redeploy the edge function
-- Re-generate the plan for Testni otrok to verify it works
-
-This is a single insertion of missing variable declarations — no other changes needed.
-
+5. **Testni otrok fix**: Orphaned archived plan `b9aaa254` reactivated with preserved progress
