@@ -134,6 +134,42 @@ export type Database = {
         }
         Relationships: []
       }
+      album_stickers: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_golden: boolean
+          name: string
+          rarity: Database["public"]["Enums"]["sticker_rarity"]
+          sort_order: number
+          world: Database["public"]["Enums"]["sticker_world"]
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_golden?: boolean
+          name: string
+          rarity?: Database["public"]["Enums"]["sticker_rarity"]
+          sort_order?: number
+          world: Database["public"]["Enums"]["sticker_world"]
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_golden?: boolean
+          name?: string
+          rarity?: Database["public"]["Enums"]["sticker_rarity"]
+          sort_order?: number
+          world?: Database["public"]["Enums"]["sticker_world"]
+        }
+        Relationships: []
+      }
       archived_children: {
         Row: {
           age: number | null
@@ -639,6 +675,49 @@ export type Database = {
           },
         ]
       }
+      child_album_stats: {
+        Row: {
+          child_id: string
+          last_sticker_at: string | null
+          total_golden: number
+          total_stickers: number
+        }
+        Insert: {
+          child_id: string
+          last_sticker_at?: string | null
+          total_golden?: number
+          total_stickers?: number
+        }
+        Update: {
+          child_id?: string
+          last_sticker_at?: string | null
+          total_golden?: number
+          total_stickers?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_album_stats_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_album_stats_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_album_stats_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+        ]
+      }
       child_documents: {
         Row: {
           child_id: string
@@ -773,6 +852,62 @@ export type Database = {
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "logopedist_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      child_stickers: {
+        Row: {
+          child_id: string
+          earned_at: string | null
+          earned_reason: string
+          id: string
+          is_golden_version: boolean
+          sticker_id: string
+        }
+        Insert: {
+          child_id: string
+          earned_at?: string | null
+          earned_reason: string
+          id?: string
+          is_golden_version?: boolean
+          sticker_id: string
+        }
+        Update: {
+          child_id?: string
+          earned_at?: string | null
+          earned_reason?: string
+          id?: string
+          is_golden_version?: boolean
+          sticker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "child_stickers_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "child_stickers_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_stickers_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children_analytics_admin"
+            referencedColumns: ["child_id"]
+          },
+          {
+            foreignKeyName: "child_stickers_sticker_id_fkey"
+            columns: ["sticker_id"]
+            isOneToOne: false
+            referencedRelation: "album_stickers"
             referencedColumns: ["id"]
           },
         ]
@@ -2207,6 +2342,15 @@ export type Database = {
         | "additional_test_completed"
       organization_type: "internal" | "school" | "kindergarten" | "private"
       report_status: "draft" | "submitted" | "revised"
+      sticker_rarity: "common" | "special" | "rare" | "legendary"
+      sticker_world:
+        | "tomijev_gozd"
+        | "carobni_grad"
+        | "vesolje"
+        | "dzungla"
+        | "pod_morjem"
+        | "dino_svet"
+        | "super_junaki"
       test_session_status: "pending" | "assigned" | "in_review" | "completed"
       user_role: "admin" | "user" | "logopedist"
       word_rating: "correct" | "partial" | "incorrect" | "unrated"
@@ -2349,6 +2493,16 @@ export const Constants = {
       ],
       organization_type: ["internal", "school", "kindergarten", "private"],
       report_status: ["draft", "submitted", "revised"],
+      sticker_rarity: ["common", "special", "rare", "legendary"],
+      sticker_world: [
+        "tomijev_gozd",
+        "carobni_grad",
+        "vesolje",
+        "dzungla",
+        "pod_morjem",
+        "dino_svet",
+        "super_junaki",
+      ],
       test_session_status: ["pending", "assigned", "in_review", "completed"],
       user_role: ["admin", "user", "logopedist"],
       word_rating: ["correct", "partial", "incorrect", "unrated"],
