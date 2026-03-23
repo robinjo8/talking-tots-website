@@ -1,19 +1,52 @@
-## Plan Generation - Robustified (implemented 2026-03-23)
 
-### Changes made
 
-1. **Edge function `generate-monthly-plan`**: 
-   - Added `mode` parameter: `report_update` (default) preserves progress, `renewal` creates fresh plan
-   - Orphan recovery: reactivates archived plans that have existing progress
-   - In-place update: when plan exists, merges new sets while keeping tracked sets intact
-   - No more archive-first pattern — existing plan stays active until new one is confirmed
+## Problem
 
-2. **Admin frontend** (`AdminUserDetail`, `AdminLogopedistChildDetail`):
-   - Changed from fire-and-forget to `await` with proper success/error toasts
-   - Passes `mode: 'report_update'` explicitly
+Set 1 was started on March 21, expired after 24h, and `expired_at` is `2026-03-23` (today). The function `hasCompletedSetToday()` (line 314-321 in `usePlanProgress.ts`) treats **any** non-active entry dated today as "done" — including **expired** sets. This causes:
 
-3. **`MojiIzzivi.tsx`**: Passes `mode: 'renewal'` for auto-renewal after 30/30
+1. User visits `/moji-izzivi` → set 1 is auto-expired (24h passed)
+2. `hasCompletedSetToday()` returns `true` because `expired_at` is today
+3. UI shows "Odlično opravljeno! Danes si že opravil sklop." even though the user never completed it
+4. User is blocked from starting set 2 until tomorrow
 
-4. **`GeneratePlanButton`**: Uses exact `pdf_url` match instead of fuzzy `ilike`, accepts optional `reportId` prop
+The archive page also shows "Čas je potekel — 1 zvezdic zbranih" which is technically correct but the main page messaging is wrong.
 
-5. **Testni otrok fix**: Orphaned archived plan `b9aaa254` reactivated with preserved progress
+## Root Cause
+
+```typescript
+// Current — treats expired as "done today"
+export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
+  const todayStr = getTodayDateStr();
+  return trackingEntries.some(entry => {
+    if (entry.status === "active") return false;  // skips active, but NOT expired
+    const dateStr = entry.completed_at || entry.expired_at || entry.started_at;
+    return dateStr.startsWith(todayStr);
+  });
+}
+```
+
+An expired set means the user **didn't finish** — they should be allowed to start the next set immediately, not be blocked until tomorrow.
+
+## Fix
+
+### 1. `src/hooks/usePlanProgress.ts` — `hasCompletedSetToday()`
+
+Change to only count **completed** entries (not expired):
+
+```typescript
+export function hasCompletedSetToday(trackingEntries: SetTracking[]): boolean {
+  const todayStr = getTodayDateStr();
+  return trackingEntries.some(entry => {
+    if (entry.status !== "completed") return false;
+    const dateStr = entry.completed_at || entry.started_at;
+    return dateStr.startsWith(todayStr);
+  });
+}
+```
+
+This single change fixes both issues:
+- Expired sets no longer block the user from starting the next set
+- "Odlično opravljeno" only shows when a set was actually completed with 10 stars today
+
+No other files need changes. The archive page display is correct as-is (it correctly shows expired sets with partial stars).
+
