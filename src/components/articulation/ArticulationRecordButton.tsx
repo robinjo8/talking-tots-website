@@ -130,7 +130,7 @@ const ArticulationRecordButton = ({
         <>
           <div className={cn(spacerClass, "flex items-center justify-center")}>
             <p className="text-red-600 font-medium text-sm text-center">
-              BESEDA NI BILA DOBRO ZAZNANA, PROSIMO PONOVITE
+              PROSIM, PONOVI ŠE ENKRAT.
             </p>
           </div>
           <button
