@@ -306,18 +306,6 @@ export default function MojiIzzivi() {
                 <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
                 <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
               </motion.div>
-            ) : todayAlreadyDone && !activeTracking ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-12 text-center bg-accent/10 rounded-2xl border border-accent/20"
-              >
-                <div className="text-4xl mb-4">🌟</div>
-                <h2 className="text-xl font-bold mb-2">Odlično opravljeno!</h2>
-                <p className="text-muted-foreground">
-                  Danes si že opravil sklop. Naslednji sklop te čaka jutri!
-                </p>
-              </motion.div>
             ) : activeTracking && currentSetData ? (
               <PlanSetCard
                 setNumber={activeTracking.set_number}
