@@ -346,27 +346,11 @@ export default function MojiIzzivi() {
                 onActivityPlay={handleActivityPlay}
               />
             ) : nextSetNumber && currentSetData ? (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col items-center justify-center py-8 text-center"
-              >
-                <h2 className="text-lg font-semibold mb-3">Sklop {nextSetNumber} je pripravljen!</h2>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Ko začneš, imaš 24 ur časa da ga dokončaš.
-                </p>
-                <Button 
-                  onClick={handleStartSet} 
-                  disabled={isProcessing}
-                  size="lg" 
-                  className="gap-2"
-                >
-                  {isProcessing ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : null}
-                  Začni sklop {nextSetNumber}
-                </Button>
-              </motion.div>
+              <SetUnboxAnimation
+                setNumber={nextSetNumber}
+                onComplete={handleStartSet}
+                isProcessing={isProcessing}
+              />
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <p>Ni več sklopov na voljo.</p>
