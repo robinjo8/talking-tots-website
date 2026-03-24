@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { ProgressSection } from "@/components/ProgressSection";
 import { TipSection } from "@/components/TipSection";
+import { AlbumSection } from "@/components/progress/AlbumSection";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { FooterSection } from "@/components/FooterSection";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
@@ -50,6 +51,10 @@ const MojaStran = () => {
               {/* Progress Section Wrapper */}
               <div className="mb-12">
                 <ProgressSection />
+              </div>
+
+              <div className="mb-12">
+                <AlbumSection />
               </div>
               
               <TipSection childName={selectedChild.name} />
