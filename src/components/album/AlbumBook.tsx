@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DisplaySticker, StickerWorld, WORLDS_ORDER } from "./albumTypes";
 import { AlbumPage } from "./AlbumPage";
 import { AlbumWorldCover } from "./AlbumWorldCover";
