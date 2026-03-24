@@ -126,22 +126,29 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-0 min-h-[500px] md:min-h-[650px]"
+            className={`${currentSpread === 0 ? 'flex items-center justify-center' : 'grid grid-cols-1 md:grid-cols-2 gap-0'} min-h-[500px] md:min-h-[650px]`}
             style={{ transformStyle: 'preserve-3d' }}
           >
-            <div className="p-2 md:p-3">
-              <RenderPage page={currentPages[0]} />
-            </div>
-            
-            <div className="p-2 md:p-3">
-              {currentPages[1] ? (
-                <RenderPage page={currentPages[1]} />
-              ) : (
-                <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm flex items-center justify-center">
-                  <span className="text-muted-foreground/30 text-sm">📖</span>
+            {currentSpread === 0 ? (
+              <div className="p-2 md:p-3 w-full md:w-1/2">
+                <RenderPage page={currentPages[0]} />
+              </div>
+            ) : (
+              <>
+                <div className="p-2 md:p-3">
+                  <RenderPage page={currentPages[0]} />
                 </div>
-              )}
-            </div>
+                <div className="p-2 md:p-3">
+                  {currentPages[1] ? (
+                    <RenderPage page={currentPages[1]} />
+                  ) : (
+                    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm flex items-center justify-center">
+                      <span className="text-muted-foreground/30 text-sm">📖</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
