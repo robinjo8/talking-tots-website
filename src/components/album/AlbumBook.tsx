@@ -5,13 +5,15 @@ import { DisplaySticker, StickerWorld, WORLDS_ORDER } from "./albumTypes";
 import { AlbumPage } from "./AlbumPage";
 import { AlbumWorldCover } from "./AlbumWorldCover";
 
+const ALBUM_COVER_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_album_naslovna.webp";
+
 interface AlbumBookProps {
   stickersByWorld: Record<StickerWorld, DisplaySticker[]>;
 }
 
 interface PageContent {
-  type: 'cover' | 'stickers';
-  world: StickerWorld;
+  type: 'album_cover' | 'cover' | 'stickers';
+  world?: StickerWorld;
   stickers?: DisplaySticker[];
   ownedCount?: number;
   totalCount?: number;
@@ -21,11 +23,14 @@ interface PageContent {
 function buildPages(stickersByWorld: Record<StickerWorld, DisplaySticker[]>): PageContent[] {
   const pages: PageContent[] = [];
   
+  // Album cover as first page
+  pages.push({ type: 'album_cover' });
+  
   for (const world of WORLDS_ORDER) {
     const stickers = stickersByWorld[world] || [];
     const ownedCount = stickers.filter(s => s.owned).length;
     
-    // Cover page
+    // World cover page
     pages.push({ type: 'cover', world, ownedCount, totalCount: stickers.length });
     
     // Sticker pages (6 per page)
@@ -44,12 +49,10 @@ function buildPages(stickersByWorld: Record<StickerWorld, DisplaySticker[]>): Pa
 
 export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
   const pages = buildPages(stickersByWorld);
-  const [currentSpread, setCurrentSpread] = useState(0); // index in spreads (2 pages per spread)
+  const [currentSpread, setCurrentSpread] = useState(0);
   const [direction, setDirection] = useState(0);
   const touchStartX = useRef(0);
 
-  // Build spreads (pairs of pages for book view)
-  // First page is alone (cover), then pairs
   const spreads: [PageContent, PageContent | null][] = [];
   for (let i = 0; i < pages.length; i += 2) {
     spreads.push([pages[i], pages[i + 1] || null]);
@@ -102,14 +105,12 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Book container */}
       <div 
         className="relative bg-[hsl(30,20%,88%)] rounded-2xl shadow-2xl overflow-hidden border-4 border-[hsl(30,20%,75%)]"
         style={{ perspective: '1200px' }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Book spine decoration */}
         <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[hsl(30,20%,70%)] z-10 hidden md:block" />
         
         <AnimatePresence mode="wait" custom={direction}>
@@ -121,15 +122,13 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className="grid grid-cols-1 md:grid-cols-2 gap-0 min-h-[400px] md:min-h-[500px]"
+            className="grid grid-cols-1 md:grid-cols-2 gap-0 min-h-[500px] md:min-h-[650px]"
             style={{ transformStyle: 'preserve-3d' }}
           >
-            {/* Left page */}
             <div className="p-2 md:p-3">
               <RenderPage page={currentPages[0]} />
             </div>
             
-            {/* Right page */}
             <div className="p-2 md:p-3">
               {currentPages[1] ? (
                 <RenderPage page={currentPages[1]} />
@@ -178,10 +177,21 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
 }
 
 function RenderPage({ page }: { page: PageContent }) {
+  if (page.type === 'album_cover') {
+    return (
+      <div className="w-full h-full rounded-sm overflow-hidden">
+        <img 
+          src={ALBUM_COVER_URL} 
+          alt="Album zmajčka Tomija" 
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+  }
   if (page.type === 'cover') {
     return (
       <AlbumWorldCover 
-        world={page.world} 
+        world={page.world!} 
         ownedCount={page.ownedCount || 0} 
         totalCount={page.totalCount || 0} 
       />
