@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DisplaySticker, StickerWorld, WORLDS_ORDER } from "./albumTypes";
 import { AlbumPage } from "./AlbumPage";
 import { AlbumWorldCover } from "./AlbumWorldCover";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ALBUM_COVER_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_album_naslovna.webp";
 
@@ -12,7 +13,7 @@ interface AlbumBookProps {
 }
 
 interface PageContent {
-  type: 'album_cover' | 'cover' | 'stickers';
+  type: 'album_cover' | 'instructions' | 'cover' | 'stickers';
   world?: StickerWorld;
   stickers?: DisplaySticker[];
   ownedCount?: number;
@@ -23,17 +24,15 @@ interface PageContent {
 function buildPages(stickersByWorld: Record<StickerWorld, DisplaySticker[]>): PageContent[] {
   const pages: PageContent[] = [];
   
-  // Album cover as first page
   pages.push({ type: 'album_cover' });
+  pages.push({ type: 'instructions' });
   
   for (const world of WORLDS_ORDER) {
     const stickers = stickersByWorld[world] || [];
     const ownedCount = stickers.filter(s => s.owned).length;
     
-    // World cover page
     pages.push({ type: 'cover', world, ownedCount, totalCount: stickers.length });
     
-    // Sticker pages (6 per page)
     for (let i = 0; i < stickers.length; i += 6) {
       pages.push({
         type: 'stickers',
@@ -47,20 +46,34 @@ function buildPages(stickersByWorld: Record<StickerWorld, DisplaySticker[]>): Pa
   return pages;
 }
 
+function buildSpreads(pages: PageContent[], isMobile: boolean): [PageContent, PageContent | null][] {
+  const spreads: [PageContent, PageContent | null][] = [];
+  
+  if (isMobile) {
+    // Mobile: each page is its own spread
+    for (const page of pages) {
+      spreads.push([page, null]);
+    }
+  } else {
+    // Desktop: first spread is cover + instructions, then pairs
+    if (pages.length >= 2) {
+      spreads.push([pages[0], pages[1]]); // cover + instructions
+      for (let i = 2; i < pages.length; i += 2) {
+        spreads.push([pages[i], pages[i + 1] || null]);
+      }
+    }
+  }
+  
+  return spreads;
+}
+
 export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
   const pages = buildPages(stickersByWorld);
+  const isMobile = useIsMobile();
+  const spreads = buildSpreads(pages, isMobile);
   const [currentSpread, setCurrentSpread] = useState(0);
   const [direction, setDirection] = useState(0);
   const touchStartX = useRef(0);
-
-  // First spread is just the cover (single page), then pairs
-  const spreads: [PageContent, PageContent | null][] = [];
-  if (pages.length > 0) {
-    spreads.push([pages[0], null]); // cover alone
-    for (let i = 1; i < pages.length; i += 2) {
-      spreads.push([pages[i], pages[i + 1] || null]);
-    }
-  }
 
   const totalSpreads = spreads.length;
 
@@ -93,6 +106,8 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
   const currentPages = spreads[currentSpread];
   if (!currentPages) return null;
 
+  const isSinglePage = !currentPages[1];
+
   const variants = {
     enter: (dir: number) => ({ 
       x: dir > 0 ? 300 : -300, 
@@ -115,7 +130,9 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[hsl(30,20%,70%)] z-10 hidden md:block" />
+        {!isMobile && (
+          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[hsl(30,20%,70%)] z-10" />
+        )}
         
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
@@ -126,10 +143,10 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className={`${currentSpread === 0 ? 'flex items-center justify-center' : 'grid grid-cols-1 md:grid-cols-2 gap-0'} min-h-[500px] md:min-h-[650px]`}
+            className={`${isSinglePage ? 'flex items-center justify-center' : 'grid grid-cols-2 gap-0'} min-h-[500px] md:min-h-[650px]`}
             style={{ transformStyle: 'preserve-3d' }}
           >
-            {currentSpread === 0 ? (
+            {isSinglePage ? (
               <div className="p-2 md:p-3 w-full md:w-1/2">
                 <RenderPage page={currentPages[0]} />
               </div>
@@ -139,13 +156,7 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
                   <RenderPage page={currentPages[0]} />
                 </div>
                 <div className="p-2 md:p-3">
-                  {currentPages[1] ? (
-                    <RenderPage page={currentPages[1]} />
-                  ) : (
-                    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm flex items-center justify-center">
-                      <span className="text-muted-foreground/30 text-sm">📖</span>
-                    </div>
-                  )}
+                  <RenderPage page={currentPages[1]!} />
                 </div>
               </>
             )}
@@ -187,6 +198,34 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
   );
 }
 
+function InstructionsPage() {
+  return (
+    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-4 md:p-6 flex flex-col justify-center">
+      <h2 className="text-center text-lg md:text-xl font-bold text-[hsl(30,40%,25%)] mb-5 font-rounded">
+        Kako zbiram sličice?
+      </h2>
+      <div className="space-y-4 text-[hsl(30,30%,30%)]">
+        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
+          <p className="text-sm md:text-base font-semibold">7 dni zaporedne vadbe</p>
+          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">5 sličic + 1 zlata sličica</p>
+        </div>
+        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
+          <p className="text-sm md:text-base font-semibold">Artikulacijski test</p>
+          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">2 sličici</p>
+        </div>
+        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
+          <p className="text-sm md:text-base font-semibold">5 različnih iger na dan</p>
+          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">1 sličica</p>
+        </div>
+        <div>
+          <p className="text-sm md:text-base font-semibold">Vsakih 20 setov vaj</p>
+          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">5 sličic + 1 zlata sličica</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RenderPage({ page }: { page: PageContent }) {
   if (page.type === 'album_cover') {
     return (
@@ -198,6 +237,9 @@ function RenderPage({ page }: { page: PageContent }) {
         />
       </div>
     );
+  }
+  if (page.type === 'instructions') {
+    return <InstructionsPage />;
   }
   if (page.type === 'cover') {
     return (
