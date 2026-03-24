@@ -150,12 +150,45 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
           </AnimatePresence>
         </div>
 
-        {/* Page number - above floating buttons */}
+        {/* Page number - clickable for page picker */}
         <div className="text-center py-2 pb-20">
-          <span className="text-sm font-medium text-[hsl(30,20%,50%)]">
+          <button
+            onClick={() => setShowPagePicker(true)}
+            className="text-sm font-medium text-[hsl(30,20%,50%)] border-b border-dashed border-[hsl(30,20%,60%)] pb-0.5 active:opacity-70 transition-opacity"
+          >
             {currentSpread + 1} / {totalSpreads}
-          </span>
+          </button>
         </div>
+
+        {/* Page picker dialog */}
+        <Dialog open={showPagePicker} onOpenChange={setShowPagePicker}>
+          <DialogContent className="max-w-xs rounded-2xl" hideCloseButton>
+            <DialogHeader>
+              <DialogTitle className="text-center text-base font-bold text-[hsl(30,40%,25%)]">
+                IZBERI STRAN
+              </DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-3 gap-2 max-h-[60vh] overflow-y-auto py-2">
+              {Array.from({ length: totalSpreads }).map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => {
+                    setDirection(i > currentSpread ? 1 : -1);
+                    setCurrentSpread(i);
+                    setShowPagePicker(false);
+                  }}
+                  className={`h-10 rounded-lg text-sm font-semibold transition-colors ${
+                    i === currentSpread
+                      ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-sm'
+                      : 'bg-[hsl(30,20%,90%)] text-[hsl(30,30%,30%)] hover:bg-[hsl(30,20%,85%)]'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
