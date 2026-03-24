@@ -72,6 +72,7 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
   const spreads = buildSpreads(pages, isMobile);
   const [currentSpread, setCurrentSpread] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [showPagePicker, setShowPagePicker] = useState(false);
   const touchStartX = useRef(0);
 
   const totalSpreads = spreads.length;
