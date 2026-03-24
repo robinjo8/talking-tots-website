@@ -52,6 +52,10 @@ const MojaStran = () => {
               <div className="mb-12">
                 <ProgressSection />
               </div>
+
+              <div className="mb-12">
+                <AlbumSection />
+              </div>
               
               <TipSection childName={selectedChild.name} />
 
