@@ -1,13 +1,14 @@
 import { DisplaySticker } from "./albumTypes";
 import { StickerSlot } from "./StickerSlot";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AlbumPageProps {
   stickers: DisplaySticker[];
   pageIndex: number;
 }
 
-// Pre-defined scattered positions for up to 6 stickers per page
-const POSITIONS = [
+// Desktop: scattered positions for up to 6 stickers per page
+const DESKTOP_POSITIONS = [
   { top: '5%', left: '8%', rotate: -3 },
   { top: '3%', left: '52%', rotate: 2 },
   { top: '35%', left: '5%', rotate: 1.5 },
@@ -16,16 +17,29 @@ const POSITIONS = [
   { top: '67%', left: '52%', rotate: -1.5 },
 ];
 
+// Mobile: tighter grid, no overlap
+const MOBILE_POSITIONS = [
+  { top: '2%', left: '5%', rotate: -2 },
+  { top: '2%', left: '52%', rotate: 1.5 },
+  { top: '34%', left: '5%', rotate: 1 },
+  { top: '34%', left: '52%', rotate: -1.5 },
+  { top: '66%', left: '5%', rotate: 2 },
+  { top: '66%', left: '52%', rotate: -1 },
+];
+
 export function AlbumPage({ stickers, pageIndex }: AlbumPageProps) {
+  const isMobile = useIsMobile();
+  const positions = isMobile ? MOBILE_POSITIONS : DESKTOP_POSITIONS;
+
   return (
-    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-3 md:p-4 flex flex-col relative">
+    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-2 md:p-4 flex flex-col relative">
       <div className="relative flex-1">
         {stickers.map((sticker, i) => {
-          const pos = POSITIONS[i] || POSITIONS[0];
+          const pos = positions[i] || positions[0];
           return (
             <div
               key={sticker.id}
-              className="absolute w-[42%] sm:w-[40%]"
+              className="absolute w-[42%] md:w-[42%]"
               style={{
                 top: pos.top,
                 left: pos.left,
@@ -37,7 +51,7 @@ export function AlbumPage({ stickers, pageIndex }: AlbumPageProps) {
           );
         })}
       </div>
-      <div className="text-center text-[10px] text-muted-foreground mt-2">
+      <div className="text-center text-[10px] text-muted-foreground mt-1">
         {pageIndex}
       </div>
     </div>

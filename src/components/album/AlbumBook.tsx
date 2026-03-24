@@ -50,14 +50,12 @@ function buildSpreads(pages: PageContent[], isMobile: boolean): [PageContent, Pa
   const spreads: [PageContent, PageContent | null][] = [];
   
   if (isMobile) {
-    // Mobile: each page is its own spread
     for (const page of pages) {
       spreads.push([page, null]);
     }
   } else {
-    // Desktop: first spread is cover + instructions, then pairs
     if (pages.length >= 2) {
-      spreads.push([pages[0], pages[1]]); // cover + instructions
+      spreads.push([pages[0], pages[1]]);
       for (let i = 2; i < pages.length; i += 2) {
         spreads.push([pages[i], pages[i + 1] || null]);
       }
@@ -122,6 +120,45 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
     }),
   };
 
+  if (isMobile) {
+    return (
+      <div className="w-full h-full flex flex-col">
+        <div 
+          className="flex-1 relative"
+          style={{ perspective: '1200px' }}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={currentSpread}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className="absolute inset-0 p-2"
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              <div className="w-full h-full">
+                <RenderPage page={currentPages[0]} />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Page number - above floating buttons */}
+        <div className="text-center py-2 pb-20">
+          <span className="text-sm font-medium text-[hsl(30,20%,50%)]">
+            {currentSpread + 1} / {totalSpreads}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop layout
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div 
@@ -130,9 +167,7 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {!isMobile && (
-          <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[hsl(30,20%,70%)] z-10" />
-        )}
+        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-[hsl(30,20%,70%)] z-10" />
         
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
@@ -143,19 +178,19 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
             animate="center"
             exit="exit"
             transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            className={`${isSinglePage ? 'flex items-center justify-center' : 'grid grid-cols-2 gap-0'} min-h-[500px] md:min-h-[650px]`}
+            className={`${isSinglePage ? 'flex items-center justify-center' : 'grid grid-cols-2 gap-0'} min-h-[650px]`}
             style={{ transformStyle: 'preserve-3d' }}
           >
             {isSinglePage ? (
-              <div className="p-2 md:p-3 w-full md:w-1/2">
+              <div className="p-3 w-1/2">
                 <RenderPage page={currentPages[0]} />
               </div>
             ) : (
               <>
-                <div className="p-2 md:p-3">
+                <div className="p-3">
                   <RenderPage page={currentPages[0]} />
                 </div>
-                <div className="p-2 md:p-3">
+                <div className="p-3">
                   <RenderPage page={currentPages[1]!} />
                 </div>
               </>
@@ -164,7 +199,7 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
         </AnimatePresence>
       </div>
 
-      {/* Navigation */}
+      {/* Desktop navigation */}
       <div className="flex items-center justify-between mt-4 px-2">
         <button
           onClick={goPrev}
