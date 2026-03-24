@@ -10,10 +10,10 @@ interface AlbumPageProps {
 const POSITIONS = [
   { top: '5%', left: '8%', rotate: -3 },
   { top: '3%', left: '52%', rotate: 2 },
-  { top: '38%', left: '5%', rotate: 1.5 },
-  { top: '36%', left: '48%', rotate: -2 },
-  { top: '68%', left: '12%', rotate: 2.5 },
-  { top: '66%', left: '50%', rotate: -1.5 },
+  { top: '35%', left: '5%', rotate: 1.5 },
+  { top: '33%', left: '50%', rotate: -2 },
+  { top: '65%', left: '6%', rotate: 2.5 },
+  { top: '67%', left: '52%', rotate: -1.5 },
 ];
 
 export function AlbumPage({ stickers, pageIndex }: AlbumPageProps) {

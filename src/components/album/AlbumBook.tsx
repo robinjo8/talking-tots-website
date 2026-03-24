@@ -53,9 +53,13 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
   const [direction, setDirection] = useState(0);
   const touchStartX = useRef(0);
 
+  // First spread is just the cover (single page), then pairs
   const spreads: [PageContent, PageContent | null][] = [];
-  for (let i = 0; i < pages.length; i += 2) {
-    spreads.push([pages[i], pages[i + 1] || null]);
+  if (pages.length > 0) {
+    spreads.push([pages[0], null]); // cover alone
+    for (let i = 1; i < pages.length; i += 2) {
+      spreads.push([pages[i], pages[i + 1] || null]);
+    }
   }
 
   const totalSpreads = spreads.length;
