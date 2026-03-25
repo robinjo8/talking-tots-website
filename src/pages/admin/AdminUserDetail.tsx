@@ -121,7 +121,7 @@ export default function AdminUserDetail() {
       // Fetch child data with gender
       const { data: child, error: childError } = await supabase
         .from('children')
-        .select('name, age, gender')
+        .select('name, age, gender, birth_date')
         .eq('id', childId)
         .single();
 
