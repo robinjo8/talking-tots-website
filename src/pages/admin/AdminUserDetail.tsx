@@ -54,6 +54,13 @@ import { generateReportPdf } from '@/utils/generateReportPdf';
 import { Badge } from '@/components/ui/badge';
 import { AdditionalTestSection } from '@/components/admin/AdditionalTestSection';
 import { GeneratePlanButton } from '@/components/admin/GeneratePlanButton';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { sl } from 'date-fns/locale';
+import { CalendarIcon } from 'lucide-react';
+import { calculateAge } from '@/utils/childUtils';
+import { cn } from '@/lib/utils';
 
 export default function AdminUserDetail() {
   const { parentId, childId } = useParams<{ parentId: string; childId: string }>();
