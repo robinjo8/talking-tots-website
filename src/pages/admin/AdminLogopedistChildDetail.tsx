@@ -754,10 +754,10 @@ export default function AdminLogopedistChildDetail() {
               {/* Generated Reports Section */}
               {generatedReports.length > 0 && (
                 <Card>
-                  <CardHeader className="pb-3">
+                  <CardHeader>
                     <div className="flex items-center gap-2">
                       <Sparkles className="h-5 w-5 text-primary" />
-                      <CardTitle className="text-base">Generirana poročila</CardTitle>
+                      <CardTitle>Generirana poročila</CardTitle>
                     </div>
                     <CardDescription>
                       PDF poročila generirana za tega otroka
