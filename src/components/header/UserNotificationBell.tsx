@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, FileText, ChevronRight } from 'lucide-react';
+import { Bell, CheckCheck, FileText, ChevronRight, ClipboardCheck } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +32,10 @@ function formatRelativeTime(dateString: string): string {
   return date.toLocaleDateString('sl-SI');
 }
 
+function isTestReminder(notification: UserNotification): boolean {
+  return notification.source === 'database' && !!notification.type?.startsWith('test_');
+}
+
 interface NotificationItemProps {
   notification: UserNotification;
   onMarkAsRead: (id: string) => void;
@@ -46,8 +50,15 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
       onMarkAsRead(notification.id);
     }
     onClose?.();
-    navigate('/profile?expandSection=myDocuments');
+    
+    if (isTestReminder(notification) && notification.link) {
+      navigate(notification.link);
+    } else {
+      navigate('/profile?expandSection=myDocuments');
+    }
   };
+
+  const isReminder = isTestReminder(notification);
 
   return (
     <div
@@ -66,8 +77,12 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
         {notification.is_read && <div className="w-2 h-2" />}
       </div>
 
-      <div className="flex-shrink-0 mt-0.5 text-destructive">
-        <FileText className="h-5 w-5" />
+      <div className={cn("flex-shrink-0 mt-0.5", isReminder ? "text-amber-500" : "text-destructive")}>
+        {isReminder ? (
+          <ClipboardCheck className="h-5 w-5" />
+        ) : (
+          <FileText className="h-5 w-5" />
+        )}
       </div>
 
       <div className="flex-1 min-w-0">
@@ -75,11 +90,20 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
           'text-sm',
           notification.is_read ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
         )}>
-          Logopedsko poročilo naloženo
+          {isReminder ? notification.title : 'Logopedsko poročilo naloženo'}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          Za otroka: {notification.child_name}
+          {isReminder && notification.message ? (
+            <span className="line-clamp-2">{notification.message}</span>
+          ) : (
+            <>Za otroka: {notification.child_name}</>
+          )}
         </p>
+        {isReminder && notification.child_name && (
+          <p className="text-xs text-muted-foreground/70 mt-0.5">
+            Otrok: {notification.child_name}
+          </p>
+        )}
         <p className="text-xs text-muted-foreground/70 mt-1">
           {formatRelativeTime(notification.created_at)}
         </p>
@@ -134,7 +158,7 @@ function NotificationContent({
             <Bell className="h-10 w-10 mb-2 opacity-20" />
             <p className="text-sm">Ni novih obvestil</p>
             <p className="text-xs mt-1 text-center px-4">
-              Tukaj bodo prikazana poročila logopedov
+              Tukaj bodo prikazana poročila logopedov in opomniki
             </p>
           </div>
         ) : (
@@ -178,9 +202,7 @@ export function UserNotificationBell() {
 
   return (
     <>
-      {/* Single bell button - no CSS breakpoint logic */}
       {isMobile ? (
-        // Mobile: Just a button that opens the Dialog
         <button 
           className="relative w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors"
           onClick={handleBellClick}
@@ -194,7 +216,6 @@ export function UserNotificationBell() {
           )}
         </button>
       ) : (
-        // Desktop: Button wrapped in Popover
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button 
@@ -226,7 +247,6 @@ export function UserNotificationBell() {
         </Popover>
       )}
 
-      {/* Mobile: Dialog - centriran na sredini zaslona */}
       <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
         <DialogContent className="w-[90vw] max-w-[350px] max-h-[80vh] p-0 overflow-hidden">
           <NotificationContent

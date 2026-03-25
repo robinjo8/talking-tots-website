@@ -10,11 +10,16 @@ export interface UserNotification {
   created_at: string;
   is_read: boolean;
   path: string;
+  source: 'storage' | 'database';
+  type?: string;
+  title?: string;
+  message?: string;
+  link?: string;
 }
 
 /**
  * Hook for fetching user notifications about new logopedist reports
- * Checks the 'Generirana-porocila' folder in storage for new PDFs
+ * and test reminders from the database
  */
 export function useUserNotifications() {
   const { user, profile } = useAuth();
@@ -22,7 +27,7 @@ export function useUserNotifications() {
   const [isLoading, setIsLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Get read notification IDs from localStorage
+  // Get read notification IDs from localStorage (for storage-based notifications)
   const getReadNotifications = useCallback((): Set<string> => {
     try {
       const stored = localStorage.getItem('user_read_notifications');
@@ -37,7 +42,7 @@ export function useUserNotifications() {
     localStorage.setItem('user_read_notifications', JSON.stringify([...readIds]));
   }, []);
 
-  // Fetch notifications (reports from storage)
+  // Fetch notifications from both sources
   const fetchNotifications = useCallback(async () => {
     if (!user?.id || !profile?.children) {
       setIsLoading(false);
@@ -48,10 +53,10 @@ export function useUserNotifications() {
       const readIds = getReadNotifications();
       const allNotifications: UserNotification[] = [];
 
+      // 1. Fetch storage-based notifications (PDF reports)
       for (const child of profile.children) {
         if (!child.id) continue;
 
-        // Fetch generated PDF reports from storage
         const { data: reportFiles } = await supabase.storage
           .from('uporabniski-profili')
           .list(`${user.id}/${child.id}/Generirana-porocila`);
@@ -69,9 +74,37 @@ export function useUserNotifications() {
                 created_at: f.created_at || new Date().toISOString(),
                 is_read: readIds.has(notificationId),
                 path: `${user.id}/${child.id}/Generirana-porocila/${f.name}`,
+                source: 'storage' as const,
               };
             });
           allNotifications.push(...childReports);
+        }
+      }
+
+      // 2. Fetch database notifications (test reminders)
+      const { data: dbNotifications, error: dbError } = await supabase
+        .from('user_notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (!dbError && dbNotifications) {
+        for (const dbNotif of dbNotifications) {
+          const childName = profile.children.find(c => c.id === dbNotif.child_id)?.name || '';
+          allNotifications.push({
+            id: dbNotif.id,
+            child_id: dbNotif.child_id || '',
+            child_name: childName,
+            report_name: '',
+            created_at: dbNotif.created_at,
+            is_read: dbNotif.is_read || false,
+            path: '',
+            source: 'database',
+            type: dbNotif.type,
+            title: dbNotif.title,
+            message: dbNotif.message,
+            link: dbNotif.link || undefined,
+          });
         }
       }
 
@@ -90,10 +123,21 @@ export function useUserNotifications() {
   }, [user?.id, profile?.children, getReadNotifications]);
 
   // Mark single notification as read
-  const markAsRead = useCallback((notificationId: string) => {
-    const readIds = getReadNotifications();
-    readIds.add(notificationId);
-    saveReadNotifications(readIds);
+  const markAsRead = useCallback(async (notificationId: string) => {
+    const notification = notifications.find(n => n.id === notificationId);
+    
+    if (notification?.source === 'database') {
+      // Update in database
+      await supabase
+        .from('user_notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
+    } else {
+      // Update in localStorage
+      const readIds = getReadNotifications();
+      readIds.add(notificationId);
+      saveReadNotifications(readIds);
+    }
 
     setNotifications(prev =>
       prev.map(n =>
@@ -101,13 +145,30 @@ export function useUserNotifications() {
       )
     );
     setUnreadCount(prev => Math.max(0, prev - 1));
-  }, [getReadNotifications, saveReadNotifications]);
+  }, [notifications, getReadNotifications, saveReadNotifications]);
 
   // Mark all notifications as read
-  const markAllAsRead = useCallback(() => {
+  const markAllAsRead = useCallback(async () => {
     const readIds = getReadNotifications();
-    notifications.forEach(n => readIds.add(n.id));
+    const dbIds: string[] = [];
+    
+    notifications.forEach(n => {
+      if (n.source === 'database' && !n.is_read) {
+        dbIds.push(n.id);
+      } else {
+        readIds.add(n.id);
+      }
+    });
+    
     saveReadNotifications(readIds);
+
+    // Batch update database notifications
+    if (dbIds.length > 0) {
+      await supabase
+        .from('user_notifications')
+        .update({ is_read: true })
+        .in('id', dbIds);
+    }
 
     setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
     setUnreadCount(0);

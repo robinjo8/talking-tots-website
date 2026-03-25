@@ -54,3 +54,6 @@ verify_jwt = false
 [functions.award-stickers]
 verify_jwt = false
 
+[functions.check-test-reminders]
+verify_jwt = false
+
