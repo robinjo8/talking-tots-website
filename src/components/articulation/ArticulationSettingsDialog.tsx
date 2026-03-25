@@ -125,7 +125,7 @@ const ArticulationSettingsDialog = ({
         if (!isOpen && !isInitialSetup) onClose();
       }}>
         <DialogContent 
-          className="sm:max-w-2xl"
+          className="sm:max-w-2xl max-h-[90vh] overflow-y-auto"
           onPointerDownOutside={isInitialSetup ? (e) => e.preventDefault() : undefined}
           onEscapeKeyDown={isInitialSetup ? (e) => e.preventDefault() : undefined}
           hideCloseButton={isInitialSetup}
