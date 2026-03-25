@@ -60,7 +60,8 @@ export default function AdminUserDetail() {
   const navigate = useNavigate();
   const { profile: logopedistProfile } = useAdminAuth();
   
-  const [childData, setChildData] = useState<{ name: string; age: number; gender: string | null } | null>(null);
+  const [childData, setChildData] = useState<{ name: string; age: number; gender: string | null; birth_date: string | null } | null>(null);
+  const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [parentData, setParentData] = useState<{ name: string; email: string } | null>(null);
   const [testSessions, setTestSessions] = useState<{ id: string; date: string; formattedDate: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
