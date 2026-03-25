@@ -1,18 +1,17 @@
 
 
-## Plan: Page picker popup on mobile
+## Plan: Poenotenje stilov treh sekcij na AdminUserDetail
 
-### What
-Make the page counter ("1 / 30") clickable. On tap, open a Dialog with a 3-column grid of page numbers (1–N). Tapping a number jumps to that page and closes the dialog.
+### Problem
+Na strani `/admin/users/.../...` imajo tri sekcije (Dokumenti, Generirana poročila logopeda, Preverjanje izgovorjave) različno oblikovane naslove:
+- **Dokumenti**: `<CardHeader>` brez dodatnih razredov, `<CardTitle>` brez dodatnih razredov — privzeto (text-2xl)
+- **Generirana poročila logopeda**: `<CardHeader className="pb-3">` + `<CardTitle className="text-base">` — manjši naslov, manj paddinga
+- **Preverjanje izgovorjave**: privzeto — brez dodatnih razredov
 
-### Changes in `src/components/album/AlbumBook.tsx`
+### Popravek v `src/pages/admin/AdminUserDetail.tsx`
 
-1. Add `useState<boolean>` for `showPagePicker`
-2. Make the page counter a `<button>` that sets `showPagePicker(true)`
-3. Add a `Dialog` (from `@/components/ui/dialog`) below the counter:
-   - Title: "IZBERI STRAN"
-   - Content: 3-column grid (`grid grid-cols-3 gap-2`) with buttons numbered 1 to `totalSpreads`
-   - Current page highlighted (e.g., `bg-amber-500 text-white`, others `bg-muted`)
-   - On click: `setDirection(...)`, `setCurrentSpread(i)`, `setShowPagePicker(false)`
-4. Style the counter button with underline/dashed border to hint it's tappable
+1. **Vrstica 882**: Odstrani `className="pb-3"` iz `CardHeader` → `<CardHeader>`
+2. **Vrstica 885**: Odstrani `className="text-base"` iz `CardTitle` → `<CardTitle>Generirana poročila logopeda</CardTitle>`
+
+S tem bodo vse tri sekcije uporabljale identičen privzeti stil `CardHeader` in `CardTitle`.
 
