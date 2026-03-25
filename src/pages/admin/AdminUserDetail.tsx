@@ -781,6 +781,48 @@ export default function AdminUserDetail() {
                 Otrok: <span className="font-medium">{childData.name}</span>
                 {childData.age && <> • {childData.age} let</>}
                 {parentData?.name && <> • Starš: {parentData.name}</>}
+                <span className="flex items-center gap-1 mt-1">
+                  <CalendarIcon className="h-3.5 w-3.5" />
+                  {childData.birth_date 
+                    ? format(new Date(childData.birth_date), "d. MMMM yyyy", { locale: sl })
+                    : 'Datum rojstva ni vnesen'}
+                  <Popover open={isEditingBirthDate} onOpenChange={setIsEditingBirthDate}>
+                    <PopoverTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 ml-1">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={childData.birth_date ? new Date(childData.birth_date) : undefined}
+                        onSelect={async (date) => {
+                          if (!date || !childId) return;
+                          const newAge = calculateAge(date);
+                          const birthDateStr = date.toISOString().split('T')[0];
+                          const { error } = await supabase
+                            .from('children')
+                            .update({ birth_date: birthDateStr, age: newAge })
+                            .eq('id', childId);
+                          if (error) {
+                            toast.error('Napaka pri posodabljanju datuma rojstva');
+                            console.error(error);
+                          } else {
+                            setChildData(prev => prev ? { ...prev, birth_date: birthDateStr, age: newAge } : prev);
+                            toast.success(`Datum rojstva posodobljen. Nova starost: ${newAge} let.`);
+                            setIsEditingBirthDate(false);
+                          }
+                        }}
+                        disabled={(date) =>
+                          date > new Date() || date < new Date("2000-01-01")
+                        }
+                        initialFocus
+                        className={cn("p-3 pointer-events-auto")}
+                        locale={sl}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </span>
               </>
             ) : (
               'Nalaganje...'
