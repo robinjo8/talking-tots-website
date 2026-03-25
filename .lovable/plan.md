@@ -1,70 +1,122 @@
 
 
-## Analiza: Starostni prehod otroka in vpliv na osebni načrt
+## Plan: Avtomatsko obveščanje o novem preverjanju izgovorjave
 
-### Trenutno stanje
+### Pregled
 
-**Kako deluje starost v sistemu:**
-1. `calculateAge()` vedno izračuna starost **dinamično** iz `birth_date` — ob vsakem nalaganju strani
-2. `getAgeGroup()` uvrsti starost v skupino: `3-4`, `5-6`, `7-8`, `9-10`
-3. Edge funkcija `generate-monthly-plan` ob generiranju načrta izračuna starost in **vgradi starostno skupino v URL-je iger** (npr. `/igra-ujemanja` za 3-4, `/igra-ujemanja56` za 5-6)
-4. Ti URL-ji so **shranjeni v `plan_data.sets[].activities[].path`** in se ne posodabljajo naknadno
+Sistem bo uporabnika obvestil ob štirih mejnikih po opravljenem preverjanju izgovorjave:
+- **Dan 83** (7 dni pred potekom 3 mesecev): "Novo preverjanje bo na voljo čez 7 dni"
+- **Dan 90** (na dan poteka): "Novo preverjanje je na voljo"
+- **Dan 93** (3 dni po poteku): "Opomnik: Novo preverjanje čaka"
+- **Dan 97** (7 dni po poteku): "Zadnji opomnik: Prosimo, opravite preverjanje"
 
-### Kaj se zgodi, ko otrok dopolni 5 let med izvajanjem načrta?
-
-**Scenarij:** Otrok star 4 let, načrt generiran za starostno skupino 3-4, čez 10 dni ima rojstni dan.
-
-1. **Obstoječi načrt (sklopi 1–30):** Igre še vedno kažejo na URL-je za 3-4 (npr. `/igra-ujemanja/ch`). To je **pravilno** — otrok naj dokonča načrt s težavnostjo, za katero je bil načrt ustvarjen.
-2. **Ob renewal-u (ko začne sklop 30):** Edge funkcija `generate-monthly-plan` ponovno izračuna starost → zdaj je 5 → `ageGroup = "5-6"` → novi sklopi (31–60) bodo imeli URL-je za 5-6 (npr. `/igra-ujemanja56/ch`).
-3. **Artikulacijski test:** `AgeGatedRoute` dinamično preverja starost — bo takoj prilagodil dostop.
-4. **Admin igre:** Dinamično berejo `child.age` in prilagodijo suffix.
-
-### Tvoje vprašanje: Ali naj otrok dokonča obstoječi načrt?
-
-**DA — trenutna implementacija je pravilna in optimalna:**
-- Obstoječi sklopi ohranijo starostno težavnost, za katero so bili generirani
-- Renewal samodejno uporabi novo starostno skupino
-- Ni potrebe po ročnem posredovanju
-
-Edini robni primer: če logoped **po rojstnem dnevu** ročno sproži nov `report_update` (ne renewal), bo ta tudi uporabil novo starost — kar je zaželeno.
-
-### Glede evalov (evaluacij)
-
-Evals v smislu AI/LLM testiranja **niso smiselni za tvoj projekt**. Tvoj sistem ni LLM-based produkt, ki ga moraš evalvirati. Kar ti rabiš, je:
-- **Integracijsko testiranje** (ali osebni načrt pravilno upošteva starost, ali renewal deluje)
-- **E2E testi** (Playwright/Cypress) za kritične tokove
-
-To je ločena tema in jo lahko naslavljamo posebej, če želiš.
+Obvestilo bo vidno na dva načina: (1) v uporabniškem zvončku (UserNotificationBell) in (2) kot email prek Resend API.
 
 ---
 
-## Plan: Dodaj urejanje datuma rojstva na AdminUserDetail
+### 1. Nova tabela: `user_notifications`
 
-### Zakaj
-Logoped/admin mora imeti možnost popraviti datum rojstva otroka na strani `/admin/users/:userId/:childId`, ker bo urejanje na uporabniški strani onemogočeno.
+Obstoječa `notifications` tabela je namenjena admin/organizacijskemu portalu (ima `organization_id` NOT NULL). Za uporabniška obvestila potrebujemo ločeno tabelo.
 
-### Spremembe
+```sql
+CREATE TABLE public.user_notifications (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  child_id UUID REFERENCES public.children(id) ON DELETE CASCADE,
+  type TEXT NOT NULL,  -- 'test_reminder_7d_before', 'test_available', 'test_reminder_3d_after', 'test_reminder_7d_after'
+  title TEXT NOT NULL,
+  message TEXT NOT NULL,
+  link TEXT,
+  is_read BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
 
-**1. `src/pages/admin/AdminUserDetail.tsx`**
-- Poleg prikaza datuma rojstva dodaj ikono svinčnika (Pencil)
-- Ob kliku odpri inline Popover s Calendar komponentno (Shadcn datepicker)
-- Ob izbiri datuma: posodobi `children` tabelo (`birth_date` + preračunan `age`) prek supabase
-- Osveži lokalno stanje
+ALTER TABLE public.user_notifications ENABLE ROW LEVEL SECURITY;
 
-**2. Potreben dostop:** Super admin že ima `ALL` policy na `children` tabeli, zato ni potrebna migracija.
+CREATE POLICY "Users can read own notifications"
+  ON public.user_notifications FOR SELECT TO authenticated
+  USING (auth.uid() = user_id);
 
-### Tehnični detajl
-
-```text
-[Datum rojstva: 15. 3. 2021 (4 leta)  ✏️]
-                                        │
-                              klik → Popover s Calendar
-                                        │
-                              izbira → UPDATE children
-                                SET birth_date = '2021-03-15',
-                                    age = calculateAge('2021-03-15')
-                                WHERE id = childId
+CREATE POLICY "Users can update own notifications"
+  ON public.user_notifications FOR UPDATE TO authenticated
+  USING (auth.uid() = user_id);
 ```
 
-Obstoječi osebni načrt ostane nespremenjen (pravilno). Naslednji renewal ali report_update bo avtomatično uporabil novo starost.
+### 2. Nova Edge funkcija: `check-test-reminders`
+
+Periodična Edge funkcija (pg_cron, 1x dnevno), ki:
+
+1. Poišče vse otroke z `articulation_test_results` — zadnji `completed_at`
+2. Izračuna koliko dni je minilo od zadnjega testa
+3. Za vsakega otroka preveri ali je treba poslati obvestilo na dan 83, 90, 93, 97
+4. Preveri ali je obvestilo za ta mejnik že bilo poslano (po `type` + `child_id` + interval)
+5. Če ne: vstavi v `user_notifications` + pošlje email prek Resend
+
+Email pošiljanje bo sledilo obstoječemu vzorcu iz `send-signup-confirmation` (Resend SDK + React Email template).
+
+```text
+Za vsak mejnik:
+  1. Query: children JOIN articulation_test_results (zadnji completed_at)
+  2. Izračun: daysSinceTest = now() - completed_at
+  3. Preveri: ali že obstaja user_notification z istim type + child_id
+  4. Če ne obstaja IN daysSinceTest >= mejnik:
+     → INSERT user_notifications
+     → Resend email (iz profiles tabele dobi email prek auth.users)
+```
+
+### 3. React Email template za opomnike
+
+Datoteka: `supabase/functions/check-test-reminders/_templates/test-reminder.tsx`
+
+4 variante besedila glede na tip opomnika, skupen template z dinamičnim naslovom in sporočilom. Sledil bo vizualnemu slogu obstoječega `signup-confirmation` templata.
+
+### 4. Posodobitev `useUserNotifications` hooka
+
+Trenutno hook bere samo PDF-je iz storage-a. Razširimo ga:
+
+1. Poleg obstoječega branja storage-ov, dodaj query na novo `user_notifications` tabelo
+2. Združi oba vira obvestil v eno listo, sortirano po datumu
+3. `markAsRead` za user_notifications: UPDATE `is_read = true` v bazi (namesto localStorage)
+4. Za stara storage-based obvestila ohrani localStorage pristop
+
+### 5. Posodobitev `UserNotificationBell` komponente
+
+Dodaj nov tip obvestila z ikono (npr. `ClipboardCheck`) in prilagojenim besedilom. Ob kliku na test-reminder obvestilo navigiraj na `/artikulacijski-test`.
+
+### 6. Prikaz datuma zadnjega preverjanja na `/moja-stran`
+
+`ArticulationTestSection` že prikazuje datum zadnjega testa. Dodaj ta razdelek tudi na `/moja-stran` (ProgressSection ali kot ločen blok), da je informacija vidna brez navigacije na podstran.
+
+### 7. pg_cron job za dnevno izvajanje
+
+```sql
+SELECT cron.schedule(
+  'check-test-reminders-daily',
+  '0 8 * * *',  -- vsak dan ob 8:00 UTC
+  $$ SELECT net.http_post(...) $$
+);
+```
+
+---
+
+### Tehnični povzetek sprememb
+
+| Datoteka / Resursa | Sprememba |
+|---|---|
+| Migracija SQL | Nova tabela `user_notifications` + RLS |
+| `supabase/functions/check-test-reminders/index.ts` | Nova Edge funkcija (cron) |
+| `supabase/functions/check-test-reminders/_templates/test-reminder.tsx` | Email template |
+| `src/hooks/useUserNotifications.ts` | Razširitev: bere tudi iz `user_notifications` tabele |
+| `src/components/header/UserNotificationBell.tsx` | Nov tip obvestila z ikono in navigacijo |
+| `src/components/progress/ArticulationTestSection.tsx` | Brez sprememb (že prikazuje datume) |
+| pg_cron job (SQL insert) | Dnevno izvajanje ob 8:00 |
+
+### Mejniki obveščanja
+
+| Dan | Tip | Naslov | Email |
+|---|---|---|---|
+| 83 | `test_reminder_7d_before` | "Novo preverjanje bo na voljo čez 7 dni" | Da |
+| 90 | `test_available` | "Novo preverjanje izgovorjave je na voljo!" | Da |
+| 93 | `test_reminder_3d_after` | "Opomnik: Novo preverjanje čaka" | Da |
+| 97 | `test_reminder_7d_after` | "Zadnji opomnik: Prosimo, opravite preverjanje" | Da |
 
