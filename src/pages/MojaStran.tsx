@@ -57,6 +57,10 @@ const MojaStran = () => {
               <div className="mb-12">
                 <AlbumSection />
               </div>
+
+              <div className="mb-12">
+                <ArticulationTestSection />
+              </div>
               
               <TipSection childName={selectedChild.name} />
 
