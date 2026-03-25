@@ -797,7 +797,7 @@ export default function AdminUserDetail() {
                         onSelect={async (date) => {
                           if (!date || !childId) return;
                           const newAge = calculateAge(date);
-                          const birthDateStr = date.toISOString().split('T')[0];
+                          const birthDateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                           const { error } = await supabase
                             .from('children')
                             .update({ birth_date: birthDateStr, age: newAge })
