@@ -1,0 +1,1 @@
+DELETE FROM articulation_test_results WHERE child_id = '0e054bde-ab83-4728-b55d-e02134e6d35b';
