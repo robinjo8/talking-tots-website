@@ -127,17 +127,37 @@ Deno.serve(async (req) => {
 
         notificationsSent++
 
+        // Check email preferences before sending email
+        const { data: emailPref } = await supabase
+          .from('email_preferences')
+          .select('notifications_enabled')
+          .eq('user_id', child.parent_id)
+          .maybeSingle()
+
+        const notificationsEnabled = emailPref?.notifications_enabled !== false
+
+        if (!notificationsEnabled) {
+          console.log(`Email notifications disabled for user ${child.parent_id}, skipping email`)
+          continue
+        }
+
         // Get parent email from auth.users
         const { data: userData } = await supabase.auth.admin.getUserById(child.parent_id)
 
         if (userData?.user?.email) {
           try {
+            // Generate unsubscribe token
+            const tokenPayload = { sub: child.parent_id, exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60 }
+            const tokenBase64 = btoa(JSON.stringify({ alg: "none", typ: "JWT" })).replace(/=/g, "") + "." + btoa(JSON.stringify(tokenPayload)).replace(/=/g, "") + "."
+            const unsubscribeUrl = `https://tomitalk.com/odjava-obvestil?token=${tokenBase64}`
+
             const html = await renderAsync(
               React.createElement(TestReminderEmail, {
                 childName: child.name,
                 title: milestone.title,
                 message: milestone.message,
                 milestoneType: milestone.type,
+                unsubscribeUrl,
               })
             )
 

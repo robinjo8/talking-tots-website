@@ -88,7 +88,7 @@ export const TestReminderEmail = ({
           <Section style={footer}>
             <Text style={footerText}>
               To sporočilo ste prejeli, ker imate račun pri TomiTalk.<br />
-              Če teh e-poštnih sporočil ne želite več prejemati, <Link href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style={unsubscribeLink}>se lahko odjavite</Link>.
+              Če teh e-poštnih sporočil ne želite več prejemati, <Link href={unsubscribeUrl || "https://tomitalk.com/kontakt"} style={unsubscribeLink}>se lahko odjavite</Link>.
             </Text>
           </Section>
         </Container>
