@@ -837,6 +837,17 @@ export default function AdminUserDetail() {
                     </PopoverContent>
                   </Popover>
                 </span>
+                {subscriptionInfo && (
+                  <span className="flex items-center gap-1 mt-1 text-sm">
+                    📋 Naročnina: <span className="font-medium">{subscriptionInfo.planId === 'pro' ? 'Pro' : subscriptionInfo.planId === 'start' ? 'Start' : 'Ni naročnine'}</span>
+                    {subscriptionInfo.subscriptionEnd && (
+                      <> • Poteče: <span className="font-medium">{format(new Date(subscriptionInfo.subscriptionEnd), 'd. M. yyyy', { locale: sl })}</span></>
+                    )}
+                    {subscriptionInfo.status === 'canceled' && (
+                      <Badge variant="outline" className="ml-2 text-destructive border-destructive text-xs">Preklicana</Badge>
+                    )}
+                  </span>
+                )}
               </>
             ) : (
               'Nalaganje...'
