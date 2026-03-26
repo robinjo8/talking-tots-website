@@ -378,7 +378,7 @@ serve(async (req) => {
 
     const { data: child } = await supabase
       .from("children")
-      .select("id, birth_date, age, name, gender")
+      .select("id, birth_date, age, name, gender, parent_id")
       .eq("id", childId)
       .single();
 
