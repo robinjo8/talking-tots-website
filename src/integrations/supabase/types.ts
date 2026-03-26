@@ -1006,6 +1006,30 @@ export type Database = {
           },
         ]
       }
+      email_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          notifications_enabled: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          notifications_enabled?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       exercises: {
         Row: {
           age_range_max: number
