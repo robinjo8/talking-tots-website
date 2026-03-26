@@ -690,11 +690,26 @@ serve(async (req) => {
         // Send email via Resend
         const resendApiKey = Deno.env.get("RESEND_API_KEY");
         if (resendApiKey) {
-          const { data: userData } = await supabase.auth.admin.getUserById(child.parent_id);
-          if (userData?.user?.email) {
-            const emailSubject = isPlanNew
-              ? "Nov osebni načrt je pripravljen! 🐉"
-              : "Osebni načrt je bil podaljšan! 🐉";
+          // Check email preferences
+          const { data: emailPref } = await supabase
+            .from("email_preferences")
+            .select("notifications_enabled")
+            .eq("user_id", child.parent_id)
+            .maybeSingle();
+
+          const notificationsEnabled = emailPref?.notifications_enabled !== false;
+
+          if (notificationsEnabled) {
+            const { data: userData } = await supabase.auth.admin.getUserById(child.parent_id);
+            if (userData?.user?.email) {
+              // Generate unsubscribe token (simple JWT-like base64)
+              const tokenPayload = { sub: child.parent_id, exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60 };
+              const tokenBase64 = btoa(JSON.stringify({ alg: "none", typ: "JWT" })).replace(/=/g, "") + "." + btoa(JSON.stringify(tokenPayload)).replace(/=/g, "") + ".";
+              const unsubscribeUrl = `https://tomitalk.com/odjava-obvestil?token=${tokenBase64}`;
+
+              const emailSubject = isPlanNew
+                ? "Nov osebni načrt je pripravljen! 🐉"
+                : "Osebni načrt je bil podaljšan! 🐉";
 
             const emailHtml = `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
