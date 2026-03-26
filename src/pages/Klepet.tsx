@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import { useBannerVisible } from "@/components/MissingChildBanner";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 function calculateAge(birthDate: Date | null | undefined): number | null {
   if (!birthDate) return null;
