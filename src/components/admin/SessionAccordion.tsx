@@ -15,6 +15,8 @@ import { sl } from 'date-fns/locale';
 interface SessionAccordionProps {
   sessionNumber: number;
   baseDate: string | null; // submitted_at of Seja-1
+  subscriptionEnd?: string | null; // current_period_end from user_subscriptions
+  actualSessionDates?: Map<number, string>; // actual submitted_at per session number
   hasData: boolean;
   recordingsByLetter: Map<string, Recording[]>;
   evaluations: Map<string, LetterEvaluation>;
