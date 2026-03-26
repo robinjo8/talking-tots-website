@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChatInterface } from "@/components/chat/ChatInterface";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 import type { ChildContext } from "@/hooks/useChatAssistant";
