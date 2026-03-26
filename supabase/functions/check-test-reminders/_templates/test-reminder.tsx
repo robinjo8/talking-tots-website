@@ -26,6 +26,7 @@ export const TestReminderEmail = ({
   title,
   message,
   milestoneType,
+  unsubscribeUrl,
 }: TestReminderEmailProps) => {
   const isUrgent = milestoneType === 'test_reminder_7d_after'
   const isAvailable = milestoneType === 'test_available'
