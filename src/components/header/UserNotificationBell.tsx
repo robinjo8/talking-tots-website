@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, CheckCheck, FileText, ChevronRight, ClipboardCheck } from 'lucide-react';
+import { Bell, CheckCheck, FileText, ChevronRight, ClipboardCheck, Calendar } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +36,14 @@ function isTestReminder(notification: UserNotification): boolean {
   return notification.source === 'database' && !!notification.type?.startsWith('test_');
 }
 
+function isPlanNotification(notification: UserNotification): boolean {
+  return notification.source === 'database' && (notification.type === 'plan_new' || notification.type === 'plan_renewed');
+}
+
+function isDbNotification(notification: UserNotification): boolean {
+  return isTestReminder(notification) || isPlanNotification(notification);
+}
+
 interface NotificationItemProps {
   notification: UserNotification;
   onMarkAsRead: (id: string) => void;
@@ -51,7 +59,7 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
     }
     onClose?.();
     
-    if (isTestReminder(notification) && notification.link) {
+    if (isDbNotification(notification) && notification.link) {
       navigate(notification.link);
     } else {
       navigate('/profile?expandSection=myDocuments');
@@ -59,6 +67,20 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
   };
 
   const isReminder = isTestReminder(notification);
+  const isPlan = isPlanNotification(notification);
+  const isDbNotif = isReminder || isPlan;
+
+  const getIcon = () => {
+    if (isPlan) return <Calendar className="h-5 w-5" />;
+    if (isReminder) return <ClipboardCheck className="h-5 w-5" />;
+    return <FileText className="h-5 w-5" />;
+  };
+
+  const getIconColor = () => {
+    if (isPlan) return "text-primary";
+    if (isReminder) return "text-amber-500";
+    return "text-destructive";
+  };
 
   return (
     <div
@@ -77,12 +99,8 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
         {notification.is_read && <div className="w-2 h-2" />}
       </div>
 
-      <div className={cn("flex-shrink-0 mt-0.5", isReminder ? "text-amber-500" : "text-destructive")}>
-        {isReminder ? (
-          <ClipboardCheck className="h-5 w-5" />
-        ) : (
-          <FileText className="h-5 w-5" />
-        )}
+      <div className={cn("flex-shrink-0 mt-0.5", getIconColor())}>
+        {getIcon()}
       </div>
 
       <div className="flex-1 min-w-0">
@@ -90,16 +108,16 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
           'text-sm',
           notification.is_read ? 'font-normal text-muted-foreground' : 'font-medium text-foreground'
         )}>
-          {isReminder ? notification.title : 'Logopedsko poročilo naloženo'}
+          {isDbNotif ? notification.title : 'Logopedsko poročilo naloženo'}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {isReminder && notification.message ? (
+          {isDbNotif && notification.message ? (
             <span className="line-clamp-2">{notification.message}</span>
           ) : (
             <>Za otroka: {notification.child_name}</>
           )}
         </p>
-        {isReminder && notification.child_name && (
+        {isDbNotif && notification.child_name && (
           <p className="text-xs text-muted-foreground/70 mt-0.5">
             Otrok: {notification.child_name}
           </p>
