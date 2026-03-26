@@ -38,8 +38,10 @@ export function useChildDocuments(): UseChildDocumentsResult {
   const uploadDocument = useCallback(async (
     file: File,
     childId: string,
-    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire'
+    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire',
+    options?: { silent?: boolean }
   ): Promise<ChildDocument | null> => {
+    const silent = options?.silent ?? false;
     try {
       setUploadStatus('uploading');
       setErrorMessage(null);
