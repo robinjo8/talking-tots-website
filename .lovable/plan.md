@@ -1,75 +1,60 @@
 
 
-## Plan: Popravi simulacijo za pravilen letni cikel (3×30 = 90 sklopov med testi)
 
-### Pravilna logika sistema
-
-Med dvema preverjanjema (90 dni) otrok opravi **90 sklopov**:
-1. Začetnih 30 sklopov → ko so vsi zaključeni, se sproži **renewal** → nov načrt z 30 sklopi
-2. Drugih 30 sklopov → renewal → nov načrt z 30 sklopi  
-3. Tretjih 30 sklopov → konec obdobja, čas za novo preverjanje
-
-Renewal v produkciji sproži `MojiIzzivi.tsx` (vrstica 240-260) ko zazna `allSetsCompleted`. Simulacija tega ne naredi.
+## Plan: Popravi "Zaključi vseh 30 sklopov" — active sklop se ne zaključi
 
 ### Problem
 
-Gumb **"Zaključi vseh 30 sklopov"** označi 30/30 kot opravljene, ampak **ne sproži renewal**. Zato ni novih 30 sklopov. Uporabnik mora klikniti 3× "Zaključi vseh 30 sklopov" (vsakič po renewalu), ne samo enkrat.
+Ko si odprl Sklop 1 (klik na darilo), se je ustvaril zapis v `plan_set_tracking` s statusom `active`. Ko si kliknil "Zaključi vseh 30 sklopov", funkcija preveri obstoječe zapise in **preskoči** set 1 (ker že obstaja kot `active`). Vstavi le sete 2-30 kot `completed`. Rezultat: 29 completed + 1 active = **29/30 sklopov**.
 
-### Sprememba
+### Popravek
 
 **`supabase/functions/simulate-plan-lifecycle/index.ts`** — akcija `complete_all_sets`:
 
-Po tem ko označi vseh 30 sklopov kot completed, **avtomatsko sproži renewal** (kliče `generate-monthly-plan` z `mode: "renewal"`). To ustvari nov načrt z novimi 30 sklopi, tako kot bi se zgodilo v produkciji.
+Po vstavljanju manjkajočih setov, dodaj UPDATE za vse obstoječe sete, ki imajo status `active` ali `expired`, da jih postavi na `completed`:
 
-Logika:
-```text
-1. Najdi aktiven načrt
-2. Označi vseh 30 sklopov kot completed
-3. Kliči generate-monthly-plan z mode: "renewal" in reportId iz načrta
-4. Vrni: { completed: 30, renewed: true, newPlanId: "..." }
+```ts
+// Po insertu manjkajočih setov:
+await supabase
+  .from("plan_set_tracking")
+  .update({ status: "completed", total_stars: 5, completed_at: new Date().toISOString() })
+  .eq("plan_id", plan.id)
+  .eq("child_id", childId)
+  .in("status", ["active", "expired"]);
 ```
 
-To pomeni, da je po enem kliku na "Zaključi vseh 30 sklopov" takoj na voljo novih 30 sklopov (sklopi 31-60 za uporabnika).
-
-### Posodobljen postopkovnik za 1 leto
-
-Po **"Ponastavi celoten cikel"**:
-
-**Cikel 1 (meseci 1-3):**
-
-| # | Gumb | Kaj naredi |
-|---|------|------------|
-| 1 | Simuliraj celotno preverjanje | Ustvari test sejo |
-| 2 | Simuliraj ocenjevanje + poročilo | Oceni + generira načrt (30 sklopov) |
-| 3 | Zaključi vseh 30 sklopov | 30/30 + renewal → nov načrt (sklopi 31-60) |
-| 4 | Zaključi vseh 30 sklopov | 30/30 + renewal → nov načrt (sklopi 61-90) |
-| 5 | Zaključi vseh 30 sklopov | 30/30 (brez renewala — čas za novo preverjanje) |
-| 6 | Simuliraj zamudo (90 dni) | Odkleni naslednji test |
-
-**Cikel 2 (meseci 4-6):**
-
-| # | Gumb | Kaj naredi |
-|---|------|------------|
-| 7 | Simuliraj celotno preverjanje | Nov test |
-| 8 | Simuliraj ocenjevanje + poročilo | Nova ocena + nov načrt |
-| 9-11 | Zaključi vseh 30 sklopov (3×) | 90 sklopov |
-| 12 | Simuliraj zamudo (90 dni) | Odkleni naslednji test |
-
-**Cikel 3 in 4:** Ponovi korake 7-12.
-
-Zadnji cikel (4) brez zamude na koncu.
-
-**Skupaj:** 4× preverjanje, 4× ocenjevanje, 12× zaključi sklope, 3× zamuda = **23 klikov** za celotno leto.
-
-### Podrobnost: Kdaj renewal, kdaj ne?
-
-Tretji klik "Zaključi vseh 30 sklopov" v vsakem ciklu **ne sme** sprožiti renewala, ker je čas za novo preverjanje. Logika:
-- Preštej koliko renewalov je bilo že narejenih za ta report (koliko načrtov obstaja z istim `report_id`)
-- Če je bilo že 2 renewala (3 načrti skupaj), NE sproži renewala — vrni sporočilo "Čas za novo preverjanje"
-- Sicer sproži renewal
-
-Alternativno, enostavnejše: vedno sproži renewal, uporabnik pa sam ve kdaj klikniti "Simuliraj zamudo" + novo preverjanje. To je bolj fleksibilno za testiranje.
-
 ### Obseg
-- 1 Edge funkcija posodobljena (~15 vrstic dodanih v `complete_all_sets`)
+- 1 Edge funkcija, ~5 vrstic dodanih
 
+---
+
+## Postopkovnik za celotno letno simulacijo
+
+Po resetiranju celotnega cikla ("Ponastavi celoten cikel") sledi ta vrstni red:
+
+### Cikel 1 (mesec 0-3)
+
+| Korak | Gumb | Kaj naredi |
+|-------|------|------------|
+| 1 | **Simuliraj celotno preverjanje** | Ustvari test sejo + posnetke (status: pending) |
+| 2 | **Simuliraj ocenjevanje + poročilo** | Oceni glasove, generira poročilo, ustvari osebni načrt (30 sklopov) |
+| 3 | **Zaključi vseh 30 sklopov** | Označi vseh 30 sklopov kot opravljene |
+
+### Cikel 2 (mesec 3-6)
+
+| Korak | Gumb | Kaj naredi |
+|-------|------|------------|
+| 4 | **Simuliraj zamudo** (90 dni) | Premakne datum zadnjega testa 90 dni nazaj → cooldown poteče |
+| 5 | **Simuliraj celotno preverjanje** | Novo preverjanje izgovorjave |
+| 6 | **Simuliraj ocenjevanje + poročilo** | Nov načrt (report_update ali nov plan) |
+| 7 | **Zaključi vseh 30 sklopov** | Zaključi novih 30 sklopov |
+
+### Cikel 3 in 4
+
+Ponovi korake 4-7 še dvakrat.
+
+**Skupaj za 1 leto**: 4× preverjanje + 4× ocenjevanje + 4× zaključi sklope = **12 klikov** (+ 3× simuliraj zamudo).
+
+### Opomba
+
+Gumb "Simuliraj zamudo" je potreben, ker smart cooldown drugače ne dovoli novega preverjanja prej kot čez 90 dni. Z zamudo premikaš datum zadnjega testa v preteklost, s čimer "odklenješ" naslednje preverjanje.

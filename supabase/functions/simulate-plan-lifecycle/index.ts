@@ -135,6 +135,54 @@ Deno.serve(async (req) => {
         result = { completed: sets.length, updated: updatedSets?.length || 0, totalSets, fromSet: 1, toSet: totalSets, skipped: existingSetNumbers.size };
       }
 
+      // After completing all sets, trigger renewal (like production MojiIzzivi.tsx does)
+      // Check how many plans exist with the same report_id to decide if renewal is needed
+      const { data: currentPlan } = await supabase
+        .from("child_monthly_plans")
+        .select("id, report_id")
+        .eq("child_id", childId)
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (currentPlan?.report_id) {
+        // Count how many plans share this report_id (including archived)
+        const { data: relatedPlans } = await supabase
+          .from("child_monthly_plans")
+          .select("id")
+          .eq("report_id", currentPlan.report_id)
+          .eq("child_id", childId);
+
+        const planCount = relatedPlans?.length || 1;
+
+        if (planCount < 3) {
+          // Less than 3 plans for this report — trigger renewal
+          const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const renewResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
+            method: "POST",
+            headers: {
+              "Authorization": authHeader!,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              childId,
+              mode: "renewal",
+              reportId: currentPlan.report_id,
+            }),
+          });
+          const renewResult = await renewResponse.json().catch(() => null);
+          result.renewed = true;
+          result.renewResult = renewResult;
+          result.plansForReport = planCount + 1;
+        } else {
+          // 3 plans already exist — no more renewals, time for new test
+          result.renewed = false;
+          result.note = "3× 30 sklopov opravljenih. Čas za novo preverjanje (Simuliraj zamudo + Simuliraj celotno preverjanje).";
+          result.plansForReport = planCount;
+        }
+      }
+
     } else if (action === "simulate_age_transition") {
       // Shift birth_date 1 year back
       const { data: child } = await supabase
