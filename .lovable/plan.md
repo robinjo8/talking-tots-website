@@ -1,37 +1,38 @@
 
-
-## Plan: Popravi auto_evaluate_and_report — manjkajoč logopedist profil
+## Plan: Popravi simulacijo — generiraj PDF + pravilne igre v osebnem načrtu
 
 ### Problem
 
-Ko klikneš "Simuliraj ocenjevanje + poročilo", funkcija na vrstici 290-300 poišče `logopedist_profiles` zapis za tvojega uporabnika (`qjavec@gmail.com`). Ker ta uporabnik je **starš** (ne logoped), v tabeli `logopedist_profiles` ni zapisa zanj. Funkcija vrne napako 400: "Dev uporabnik nima logopedist profila".
+Dva glavna problema v akciji `auto_evaluate_and_report`:
 
-### Rešitev
+**1. Pozicije glasov so napačne (→ ni iger v načrtu)**
 
-Namesto da zahteva logopedist profil od dev uporabnika, naj funkcija uporabi **kateregakoli obstoječega internega logopeda** kot ocenjevalca. Konkretno:
+V `report_details.letters` simulacija zapiše pozicije kot `["začetek", "sredina/konec"]` (slovensko), vendar `generate-monthly-plan` pričakuje angleške kode: `"start"`, `"middle-end"`, `"initial-exercises"`. Funkcija `buildGameCombinations` ne najde ujemanja → 0 iger → v načrtu je samo "Vaje za motoriko govoril".
 
-**`supabase/functions/simulate-plan-lifecycle/index.ts`** — v akciji `auto_evaluate_and_report` (vrstica 289-301):
+**2. Ni PDF poročila (→ pod "Dokumenti" ni ničesar)**
 
-Zamenjaj iskanje logopedist profila za `userId` z iskanjem prvega dostopnega internega logopeda:
+Simulacija shrani le `.txt` datoteko v `Porocila/`, vendar pravi "Generiraj" gumb v admin portalu generira **PDF** in ga shrani v `Generirana-porocila/`. PDF pod `Generirana-porocila/` je tisto, kar se prikaže pod "Dokumenti" na admin strani in uporabniku.
 
-```ts
-// Namesto:
-const { data: logProfile } = await supabase
-  .from("logopedist_profiles")
-  .select("id")
-  .eq("user_id", userId)
-  .maybeSingle();
+### Spremembe
 
-// Uporabi:
-const { data: logProfile } = await supabase
-  .from("logopedist_profiles")
-  .select("id")
-  .limit(1)
-  .single();
-```
+**`supabase/functions/simulate-plan-lifecycle/index.ts`** — akcija `auto_evaluate_and_report`:
 
-To bo vzelo prvega logopeda iz baze (npr. Robert, id `6837d765-...`) in ga uporabilo kot ocenjevalca. Funkcija bo tako delovala ne glede na to, ali je dev uporabnik starš ali logoped.
+1. **Popravi pozicije glasov** (vrstica 388):
+   ```ts
+   // Namesto:
+   positions: ["začetek", "sredina/konec"]
+   // Uporabi:
+   positions: ["start", "middle-end", "initial-exercises"]
+   ```
+   To je ekvivalent izbire "Začetek", "Sredina/konec" in "Začetne vaje" v admin portalu za glas R.
+
+2. **Generiraj PDF in shrani v `Generirana-porocila/`**: 
+   - Ker Edge funkcija nima dostopa do `generateReportPdf` (to je frontend utilita, ki uporablja jsPDF), generiramo minimalen PDF v Deno z uporabo osnove (raw PDF bytes) ali pa shranimo `.txt` datoteko v `Generirana-porocila/` namesto `Porocila/`.
+   - Realno: admin portal shranjuje PDF-je v `Generirana-porocila/`, `.txt` osnutke pa v `Porocila/`. Simulacija mora storiti oboje — shraniti `.txt` v `Porocila/` (za shranjena poročila) IN kopijo v `Generirana-porocila/` (za razdelek "Dokumenti").
+   - Najenostavnejša rešitev: `.txt` shranimo v **oba folderja** (`Porocila/` in `Generirana-porocila/`), ker admin stran pod "Dokumenti" prikazuje datoteke iz `Generirana-porocila/`.
+
+3. **Posodobi `pdf_url` v `logopedist_reports`** da kaže na pot v `Generirana-porocila/`.
 
 ### Obseg
-- 1 Edge funkcija, ~3 vrstice spremenjene
-
+- 1 Edge funkcija posodobljena (~10 vrstic spremenjenih)
+- Popravek pozicij bo omogočil, da `generate-monthly-plan` pravilno generira 11 iger za vsak sklop
