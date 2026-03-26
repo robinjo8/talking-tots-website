@@ -126,8 +126,9 @@ export function ChildCompletedView({
           <CollapsibleContent>
             <div className="bg-white rounded-lg border divide-y mt-2">
               {answerItems.map((item, index) => (
-                <div key={item.id} className="p-4 flex items-center justify-between">
-                  <span className="text-gray-700">Vprašanje {index + 1}</span>
+                <div key={item.id} className="p-4 flex flex-col gap-2">
+                  <span className="text-gray-700 text-sm">{item.questionText}</span>
+                  <div className="flex justify-end">
                   <Badge 
                     variant={item.answer === "Da" ? "success" : 
                            item.answer === "Ne" ? "outline" : "secondary"}

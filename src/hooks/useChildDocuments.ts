@@ -84,9 +84,11 @@ export function useChildDocuments(): UseChildDocumentsResult {
 
     } catch (error: any) {
       console.error('Upload error:', error);
-      setUploadStatus('error');
-      setErrorMessage(error.message || 'Napaka pri nalaganju');
-      toast.error(error.message || 'Napaka pri nalaganju dokumenta');
+      if (!silent) {
+        setUploadStatus('error');
+        setErrorMessage(error.message || 'Napaka pri nalaganju');
+        toast.error(error.message || 'Napaka pri nalaganju dokumenta');
+      }
       return null;
     }
   }, []);
