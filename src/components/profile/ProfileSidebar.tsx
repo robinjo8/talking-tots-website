@@ -25,6 +25,12 @@ const menuItems = [
 export function ProfileSidebar({ activeSection, setActiveSection, childrenCount }: ProfileSidebarProps) {
   const { isPro } = useSubscriptionContext();
   const { unreadCount } = useUserNotifications();
+  const { user } = useAuth();
+  const isDev = isDevUser(user?.email);
+
+  const allItems = isDev
+    ? [...menuItems, { id: "lifecycleTools", label: "Lifecycle orodja", icon: FlaskConical }]
+    : menuItems;
   return (
     <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden sticky top-28">
       {/* Header */}
