@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 
 import type { ChildProfile } from "@/hooks/useRegistration";
 import { SpeechDifficultyBadge } from "@/components/speech";
+import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 
 interface ChildCompletedViewProps {
   child: ChildProfile;
