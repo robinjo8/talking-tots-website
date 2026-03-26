@@ -68,6 +68,7 @@ export default function AdminUserDetail() {
   const [childData, setChildData] = useState<{ name: string; age: number; gender: string | null; birth_date: string | null } | null>(null);
   const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [parentData, setParentData] = useState<{ name: string; email: string } | null>(null);
+  const [subscriptionInfo, setSubscriptionInfo] = useState<{ planId: string | null; subscriptionEnd: string | null; status: string | null } | null>(null);
   const [testSessions, setTestSessions] = useState<{ id: string; date: string; formattedDate: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
