@@ -1,39 +1,42 @@
 
 
-## Plan: Gumb "Simuliraj ocenjevanje + poročilo" v Lifecycle orodjih
+## Plan: Popravi auto_evaluate napako + dodaj gumb za popoln reset
 
-### Kaj bo gumb naredil (en klik = celoten postopek)
+### Problem 1: auto_evaluate_and_report ne najde seje
 
-1. **Poišče zadnjo neocenjeno sejo** za tega otroka (status `pending` ali `assigned`)
-2. **Oceni vse glasove**: za vse črke (P, B, M, T, D, K, G, N, H, V, J, F, L, S, Z, C, Š, Ž, Č) označi `acquired` ("Glas je usvojen"), za črko **R** označi `not_acquired` ("Glas ni usvojen")
-3. **Zaključi pregled** (status → `completed`, `reviewed_at` → now)
-4. **Sestavi ugotovitve** iz ocen (enako kot `generateAutoUgotovitve`)
-5. **Shrani .txt poročilo** v Storage (`{parentId}/{childId}/Porocila/porocilo-{datum}.txt`) z:
-   - ANAMNEZA: "Test"
-   - UGOTOVITVE: avtomatsko generirano iz ocen
-   - Priporočamo igre in vaje za glas R (začetek, sredina/konec, začetne vaje)
-   - Vaje za motoriko govoril: enkrat na teden
-   - Ogled video navodil: R
-6. **Vstavi zapis v `logopedist_reports`** z vsemi podatki
-7. **Sproži `generate-monthly-plan`** za generiranje osebnega načrta
+Uporabnik je na admin strani "prevzel" sejo, kar je spremenilo status iz `pending` v `assigned` ali `in_review`. Funkcija `auto_evaluate_and_report` išče samo statuse `["pending", "assigned"]` — če je status `in_review`, seje ne najde in vrne 404.
+
+**Popravek:** Razširi filter na `["pending", "assigned", "in_review"]` v Edge funkciji (vrstica 290).
+
+### Problem 2: Ni gumba za popoln reset celotnega cikla
+
+Trenutni gumb "Ponastavi osebni načrt" (`reset_plan`) pobriše samo načrte in tracking. Manjka možnost za popoln reset vsega — da je otrok "kot nov".
+
+**Nova akcija `reset_full_lifecycle`** v Edge funkciji pobriše:
+
+1. `plan_activity_completions` — za vse načrte tega otroka
+2. `plan_set_tracking` — za vse načrte tega otroka
+3. `child_monthly_plans` — vse načrte (ne samo active/pending)
+4. `articulation_evaluations` — za vse seje tega otroka
+5. `logopedist_reports` — za vse seje tega otroka
+6. `articulation_word_results` — za vse seje tega otroka
+7. `articulation_test_sessions` — vse seje tega otroka
+8. `articulation_test_results` — vse rezultate tega otroka
+
+Vrstni red je pomemben (foreign key odvisnosti).
 
 ### Spremembe
 
-**1. Edge funkcija `simulate-plan-lifecycle/index.ts`** — nova akcija `auto_evaluate_and_report`:
-- Poišče sejo, logopedist profil za dev uporabnika
-- Vstavi 20 `articulation_evaluations` zapisov (upsert)
-- Posodobi sejo na `completed`
-- Sestavi besedilo poročila server-side (anamneza, ugotovitve, priporočila)
-- Naloži .txt v Storage bucket `uporabniski-profili`
-- Vstavi `logopedist_reports` zapis
-- Kliče `generate-monthly-plan` Edge funkcijo
+**1. `supabase/functions/simulate-plan-lifecycle/index.ts`**
+- Vrstica 290: dodaj `"in_review"` v status filter
+- Nova akcija `reset_full_lifecycle` (~40 vrstic): zaporedno briše podatke iz vseh 8 tabel za childId
+- Vrne povzetek koliko zapisov je bilo izbrisanih
 
-**2. `PlanLifecycleTools.tsx`** — nov gumb:
-- "Simuliraj ocenjevanje + poročilo" z ikono
-- Kliče `invoke("auto_evaluate_and_report")`
-- Prikaže toast z rezultatom
+**2. `src/components/profile/PlanLifecycleTools.tsx`**
+- Nov gumb "Ponastavi celoten cikel" (rdeč, z ikono RotateCcw) z dialogom za potrditev
+- Kliče `invoke("reset_full_lifecycle")`
 
 ### Obseg
-- 1 Edge funkcija posodobljena (nova akcija ~120 vrstic)
+- 1 Edge funkcija posodobljena (1 popravek + 1 nova akcija)
 - 1 UI komponenta posodobljena (nov gumb)
 
