@@ -37,10 +37,7 @@ export const SignupConfirmationEmail = ({
       <Container style={container}>
         {/* Header with Logo */}
         <Section style={header}>
-          <div style={logoContainer}>
-            <span style={logoTextGreen}>Tomi</span>
-            <span style={logoTextOrange}>Talk</span>
-          </div>
+          <Img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png" alt="TomiTalk" style={logoImg} />
         </Section>
 
         {/* Welcome Content */}
