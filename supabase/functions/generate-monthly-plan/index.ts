@@ -754,6 +754,9 @@ serve(async (req) => {
             });
 
             console.log(`Plan notification email sent to ${userData.user.email} (${notifType})`);
+            }
+          } else {
+            console.log(`Email notifications disabled for user ${child.parent_id}`);
           }
         }
       } else {
