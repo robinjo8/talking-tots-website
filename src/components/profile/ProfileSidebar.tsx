@@ -1,7 +1,9 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
+import { useAuth } from "@/contexts/AuthContext";
+import { isDevUser } from "@/lib/devAccess";
 
 type ProfileSidebarProps = {
   activeSection: string;
