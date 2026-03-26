@@ -52,10 +52,17 @@ export function AdminChildCompletedView({
       rarely: 'Redko',
     };
 
-    return Object.entries(answers).map(([key, value]) => ({
-      id: key,
-      answer: labelMap[value] || value,
-    }));
+    return Object.entries(answers).map(([key, value]) => {
+      const radioQ = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === key);
+      const textQ = SPEECH_DEVELOPMENT_TEXT_QUESTIONS.find(q => q.id === key);
+      const questionText = radioQ?.question || textQ?.question || `Vprašanje: ${key}`;
+      const option = radioQ?.options.find(o => o.value === value);
+      return {
+        id: key,
+        questionText,
+        answer: option?.label || labelMap[value] || value,
+      };
+    });
   };
 
   const answerItems = child.speechDevelopment ? getAnswerLabels(child.speechDevelopment) : [];
