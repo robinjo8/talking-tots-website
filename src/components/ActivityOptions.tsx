@@ -120,9 +120,11 @@ export function ActivityOptions() {
     >
       {activities.map((activity, index) => {
         const isProOnly = PRO_ONLY_ACTIVITIES.includes(activity.id);
+        const isSubRequired = SUBSCRIPTION_REQUIRED_ACTIVITIES.includes(activity.id);
         const isProLocked = isProOnly && !isPro;
+        const isSubLocked = isSubRequired && !isSubscribed;
         const isTimeLocked = activity.id === 'test' && isTestLocked;
-        const isLocked = isProLocked || isTimeLocked;
+        const isLocked = isProLocked || isSubLocked || isTimeLocked;
         
         console.log('🎯 Rendering card:', activity.title, 'isProLocked:', isProLocked);
         return (
