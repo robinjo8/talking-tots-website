@@ -36,6 +36,14 @@ function isTestReminder(notification: UserNotification): boolean {
   return notification.source === 'database' && !!notification.type?.startsWith('test_');
 }
 
+function isPlanNotification(notification: UserNotification): boolean {
+  return notification.source === 'database' && (notification.type === 'plan_new' || notification.type === 'plan_renewed');
+}
+
+function isDbNotification(notification: UserNotification): boolean {
+  return isTestReminder(notification) || isPlanNotification(notification);
+}
+
 interface NotificationItemProps {
   notification: UserNotification;
   onMarkAsRead: (id: string) => void;
