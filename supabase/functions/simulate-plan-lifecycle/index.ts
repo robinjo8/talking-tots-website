@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
 
     let result: any = {};
 
-    if (action === "complete_all_sets") {
+  if (action === "complete_all_sets") {
       // Find active plan
       const { data: plan } = await supabase
         .from("child_monthly_plans")
@@ -78,24 +78,25 @@ Deno.serve(async (req) => {
         });
       }
 
-      // Get current max set
-      const { data: existing } = await supabase
+      // Get totalSets from plan_data (default 30)
+      const planData = plan.plan_data as any;
+      const totalSets = planData?.totalSets || 30;
+
+      // Get ALL existing set numbers for THIS plan
+      const { data: existingSets } = await supabase
         .from("plan_set_tracking")
         .select("set_number")
         .eq("plan_id", plan.id)
-        .eq("child_id", childId)
-        .order("set_number", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .eq("child_id", childId);
 
-      const startSet = (existing?.set_number || 0) + 1;
-      const endSet = startSet + 29;
+      const existingSetNumbers = new Set((existingSets || []).map((s: { set_number: number }) => s.set_number));
 
-      // Bulk insert set tracking
+      // Only insert MISSING sets from 1 to totalSets
       const sets = [];
       const now = new Date();
-      for (let i = startSet; i <= endSet; i++) {
-        const startedAt = new Date(now.getTime() - (endSet - i) * 86400000);
+      for (let i = 1; i <= totalSets; i++) {
+        if (existingSetNumbers.has(i)) continue;
+        const startedAt = new Date(now.getTime() - (totalSets - i) * 86400000);
         sets.push({
           plan_id: plan.id,
           child_id: childId,
@@ -107,19 +108,23 @@ Deno.serve(async (req) => {
         });
       }
 
-      const { error: insertError } = await supabase
-        .from("plan_set_tracking")
-        .insert(sets);
+      if (sets.length === 0) {
+        result = { completed: 0, totalSets, note: "Vsi sklopi so že zaključeni za ta načrt." };
+      } else {
+        const { error: insertError } = await supabase
+          .from("plan_set_tracking")
+          .insert(sets);
 
-      if (insertError) {
-        console.error("Insert error:", insertError);
-        return new Response(JSON.stringify({ error: insertError.message }), {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        if (insertError) {
+          console.error("Insert error:", insertError);
+          return new Response(JSON.stringify({ error: insertError.message }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        result = { completed: sets.length, totalSets, fromSet: 1, toSet: totalSets, skipped: existingSetNumbers.size };
       }
-
-      result = { completed: endSet - startSet + 1, fromSet: startSet, toSet: endSet };
 
     } else if (action === "simulate_age_transition") {
       // Shift birth_date 1 year back
