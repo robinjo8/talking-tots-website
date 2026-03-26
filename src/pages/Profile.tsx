@@ -16,6 +16,7 @@ import { SubscriptionSection } from "@/components/profile/SubscriptionSection";
 import { PaymentMethodsSection } from "@/components/profile/PaymentMethodsSection";
 import { MyDocumentsSection } from "@/components/profile/MyDocumentsSection";
 import { ArticulationTestProfileSection } from "@/components/profile/ArticulationTestProfileSection";
+import { PlanLifecycleTools } from "@/components/profile/PlanLifecycleTools";
 
 import { ProfileSidebar } from "@/components/profile/ProfileSidebar";
 import { ProfileMobileTabs } from "@/components/profile/ProfileMobileTabs";
