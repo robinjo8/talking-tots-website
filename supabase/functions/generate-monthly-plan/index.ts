@@ -697,16 +697,30 @@ serve(async (req) => {
               : "Osebni načrt je bil podaljšan! 🐉";
 
             const emailHtml = `
-              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h2 style="color: #F97316; margin-bottom: 16px;">${notifTitle}</h2>
-                <p style="color: #333; font-size: 16px; line-height: 1.6;">${notifMessage}</p>
-                <div style="margin-top: 24px;">
-                  <a href="https://tomitalk.lovable.app/moji-izzivi" 
-                     style="background-color: #F97316; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
-                    Odpri moje izzive
-                  </a>
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center; border-radius: 12px 12px 0 0;">
+                  <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png" alt="TomiTalk" style="max-width: 180px; height: auto;" />
                 </div>
-                <p style="color: #999; font-size: 12px; margin-top: 32px;">TomiTalk - Govorne vaje za otroke</p>
+                <div style="background-color: #ffffff; padding: 30px; border: 1px solid #f0f0f0;">
+                  <h2 style="color: hsl(122, 39%, 49%); font-size: 24px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">${notifTitle}</h2>
+                  <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 16px 0;">Pozdravljeni!</p>
+                  <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 16px 0;">${notifMessage}</p>
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://tomitalk.com/moji-izzivi" 
+                       style="background-color: hsl(122, 39%, 49%); color: #ffffff; padding: 14px 28px; border-radius: 25px; text-decoration: none; font-weight: bold; font-size: 18px; display: inline-block;">
+                      Odpri moje izzive
+                    </a>
+                  </div>
+                </div>
+                <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center;">
+                  <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">S spoštovanjem,<br/>TomiTalk</p>
+                </div>
+                <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+                  <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">
+                    To sporočilo ste prejeli, ker imate račun pri TomiTalk.<br/>
+                    Če teh e-poštnih sporočil ne želite več prejemati, <a href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style="color: hsl(122, 39%, 49%);">se lahko odjavite</a>.
+                  </p>
+                </div>
               </div>
             `;
 
