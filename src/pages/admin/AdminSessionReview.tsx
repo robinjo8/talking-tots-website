@@ -376,6 +376,8 @@ export default function AdminSessionReview() {
               key={sessionNum}
               sessionNumber={sessionNum}
               baseDate={data.session.submittedAt}
+              subscriptionEnd={subscriptionEnd}
+              actualSessionDates={actualSessionDates}
               hasData={hasSessionData}
               recordingsByLetter={hasSessionData ? data.recordingsByLetter : new Map()}
               evaluations={hasSessionData ? localEvaluations : new Map()}
