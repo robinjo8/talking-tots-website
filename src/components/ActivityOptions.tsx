@@ -154,6 +154,14 @@ export function ActivityOptions() {
                 </div>
               )}
               
+              {/* Subscription-required badge */}
+              {isSubLocked && !isProLocked && (
+                <div className="absolute top-4 left-4 bg-dragon-green text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
+                  <Lock className="w-3 h-3" />
+                  Na voljo z naročnino
+                </div>
+              )}
+              
               {/* Locked badge for test cooldown */}
               {isTimeLocked && !isProLocked && (
                 <div className="absolute top-4 right-4 bg-gray-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
