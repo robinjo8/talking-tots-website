@@ -536,6 +536,81 @@ Deno.serve(async (req) => {
         planId: sub?.plan_id || null,
       };
 
+    } else if (action === "reset_full_lifecycle") {
+      // Get all plans for this child
+      const { data: plans } = await supabase
+        .from("child_monthly_plans")
+        .select("id")
+        .eq("child_id", childId);
+      const planIds = (plans || []).map((p: { id: string }) => p.id);
+
+      // Get all sessions for this child
+      const { data: sessions } = await supabase
+        .from("articulation_test_sessions")
+        .select("id")
+        .eq("child_id", childId);
+      const sessionIds = (sessions || []).map((s: { id: string }) => s.id);
+
+      const deleted: Record<string, number> = {};
+
+      // 1. plan_activity_completions
+      if (planIds.length > 0) {
+        const { data: d1 } = await supabase.from("plan_activity_completions").delete().in("plan_id", planIds).select("id");
+        deleted.plan_activity_completions = d1?.length || 0;
+
+        // 2. plan_set_tracking
+        const { data: d2 } = await supabase.from("plan_set_tracking").delete().in("plan_id", planIds).select("id");
+        deleted.plan_set_tracking = d2?.length || 0;
+
+        // 3. child_monthly_plans
+        const { data: d3 } = await supabase.from("child_monthly_plans").delete().in("id", planIds).select("id");
+        deleted.child_monthly_plans = d3?.length || 0;
+      }
+
+      // 4-6. Session-related
+      if (sessionIds.length > 0) {
+        const { data: d4 } = await supabase.from("articulation_evaluations").delete().in("session_id", sessionIds).select("id");
+        deleted.articulation_evaluations = d4?.length || 0;
+
+        const { data: d5 } = await supabase.from("logopedist_reports").delete().in("session_id", sessionIds).select("id");
+        deleted.logopedist_reports = d5?.length || 0;
+
+        const { data: d6 } = await supabase.from("articulation_word_results").delete().in("session_id", sessionIds).select("id");
+        deleted.articulation_word_results = d6?.length || 0;
+
+        // 7. Sessions themselves
+        const { data: d7 } = await supabase.from("articulation_test_sessions").delete().in("id", sessionIds).select("id");
+        deleted.articulation_test_sessions = d7?.length || 0;
+      }
+
+      // 8. Test results
+      const { data: d8 } = await supabase.from("articulation_test_results").delete().eq("child_id", childId).select("id");
+      deleted.articulation_test_results = d8?.length || 0;
+
+      // 9. Clean up storage
+      const { data: child } = await supabase.from("children").select("parent_id").eq("id", childId).maybeSingle();
+      if (child) {
+        const basePath = `${child.parent_id}/${childId}`;
+        // Delete Porocila folder
+        const { data: reportFiles } = await supabase.storage.from("uporabniski-profili").list(`${basePath}/Porocila`);
+        if (reportFiles && reportFiles.length > 0) {
+          await supabase.storage.from("uporabniski-profili").remove(reportFiles.map((f: { name: string }) => `${basePath}/Porocila/${f.name}`));
+        }
+        // Delete Preverjanje-izgovorjave folder
+        const { data: testFolders } = await supabase.storage.from("uporabniski-profili").list(`${basePath}/Preverjanje-izgovorjave`);
+        if (testFolders && testFolders.length > 0) {
+          for (const folder of testFolders) {
+            const folderPath = `${basePath}/Preverjanje-izgovorjave/${folder.name}`;
+            const { data: files } = await supabase.storage.from("uporabniski-profili").list(folderPath);
+            if (files && files.length > 0) {
+              await supabase.storage.from("uporabniski-profili").remove(files.map((f: { name: string }) => `${folderPath}/${f.name}`));
+            }
+          }
+        }
+      }
+
+      result = { deleted, note: "Celoten cikel ponastavljen." };
+
     } else {
       return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
         status: 400,
