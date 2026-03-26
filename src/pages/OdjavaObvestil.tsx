@@ -161,8 +161,8 @@ const OdjavaObvestil = () => {
               <p className="text-muted-foreground leading-relaxed">{errorMessage}</p>
               <p className="text-sm text-muted-foreground">
                 Za pomoč nas kontaktirajte na{" "}
-                <a href="mailto:podpora@tomitalk.si" className="text-dragon-green hover:underline">
-                  podpora@tomitalk.si
+                <a href="mailto:info@tomitalk.si" className="text-dragon-green hover:underline">
+                  info@tomitalk.si
                 </a>
               </p>
             </div>
