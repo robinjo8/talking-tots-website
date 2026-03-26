@@ -281,6 +281,179 @@ Deno.serve(async (req) => {
         note: "Seja ustvarjena s 60 besedami + test result dodan. Logoped lahko oceni na admin portalu."
       };
 
+    } else if (action === "auto_evaluate_and_report") {
+      // 1. Find latest pending/assigned session for this child
+      const { data: session } = await supabase
+        .from("articulation_test_sessions")
+        .select("id, child_id, parent_id, session_number")
+        .eq("child_id", childId)
+        .in("status", ["pending", "assigned"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!session) {
+        return new Response(JSON.stringify({ error: "Ni neocenjene seje za tega otroka" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 2. Get logopedist profile for dev user
+      const { data: logProfile } = await supabase
+        .from("logopedist_profiles")
+        .select("id")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (!logProfile) {
+        return new Response(JSON.stringify({ error: "Dev uporabnik nima logopedist profila" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 3. Evaluate all 20 letters
+      const PHONETIC_ORDER = ['P','B','M','T','D','K','G','N','H','V','J','F','L','S','Z','C','Š','Ž','Č','R'];
+      const evaluations = PHONETIC_ORDER.map(letter => ({
+        session_id: session.id,
+        letter,
+        selected_options: letter === 'R' ? ['not_acquired'] : ['acquired'],
+        rating: letter === 'R' ? 1 : 3,
+        comment: '',
+        evaluated_by: logProfile.id,
+      }));
+
+      // Delete existing evaluations for this session first
+      await supabase
+        .from("articulation_evaluations")
+        .delete()
+        .eq("session_id", session.id);
+
+      const { error: evalError } = await supabase
+        .from("articulation_evaluations")
+        .insert(evaluations);
+
+      if (evalError) {
+        console.error("Eval insert error:", evalError);
+        return new Response(JSON.stringify({ error: evalError.message }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 4. Complete the session
+      await supabase
+        .from("articulation_test_sessions")
+        .update({
+          status: "completed",
+          reviewed_at: new Date().toISOString(),
+          completed_at: new Date().toISOString(),
+          assigned_to: logProfile.id,
+        })
+        .eq("id", session.id);
+
+      // 5. Generate ugotovitve text
+      const ugotovitve = "Glas R ni usvojen.";
+
+      // 6. Build report text
+      const timestamp = new Date().toISOString().split("T")[0];
+      const reportText = [
+        "===== POROČILO LOGOPEDA =====",
+        "",
+        "ANAMNEZA:",
+        "Test",
+        "",
+        "UGOTOVITVE:",
+        ugotovitve,
+        "",
+        "PRIPOROČAMO IGRE IN VAJE ZA GLAS:",
+        "R - začetek, sredina/konec, začetne vaje",
+        "",
+        "VAJE ZA MOTORIKO GOVORIL:",
+        "enkrat na teden",
+        "",
+        "OGLED VIDEO NAVODIL:",
+        "R",
+        "",
+        `Datum: ${timestamp}`,
+      ].join("\n");
+
+      // 7. Upload .txt to storage
+      const parentId = session.parent_id;
+      const filePath = `${parentId}/${childId}/Porocila/porocilo-${timestamp}.txt`;
+      const encoder = new TextEncoder();
+      const reportBlob = encoder.encode(reportText);
+
+      const { error: uploadError } = await supabase.storage
+        .from("uporabniski-profili")
+        .upload(filePath, reportBlob, {
+          contentType: "text/plain",
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+      }
+
+      // 8. Build report details matching admin portal format
+      const reportDetails = {
+        letters: [{ letter: "R", positions: ["začetek", "sredina/konec"], includeBeginnerExercises: true }],
+        motorika: { type: "weekly", count: 1, unit: "week" },
+        videoLetters: ["R"],
+      };
+
+      // 9. Insert logopedist_reports
+      const { data: insertedReport, error: reportError } = await supabase
+        .from("logopedist_reports")
+        .insert({
+          logopedist_id: logProfile.id,
+          session_id: session.id,
+          summary: ugotovitve.substring(0, 200),
+          findings: { anamneza: "Test", ugotovitve },
+          recommendations: "",
+          recommended_letters: ["R"],
+          report_details: reportDetails,
+          next_steps: "",
+          pdf_url: filePath,
+          status: "submitted",
+        } as any)
+        .select("id")
+        .single();
+
+      if (reportError) {
+        console.error("Report insert error:", reportError);
+        return new Response(JSON.stringify({ error: reportError.message }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 10. Trigger generate-monthly-plan
+      let planResult: any = null;
+      if (insertedReport?.id) {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const planResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
+          method: "POST",
+          headers: {
+            "Authorization": authHeader!,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reportId: insertedReport.id, mode: "report_update" }),
+        });
+        planResult = await planResponse.json().catch(() => null);
+      }
+
+      result = {
+        sessionId: session.id,
+        evaluationsInserted: 20,
+        sessionCompleted: true,
+        reportId: insertedReport?.id,
+        reportUploaded: !uploadError,
+        planGenerated: planResult,
+        note: "Ocenjevanje zaključeno, poročilo shranjeno, osebni načrt generiran.",
+      };
+
     } else if (action === "calculate_cooldown_preview") {
       // Get all completed tests for this child
       const { data: tests } = await supabase
