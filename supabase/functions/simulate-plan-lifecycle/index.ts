@@ -287,7 +287,7 @@ Deno.serve(async (req) => {
         .from("articulation_test_sessions")
         .select("id, child_id, parent_id, session_number")
         .eq("child_id", childId)
-        .in("status", ["pending", "assigned"])
+        .in("status", ["pending", "assigned", "in_review"])
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();
