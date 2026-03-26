@@ -115,20 +115,14 @@ const header = {
   borderRadius: '12px 12px 0 0',
 }
 
-const logoContainer = {
-  display: 'inline-block',
+const logoImg = {
+  maxWidth: '180px',
+  height: 'auto' as const,
+  margin: '0 auto',
 }
 
-const logoTextGreen = {
-  fontSize: '32px',
-  fontWeight: 'bold',
+const unsubscribeLink = {
   color: 'hsl(122, 39%, 49%)',
-}
-
-const logoTextOrange = {
-  fontSize: '32px',
-  fontWeight: 'bold',
-  color: 'hsl(36, 100%, 50%)',
 }
 
 const content = {
