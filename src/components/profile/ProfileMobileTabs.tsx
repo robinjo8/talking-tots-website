@@ -32,7 +32,13 @@ const tabs = [
 export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCount }: ProfileMobileTabsProps) {
   const { isPro } = useSubscriptionContext();
   const { unreadCount } = useUserNotifications();
-  const activeTab = tabs.find(tab => tab.id === activeSection);
+  const { user } = useAuth();
+  const isDev = isDevUser(user?.email);
+
+  const allTabs = isDev
+    ? [...tabs, { id: "lifecycleTools", label: "Lifecycle orodja", icon: FlaskConical }]
+    : tabs;
+  const activeTab = allTabs.find(tab => tab.id === activeSection);
   const ActiveIcon = activeTab?.icon || User;
   
   return (
