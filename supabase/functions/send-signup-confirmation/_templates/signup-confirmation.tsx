@@ -37,10 +37,7 @@ export const SignupConfirmationEmail = ({
       <Container style={container}>
         {/* Header with Logo */}
         <Section style={header}>
-          <div style={logoContainer}>
-            <span style={logoTextGreen}>Tomi</span>
-            <span style={logoTextOrange}>Talk</span>
-          </div>
+          <Img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png" alt="TomiTalk" style={logoImg} />
         </Section>
 
         {/* Welcome Content */}
@@ -96,14 +93,14 @@ export const SignupConfirmationEmail = ({
           </Text>
           <Text style={footerText}>
             S spoštovanjem,<br/>
-            <span style={logoTextGreen}>Tomi</span><span style={logoTextOrange}>Talk</span>
+            TomiTalk
           </Text>
         </Section>
         
         <Section style={footer}>
           <Text style={footerText}>
             To sporočilo ste prejeli, ker ste se prijavili v TomiTalk.<br/>
-            Če teh e-poštnih sporočil ne želite več prejemati, se lahko odjavite.
+            Če teh e-poštnih sporočil ne želite več prejemati, <Link href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style={unsubscribeLink}>se lahko odjavite</Link>.
           </Text>
         </Section>
       </Container>
@@ -132,21 +129,14 @@ const header = {
   borderRadius: '12px 12px 0 0',
 }
 
-const logoContainer = {
-  display: 'inline-block',
+const logoImg = {
+  maxWidth: '180px',
+  height: 'auto' as const,
+  margin: '0 auto',
 }
 
-const logoTextGreen = {
-  fontSize: '32px',
-  fontWeight: 'bold',
-  color: 'hsl(122, 39%, 49%)', // dragon-green
-  marginRight: '0',
-}
-
-const logoTextOrange = {
-  fontSize: '32px',
-  fontWeight: 'bold',
-  color: 'hsl(36, 100%, 50%)', // app-orange
+const unsubscribeLink = {
+  color: 'hsl(122, 39%, 49%)',
 }
 
 const content = {

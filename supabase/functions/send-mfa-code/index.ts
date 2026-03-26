@@ -157,24 +157,35 @@ serve(async (req: Request) => {
         subject: "Vaša potrditvena koda za prijavo - TomiTalk",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <span style="font-size: 28px; font-weight: 800; color: #22c55e;">TOMI</span>
-              <span style="font-size: 28px; font-weight: 800; color: #f97316;">TALK</span>
+            <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center; border-radius: 12px 12px 0 0;">
+              <img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png" alt="TomiTalk" style="max-width: 180px; height: auto;" />
             </div>
-            <h2 style="color: #1e293b; font-size: 20px; margin-bottom: 8px;">Potrditvena koda za prijavo</h2>
-            <p style="color: #64748b; font-size: 14px; margin-bottom: 24px;">
-              Pozdravljeni, ${firstName}! Vaša potrditvena koda za prijavo v portal za organizacije je:
-            </p>
-            <div style="background: #f1f5f9; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-              <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #1e293b;">${plainCode}</span>
+            <div style="background-color: #ffffff; padding: 30px; border: 1px solid #f0f0f0;">
+              <h2 style="color: hsl(122, 39%, 49%); font-size: 24px; font-weight: bold; margin: 0 0 20px 0; text-align: center;">Potrditvena koda za prijavo</h2>
+              <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 16px 0;">
+                Pozdravljeni, ${firstName}! Vaša potrditvena koda za prijavo v portal za organizacije je:
+              </p>
+              <div style="background: #f1f5f9; border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
+                <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #1e293b;">${plainCode}</span>
+              </div>
+              <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 16px 0;">
+                Koda velja <strong>5 minut</strong>. Če niste zahtevali te kode, prezrite to sporočilo.
+              </p>
             </div>
-            <p style="color: #64748b; font-size: 13px; margin-bottom: 8px;">
-              Koda velja <strong>5 minut</strong>. Če niste zahtevali te kode, prezrite to sporočilo.
-            </p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 24px 0;" />
-            <p style="color: #94a3b8; font-size: 12px; text-align: center;">
-              TomiTalk – Portal za organizacije
-            </p>
+            <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center;">
+              <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">
+                Če niste ustvarili računa pri TomiTalk, lahko to sporočilo varno prezrete.
+              </p>
+              <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">
+                S spoštovanjem,<br/>TomiTalk
+              </p>
+            </div>
+            <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
+              <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">
+                To sporočilo ste prejeli, ker ste se prijavili v TomiTalk.<br/>
+                Če teh e-poštnih sporočil ne želite več prejemati, <a href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style="color: hsl(122, 39%, 49%);">se lahko odjavite</a>.
+              </p>
+            </div>
           </div>
         `,
       }),

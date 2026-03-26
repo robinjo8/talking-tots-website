@@ -4,6 +4,8 @@ import {
   Head,
   Heading,
   Html,
+  Img,
+  Link,
   Preview,
   Text,
   Section,
@@ -35,10 +37,7 @@ export const TestReminderEmail = ({
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <div style={logoContainer}>
-              <span style={logoTextGreen}>Tomi</span>
-              <span style={logoTextOrange}>Talk</span>
-            </div>
+            <Img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png" alt="TomiTalk" style={logoImg} />
           </Section>
 
           {/* Content */}
@@ -76,15 +75,18 @@ export const TestReminderEmail = ({
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
+              Če niste ustvarili računa pri TomiTalk, lahko to sporočilo varno prezrete.
+            </Text>
+            <Text style={footerText}>
               S spoštovanjem,<br />
-              <span style={logoTextGreen}>Tomi</span><span style={logoTextOrange}>Talk</span>
+              TomiTalk
             </Text>
           </Section>
 
           <Section style={footer}>
             <Text style={footerText}>
               To sporočilo ste prejeli, ker imate račun pri TomiTalk.<br />
-              Če teh e-poštnih sporočil ne želite več prejemati, se lahko odjavite.
+              Če teh e-poštnih sporočil ne želite več prejemati, <Link href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style={unsubscribeLink}>se lahko odjavite</Link>.
             </Text>
           </Section>
         </Container>
@@ -113,20 +115,14 @@ const header = {
   borderRadius: '12px 12px 0 0',
 }
 
-const logoContainer = {
-  display: 'inline-block',
+const logoImg = {
+  maxWidth: '180px',
+  height: 'auto' as const,
+  margin: '0 auto',
 }
 
-const logoTextGreen = {
-  fontSize: '32px',
-  fontWeight: 'bold',
+const unsubscribeLink = {
   color: 'hsl(122, 39%, 49%)',
-}
-
-const logoTextOrange = {
-  fontSize: '32px',
-  fontWeight: 'bold',
-  color: 'hsl(36, 100%, 50%)',
 }
 
 const content = {
