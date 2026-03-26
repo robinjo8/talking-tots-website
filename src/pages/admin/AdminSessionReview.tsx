@@ -46,6 +46,44 @@ export default function AdminSessionReview() {
     }
   }, [data?.evaluations]);
 
+  // Fetch subscription end and actual session dates for smart cooldown
+  useEffect(() => {
+    if (!data?.session?.parentId || !data?.session?.childId) return;
+
+    const fetchExtraData = async () => {
+      // Fetch subscription
+      const { data: subData } = await supabase
+        .from('user_subscriptions')
+        .select('current_period_end')
+        .eq('user_id', data.session.parentId)
+        .maybeSingle();
+
+      if (subData?.current_period_end) {
+        setSubscriptionEnd(subData.current_period_end);
+      }
+
+      // Fetch all session dates for this child
+      const { data: sessions } = await supabase
+        .from('articulation_test_sessions')
+        .select('session_number, submitted_at')
+        .eq('child_id', data.session.childId!)
+        .not('submitted_at', 'is', null)
+        .order('session_number');
+
+      if (sessions) {
+        const datesMap = new Map<number, string>();
+        sessions.forEach(s => {
+          if (s.session_number && s.submitted_at) {
+            datesMap.set(s.session_number, s.submitted_at);
+          }
+        });
+        setActualSessionDates(datesMap);
+      }
+    };
+
+    fetchExtraData();
+  }, [data?.session?.parentId, data?.session?.childId]);
+
   // Preveri spremembe
   const checkForChanges = useCallback(() => {
     for (const [letter, evaluation] of localEvaluations.entries()) {
