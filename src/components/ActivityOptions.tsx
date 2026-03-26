@@ -10,6 +10,7 @@ import { sl } from "date-fns/locale";
 
 // Pro-only activity IDs
 const PRO_ONLY_ACTIVITIES = ['test', 'challenges'];
+const SUBSCRIPTION_REQUIRED_ACTIVITIES = ['exercises'];
 
 export function ActivityOptions() {
   const navigate = useNavigate();

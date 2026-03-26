@@ -172,6 +172,7 @@ const GovornojezicovneVaje = () => {
               </p>
             </div>
           )}
+          </SubscriptionGate>
         </div>
       </section>
       
