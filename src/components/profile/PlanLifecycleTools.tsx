@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FlaskConical, Loader2, RotateCcw, Zap, Calendar, CreditCard, Eye } from "lucide-react";
+import { FlaskConical, Loader2, RotateCcw, Zap, Calendar, CreditCard, Eye, ClipboardCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -104,7 +104,18 @@ export function PlanLifecycleTools() {
           Simuliraj celotno preverjanje
         </Button>
 
-        {/* Test simulation */}
+        {/* Auto evaluate + report */}
+        <p className="text-sm font-medium text-muted-foreground mt-4">Ocenjevanje + Poročilo</p>
+        <Button
+          variant="outline"
+          className="w-full justify-start hover:bg-dragon-green/10 hover:border-dragon-green"
+          onClick={() => invoke("auto_evaluate_and_report")}
+          disabled={!!loading}
+        >
+          <BtnIcon action="auto_evaluate_and_report" />
+          {!isLoading("auto_evaluate_and_report") && <ClipboardCheck className="h-4 w-4 mr-2 text-dragon-green" />}
+          Simuliraj ocenjevanje + poročilo
+        </Button>
         <p className="text-sm font-medium text-muted-foreground mt-4">Simulacija zamude pri testu</p>
         <div className="flex gap-2">
           <Input
