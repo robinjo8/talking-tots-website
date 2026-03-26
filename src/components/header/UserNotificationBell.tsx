@@ -59,7 +59,7 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
     }
     onClose?.();
     
-    if (isTestReminder(notification) && notification.link) {
+    if (isDbNotification(notification) && notification.link) {
       navigate(notification.link);
     } else {
       navigate('/profile?expandSection=myDocuments');
