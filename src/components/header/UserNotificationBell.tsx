@@ -111,13 +111,13 @@ function NotificationItem({ notification, onMarkAsRead, onClose }: NotificationI
           {isDbNotif ? notification.title : 'Logopedsko poročilo naloženo'}
         </p>
         <p className="text-xs text-muted-foreground mt-0.5">
-          {isReminder && notification.message ? (
+          {isDbNotif && notification.message ? (
             <span className="line-clamp-2">{notification.message}</span>
           ) : (
             <>Za otroka: {notification.child_name}</>
           )}
         </p>
-        {isReminder && notification.child_name && (
+        {isDbNotif && notification.child_name && (
           <p className="text-xs text-muted-foreground/70 mt-0.5">
             Otrok: {notification.child_name}
           </p>

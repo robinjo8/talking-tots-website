@@ -653,6 +653,88 @@ serve(async (req) => {
 
     console.log(`30-set plan generated for ${child.name} (${planRecord.id})`);
 
+    // --- Send notification to parent about new/renewed plan ---
+    try {
+      const isPlanNew = mode === "report_update";
+      const notifType = isPlanNew ? "plan_new" : "plan_renewed";
+      const notifTitle = isPlanNew
+        ? "Nov osebni načrt je pripravljen!"
+        : "Osebni načrt je bil podaljšan!";
+      const notifMessage = isPlanNew
+        ? `Za otroka ${child.name} je bil pripravljen nov osebni načrt vaj. Odprite aplikacijo in začnite z vajami!`
+        : `Osebni načrt za otroka ${child.name} je bil podaljšan z novimi vajami. Nadaljujte z vajami!`;
+
+      // Deduplication: check if same notification already sent in last 24h
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data: existingNotif } = await supabase
+        .from("user_notifications")
+        .select("id")
+        .eq("user_id", child.parent_id)
+        .eq("child_id", childId)
+        .eq("type", notifType)
+        .gte("created_at", oneDayAgo)
+        .limit(1);
+
+      if (!existingNotif || existingNotif.length === 0) {
+        // Insert notification
+        await supabase.from("user_notifications").insert({
+          user_id: child.parent_id,
+          child_id: childId,
+          type: notifType,
+          title: notifTitle,
+          message: notifMessage,
+          link: "/moji-izzivi",
+          is_read: false,
+        });
+
+        // Send email via Resend
+        const resendApiKey = Deno.env.get("RESEND_API_KEY");
+        if (resendApiKey) {
+          const { data: userData } = await supabase.auth.admin.getUserById(child.parent_id);
+          if (userData?.user?.email) {
+            const emailSubject = isPlanNew
+              ? "Nov osebni načrt je pripravljen! 🐉"
+              : "Osebni načrt je bil podaljšan! 🐉";
+
+            const emailHtml = `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #F97316; margin-bottom: 16px;">${notifTitle}</h2>
+                <p style="color: #333; font-size: 16px; line-height: 1.6;">${notifMessage}</p>
+                <div style="margin-top: 24px;">
+                  <a href="https://tomitalk.lovable.app/moji-izzivi" 
+                     style="background-color: #F97316; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;">
+                    Odpri moje izzive
+                  </a>
+                </div>
+                <p style="color: #999; font-size: 12px; margin-top: 32px;">TomiTalk - Govorne vaje za otroke</p>
+              </div>
+            `;
+
+            await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${resendApiKey}`,
+              },
+              body: JSON.stringify({
+                from: "TomiTalk <noreply@tomitalk.si>",
+                to: [userData.user.email],
+                subject: emailSubject,
+                html: emailHtml,
+              }),
+            });
+
+            console.log(`Plan notification email sent to ${userData.user.email} (${notifType})`);
+          }
+        }
+      } else {
+        console.log(`Skipping duplicate ${notifType} notification for child ${childId}`);
+      }
+    } catch (notifError) {
+      // Don't fail the whole request if notification fails
+      console.error("Error sending plan notification:", notifError);
+    }
+
     return new Response(
       JSON.stringify({
         success: true, 
