@@ -21,7 +21,8 @@ interface UseChildDocumentsResult {
   uploadDocument: (
     file: File,
     childId: string,
-    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire'
+    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire',
+    options?: { silent?: boolean }
   ) => Promise<ChildDocument | null>;
   uploadStatus: UploadStatus;
   errorMessage: string | null;
