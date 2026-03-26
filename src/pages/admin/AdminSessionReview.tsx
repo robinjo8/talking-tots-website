@@ -35,6 +35,8 @@ export default function AdminSessionReview() {
   const [showTakeoverDialog, setShowTakeoverDialog] = useState(false);
   const [isTakingOver, setIsTakingOver] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const [actualSessionDates, setActualSessionDates] = useState<Map<number, string>>(new Map());
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
