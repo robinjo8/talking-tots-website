@@ -35,6 +35,8 @@ interface SessionAccordionProps {
 export function SessionAccordion({
   sessionNumber,
   baseDate,
+  subscriptionEnd,
+  actualSessionDates,
   hasData,
   recordingsByLetter,
   evaluations,
