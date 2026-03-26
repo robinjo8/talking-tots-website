@@ -74,6 +74,18 @@ export function ActivityOptions() {
 
   const handleActivityClick = (activity: typeof activities[0]) => {
     const isProOnly = PRO_ONLY_ACTIVITIES.includes(activity.id);
+    const isSubRequired = SUBSCRIPTION_REQUIRED_ACTIVITIES.includes(activity.id);
+    
+    // Check if subscription-required feature and user has no subscription
+    if (isSubRequired && !isSubscribed) {
+      toast.info("Ta funkcija je na voljo v naročniških paketih", {
+        action: {
+          label: "Oglej si pakete",
+          onClick: () => navigate('/cenik')
+        }
+      });
+      return;
+    }
     
     // Check if Pro-only feature and user doesn't have Pro
     if (isProOnly && !isPro) {

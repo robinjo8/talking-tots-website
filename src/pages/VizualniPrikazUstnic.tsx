@@ -264,6 +264,7 @@ const VizualniPrikazUstnic = () => {
           </div>
         )}
       </div>
+      </SubscriptionGate>
 
       {/* Floating back button */}
       <button
