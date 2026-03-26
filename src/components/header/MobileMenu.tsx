@@ -247,15 +247,17 @@ export function MobileMenu({
                       Moja naročnina
                     </Button>
                     
-                    {/* Klepet */}
-                    <Button 
-                      variant="ghost" 
-                      className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/klepet') ? 'bg-accent' : ''}`} 
-                      onClick={() => handleNavigate('/klepet')}
-                    >
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Klepet
-                    </Button>
+                    {/* Klepet - samo za naročnike */}
+                    {isSubscribed && (
+                      <Button 
+                        variant="ghost" 
+                        className={`w-full justify-start text-left h-12 uppercase ${isActivePath('/klepet') ? 'bg-accent' : ''}`} 
+                        onClick={() => handleNavigate('/klepet')}
+                      >
+                        <MessageCircle className="h-4 w-4 mr-2" />
+                        Klepet
+                      </Button>
+                    )}
                     
                     {/* Obvestila - removed, now in header bell */}
                     

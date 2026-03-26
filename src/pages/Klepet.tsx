@@ -9,6 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import { useBannerVisible } from "@/components/MissingChildBanner";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 function calculateAge(birthDate: Date | null | undefined): number | null {
   if (!birthDate) return null;
@@ -89,7 +90,9 @@ export default function Klepet() {
             <h1 className="text-lg font-semibold">Klepet - Tomi</h1>
             <p className="text-sm text-white/80">Vaš digitalni logopedski pomočnik</p>
           </div>
-          <ChatInterface childContext={childContext} />
+          <SubscriptionGate>
+            <ChatInterface childContext={childContext} />
+          </SubscriptionGate>
         </div>
       </div>
     </div>

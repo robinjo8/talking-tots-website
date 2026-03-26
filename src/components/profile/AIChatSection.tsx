@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ChatInterface } from "@/components/chat/ChatInterface";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 import { SPEECH_DIFFICULTIES } from "@/models/SpeechDifficulties";
 import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 import type { ChildContext } from "@/hooks/useChatAssistant";
@@ -76,7 +77,9 @@ export function AIChatSection() {
         <p className="text-sm text-white/80">Vaš digitalni logopedski pomočnik</p>
       </div>
       <div className="h-[600px]">
-        <ChatInterface childContext={childContext} />
+        <SubscriptionGate>
+          <ChatInterface childContext={childContext} />
+        </SubscriptionGate>
       </div>
     </div>
   );
