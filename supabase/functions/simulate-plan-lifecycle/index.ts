@@ -123,7 +123,16 @@ Deno.serve(async (req) => {
           });
         }
 
-        result = { completed: sets.length, totalSets, fromSet: 1, toSet: totalSets, skipped: existingSetNumbers.size };
+        // Update any existing active/expired sets to completed
+        const { data: updatedSets } = await supabase
+          .from("plan_set_tracking")
+          .update({ status: "completed", total_stars: Math.floor(Math.random() * 3) + 1, completed_at: new Date().toISOString() })
+          .eq("plan_id", plan.id)
+          .eq("child_id", childId)
+          .in("status", ["active", "expired"])
+          .select("id");
+
+        result = { completed: sets.length, updated: updatedSets?.length || 0, totalSets, fromSet: 1, toSet: totalSets, skipped: existingSetNumbers.size };
       }
 
     } else if (action === "simulate_age_transition") {
