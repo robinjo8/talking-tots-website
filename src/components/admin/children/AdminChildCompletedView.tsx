@@ -6,6 +6,7 @@ import { CheckCircle2, Plus, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { SpeechDifficultyBadge } from '@/components/speech';
+import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from '@/models/SpeechDevelopment';
 import { avatarOptions } from '@/components/AvatarSelector';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
