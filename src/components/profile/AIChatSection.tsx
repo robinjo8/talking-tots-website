@@ -77,7 +77,9 @@ export function AIChatSection() {
         <p className="text-sm text-white/80">Vaš digitalni logopedski pomočnik</p>
       </div>
       <div className="h-[600px]">
-        <ChatInterface childContext={childContext} />
+        <SubscriptionGate>
+          <ChatInterface childContext={childContext} />
+        </SubscriptionGate>
       </div>
     </div>
   );

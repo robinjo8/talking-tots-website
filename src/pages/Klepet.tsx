@@ -90,7 +90,9 @@ export default function Klepet() {
             <h1 className="text-lg font-semibold">Klepet - Tomi</h1>
             <p className="text-sm text-white/80">Vaš digitalni logopedski pomočnik</p>
           </div>
-          <ChatInterface childContext={childContext} />
+          <SubscriptionGate>
+            <ChatInterface childContext={childContext} />
+          </SubscriptionGate>
         </div>
       </div>
     </div>

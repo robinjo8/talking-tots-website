@@ -161,7 +161,7 @@ export function DesktopNavigation({ user, onStartNow }: DesktopNavigationProps) 
         
         {/* Right side - user profile or login buttons */}
         <div className="flex items-center gap-2">
-          {user && (
+          {user && isSubscribed && (
             <button
               onClick={() => navigate('/klepet')}
               className="w-9 h-9 rounded-full border border-border flex items-center justify-center hover:bg-accent transition-colors"
