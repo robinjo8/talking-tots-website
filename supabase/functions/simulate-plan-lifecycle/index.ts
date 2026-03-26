@@ -290,8 +290,8 @@ Deno.serve(async (req) => {
       const { data: logProfile } = await supabase
         .from("logopedist_profiles")
         .select("id")
-        .eq("user_id", userId)
-        .maybeSingle();
+        .limit(1)
+        .single();
 
       if (!logProfile) {
         return new Response(JSON.stringify({ error: "Dev uporabnik nima logopedist profila" }), {
