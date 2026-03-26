@@ -4,6 +4,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { ArrowLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const artikulacijaLetters = [
   { letter: "C", urlKey: "c", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png", description: "Vaje za izgovorjavo glasu C" },

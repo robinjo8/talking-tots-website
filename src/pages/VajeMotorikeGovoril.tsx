@@ -11,6 +11,7 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { useToast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
 import { cn } from "@/lib/utils";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const VajeMoториkeGovoril = () => {
   const { user } = useAuth();

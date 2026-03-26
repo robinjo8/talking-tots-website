@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const GovornojezicovneVaje = () => {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
