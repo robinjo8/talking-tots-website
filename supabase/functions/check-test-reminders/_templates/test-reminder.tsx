@@ -35,10 +35,7 @@ export const TestReminderEmail = ({
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <div style={logoContainer}>
-              <span style={logoTextGreen}>Tomi</span>
-              <span style={logoTextOrange}>Talk</span>
-            </div>
+            <Img src="https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png" alt="TomiTalk" style={logoImg} />
           </Section>
 
           {/* Content */}
