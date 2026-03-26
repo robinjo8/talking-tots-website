@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { FlaskConical, Loader2, RotateCcw, Zap, Calendar, CreditCard, Eye, ClipboardCheck } from "lucide-react";
+import { FlaskConical, Loader2, RotateCcw, Zap, Calendar, CreditCard, Eye, ClipboardCheck, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isDevUser } from "@/lib/devAccess";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export function PlanLifecycleTools() {
   const { user, selectedChild } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
   const [daysAgo, setDaysAgo] = useState("100");
   const [cooldownPreview, setCooldownPreview] = useState<any>(null);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
 
   if (!isDevUser(user?.email)) return null;
 
@@ -199,6 +201,37 @@ export function PlanLifecycleTools() {
             )}
           </div>
         )}
+
+        {/* Full lifecycle reset */}
+        <div className="border-t pt-4 mt-4">
+          <p className="text-sm font-medium text-destructive mb-2">Nevarno območje</p>
+          <Button
+            variant="outline"
+            className="w-full justify-start border-destructive/50 text-destructive hover:bg-destructive/10 hover:border-destructive"
+            onClick={() => setShowResetConfirm(true)}
+            disabled={!!loading}
+          >
+            <BtnIcon action="reset_full_lifecycle" />
+            {!isLoading("reset_full_lifecycle") && <Trash2 className="h-4 w-4 mr-2" />}
+            Ponastavi celoten cikel
+          </Button>
+          <p className="text-xs text-muted-foreground mt-1">
+            Izbriše vse: teste, ocene, poročila, načrte, napredek in datoteke.
+          </p>
+        </div>
+
+        <ConfirmDialog
+          open={showResetConfirm}
+          onOpenChange={setShowResetConfirm}
+          title="Ponastavi celoten cikel?"
+          description="To bo TRAJNO izbrisalo vse podatke za tega otroka: preverjanja, ocene, poročila, osebne načrte in napredek. Tega dejanja ni mogoče razveljaviti."
+          confirmText="Izbriši vse"
+          confirmVariant="destructive"
+          isLoading={isLoading("reset_full_lifecycle")}
+          onConfirm={() => {
+            invoke("reset_full_lifecycle").then(() => setShowResetConfirm(false));
+          }}
+        />
       </div>
     </div>
   );
