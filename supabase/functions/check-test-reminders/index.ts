@@ -74,6 +74,26 @@ Deno.serve(async (req) => {
     let emailsSent = 0
 
     for (const child of children || []) {
+      // Check if parent has active Pro subscription
+      const { data: subscription } = await supabase
+        .from('user_subscriptions')
+        .select('status, plan_id, current_period_end, cancel_at_period_end')
+        .eq('user_id', child.parent_id)
+        .maybeSingle()
+
+      // Skip if no Pro subscription
+      const isProActive = subscription && (
+        (subscription.status === 'active' || subscription.status === 'trialing') ||
+        ((subscription.status === 'canceled' || subscription.cancel_at_period_end) &&
+          subscription.current_period_end && new Date(subscription.current_period_end) > new Date())
+      )
+      const isPro = isProActive && subscription.plan_id === 'pro'
+
+      if (!isPro) {
+        console.log(`Skipping child ${child.id} - parent has no active Pro subscription`)
+        continue
+      }
+
       // Get the latest test result for this child
       const { data: latestTest } = await supabase
         .from('articulation_test_results')
@@ -89,10 +109,60 @@ Deno.serve(async (req) => {
       const now = new Date()
       const daysSinceTest = Math.floor((now.getTime() - completedAt.getTime()) / (1000 * 60 * 60 * 24))
 
-      // Check if child has already completed a NEWER test (making reminders irrelevant)
-      // This is already handled by getting the latest test above
+      // Calculate smart cooldown: if normal 90-day cooldown would push past
+      // subscriptionEnd - 7 days, shorten it
+      const subscriptionEnd = subscription.current_period_end
+        ? new Date(subscription.current_period_end)
+        : null
+      const lastTestTarget = subscriptionEnd
+        ? new Date(subscriptionEnd.getTime() - 7 * 24 * 60 * 60 * 1000)
+        : null
 
-      for (const milestone of MILESTONES) {
+      let nextTestDays = 90
+      if (lastTestTarget) {
+        const daysToLastTarget = Math.floor(
+          (lastTestTarget.getTime() - completedAt.getTime()) / (1000 * 60 * 60 * 24)
+        )
+        // If normal cooldown (90) overshoots the last-test target, shorten it
+        // But minimum 30 days between tests
+        if (daysToLastTarget < 90 && daysToLastTarget >= 30) {
+          nextTestDays = daysToLastTarget
+        }
+      }
+
+      // Dynamic milestones based on smart cooldown
+      const dynamicMilestones: ReminderMilestone[] = [
+        {
+          days: nextTestDays - 7,
+          type: 'test_reminder_7d_before',
+          title: 'Novo preverjanje bo na voljo čez 7 dni',
+          message: 'Čez 7 dni bo na voljo novo preverjanje izgovorjave. Pripravite se na naslednjo oceno napredka vašega otroka.',
+          emailSubject: 'TomiTalk: Novo preverjanje izgovorjave bo kmalu na voljo',
+        },
+        {
+          days: nextTestDays,
+          type: 'test_available',
+          title: 'Novo preverjanje izgovorjave je na voljo!',
+          message: 'Čas je za novo preverjanje izgovorjave. Opravite test za spremljanje napredka vašega otroka.',
+          emailSubject: 'TomiTalk: Novo preverjanje izgovorjave je na voljo!',
+        },
+        {
+          days: nextTestDays + 3,
+          type: 'test_reminder_3d_after',
+          title: 'Opomnik: Novo preverjanje čaka',
+          message: 'Novo preverjanje izgovorjave je na voljo že 3 dni. Ne pozabite ga opraviti za natančno spremljanje napredka.',
+          emailSubject: 'TomiTalk: Opomnik – opravite preverjanje izgovorjave',
+        },
+        {
+          days: nextTestDays + 7,
+          type: 'test_reminder_7d_after',
+          title: 'Zadnji opomnik: Prosimo, opravite preverjanje',
+          message: 'Novo preverjanje izgovorjave je na voljo že 7 dni. Redno preverjanje je ključno za spremljanje govornega napredka.',
+          emailSubject: 'TomiTalk: Zadnji opomnik – preverjanje izgovorjave',
+        },
+      ]
+
+      for (const milestone of dynamicMilestones) {
         if (daysSinceTest < milestone.days) continue
 
         // Check if this notification was already sent

@@ -15,6 +15,8 @@ import { sl } from 'date-fns/locale';
 interface SessionAccordionProps {
   sessionNumber: number;
   baseDate: string | null; // submitted_at of Seja-1
+  subscriptionEnd?: string | null; // current_period_end from user_subscriptions
+  actualSessionDates?: Map<number, string>; // actual submitted_at per session number
   hasData: boolean;
   recordingsByLetter: Map<string, Recording[]>;
   evaluations: Map<string, LetterEvaluation>;
@@ -33,6 +35,8 @@ interface SessionAccordionProps {
 export function SessionAccordion({
   sessionNumber,
   baseDate,
+  subscriptionEnd,
+  actualSessionDates,
   hasData,
   recordingsByLetter,
   evaluations,
@@ -49,44 +53,63 @@ export function SessionAccordion({
 }: SessionAccordionProps) {
   
 
-  // Calculate session date based on session number
+  // Calculate session date: use actual date if available, otherwise smart prediction
   const getSessionDate = (): { label: string; date: string } => {
+    // If this session has actual data, show actual date
+    const actualDate = actualSessionDates?.get(sessionNumber);
+    if (actualDate) {
+      return {
+        label: sessionNumber === 1 ? 'Oddano' : 'Opravljeno',
+        date: format(new Date(actualDate), 'd. M. yyyy', { locale: sl }),
+      };
+    }
+
     if (!baseDate) {
       return { label: 'Datum ni znan', date: '' };
     }
 
-    const baseDateObj = new Date(baseDate);
-
     if (sessionNumber === 1) {
       return {
         label: 'Oddano',
-        date: format(baseDateObj, 'd. M. yyyy', { locale: sl }),
+        date: format(new Date(baseDate), 'd. M. yyyy', { locale: sl }),
       };
     }
 
-    // Future sessions: calculated dates
-    let targetDate: Date;
-    switch (sessionNumber) {
-      case 2:
-        targetDate = addMonths(baseDateObj, 3);
-        break;
-      case 3:
-        targetDate = addMonths(baseDateObj, 6);
-        break;
-      case 4:
-        targetDate = addMonths(baseDateObj, 9);
-        break;
-      case 5:
-        // 1 week before 1 year = 11 months + 3 weeks
-        targetDate = addWeeks(addMonths(baseDateObj, 12), -1);
-        break;
-      default:
-        targetDate = baseDateObj;
+    // Find the most recent actual session before this one
+    let lastKnownDate: Date | null = null;
+    if (actualSessionDates) {
+      for (let i = sessionNumber - 1; i >= 1; i--) {
+        const d = actualSessionDates.get(i);
+        if (d) {
+          lastKnownDate = new Date(d);
+          break;
+        }
+      }
+    }
+
+    const referenceDate = lastKnownDate || new Date(baseDate);
+
+    // Smart cooldown: check if normal 90-day interval overshoots subscriptionEnd - 7 days
+    const normalTarget = addMonths(referenceDate, 3);
+    
+    if (subscriptionEnd) {
+      const subEnd = new Date(subscriptionEnd);
+      const lastTestTarget = addWeeks(subEnd, -1); // 7 days before expiry
+      
+      if (normalTarget > lastTestTarget) {
+        // Shortened cooldown — but minimum 30 days
+        const minTarget = new Date(referenceDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+        const targetDate = lastTestTarget > minTarget ? lastTestTarget : minTarget;
+        return {
+          label: 'Predvideno',
+          date: format(targetDate, 'd. M. yyyy', { locale: sl }),
+        };
+      }
     }
 
     return {
       label: 'Predvideno',
-      date: format(targetDate, 'd. M. yyyy', { locale: sl }),
+      date: format(normalTarget, 'd. M. yyyy', { locale: sl }),
     };
   };
 

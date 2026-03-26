@@ -68,6 +68,7 @@ export default function AdminUserDetail() {
   const [childData, setChildData] = useState<{ name: string; age: number; gender: string | null; birth_date: string | null } | null>(null);
   const [isEditingBirthDate, setIsEditingBirthDate] = useState(false);
   const [parentData, setParentData] = useState<{ name: string; email: string } | null>(null);
+  const [subscriptionInfo, setSubscriptionInfo] = useState<{ planId: string | null; subscriptionEnd: string | null; status: string | null } | null>(null);
   const [testSessions, setTestSessions] = useState<{ id: string; date: string; formattedDate: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -158,6 +159,21 @@ export default function AdminUserDetail() {
         setParentData({
           name: [profile.first_name, profile.last_name].filter(Boolean).join(' ') || 'Neznano',
           email: parentEmail,
+        });
+      }
+
+      // Fetch subscription info
+      const { data: subData } = await supabase
+        .from('user_subscriptions')
+        .select('plan_id, current_period_end, status')
+        .eq('user_id', parentId)
+        .maybeSingle();
+
+      if (subData) {
+        setSubscriptionInfo({
+          planId: subData.plan_id,
+          subscriptionEnd: subData.current_period_end,
+          status: subData.status,
         });
       }
 
@@ -821,6 +837,17 @@ export default function AdminUserDetail() {
                     </PopoverContent>
                   </Popover>
                 </span>
+                {subscriptionInfo && (
+                  <span className="flex items-center gap-1 mt-1 text-sm">
+                    📋 Naročnina: <span className="font-medium">{subscriptionInfo.planId === 'pro' ? 'Pro' : subscriptionInfo.planId === 'start' ? 'Start' : 'Ni naročnine'}</span>
+                    {subscriptionInfo.subscriptionEnd && (
+                      <> • Poteče: <span className="font-medium">{format(new Date(subscriptionInfo.subscriptionEnd), 'd. M. yyyy', { locale: sl })}</span></>
+                    )}
+                    {subscriptionInfo.status === 'canceled' && (
+                      <Badge variant="outline" className="ml-2 text-destructive border-destructive text-xs">Preklicana</Badge>
+                    )}
+                  </span>
+                )}
               </>
             ) : (
               'Nalaganje...'

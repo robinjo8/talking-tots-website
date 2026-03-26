@@ -1,7 +1,34 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { addMonths, isBefore } from 'date-fns';
+import { addMonths, addDays, isBefore } from 'date-fns';
+import { useSubscriptionContext } from '@/contexts/SubscriptionContext';
+
+/**
+ * Calculate smart cooldown: normally 90 days, but shortened if needed
+ * to ensure a test happens 7 days before subscription end.
+ * Minimum cooldown: 30 days.
+ */
+function calculateNextTestDate(lastCompletedAt: Date, subscriptionEnd: string | null): Date {
+  const normalNext = addMonths(lastCompletedAt, 3);
+  
+  if (!subscriptionEnd) return normalNext;
+  
+  const subEnd = new Date(subscriptionEnd);
+  const lastTestTarget = addDays(subEnd, -7); // 7 days before expiry
+  
+  if (isBefore(lastTestTarget, normalNext)) {
+    // Normal cooldown overshoots — check minimum 30 days
+    const minNext = addDays(lastCompletedAt, 30);
+    if (isBefore(lastTestTarget, minNext)) {
+      // Even shortened cooldown would be < 30 days, use minimum
+      return minNext;
+    }
+    return lastTestTarget;
+  }
+  
+  return normalNext;
+}
 
 interface ArticulationTestStatus {
   lastCompletedAt: Date | null;
@@ -12,6 +39,7 @@ interface ArticulationTestStatus {
 
 export const useArticulationTestStatus = () => {
   const { selectedChild } = useAuth();
+  const { subscriptionEnd, isPro } = useSubscriptionContext();
   const [status, setStatus] = useState<ArticulationTestStatus>({
     lastCompletedAt: null,
     nextTestDate: null,
@@ -47,7 +75,10 @@ export const useArticulationTestStatus = () => {
 
       if (data) {
         const lastCompletedAt = new Date(data.completed_at);
-        const nextTestDate = addMonths(lastCompletedAt, 3);
+        // Smart cooldown: use subscriptionEnd for Pro users
+        const nextTestDate = isPro
+          ? calculateNextTestDate(lastCompletedAt, subscriptionEnd)
+          : addMonths(lastCompletedAt, 3);
         const isTestAvailable = isBefore(nextTestDate, new Date());
 
         setStatus({
@@ -69,7 +100,7 @@ export const useArticulationTestStatus = () => {
       console.error('Error in fetchTestStatus:', err);
       setStatus(prev => ({ ...prev, isLoading: false }));
     }
-  }, [selectedChild?.id]);
+  }, [selectedChild?.id, subscriptionEnd, isPro]);
 
   useEffect(() => {
     fetchTestStatus();

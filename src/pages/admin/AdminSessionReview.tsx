@@ -35,6 +35,8 @@ export default function AdminSessionReview() {
   const [showTakeoverDialog, setShowTakeoverDialog] = useState(false);
   const [isTakingOver, setIsTakingOver] = useState(false);
   const [showAssignDialog, setShowAssignDialog] = useState(false);
+  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
+  const [actualSessionDates, setActualSessionDates] = useState<Map<number, string>>(new Map());
 
   // Inicializiraj lokalne ocene iz podatkov
   useEffect(() => {
@@ -43,6 +45,44 @@ export default function AdminSessionReview() {
       setSavedEvaluations(new Map(data.evaluations));
     }
   }, [data?.evaluations]);
+
+  // Fetch subscription end and actual session dates for smart cooldown
+  useEffect(() => {
+    if (!data?.session?.parentId || !data?.session?.childId) return;
+
+    const fetchExtraData = async () => {
+      // Fetch subscription
+      const { data: subData } = await supabase
+        .from('user_subscriptions')
+        .select('current_period_end')
+        .eq('user_id', data.session.parentId)
+        .maybeSingle();
+
+      if (subData?.current_period_end) {
+        setSubscriptionEnd(subData.current_period_end);
+      }
+
+      // Fetch all session dates for this child
+      const { data: sessions } = await supabase
+        .from('articulation_test_sessions')
+        .select('session_number, submitted_at')
+        .eq('child_id', data.session.childId!)
+        .not('submitted_at', 'is', null)
+        .order('session_number');
+
+      if (sessions) {
+        const datesMap = new Map<number, string>();
+        sessions.forEach(s => {
+          if (s.session_number && s.submitted_at) {
+            datesMap.set(s.session_number, s.submitted_at);
+          }
+        });
+        setActualSessionDates(datesMap);
+      }
+    };
+
+    fetchExtraData();
+  }, [data?.session?.parentId, data?.session?.childId]);
 
   // Preveri spremembe
   const checkForChanges = useCallback(() => {
@@ -336,6 +376,8 @@ export default function AdminSessionReview() {
               key={sessionNum}
               sessionNumber={sessionNum}
               baseDate={data.session.submittedAt}
+              subscriptionEnd={subscriptionEnd}
+              actualSessionDates={actualSessionDates}
               hasData={hasSessionData}
               recordingsByLetter={hasSessionData ? data.recordingsByLetter : new Map()}
               evaluations={hasSessionData ? localEvaluations : new Map()}
