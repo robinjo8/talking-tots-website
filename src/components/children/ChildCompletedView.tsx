@@ -125,16 +125,17 @@ export function ChildCompletedView({
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="bg-white rounded-lg border divide-y mt-2">
-              {answerItems.map((item, index) => (
+              {answerItems.map((item) => (
                 <div key={item.id} className="p-4 flex flex-col gap-2">
                   <span className="text-gray-700 text-sm">{item.questionText}</span>
                   <div className="flex justify-end">
-                  <Badge 
-                    variant={item.answer === "Da" ? "success" : 
-                           item.answer === "Ne" ? "outline" : "secondary"}
-                  >
-                    {item.answer}
-                  </Badge>
+                    <Badge 
+                      variant={item.answer === "Da" ? "success" : 
+                             item.answer === "Ne" ? "outline" : "secondary"}
+                    >
+                      {item.answer}
+                    </Badge>
+                  </div>
                 </div>
               ))}
             </div>
