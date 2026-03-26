@@ -97,6 +97,7 @@ const VizualniPrikazUstnic = () => {
     )}>
       <Header />
 
+      <SubscriptionGate>
       <div className={cn(
         "container max-w-4xl mx-auto px-4",
         isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"

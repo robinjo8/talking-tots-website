@@ -67,39 +67,41 @@ export default function ArtikulacijaVaje() {
     <div className={cn("bg-background", isMobile ? "fixed inset-0 overflow-hidden flex flex-col" : "min-h-screen")}>
       <Header />
 
-      <div className={cn(
-        "container max-w-6xl mx-auto px-4",
-        isMobile ? "flex-1 flex flex-col overflow-hidden pt-20 pb-2" : "pt-28 md:pt-32 pb-20"
-      )}>
-        <div className={cn("text-center", isMobile ? "mb-2" : "mb-6")}>
-          <h1 className={cn("font-bold text-foreground mb-2", isMobile ? "text-2xl" : "text-4xl md:text-5xl")}>
-            Moji prvi glasovi
-          </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
-        </div>
-
-        {!isMobile && (
-          <div className="mb-8">
-            <BreadcrumbNavigation />
+      <SubscriptionGate>
+        <div className={cn(
+          "container max-w-6xl mx-auto px-4",
+          isMobile ? "flex-1 flex flex-col overflow-hidden pt-20 pb-2" : "pt-28 md:pt-32 pb-20"
+        )}>
+          <div className={cn("text-center", isMobile ? "mb-2" : "mb-6")}>
+            <h1 className={cn("font-bold text-foreground mb-2", isMobile ? "text-2xl" : "text-4xl md:text-5xl")}>
+              Moji prvi glasovi
+            </h1>
+            <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
           </div>
-        )}
 
-        <div className={isMobile ? "flex-1 overflow-hidden" : "mb-12"}>
-          {isMobile ? (
-            <div className="grid grid-cols-3 gap-2 h-full content-start">
-              {artikulacijaLetters.map(letter => (
-                <LetterCard key={letter.urlKey} letter={letter} />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {artikulacijaLetters.map(letter => (
-                <LetterCard key={letter.urlKey} letter={letter} />
-              ))}
+          {!isMobile && (
+            <div className="mb-8">
+              <BreadcrumbNavigation />
             </div>
           )}
+
+          <div className={isMobile ? "flex-1 overflow-hidden" : "mb-12"}>
+            {isMobile ? (
+              <div className="grid grid-cols-3 gap-2 h-full content-start">
+                {artikulacijaLetters.map(letter => (
+                  <LetterCard key={letter.urlKey} letter={letter} />
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {artikulacijaLetters.map(letter => (
+                  <LetterCard key={letter.urlKey} letter={letter} />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </SubscriptionGate>
 
       {isMobile && (
         <button
