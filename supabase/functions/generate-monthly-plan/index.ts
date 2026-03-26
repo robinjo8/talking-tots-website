@@ -690,11 +690,26 @@ serve(async (req) => {
         // Send email via Resend
         const resendApiKey = Deno.env.get("RESEND_API_KEY");
         if (resendApiKey) {
-          const { data: userData } = await supabase.auth.admin.getUserById(child.parent_id);
-          if (userData?.user?.email) {
-            const emailSubject = isPlanNew
-              ? "Nov osebni načrt je pripravljen! 🐉"
-              : "Osebni načrt je bil podaljšan! 🐉";
+          // Check email preferences
+          const { data: emailPref } = await supabase
+            .from("email_preferences")
+            .select("notifications_enabled")
+            .eq("user_id", child.parent_id)
+            .maybeSingle();
+
+          const notificationsEnabled = emailPref?.notifications_enabled !== false;
+
+          if (notificationsEnabled) {
+            const { data: userData } = await supabase.auth.admin.getUserById(child.parent_id);
+            if (userData?.user?.email) {
+              // Generate unsubscribe token (simple JWT-like base64)
+              const tokenPayload = { sub: child.parent_id, exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60 };
+              const tokenBase64 = btoa(JSON.stringify({ alg: "none", typ: "JWT" })).replace(/=/g, "") + "." + btoa(JSON.stringify(tokenPayload)).replace(/=/g, "") + ".";
+              const unsubscribeUrl = `https://tomitalk.com/odjava-obvestil?token=${tokenBase64}`;
+
+              const emailSubject = isPlanNew
+                ? "Nov osebni načrt je pripravljen! 🐉"
+                : "Osebni načrt je bil podaljšan! 🐉";
 
             const emailHtml = `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -718,7 +733,7 @@ serve(async (req) => {
                 <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
                   <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">
                     To sporočilo ste prejeli, ker imate račun pri TomiTalk.<br/>
-                    Če teh e-poštnih sporočil ne želite več prejemati, <a href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style="color: hsl(122, 39%, 49%);">se lahko odjavite</a>.
+                    Če teh e-poštnih sporočil ne želite več prejemati, <a href="${unsubscribeUrl}" style="color: hsl(122, 39%, 49%);">se lahko odjavite</a>.
                   </p>
                 </div>
               </div>
@@ -739,6 +754,9 @@ serve(async (req) => {
             });
 
             console.log(`Plan notification email sent to ${userData.user.email} (${notifType})`);
+            }
+          } else {
+            console.log(`Email notifications disabled for user ${child.parent_id}`);
           }
         }
       } else {

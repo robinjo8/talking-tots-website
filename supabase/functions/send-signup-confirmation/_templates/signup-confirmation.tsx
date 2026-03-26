@@ -99,8 +99,8 @@ export const SignupConfirmationEmail = ({
         
         <Section style={footer}>
           <Text style={footerText}>
-            To sporočilo ste prejeli, ker ste se prijavili v TomiTalk.<br/>
-            Če teh e-poštnih sporočil ne želite več prejemati, <Link href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style={unsubscribeLink}>se lahko odjavite</Link>.
+            To sporočilo ste prejeli, ker imate račun pri TomiTalk.<br/>
+            Če imate vprašanja, nas kontaktirajte na <Link href="https://tomitalk.com/kontakt" style={unsubscribeLink}>strani za kontakt</Link>.
           </Text>
         </Section>
       </Container>
