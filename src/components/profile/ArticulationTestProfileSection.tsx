@@ -14,7 +14,7 @@ import { isDevUser } from "@/lib/devAccess";
 
 export function ArticulationTestProfileSection() {
   const { lastCompletedAt, nextTestDate, isTestAvailable, isLoading, resetTest, refetch } = useArticulationTestStatus();
-  const { selectedChild } = useAuth();
+  const { selectedChild, user } = useAuth();
   const navigate = useNavigate();
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
