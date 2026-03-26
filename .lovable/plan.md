@@ -1,5 +1,6 @@
 
 
+
 ## Plan: Popravi "Zaključi vseh 30 sklopov" — active sklop se ne zaključi
 
 ### Problem
@@ -57,4 +58,3 @@ Ponovi korake 4-7 še dvakrat.
 ### Opomba
 
 Gumb "Simuliraj zamudo" je potreben, ker smart cooldown drugače ne dovoli novega preverjanja prej kot čez 90 dni. Z zamudo premikaš datum zadnjega testa v preteklost, s čimer "odklenješ" naslednje preverjanje.
-
