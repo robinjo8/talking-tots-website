@@ -366,26 +366,41 @@ Deno.serve(async (req) => {
         `Datum: ${timestamp}`,
       ].join("\n");
 
-      // 7. Upload .txt to storage
+      // 7. Upload .txt to storage (both Porocila and Generirana-porocila)
       const parentId = session.parent_id;
-      const filePath = `${parentId}/${childId}/Porocila/porocilo-${timestamp}.txt`;
       const encoder = new TextEncoder();
       const reportBlob = encoder.encode(reportText);
 
+      const draftPath = `${parentId}/${childId}/Porocila/porocilo-${timestamp}.txt`;
+      const generatedPath = `${parentId}/${childId}/Generirana-porocila/porocilo-${timestamp}.txt`;
+
+      // Upload to Porocila (draft/saved reports)
       const { error: uploadError } = await supabase.storage
         .from("uporabniski-profili")
-        .upload(filePath, reportBlob, {
+        .upload(draftPath, reportBlob, {
           contentType: "text/plain",
           upsert: true,
         });
 
       if (uploadError) {
-        console.error("Upload error:", uploadError);
+        console.error("Upload error (Porocila):", uploadError);
       }
 
-      // 8. Build report details matching admin portal format
+      // Upload to Generirana-porocila (visible under "Dokumenti")
+      const { error: uploadError2 } = await supabase.storage
+        .from("uporabniski-profili")
+        .upload(generatedPath, reportBlob, {
+          contentType: "text/plain",
+          upsert: true,
+        });
+
+      if (uploadError2) {
+        console.error("Upload error (Generirana-porocila):", uploadError2);
+      }
+
+      // 8. Build report details matching admin portal format (English position keys)
       const reportDetails = {
-        letters: [{ letter: "R", positions: ["začetek", "sredina/konec"], includeBeginnerExercises: true }],
+        letters: [{ letter: "R", positions: ["start", "middle-end", "initial-exercises"], includeBeginnerExercises: true }],
         motorika: { type: "weekly", count: 1, unit: "week" },
         videoLetters: ["R"],
       };
@@ -402,7 +417,7 @@ Deno.serve(async (req) => {
           recommended_letters: ["R"],
           report_details: reportDetails,
           next_steps: "",
-          pdf_url: filePath,
+          pdf_url: generatedPath,
           status: "submitted",
         } as any)
         .select("id")
