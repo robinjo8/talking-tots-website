@@ -1,49 +1,60 @@
 
 
-## Plan: Popravi "Zaključi vseh 30 sklopov" — napačna logika + čiščenje
+## Plan: Popravi "Zaključi vseh 30 sklopov" — active sklop se ne zaključi
 
-### Analiza problema
+### Problem
 
-**Stanje v bazi:**
-- 5 načrtov za "Testni otrok": 4 arhivirani + 1 aktiven (`4fe99ccd`)
-- Aktiven načrt ima **0 tracking zapisov** — zato UI kaže "Sklop 1" in "0/30"
-- Vsi completed tracking zapisi pripadajo starim arhiviranim načrtom
+Ko si odprl Sklop 1 (klik na darilo), se je ustvaril zapis v `plan_set_tracking` s statusom `active`. Ko si kliknil "Zaključi vseh 30 sklopov", funkcija preveri obstoječe zapise in **preskoči** set 1 (ker že obstaja kot `active`). Vstavi le sete 2-30 kot `completed`. Rezultat: 29 completed + 1 active = **29/30 sklopov**.
 
-**Zakaj se to zgodi:**
-1. Vsak klik na "Simuliraj ocenjevanje + poročilo" ustvari NOV načrt (kliče `generate-monthly-plan`), star načrt se arhivira
-2. Ko klikneš "Zaključi vseh 30 sklopov", ta zapiše tracking za takrat aktiven načrt
-3. Če potem znova klikneš "Simuliraj ocenjevanje + poročilo", se ta načrt arhivira in ustvari nov prazen
-4. Rezultat: tracking zapisi na arhiviranem načrtu, aktiven načrt prazen
+### Popravek
 
-**Dodatna napaka v logiki `complete_all_sets`:**
-- Vedno doda 30 novih sklopov od zadnjega (`startSet = max + 1`), ne glede na `totalSets`
-- Če klikneš dvakrat, vstavi sklope 31-60, ki ne obstajajo v načrtu
+**`supabase/functions/simulate-plan-lifecycle/index.ts`** — akcija `complete_all_sets`:
 
-### Spremembe
+Po vstavljanju manjkajočih setov, dodaj UPDATE za vse obstoječe sete, ki imajo status `active` ali `expired`, da jih postavi na `completed`:
 
-**1. Edge funkcija `simulate-plan-lifecycle/index.ts` — akcija `complete_all_sets`:**
-- Omeji `endSet` na `totalSets` iz `plan_data` (ne vedno +30)
-- Če so vsi sklopi že zaključeni, vrni sporočilo namesto vstavljanja duplikatov
-- NE sproži renewal — to je simulacija, ne pravi potek
-
-**2. Edge funkcija — akcija `reset_full_lifecycle`:**
-- Preveri da briše tudi `plan_set_tracking` in `plan_activity_completions` za VSE načrte tega otroka (ne le aktivnega)
-- Preveri da briše tudi vse `child_monthly_plans` zapise
-
-**3. Čiščenje baze (migracija):**
-- Izbriši vse osirotele `plan_set_tracking` zapise za arhivirane načrte "Testni otrok"
-- Izbriši vse arhivirane `child_monthly_plans` za tega otroka (obdrži le aktiven načrt)
-
-### Pravilna logika za `complete_all_sets`:
-
-```text
-1. Najdi aktiven načrt
-2. Preberi totalSets iz plan_data (default 30)
-3. Preveri obstoječe tracking zapise za TA načrt
-4. Vstavi SAMO manjkajoče sklope od 1 do totalSets kot "completed"
-5. NE sproži renewal
+```ts
+// Po insertu manjkajočih setov:
+await supabase
+  .from("plan_set_tracking")
+  .update({ status: "completed", total_stars: 5, completed_at: new Date().toISOString() })
+  .eq("plan_id", plan.id)
+  .eq("child_id", childId)
+  .in("status", ["active", "expired"]);
 ```
 
 ### Obseg
-- 1 Edge funkcija posodobljena (logika `complete_all_sets` + morebitni popravki `reset_full_lifecycle`)
-- 1 migracija za čiščenje obstoječih osirot
+- 1 Edge funkcija, ~5 vrstic dodanih
+
+---
+
+## Postopkovnik za celotno letno simulacijo
+
+Po resetiranju celotnega cikla ("Ponastavi celoten cikel") sledi ta vrstni red:
+
+### Cikel 1 (mesec 0-3)
+
+| Korak | Gumb | Kaj naredi |
+|-------|------|------------|
+| 1 | **Simuliraj celotno preverjanje** | Ustvari test sejo + posnetke (status: pending) |
+| 2 | **Simuliraj ocenjevanje + poročilo** | Oceni glasove, generira poročilo, ustvari osebni načrt (30 sklopov) |
+| 3 | **Zaključi vseh 30 sklopov** | Označi vseh 30 sklopov kot opravljene |
+
+### Cikel 2 (mesec 3-6)
+
+| Korak | Gumb | Kaj naredi |
+|-------|------|------------|
+| 4 | **Simuliraj zamudo** (90 dni) | Premakne datum zadnjega testa 90 dni nazaj → cooldown poteče |
+| 5 | **Simuliraj celotno preverjanje** | Novo preverjanje izgovorjave |
+| 6 | **Simuliraj ocenjevanje + poročilo** | Nov načrt (report_update ali nov plan) |
+| 7 | **Zaključi vseh 30 sklopov** | Zaključi novih 30 sklopov |
+
+### Cikel 3 in 4
+
+Ponovi korake 4-7 še dvakrat.
+
+**Skupaj za 1 leto**: 4× preverjanje + 4× ocenjevanje + 4× zaključi sklope = **12 klikov** (+ 3× simuliraj zamudo).
+
+### Opomba
+
+Gumb "Simuliraj zamudo" je potreben, ker smart cooldown drugače ne dovoli novega preverjanja prej kot čez 90 dni. Z zamudo premikaš datum zadnjega testa v preteklost, s čimer "odklenješ" naslednje preverjanje.
+
