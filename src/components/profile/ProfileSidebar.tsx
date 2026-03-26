@@ -1,7 +1,9 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock, FlaskConical } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
+import { useAuth } from "@/contexts/AuthContext";
+import { isDevUser } from "@/lib/devAccess";
 
 type ProfileSidebarProps = {
   activeSection: string;
@@ -23,6 +25,12 @@ const menuItems = [
 export function ProfileSidebar({ activeSection, setActiveSection, childrenCount }: ProfileSidebarProps) {
   const { isPro } = useSubscriptionContext();
   const { unreadCount } = useUserNotifications();
+  const { user } = useAuth();
+  const isDev = isDevUser(user?.email);
+
+  const allItems = isDev
+    ? [...menuItems, { id: "lifecycleTools", label: "Lifecycle orodja", icon: FlaskConical }]
+    : menuItems;
   return (
     <div className="bg-white rounded-lg shadow-sm border border-dragon-green/20 overflow-hidden sticky top-28">
       {/* Header */}
@@ -32,7 +40,7 @@ export function ProfileSidebar({ activeSection, setActiveSection, childrenCount 
       
       {/* Menu items */}
       <nav className="p-2">
-        {menuItems.map((item) => {
+        {allItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
           const isLocked = item.proOnly && !isPro;

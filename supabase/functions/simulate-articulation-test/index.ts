@@ -123,6 +123,16 @@ serve(async (req) => {
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Dev user email check
+    const ALLOWED_EMAILS = ["qjavec@gmail.com", "kuajvec.robert@gmail.com"];
+    const { data: userData } = await supabaseAdmin.auth.admin.getUserById(userId);
+    if (!userData?.user?.email || !ALLOWED_EMAILS.includes(userData.user.email)) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const sessionNumber = 1;
 
     // Clean up any existing data before simulation

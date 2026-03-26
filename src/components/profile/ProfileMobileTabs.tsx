@@ -1,4 +1,4 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock, FlaskConical } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -9,6 +9,8 @@ import {
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { isDevUser } from "@/lib/devAccess";
 
 type ProfileMobileTabsProps = {
   activeSection: string;
@@ -30,7 +32,13 @@ const tabs = [
 export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCount }: ProfileMobileTabsProps) {
   const { isPro } = useSubscriptionContext();
   const { unreadCount } = useUserNotifications();
-  const activeTab = tabs.find(tab => tab.id === activeSection);
+  const { user } = useAuth();
+  const isDev = isDevUser(user?.email);
+
+  const allTabs = isDev
+    ? [...tabs, { id: "lifecycleTools", label: "Lifecycle orodja", icon: FlaskConical }]
+    : tabs;
+  const activeTab = allTabs.find(tab => tab.id === activeSection);
   const ActiveIcon = activeTab?.icon || User;
   
   return (
@@ -45,7 +53,7 @@ export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCou
         </div>
       </SelectTrigger>
       <SelectContent className="bg-white border border-gray-200 shadow-lg z-[100]">
-        {tabs.map((tab) => {
+        {allTabs.map((tab) => {
           const Icon = tab.icon;
           const isLocked = tab.proOnly && !isPro;
           return (

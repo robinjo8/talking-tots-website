@@ -57,3 +57,6 @@ verify_jwt = false
 [functions.check-test-reminders]
 verify_jwt = false
 
+[functions.simulate-plan-lifecycle]
+verify_jwt = false
+

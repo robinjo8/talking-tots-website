@@ -47,6 +47,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Dev user email check
+    const ALLOWED_EMAILS = ["qjavec@gmail.com", "kuajvec.robert@gmail.com"];
+    const { data: userData } = await supabase.auth.admin.getUserById(userId);
+    if (!userData?.user?.email || !ALLOWED_EMAILS.includes(userData.user.email)) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Verify authorization
     if (adminOverride) {
       // Check if caller is a logopedist or super admin
