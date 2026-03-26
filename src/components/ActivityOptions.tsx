@@ -10,6 +10,7 @@ import { sl } from "date-fns/locale";
 
 // Pro-only activity IDs
 const PRO_ONLY_ACTIVITIES = ['test', 'challenges'];
+const SUBSCRIPTION_REQUIRED_ACTIVITIES = ['exercises'];
 
 export function ActivityOptions() {
   const navigate = useNavigate();
@@ -73,6 +74,18 @@ export function ActivityOptions() {
 
   const handleActivityClick = (activity: typeof activities[0]) => {
     const isProOnly = PRO_ONLY_ACTIVITIES.includes(activity.id);
+    const isSubRequired = SUBSCRIPTION_REQUIRED_ACTIVITIES.includes(activity.id);
+    
+    // Check if subscription-required feature and user has no subscription
+    if (isSubRequired && !isSubscribed) {
+      toast.info("Ta funkcija je na voljo v naročniških paketih", {
+        action: {
+          label: "Oglej si pakete",
+          onClick: () => navigate('/cenik')
+        }
+      });
+      return;
+    }
     
     // Check if Pro-only feature and user doesn't have Pro
     if (isProOnly && !isPro) {
@@ -107,9 +120,11 @@ export function ActivityOptions() {
     >
       {activities.map((activity, index) => {
         const isProOnly = PRO_ONLY_ACTIVITIES.includes(activity.id);
+        const isSubRequired = SUBSCRIPTION_REQUIRED_ACTIVITIES.includes(activity.id);
         const isProLocked = isProOnly && !isPro;
+        const isSubLocked = isSubRequired && !isSubscribed;
         const isTimeLocked = activity.id === 'test' && isTestLocked;
-        const isLocked = isProLocked || isTimeLocked;
+        const isLocked = isProLocked || isSubLocked || isTimeLocked;
         
         console.log('🎯 Rendering card:', activity.title, 'isProLocked:', isProLocked);
         return (
@@ -136,6 +151,14 @@ export function ActivityOptions() {
                 <div className="absolute top-4 left-4 bg-dragon-green text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
                   <Crown className="w-3 h-3" />
                   Na voljo v TomiTalk Pro
+                </div>
+              )}
+              
+              {/* Subscription-required badge */}
+              {isSubLocked && !isProLocked && (
+                <div className="absolute top-4 left-4 bg-dragon-green text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg flex items-center gap-1 z-10">
+                  <Lock className="w-3 h-3" />
+                  Na voljo z naročnino
                 </div>
               )}
               
@@ -176,6 +199,18 @@ export function ActivityOptions() {
                     <p className="text-sm font-bold text-center flex items-center gap-2">
                       <Crown className="w-4 h-4" />
                       TomiTalk Pro
+                    </p>
+                  </div>
+                </div>
+              )}
+              
+              {/* Subscription overlay */}
+              {isSubLocked && !isProLocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <div className="bg-dragon-green text-white px-4 py-2 rounded-lg shadow-lg">
+                    <p className="text-sm font-bold text-center flex items-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Naročnina
                     </p>
                   </div>
                 </div>

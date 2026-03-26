@@ -11,6 +11,7 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { useToast } from "@/components/ui/use-toast";
 import Header from "@/components/Header";
 import { cn } from "@/lib/utils";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const VajeMoториkeGovoril = () => {
   const { user } = useAuth();
@@ -49,27 +50,29 @@ const VajeMoториkeGovoril = () => {
     )}>
       <Header />
 
-      <div className={cn(
-        "container max-w-6xl mx-auto px-4",
-        isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
-      )}>
-        {/* Title Section */}
-        <div className={cn("text-center", isMobile ? "mb-3" : "mb-6")}>
-          <h1 className={cn(
-            "font-bold text-white mb-2",
-            isMobile ? "text-2xl" : "text-4xl md:text-5xl"
-          )}>
-            Vaje motorike govoril
-          </h1>
-          {!isMobile && (
-            <p className="text-white/80 text-lg mt-2">
-              Vaje za krepitev mišic jezika, ustnic in čeljusti
-            </p>
-          )}
-        </div>
+      <SubscriptionGate>
+        <div className={cn(
+          "container max-w-6xl mx-auto px-4",
+          isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
+        )}>
+          {/* Title Section */}
+          <div className={cn("text-center", isMobile ? "mb-3" : "mb-6")}>
+            <h1 className={cn(
+              "font-bold text-white mb-2",
+              isMobile ? "text-2xl" : "text-4xl md:text-5xl"
+            )}>
+              Vaje motorike govoril
+            </h1>
+            {!isMobile && (
+              <p className="text-white/80 text-lg mt-2">
+                Vaje za krepitev mišic jezika, ustnic in čeljusti
+              </p>
+            )}
+          </div>
 
-        <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} gridClassName={gridClassName} isMobile={isMobile} />
-      </div>
+          <SequentialExerciseGrid exerciseProgressHook={exerciseProgressHook} gridClassName={gridClassName} isMobile={isMobile} />
+        </div>
+      </SubscriptionGate>
 
       {/* Floating menu button */}
       <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>

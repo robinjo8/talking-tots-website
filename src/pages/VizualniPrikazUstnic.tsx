@@ -7,7 +7,7 @@ import { Volume2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
-
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 const STORAGE_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo";
 
 const soundCards = [
@@ -97,6 +97,7 @@ const VizualniPrikazUstnic = () => {
     )}>
       <Header />
 
+      <SubscriptionGate>
       <div className={cn(
         "container max-w-4xl mx-auto px-4",
         isMobile ? "flex-1 flex flex-col pt-20 pb-24" : "pt-28 md:pt-32 pb-20"
@@ -263,6 +264,7 @@ const VizualniPrikazUstnic = () => {
           </div>
         )}
       </div>
+      </SubscriptionGate>
 
       {/* Floating back button */}
       <button

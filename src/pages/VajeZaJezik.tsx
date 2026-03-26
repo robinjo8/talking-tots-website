@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 // Auth protection is now handled by ProtectedRoute in routes.tsx
 const VajeZaJezik = () => {
@@ -15,26 +16,28 @@ const VajeZaJezik = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <BreadcrumbNavigation />
+      <SubscriptionGate>
+        <div className="container max-w-5xl mx-auto pt-28 md:pt-32 pb-20 px-4">
+          {/* Breadcrumb */}
+          <div className="mb-6">
+            <BreadcrumbNavigation />
+          </div>
+          
+          {/* Page Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
+              Vaje za jezik
+            </h1>
+            <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
+          </div>
+          
+          <p className="text-muted-foreground mb-8">
+            Gibalne vaje za jezik, ki pomagajo pri izboljšanju artikulacije in motorike govornih organov.
+          </p>
+          
+          <TongueGymGame />
         </div>
-        
-        {/* Page Title */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Vaje za jezik
-          </h1>
-          <div className="w-32 h-1 bg-app-yellow mx-auto rounded-full"></div>
-        </div>
-        
-        <p className="text-muted-foreground mb-8">
-          Gibalne vaje za jezik, ki pomagajo pri izboljšanju artikulacije in motorike govornih organov.
-        </p>
-        
-        <TongueGymGame />
-      </div>
+      </SubscriptionGate>
 
       {/* Mobile Back Button */}
       {isMobile && (

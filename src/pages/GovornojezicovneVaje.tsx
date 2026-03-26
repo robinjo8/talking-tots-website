@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import { DailyStarsBar } from "@/components/DailyStarsBar";
 import { FooterSection } from "@/components/FooterSection";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const GovornojezicovneVaje = () => {
   const { user, selectedChild, signOut, isLoading: isAuthLoading } = useAuth();
@@ -110,6 +111,8 @@ const GovornojezicovneVaje = () => {
             <BreadcrumbNavigation />
           </div>
           
+           <SubscriptionGate>
+          
           {selectedChild ? (
             <div className={isMobile ? "grid grid-cols-2 gap-4" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"}>
               {exerciseTypes.map(exercise => (
@@ -168,6 +171,7 @@ const GovornojezicovneVaje = () => {
               </p>
             </div>
           )}
+          </SubscriptionGate>
         </div>
       </section>
       
