@@ -1,38 +1,49 @@
 
-## Plan: Popravi simulacijo — generiraj PDF + pravilne igre v osebnem načrtu
 
-### Problem
+## Plan: Popravi "Zaključi vseh 30 sklopov" — napačna logika + čiščenje
 
-Dva glavna problema v akciji `auto_evaluate_and_report`:
+### Analiza problema
 
-**1. Pozicije glasov so napačne (→ ni iger v načrtu)**
+**Stanje v bazi:**
+- 5 načrtov za "Testni otrok": 4 arhivirani + 1 aktiven (`4fe99ccd`)
+- Aktiven načrt ima **0 tracking zapisov** — zato UI kaže "Sklop 1" in "0/30"
+- Vsi completed tracking zapisi pripadajo starim arhiviranim načrtom
 
-V `report_details.letters` simulacija zapiše pozicije kot `["začetek", "sredina/konec"]` (slovensko), vendar `generate-monthly-plan` pričakuje angleške kode: `"start"`, `"middle-end"`, `"initial-exercises"`. Funkcija `buildGameCombinations` ne najde ujemanja → 0 iger → v načrtu je samo "Vaje za motoriko govoril".
+**Zakaj se to zgodi:**
+1. Vsak klik na "Simuliraj ocenjevanje + poročilo" ustvari NOV načrt (kliče `generate-monthly-plan`), star načrt se arhivira
+2. Ko klikneš "Zaključi vseh 30 sklopov", ta zapiše tracking za takrat aktiven načrt
+3. Če potem znova klikneš "Simuliraj ocenjevanje + poročilo", se ta načrt arhivira in ustvari nov prazen
+4. Rezultat: tracking zapisi na arhiviranem načrtu, aktiven načrt prazen
 
-**2. Ni PDF poročila (→ pod "Dokumenti" ni ničesar)**
-
-Simulacija shrani le `.txt` datoteko v `Porocila/`, vendar pravi "Generiraj" gumb v admin portalu generira **PDF** in ga shrani v `Generirana-porocila/`. PDF pod `Generirana-porocila/` je tisto, kar se prikaže pod "Dokumenti" na admin strani in uporabniku.
+**Dodatna napaka v logiki `complete_all_sets`:**
+- Vedno doda 30 novih sklopov od zadnjega (`startSet = max + 1`), ne glede na `totalSets`
+- Če klikneš dvakrat, vstavi sklope 31-60, ki ne obstajajo v načrtu
 
 ### Spremembe
 
-**`supabase/functions/simulate-plan-lifecycle/index.ts`** — akcija `auto_evaluate_and_report`:
+**1. Edge funkcija `simulate-plan-lifecycle/index.ts` — akcija `complete_all_sets`:**
+- Omeji `endSet` na `totalSets` iz `plan_data` (ne vedno +30)
+- Če so vsi sklopi že zaključeni, vrni sporočilo namesto vstavljanja duplikatov
+- NE sproži renewal — to je simulacija, ne pravi potek
 
-1. **Popravi pozicije glasov** (vrstica 388):
-   ```ts
-   // Namesto:
-   positions: ["začetek", "sredina/konec"]
-   // Uporabi:
-   positions: ["start", "middle-end", "initial-exercises"]
-   ```
-   To je ekvivalent izbire "Začetek", "Sredina/konec" in "Začetne vaje" v admin portalu za glas R.
+**2. Edge funkcija — akcija `reset_full_lifecycle`:**
+- Preveri da briše tudi `plan_set_tracking` in `plan_activity_completions` za VSE načrte tega otroka (ne le aktivnega)
+- Preveri da briše tudi vse `child_monthly_plans` zapise
 
-2. **Generiraj PDF in shrani v `Generirana-porocila/`**: 
-   - Ker Edge funkcija nima dostopa do `generateReportPdf` (to je frontend utilita, ki uporablja jsPDF), generiramo minimalen PDF v Deno z uporabo osnove (raw PDF bytes) ali pa shranimo `.txt` datoteko v `Generirana-porocila/` namesto `Porocila/`.
-   - Realno: admin portal shranjuje PDF-je v `Generirana-porocila/`, `.txt` osnutke pa v `Porocila/`. Simulacija mora storiti oboje — shraniti `.txt` v `Porocila/` (za shranjena poročila) IN kopijo v `Generirana-porocila/` (za razdelek "Dokumenti").
-   - Najenostavnejša rešitev: `.txt` shranimo v **oba folderja** (`Porocila/` in `Generirana-porocila/`), ker admin stran pod "Dokumenti" prikazuje datoteke iz `Generirana-porocila/`.
+**3. Čiščenje baze (migracija):**
+- Izbriši vse osirotele `plan_set_tracking` zapise za arhivirane načrte "Testni otrok"
+- Izbriši vse arhivirane `child_monthly_plans` za tega otroka (obdrži le aktiven načrt)
 
-3. **Posodobi `pdf_url` v `logopedist_reports`** da kaže na pot v `Generirana-porocila/`.
+### Pravilna logika za `complete_all_sets`:
+
+```text
+1. Najdi aktiven načrt
+2. Preberi totalSets iz plan_data (default 30)
+3. Preveri obstoječe tracking zapise za TA načrt
+4. Vstavi SAMO manjkajoče sklope od 1 do totalSets kot "completed"
+5. NE sproži renewal
+```
 
 ### Obseg
-- 1 Edge funkcija posodobljena (~10 vrstic spremenjenih)
-- Popravek pozicij bo omogočil, da `generate-monthly-plan` pravilno generira 11 iger za vsak sklop
+- 1 Edge funkcija posodobljena (logika `complete_all_sets` + morebitni popravki `reset_full_lifecycle`)
+- 1 migracija za čiščenje obstoječih osirot
