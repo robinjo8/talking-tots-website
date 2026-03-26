@@ -262,22 +262,9 @@ Deno.serve(async (req) => {
 
       const simResult = await simResponse.json();
 
-      // Also insert articulation_test_results record
-      const { error: testResultError } = await supabase
-        .from("articulation_test_results")
-        .insert({
-          child_id: childId,
-          completed_at: new Date().toISOString(),
-        });
-
-      if (testResultError) {
-        console.error("Insert test result error:", testResultError);
-      }
-
       result = { 
         sessionCreated: true, 
         sessionId: simResult.sessionId || simResult.id,
-        testResultInserted: !testResultError,
         note: "Seja ustvarjena s 60 besedami + test result dodan. Logoped lahko oceni na admin portalu."
       };
 
