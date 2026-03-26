@@ -1,4 +1,4 @@
-import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock } from "lucide-react";
+import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardCheck, Lock, FlaskConical } from "lucide-react";
 import {
   Select,
   SelectContent,
