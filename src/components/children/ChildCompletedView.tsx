@@ -9,6 +9,7 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 
 import type { ChildProfile } from "@/hooks/useRegistration";
 import { SpeechDifficultyBadge } from "@/components/speech";
+import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from "@/models/SpeechDevelopment";
 
 interface ChildCompletedViewProps {
   child: ChildProfile;
@@ -32,10 +33,17 @@ export function ChildCompletedView({
       rarely: "Redko"
     };
     
-    return Object.entries(answers).map(([key, value]) => ({
-      id: key,
-      answer: labelMap[value] || value
-    }));
+    return Object.entries(answers).map(([key, value]) => {
+      const radioQ = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === key);
+      const textQ = SPEECH_DEVELOPMENT_TEXT_QUESTIONS.find(q => q.id === key);
+      const questionText = radioQ?.question || textQ?.question || `Vprašanje: ${key}`;
+      const option = radioQ?.options.find(o => o.value === value);
+      return {
+        id: key,
+        questionText,
+        answer: option?.label || labelMap[value] || value
+      };
+    });
   };
   
   const answerItems = child.speechDevelopment ? getAnswerLabels(child.speechDevelopment) : [];
@@ -117,15 +125,17 @@ export function ChildCompletedView({
           </CollapsibleTrigger>
           <CollapsibleContent>
             <div className="bg-white rounded-lg border divide-y mt-2">
-              {answerItems.map((item, index) => (
-                <div key={item.id} className="p-4 flex items-center justify-between">
-                  <span className="text-gray-700">Vprašanje {index + 1}</span>
-                  <Badge 
-                    variant={item.answer === "Da" ? "success" : 
-                           item.answer === "Ne" ? "outline" : "secondary"}
-                  >
-                    {item.answer}
-                  </Badge>
+              {answerItems.map((item) => (
+                <div key={item.id} className="p-4 flex flex-col gap-2">
+                  <span className="text-gray-700 text-sm">{item.questionText}</span>
+                  <div className="flex justify-end">
+                    <Badge 
+                      variant={item.answer === "Da" ? "success" : 
+                             item.answer === "Ne" ? "outline" : "secondary"}
+                    >
+                      {item.answer}
+                    </Badge>
+                  </div>
                 </div>
               ))}
             </div>

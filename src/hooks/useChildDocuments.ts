@@ -21,7 +21,8 @@ interface UseChildDocumentsResult {
   uploadDocument: (
     file: File,
     childId: string,
-    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire'
+    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire',
+    options?: { silent?: boolean }
   ) => Promise<ChildDocument | null>;
   uploadStatus: UploadStatus;
   errorMessage: string | null;
@@ -38,8 +39,10 @@ export function useChildDocuments(): UseChildDocumentsResult {
   const uploadDocument = useCallback(async (
     file: File,
     childId: string,
-    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire'
+    documentType: 'pdf_attachment' | 'speech_description' | 'questionnaire',
+    options?: { silent?: boolean }
   ): Promise<ChildDocument | null> => {
+    const silent = options?.silent ?? false;
     try {
       setUploadStatus('uploading');
       setErrorMessage(null);
@@ -82,9 +85,11 @@ export function useChildDocuments(): UseChildDocumentsResult {
 
     } catch (error: any) {
       console.error('Upload error:', error);
-      setUploadStatus('error');
-      setErrorMessage(error.message || 'Napaka pri nalaganju');
-      toast.error(error.message || 'Napaka pri nalaganju dokumenta');
+      if (!silent) {
+        setUploadStatus('error');
+        setErrorMessage(error.message || 'Napaka pri nalaganju');
+        toast.error(error.message || 'Napaka pri nalaganju dokumenta');
+      }
       return null;
     }
   }, []);

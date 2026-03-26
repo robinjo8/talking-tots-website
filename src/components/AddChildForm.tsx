@@ -203,14 +203,14 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
         try {
           // Upload PDF attachment if provided
           if (attachedFile) {
-            await uploadDocument(attachedFile, newChildId, 'pdf_attachment');
+            await uploadDocument(attachedFile, newChildId, 'pdf_attachment', { silent: true });
           }
           
           // Upload speech description as text file if provided
           if (speechDescription && speechDescription.trim()) {
             const textBlob = new Blob([speechDescription], { type: 'text/plain' });
             const textFile = new File([textBlob], `opis-govornih-tezav-${Date.now()}.txt`, { type: 'text/plain' });
-            await uploadDocument(textFile, newChildId, 'speech_description');
+            await uploadDocument(textFile, newChildId, 'speech_description', { silent: true });
           }
           
           // Upload questionnaire as text file
@@ -222,7 +222,7 @@ export function AddChildForm({ onSuccess, onBack: onBackProp, initialName, initi
               `${newChildId}-osnovni-vprasalnik.txt`, 
               { type: 'text/plain' }
             );
-            await uploadDocument(questionnaireFile, newChildId, 'questionnaire');
+            await uploadDocument(questionnaireFile, newChildId, 'questionnaire', { silent: true });
           }
           console.log("Background document upload completed successfully");
         } catch (uploadError) {

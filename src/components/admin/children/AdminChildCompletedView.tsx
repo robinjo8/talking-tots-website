@@ -6,6 +6,7 @@ import { CheckCircle2, Plus, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { sl } from 'date-fns/locale';
 import { SpeechDifficultyBadge } from '@/components/speech';
+import { SPEECH_DEVELOPMENT_QUESTIONS, SPEECH_DEVELOPMENT_TEXT_QUESTIONS } from '@/models/SpeechDevelopment';
 import { avatarOptions } from '@/components/AvatarSelector';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -51,10 +52,17 @@ export function AdminChildCompletedView({
       rarely: 'Redko',
     };
 
-    return Object.entries(answers).map(([key, value]) => ({
-      id: key,
-      answer: labelMap[value] || value,
-    }));
+    return Object.entries(answers).map(([key, value]) => {
+      const radioQ = SPEECH_DEVELOPMENT_QUESTIONS.find(q => q.id === key);
+      const textQ = SPEECH_DEVELOPMENT_TEXT_QUESTIONS.find(q => q.id === key);
+      const questionText = radioQ?.question || textQ?.question || `Vprašanje: ${key}`;
+      const option = radioQ?.options.find(o => o.value === value);
+      return {
+        id: key,
+        questionText,
+        answer: option?.label || labelMap[value] || value,
+      };
+    });
   };
 
   const answerItems = child.speechDevelopment ? getAnswerLabels(child.speechDevelopment) : [];
@@ -140,20 +148,22 @@ export function AdminChildCompletedView({
         <div>
           <h3 className="font-semibold text-lg mb-4">Odgovori na vprašalnik</h3>
           <div className="bg-white rounded-lg border divide-y">
-            {answerItems.map((item, index) => (
-              <div key={item.id} className="p-3 flex items-center justify-between">
-                <span className="text-gray-700 text-sm">Vprašanje {index + 1}</span>
-                <Badge
-                  variant={
-                    item.answer === 'Da'
-                      ? 'default'
-                      : item.answer === 'Ne'
-                      ? 'outline'
-                      : 'secondary'
-                  }
-                >
-                  {item.answer}
-                </Badge>
+            {answerItems.map((item) => (
+              <div key={item.id} className="p-3 flex flex-col gap-1">
+                <span className="text-gray-700 text-sm">{item.questionText}</span>
+                <div className="flex justify-end">
+                  <Badge
+                    variant={
+                      item.answer === 'Da'
+                        ? 'default'
+                        : item.answer === 'Ne'
+                        ? 'outline'
+                        : 'secondary'
+                    }
+                  >
+                    {item.answer}
+                  </Badge>
+                </div>
               </div>
             ))}
           </div>
