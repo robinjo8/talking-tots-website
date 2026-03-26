@@ -18,6 +18,7 @@ interface TestReminderEmailProps {
   title: string
   message: string
   milestoneType: string
+  unsubscribeUrl?: string
 }
 
 export const TestReminderEmail = ({
