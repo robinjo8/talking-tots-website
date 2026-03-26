@@ -162,6 +162,21 @@ export default function AdminUserDetail() {
         });
       }
 
+      // Fetch subscription info
+      const { data: subData } = await supabase
+        .from('user_subscriptions')
+        .select('plan_id, current_period_end, status')
+        .eq('user_id', parentId)
+        .maybeSingle();
+
+      if (subData) {
+        setSubscriptionInfo({
+          planId: subData.plan_id,
+          subscriptionEnd: subData.current_period_end,
+          status: subData.status,
+        });
+      }
+
       // Sessions will be extracted from storage recordings in a separate effect
     }
 
