@@ -240,6 +240,47 @@ Deno.serve(async (req) => {
         }
       }
 
+    } else if (action === "simulate_full_test") {
+      // Call simulate-articulation-test to create a full session with 60 words
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const simResponse = await fetch(`${supabaseUrl}/functions/v1/simulate-articulation-test`, {
+        method: "POST",
+        headers: {
+          "Authorization": authHeader!,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ childId: childId }),
+      });
+
+      if (!simResponse.ok) {
+        const errText = await simResponse.text();
+        return new Response(JSON.stringify({ error: `simulate-articulation-test failed: ${errText}` }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const simResult = await simResponse.json();
+
+      // Also insert articulation_test_results record
+      const { error: testResultError } = await supabase
+        .from("articulation_test_results")
+        .insert({
+          child_id: childId,
+          completed_at: new Date().toISOString(),
+        });
+
+      if (testResultError) {
+        console.error("Insert test result error:", testResultError);
+      }
+
+      result = { 
+        sessionCreated: true, 
+        sessionId: simResult.sessionId || simResult.id,
+        testResultInserted: !testResultError,
+        note: "Seja ustvarjena s 60 besedami + test result dodan. Logoped lahko oceni na admin portalu."
+      };
+
     } else if (action === "calculate_cooldown_preview") {
       // Get all completed tests for this child
       const { data: tests } = await supabase

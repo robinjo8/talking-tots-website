@@ -91,6 +91,19 @@ export function PlanLifecycleTools() {
           Ponastavi osebni načrt
         </Button>
 
+        {/* Full test simulation */}
+        <p className="text-sm font-medium text-muted-foreground mt-4">Preverjanje izgovorjave</p>
+        <Button
+          variant="outline"
+          className="w-full justify-start hover:bg-dragon-green/10 hover:border-dragon-green"
+          onClick={() => invoke("simulate_full_test")}
+          disabled={!!loading}
+        >
+          <BtnIcon action="simulate_full_test" />
+          {!isLoading("simulate_full_test") && <FlaskConical className="h-4 w-4 mr-2 text-dragon-green" />}
+          Simuliraj celotno preverjanje
+        </Button>
+
         {/* Test simulation */}
         <p className="text-sm font-medium text-muted-foreground mt-4">Simulacija zamude pri testu</p>
         <div className="flex gap-2">
