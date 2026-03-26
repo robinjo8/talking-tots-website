@@ -9,6 +9,8 @@ import {
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { isDevUser } from "@/lib/devAccess";
 
 type ProfileMobileTabsProps = {
   activeSection: string;
