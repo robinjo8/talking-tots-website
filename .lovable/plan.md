@@ -1,49 +1,67 @@
 
 
-## Plan: Logo slika in footer za vse Resend emaile
+## Plan: Odjava od obvestil in link na /kontakt
 
 ### Problem
-- Vsi emaili uporabljajo besedilni logo ("Tomi" + "Talk" s CSS barvami) namesto dejanske slike logotipa `TomiTalk_logo_22.png`
-- MFA koda in obvestilo o načrtu (inline HTML) nimata ustreznega footerja z odjavnim besedilom
-- "Odjavite" link v footerju ne vodi nikamor
+Vsi emaili trenutno uporabljajo `mailto:podpora@tomitalk.si` za odjavo, kar ni pravi unsubscribe mehanizem.
 
-### Potrebna informacija
-Moram vedeti v katerem Supabase storage bucket-u se nahaja `TomiTalk_logo_22.png`. Predvidevam `slike-ostalo` — torej URL: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png`. Če je v drugem bucketu, mi sporoči.
+### Rešitev — dva tipa footerjev
 
-### Spremembe (4 datoteke)
+**1. Sistemski/auth emaili** (registracija, MFA koda, sprememba gesla):
+- Footer link "se lahko odjavite" zamenjamo z linkom na stran `/kontakt`
+- Besedilo: "Če imate vprašanja, nas kontaktirajte na [strani za kontakt](https://tomitalk.com/kontakt)."
+- Te emaile uporabnik NE MORE onemogočiti (so obvezni za delovanje računa)
 
-**1. `supabase/functions/send-mfa-code/index.ts`**
-- V inline HTML zamenjam besedilni logo z `<img>` tagom za `TomiTalk_logo_22.png` (centriran, max-width 180px)
-- Na koncu emaila dodam footer: "Če niste ustvarili računa pri TomiTalk..." + "S spoštovanjem, TomiTalk" + "To sporočilo ste prejeli..." z linkom za odjavo
-- Footer oblikovan enako kot v `signup-confirmation.tsx`
+**2. Obvestilni emaili** (opomniki za preverjanje, obvestila o načrtu):
+- Footer link vodi na novo stran `/odjava-obvestil`
+- Stran omogoča dejansko odjavo od email obvestil
 
-**2. `supabase/functions/generate-monthly-plan/index.ts` (vrstica 699-711)**
-- Zamenjam inline HTML z enakim vzorcem: `<img>` logo zgoraj, zelena glava
-- Dodam enak footer kot zgoraj
+### Spremembe
 
-**3. `supabase/functions/check-test-reminders/_templates/test-reminder.tsx`**
-- V header sekciji zamenjam `<span>` logo z `<Img>` React Email komponento za `TomiTalk_logo_22.png`
-- Dodam import `Img` iz `@react-email/components`
-- V footerju "se lahko odjavite" dodaj link na email nastavitve (uporabim `mailto:` ali link na stran za odjavo)
-
-**4. `supabase/functions/send-signup-confirmation/_templates/signup-confirmation.tsx`**
-- V header sekciji zamenjam `<span>` logo z `<Img>` React Email komponento
-- `Img` je že importiran
-
-### Footer tekst (enak povsod)
+**Nova tabela `email_preferences`:**
 ```
-Če niste ustvarili računa pri TomiTalk, lahko to sporočilo varno prezrete.
-
-S spoštovanjem,
-TomiTalk
-
-To sporočilo ste prejeli, ker ste se prijavili v TomiTalk.
-Če teh e-poštnih sporočil ne želite več prejemati, se lahko odjavite.
+- id (uuid)
+- user_id (uuid, FK auth.users)
+- notifications_enabled (boolean, default true)
+- created_at, updated_at
 ```
+RLS: uporabnik lahko bere/ureja samo svoje nastavitve.
 
-### Odjava link
-Za "se lahko odjavite" uporabim `mailto:podpora@tomitalk.si?subject=Odjava od obvestil` — ker projekt nima dedicirane unsubscribe strani. Alternativno lahko ustvarimo preprosto stran `/odjava-obvestil`, če želiš pravi unsubscribe mehanizem.
+**Nova stran `/odjava-obvestil`:**
+- Preprosta stran z besedilom "Odjava od email obvestil"
+- Sprejme query parameter `?token=...` (JWT z user_id)
+- Ob kliku na gumb "Potrdi odjavo" nastavi `notifications_enabled = false`
+- Prikaz potrditve "Uspešno ste se odjavili od obvestil"
+- Možnost ponovne prijave
 
-### Deployment
-Po spremembah deplojiram vse tri Edge funkcije: `send-mfa-code`, `generate-monthly-plan`, `check-test-reminders`. Funkcija `send-signup-confirmation` se prav tako deploja.
+**Token za odjavo:**
+- Edge funkcije ob pošiljanju obvestilnih emailov generirajo JWT token z `user_id` in `exp` (30 dni)
+- Token se doda v URL: `https://tomitalk.com/odjava-obvestil?token=xxx`
+- Na strani `/odjava-obvestil` se token verificira in uporabnik odjavi
+
+**Spremembe v Edge funkcijah:**
+
+| Datoteka | Tip | Sprememba footerja |
+|---|---|---|
+| `send-signup-confirmation/_templates/signup-confirmation.tsx` | Auth | Link → `/kontakt` |
+| `send-mfa-code/index.ts` | Auth | Link → `/kontakt` |
+| `check-test-reminders/_templates/test-reminder.tsx` | Obvestilo | Link → `/odjava-obvestil?token=xxx` |
+| `generate-monthly-plan/index.ts` | Obvestilo | Link → `/odjava-obvestil?token=xxx` |
+
+**Preverjanje pred pošiljanjem:**
+- V `check-test-reminders/index.ts` in `generate-monthly-plan/index.ts` pred pošiljanjem emaila preverimo `email_preferences.notifications_enabled`
+- Če je `false`, email ne pošljemo (in-app obvestilo v `user_notifications` se še vedno ustvari)
+
+### Datoteke
+
+| Datoteka | Akcija |
+|---|---|
+| SQL migracija: `email_preferences` tabela | Nova |
+| `src/pages/OdjavaObvestil.tsx` | Nova stran |
+| `src/App.tsx` | Dodaj route `/odjava-obvestil` |
+| `supabase/functions/send-signup-confirmation/_templates/signup-confirmation.tsx` | Spremeni footer → `/kontakt` |
+| `supabase/functions/send-mfa-code/index.ts` | Spremeni footer → `/kontakt` |
+| `supabase/functions/check-test-reminders/_templates/test-reminder.tsx` | Spremeni footer → `/odjava-obvestil?token=xxx` |
+| `supabase/functions/check-test-reminders/index.ts` | Dodaj generiranje tokena + preverjanje preferenc |
+| `supabase/functions/generate-monthly-plan/index.ts` | Dodaj generiranje tokena + preverjanje preferenc |
 
