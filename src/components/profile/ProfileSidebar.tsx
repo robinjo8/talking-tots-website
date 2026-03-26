@@ -40,7 +40,7 @@ export function ProfileSidebar({ activeSection, setActiveSection, childrenCount 
       
       {/* Menu items */}
       <nav className="p-2">
-        {menuItems.map((item) => {
+        {allItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
           const isLocked = item.proOnly && !isPro;

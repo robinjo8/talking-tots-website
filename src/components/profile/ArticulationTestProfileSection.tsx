@@ -249,6 +249,7 @@ export function ArticulationTestProfileSection() {
             </Button>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

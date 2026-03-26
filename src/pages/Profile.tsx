@@ -231,6 +231,8 @@ export default function Profile() {
             
             {activeSection === 'articulationTest' && <ArticulationTestProfileSection />}
             
+            {activeSection === 'lifecycleTools' && <PlanLifecycleTools />}
+            
             {activeSection === 'subscription' && (
               <div data-section="subscription">
                 <SubscriptionSection />

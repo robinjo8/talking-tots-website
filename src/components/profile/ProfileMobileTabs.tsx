@@ -53,7 +53,7 @@ export function ProfileMobileTabs({ activeSection, setActiveSection, childrenCou
         </div>
       </SelectTrigger>
       <SelectContent className="bg-white border border-gray-200 shadow-lg z-[100]">
-        {tabs.map((tab) => {
+        {allTabs.map((tab) => {
           const Icon = tab.icon;
           const isLocked = tab.proOnly && !isPro;
           return (
