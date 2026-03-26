@@ -48,6 +48,10 @@ const PogostaVprasanja = () => {
     {
       question: "Ali lahko starši spremljajo, katere vaje otrok izvaja?",
       answer: "Seveda! Starši imajo v zavihku »Moja stran« popoln pregled nad vajami, ki jih je otrok opravil, in nad njegovim vsakodnevnim napredkom."
+    },
+    {
+      question: "Ali lahko TomiTalk uporabljajo otroci starejši od 10 let?",
+      answer: "Da. Za otroke, starejše od 10 let, se uporabljajo igre, vaje in preverjanje izgovorjave, ki so prilagojeni starostni skupini 9–10 let. Vsebine so tako še vedno ustrezne in koristne za krepitev govornih sposobnosti."
     }
   ];
 
