@@ -275,6 +275,7 @@ export function AppRoutes() {
       <Route path="/info-govor" element={<LazyRoute><InfoGovor /></LazyRoute>} />
       <Route path="/info-jezik" element={<LazyRoute><InfoJezik /></LazyRoute>} />
       <Route path="/info-moja-stran" element={<LazyRoute><InfoMojaStran /></LazyRoute>} />
+      <Route path="/odjava-obvestil" element={<LazyRoute><OdjavaObvestil /></LazyRoute>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

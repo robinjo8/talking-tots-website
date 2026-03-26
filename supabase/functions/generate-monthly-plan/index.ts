@@ -718,7 +718,7 @@ serve(async (req) => {
                 <div style="background-color: hsl(122, 39%, 95%); padding: 20px; text-align: center; border-radius: 0 0 12px 12px;">
                   <p style="color: #666; font-size: 14px; line-height: 1.5; margin: 8px 0;">
                     To sporočilo ste prejeli, ker imate račun pri TomiTalk.<br/>
-                    Če teh e-poštnih sporočil ne želite več prejemati, <a href="mailto:podpora@tomitalk.si?subject=Odjava od obvestil" style="color: hsl(122, 39%, 49%);">se lahko odjavite</a>.
+                    Če teh e-poštnih sporočil ne želite več prejemati, <a href="${unsubscribeUrl}" style="color: hsl(122, 39%, 49%);">se lahko odjavite</a>.
                   </p>
                 </div>
               </div>
