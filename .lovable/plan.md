@@ -1,43 +1,49 @@
 
 
-## Plan: Obvestilo staršem ob generiranju novega osebnega načrta
+## Plan: Logo slika in footer za vse Resend emaile
 
 ### Problem
-Ko se generira nov osebni načrt (prvič ali ob renewal-u), starš ne dobi nobenega obvestila. Načrt se tiho pojavi na `/moji-izzivi`.
+- Vsi emaili uporabljajo besedilni logo ("Tomi" + "Talk" s CSS barvami) namesto dejanske slike logotipa `TomiTalk_logo_22.png`
+- MFA koda in obvestilo o načrtu (inline HTML) nimata ustreznega footerja z odjavnim besedilom
+- "Odjavite" link v footerju ne vodi nikamor
 
-### Rešitev
-Na koncu Edge funkcije `generate-monthly-plan`, po uspešnem zapisu načrta, vstavimo obvestilo v tabelo `user_notifications` in pošljemo email prek Resend API.
+### Potrebna informacija
+Moram vedeti v katerem Supabase storage bucket-u se nahaja `TomiTalk_logo_22.png`. Predvidevam `slike-ostalo` — torej URL: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo/TomiTalk_logo_22.png`. Če je v drugem bucketu, mi sporoči.
 
-### Spremembe
+### Spremembe (4 datoteke)
 
-**1. `supabase/functions/generate-monthly-plan/index.ts`**
+**1. `supabase/functions/send-mfa-code/index.ts`**
+- V inline HTML zamenjam besedilni logo z `<img>` tagom za `TomiTalk_logo_22.png` (centriran, max-width 180px)
+- Na koncu emaila dodam footer: "Če niste ustvarili računa pri TomiTalk..." + "S spoštovanjem, TomiTalk" + "To sporočilo ste prejeli..." z linkom za odjavo
+- Footer oblikovan enako kot v `signup-confirmation.tsx`
 
-Po vrstici 654 (po uspešnem generiranju), dodamo:
+**2. `supabase/functions/generate-monthly-plan/index.ts` (vrstica 699-711)**
+- Zamenjam inline HTML z enakim vzorcem: `<img>` logo zgoraj, zelena glava
+- Dodam enak footer kot zgoraj
 
-- Poiščemo `parent_id` iz tabele `children` (že imamo `child` objekt z `parent_id`)
-- Določimo tip obvestila glede na `mode`:
-  - `report_update` → tip `plan_new`, naslov: "Nov osebni načrt je pripravljen!"
-  - `renewal` → tip `plan_renewed`, naslov: "Osebni načrt je bil podaljšan!"
-- INSERT v `user_notifications` (user_id, child_id, type, title, message, link `/moji-izzivi`)
-- Pošljemo email prek Resend API z obstoječim vzorcem (fetch na `https://api.resend.com/emails`)
+**3. `supabase/functions/check-test-reminders/_templates/test-reminder.tsx`**
+- V header sekciji zamenjam `<span>` logo z `<Img>` React Email komponento za `TomiTalk_logo_22.png`
+- Dodam import `Img` iz `@react-email/components`
+- V footerju "se lahko odjavite" dodaj link na email nastavitve (uporabim `mailto:` ali link na stran za odjavo)
 
-Email vsebina:
-- **Nov načrt**: "Za otroka {ime} je bil pripravljen nov osebni načrt vaj. Odprite aplikacijo in začnite z vajami!"
-- **Podaljšanje**: "Osebni načrt za otroka {ime} je bil podaljšan z novimi vajami. Nadaljujte z vajami!"
+**4. `supabase/functions/send-signup-confirmation/_templates/signup-confirmation.tsx`**
+- V header sekciji zamenjam `<span>` logo z `<Img>` React Email komponento
+- `Img` je že importiran
 
-**2. `src/hooks/useUserNotifications.ts`**
+### Footer tekst (enak povsod)
+```
+Če niste ustvarili računa pri TomiTalk, lahko to sporočilo varno prezrete.
 
-Ni sprememb — hook že bere vse zapise iz `user_notifications` tabele, novi tipi (`plan_new`, `plan_renewed`) se bodo avtomatsko prikazali.
+S spoštovanjem,
+TomiTalk
 
-**3. `src/components/header/UserNotificationBell.tsx`**
+To sporočilo ste prejeli, ker ste se prijavili v TomiTalk.
+Če teh e-poštnih sporočil ne želite več prejemati, se lahko odjavite.
+```
 
-- Dodamo prepoznavo novih tipov `plan_new` in `plan_renewed` v funkciji `isTestReminder` (ali nova funkcija `isPlanNotification`)
-- Ikona: uporabimo `Calendar` namesto `ClipboardCheck`
-- Ob kliku navigacija na `/moji-izzivi`
+### Odjava link
+Za "se lahko odjavite" uporabim `mailto:podpora@tomitalk.si?subject=Odjava od obvestil` — ker projekt nima dedicirane unsubscribe strani. Alternativno lahko ustvarimo preprosto stran `/odjava-obvestil`, če želiš pravi unsubscribe mehanizem.
 
-### Tehnični detajli
-
-- Email pošiljanje: direkten `fetch` na Resend API z `RESEND_API_KEY` (že obstaja med secrets)
-- Deduplikacija: za `renewal` preverimo ali obvestilo za ta `child_id` + `plan_renewed` že obstaja v zadnjih 24 urah (preprečimo dvojna obvestila ob ponovnem klicu)
-- `parent_id` je že dostopen iz `children` query-ja v Edge funkciji
+### Deployment
+Po spremembah deplojiram vse tri Edge funkcije: `send-mfa-code`, `generate-monthly-plan`, `check-test-reminders`. Funkcija `send-signup-confirmation` se prav tako deploja.
 
