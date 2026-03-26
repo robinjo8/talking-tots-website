@@ -1,12 +1,22 @@
 
 
-## Plan: Popravek emaila in razlaga napake na /odjava-obvestil
+## Plan: Dodaj manjkajoče vprašanje na /clanki/pogosta-vprasanja
 
-### Razlaga napake na sliki
+### Problem
+Stran `/clanki/pogosta-vprasanja` ima 10 vprašanj, prva stran pa 11. Manjka zadnje vprašanje:
+- **"Ali lahko TomiTalk uporabljajo otroci starejši od 10 let?"** z odgovorom o prilagoditvi na starostno skupino 9-10 let.
 
-Stran `/odjava-obvestil` zahteva query parameter `?token=...` v URL-ju. Ko obiščeš stran brez tokena (npr. samo `/odjava-obvestil`), se prikaže napaka "Manjka žeton za odjavo" — to je **pričakovano obnašanje**. Uporabnik to stran nikoli ne obišče ročno; nanjo pride samo prek linka v emailu, ki vsebuje token.
+### Sprememba
+**Datoteka:** `src/pages/clanki/PogostaVprasanja.tsx`
 
-### Sprememba: podpora@tomitalk.si → info@tomitalk.si
+Dodaj na konec `faqData` arraya (za vrstico 51) nov objekt:
+```js
+{
+  question: "Ali lahko TomiTalk uporabljajo otroci starejši od 10 let?",
+  answer: "Da. Za otroke, starejše od 10 let, se uporabljajo igre, vaje in preverjanje izgovorjave, ki so prilagojeni starostni skupini 9–10 let. Vsebine so tako še vedno ustrezne in koristne za krepitev govornih sposobnosti."
+}
+```
 
-Edina datoteka z `podpora@tomitalk.si` je `src/pages/OdjavaObvestil.tsx` (vrstica 164-165). Zamenjam `mailto:podpora@tomitalk.si` in prikazano besedilo z `info@tomitalk.si`.
+### Obseg
+1 datoteka, 1 vrstica dodana.
 
