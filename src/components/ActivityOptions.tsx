@@ -203,6 +203,18 @@ export function ActivityOptions() {
                   </div>
                 </div>
               )}
+              
+              {/* Subscription overlay */}
+              {isSubLocked && !isProLocked && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                  <div className="bg-dragon-green text-white px-4 py-2 rounded-lg shadow-lg">
+                    <p className="text-sm font-bold text-center flex items-center gap-2">
+                      <Lock className="w-4 h-4" />
+                      Naročnina
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Card Content */}
