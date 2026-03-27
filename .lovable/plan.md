@@ -1,52 +1,30 @@
 
 
-## Plan: Dodaj naključno razporeditev iger v osebnem načrtu
+## Plan: Popravi sliko za Zabavno pot + unikatna poročila
 
-### Odgovor na vprašanja
+### Problem 1: Zabavna pot brez slike
 
-**1. Dokumenti / Poročila**: Da, vsak klik na "Simuliraj ocenjevanje + poročilo" ustvari novo poročilo v Storage (mapa `Generirana-porocila/`), ki se prikaže pod "Dokumenti" na admin strani. Po 90 sklopih + novo preverjanje → novo poročilo. Po 180 sklopih + novo preverjanje → tretje poročilo itd. To deluje pravilno.
+`GameImageMap.ts` nima vnosa za `"kace"` (Zabavna pot). Ko `getGameImage("kace", "igra")` ne najde ujemanja, vrne prazen string → prikaže se generična ikona gamepad.
 
-**2. Osebni načrt je vedno enak**: To je dejanski problem. Funkcija `generateSetBasedPlan` v `generate-monthly-plan/index.ts` (vrstica 211-291) uporablja **deterministični round-robin** za razporejanje iger po sklopih. Ni nobene naključnosti — če ima otrok isto črko (npr. R) in isto starostno skupino, dobi **identičen načrt** kot vsak drug otrok z enakimi parametri. Tudi pri renewalu (2. in 3. serija 30 sklopov) so igre v enakem vrstnem redu.
-
-### Sprememba
-
-**`supabase/functions/generate-monthly-plan/index.ts`** — funkcija `generateSetBasedPlan`:
-
-1. **Premešaj `combinations` array** pred generiranjem sklopov s Fisher-Yates shuffle algoritmom
-2. **Premešaj vrstni red iger znotraj vsakega sklopa** po tem ko so izbrane
-
-Dodaj helper funkcijo:
+**Popravek**: Dodaj `"kace"` v `GAME_IMAGE_MAP`:
 ```ts
-function shuffleArray<T>(arr: T[]): T[] {
-  const shuffled = [...arr];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
+"kace": `${SUPABASE_URL}/slike-ostalo/zabavna_pot_1.webp`,
 ```
 
-V `generateSetBasedPlan` (vrstica 211):
-```ts
-function generateSetBasedPlan(totalSets: number, combinations: GameCombination[], motorika: MotorikaConfig): PlanSet[] {
-  const shuffledCombinations = shuffleArray(combinations);
-  // ... ostala logika ostane enaka, samo uporabi shuffledCombinations
-```
+### Problem 2: Samo 1 poročilo v "Generirana poročila logopeda"
 
-In na koncu vsakega sklopa (pred `sets.push`):
-```ts
-// Premešaj igre znotraj sklopa (motorika ostane prva)
-const motorikaActivities = activities.filter(a => a.type === "motorika");
-const gameActivities = shuffleArray(activities.filter(a => a.type === "igra"));
-sets.push({ setNumber: i + 1, activities: [...motorikaActivities, ...gameActivities] });
-```
+V `simulate-plan-lifecycle/index.ts` (vrstica 410) je ime datoteke `porocilo-2026-03-27.txt` — uporablja se samo datum (`YYYY-MM-DD`). Ker je `upsert: true`, se ob vsakem kliku na isti dan datoteka **prepiše**. Zato vidiš vedno samo 1 poročilo.
 
-### Rezultat
-- Vsak generiran načrt bo imel **unikatno zaporedje iger**, tudi za isto črko in starost
-- Motorika vaj ostane vedno na prvem mestu v sklopu
-- Igre so še vedno izbrane iz pravilnega nabora glede na pozicijo glasu
+**Popravek**: Dodaj uro/minuto/sekundo v ime datoteke:
+```ts
+// Prej:
+const timestamp = new Date().toISOString().split("T")[0];
+// Potem:
+const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+// Rezultat: "2026-03-27T14-30-45" → unikatno ime datoteke
+```
 
 ### Obseg
-- 1 Edge funkcija — ~15 vrstic dodanih/spremenjenih
+- 1 UI datoteka (`GameImageMap.ts`) — 1 vrstica dodana
+- 1 Edge funkcija (`simulate-plan-lifecycle`) — 1 vrstica spremenjena
 
