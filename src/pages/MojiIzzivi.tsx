@@ -324,7 +324,23 @@ export default function MojiIzzivi() {
             </motion.div>
 
             {/* Current set or state */}
-            {allSetsCompleted ? (
+            {allSetsCompleted && plansForReport >= 3 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-12 text-center"
+              >
+                <PartyPopper className="h-12 w-12 text-primary mb-4" />
+                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                <p className="text-muted-foreground mb-4">Čas je za novo preverjanje izgovorjave in osvežitev osebnega načrta.</p>
+                <Button asChild className="gap-2">
+                  <Link to="/artikulacijski-test">
+                    <ClipboardCheck className="h-4 w-4" />
+                    Preverjanje izgovorjave
+                  </Link>
+                </Button>
+              </motion.div>
+            ) : allSetsCompleted ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
