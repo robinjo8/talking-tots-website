@@ -317,7 +317,7 @@ export default function MojiIzzivi() {
                 className="flex flex-col items-center justify-center py-12 text-center"
               >
                 <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets} sklopov je opravljenih!</h2>
+                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
                 <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
                 <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
               </motion.div>
