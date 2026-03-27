@@ -51,6 +51,7 @@ export default function MojiIzzivi() {
 
   const isSetBased = !!(planData?.sets && planData.sets.length > 0);
   const totalSets = planData?.totalSets || 30;
+  const setOffset = planData?.setOffset || 0;
 
   const { data: completions = [] } = usePlanCompletions(plan?.id, selectedChild?.id);
   const { data: trackingEntries = [], refetch: refetchTracking } = useSetTracking(plan?.id, selectedChild?.id);
@@ -260,7 +261,7 @@ export default function MojiIzzivi() {
   }, [allSetsCompleted, plan?.report_id]);
 
   // Progress percentage
-  const progressPercent = Math.round((completedSetsCount / totalSets) * 100);
+  const progressPercent = Math.round(((completedSetsCount + setOffset) / (totalSets + setOffset)) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -291,7 +292,7 @@ export default function MojiIzzivi() {
               <div className="mt-4 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Napredek</span>
-                  <span className="font-semibold">{completedSetsCount}/{totalSets} sklopov</span>
+                  <span className="font-semibold">{completedSetsCount + setOffset}/{totalSets + setOffset} sklopov</span>
                 </div>
                 <Progress value={progressPercent} className="h-3" />
               </div>
@@ -316,14 +317,14 @@ export default function MojiIzzivi() {
                 className="flex flex-col items-center justify-center py-12 text-center"
               >
                 <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets} sklopov je opravljenih!</h2>
+                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
                 <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
                 <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
               </motion.div>
             ) : activeTracking && currentSetData ? (
               <PlanSetCard
-                setNumber={activeTracking.set_number}
-                totalSets={totalSets}
+                setNumber={activeTracking.set_number + setOffset}
+                totalSets={totalSets + setOffset}
                 activities={currentSetData.activities}
                 totalStars={currentSetStars}
                 completionCounts={completionCountsBySet.get(activeTracking.set_number) || new Map()}
@@ -337,7 +338,7 @@ export default function MojiIzzivi() {
               />
             ) : nextSetNumber && currentSetData ? (
               <SetUnboxAnimation
-                setNumber={nextSetNumber}
+                setNumber={nextSetNumber + setOffset}
                 onComplete={handleStartSet}
                 isProcessing={isProcessing}
               />

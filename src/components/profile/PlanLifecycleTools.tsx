@@ -7,9 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { isDevUser } from "@/lib/devAccess";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function PlanLifecycleTools() {
   const { user, selectedChild } = useAuth();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState<string | null>(null);
   const [daysAgo, setDaysAgo] = useState("100");
   const [cooldownPreview, setCooldownPreview] = useState<any>(null);
@@ -36,6 +38,10 @@ export function PlanLifecycleTools() {
           toast.success("Cooldown predogled izračunan.");
         } else {
           toast.success(`${action}: ${JSON.stringify(response.data)}`);
+          // Invalidate all plan-related caches after any mutation
+          queryClient.invalidateQueries({ queryKey: ["monthly-plan"] });
+          queryClient.invalidateQueries({ queryKey: ["set-tracking"] });
+          queryClient.invalidateQueries({ queryKey: ["plan-completions"] });
         }
       }
     } catch (err) {
