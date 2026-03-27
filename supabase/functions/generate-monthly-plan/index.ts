@@ -208,8 +208,19 @@ interface PlanSet {
   activities: PlanSetActivity[];
 }
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 function generateSetBasedPlan(totalSets: number, combinations: GameCombination[], motorika: MotorikaConfig): PlanSet[] {
   const sets: PlanSet[] = [];
+  // Shuffle combinations for unique plan per generation
+  const shuffledCombinations = shuffleArray(combinations);
   let combinationIndex = 0;
 
   for (let i = 0; i < totalSets; i++) {
@@ -229,13 +240,13 @@ function generateSetBasedPlan(totalSets: number, combinations: GameCombination[]
       });
     }
 
-    if (combinations.length > 0) {
+    if (shuffledCombinations.length > 0) {
       const usedGameIds = new Set<string>();
       let attempts = 0;
-      const maxAttempts = combinations.length * 2;
+      const maxAttempts = shuffledCombinations.length * 2;
 
       while (activities.filter(a => a.type === "igra").length < targetGames && attempts < maxAttempts) {
-        const combo = combinations[combinationIndex % combinations.length];
+        const combo = shuffledCombinations[combinationIndex % shuffledCombinations.length];
         combinationIndex++;
         attempts++;
         if (!usedGameIds.has(combo.gameId)) {
@@ -252,7 +263,7 @@ function generateSetBasedPlan(totalSets: number, combinations: GameCombination[]
 
       // Fill remaining slots if needed
       if (activities.filter(a => a.type === "igra").length < targetGames) {
-        for (const combo of combinations) {
+        for (const combo of shuffledCombinations) {
           if (activities.filter(a => a.type === "igra").length >= targetGames) break;
           if (!usedGameIds.has(combo.gameId)) {
             usedGameIds.add(combo.gameId);
@@ -270,8 +281,8 @@ function generateSetBasedPlan(totalSets: number, combinations: GameCombination[]
       // If still not enough (fewer unique games than slots), reuse combinations
       if (activities.filter(a => a.type === "igra").length < targetGames) {
         let fillIdx = 0;
-        while (activities.filter(a => a.type === "igra").length < targetGames && fillIdx < combinations.length) {
-          const combo = combinations[fillIdx];
+        while (activities.filter(a => a.type === "igra").length < targetGames && fillIdx < shuffledCombinations.length) {
+          const combo = shuffledCombinations[fillIdx];
           fillIdx++;
           activities.push({ 
             type: "igra", 
@@ -284,7 +295,10 @@ function generateSetBasedPlan(totalSets: number, combinations: GameCombination[]
       }
     }
 
-    sets.push({ setNumber: i + 1, activities });
+    // Shuffle game activities within set (motorika stays first)
+    const motorikaActs = activities.filter(a => a.type === "motorika");
+    const gameActs = shuffleArray(activities.filter(a => a.type === "igra"));
+    sets.push({ setNumber: i + 1, activities: [...motorikaActs, ...gameActs] });
   }
 
   return sets;
