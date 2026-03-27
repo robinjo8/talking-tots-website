@@ -38,6 +38,10 @@ export function PlanLifecycleTools() {
           toast.success("Cooldown predogled izračunan.");
         } else {
           toast.success(`${action}: ${JSON.stringify(response.data)}`);
+          // Invalidate all plan-related caches after any mutation
+          queryClient.invalidateQueries({ queryKey: ["monthly-plan"] });
+          queryClient.invalidateQueries({ queryKey: ["set-tracking"] });
+          queryClient.invalidateQueries({ queryKey: ["plan-completions"] });
         }
       }
     } catch (err) {
