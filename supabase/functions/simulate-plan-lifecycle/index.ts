@@ -159,10 +159,11 @@ Deno.serve(async (req) => {
         if (planCount < 3) {
           // Less than 3 plans for this report — trigger renewal
           const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
           const renewResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
             method: "POST",
             headers: {
-              "Authorization": authHeader!,
+              "Authorization": `Bearer ${serviceKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -497,10 +498,11 @@ Deno.serve(async (req) => {
       let planResult: any = null;
       if (insertedReport?.id) {
         const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
         const planResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
           method: "POST",
           headers: {
-            "Authorization": authHeader!,
+            "Authorization": `Bearer ${serviceKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ reportId: insertedReport.id, mode: "report_update" }),
@@ -670,6 +672,11 @@ Deno.serve(async (req) => {
               await supabase.storage.from("uporabniski-profili").remove(files.map((f: { name: string }) => `${folderPath}/${f.name}`));
             }
           }
+        }
+        // Delete Generirana-porocila folder
+        const { data: genFiles } = await supabase.storage.from("uporabniski-profili").list(`${basePath}/Generirana-porocila`);
+        if (genFiles && genFiles.length > 0) {
+          await supabase.storage.from("uporabniski-profili").remove(genFiles.map((f: { name: string }) => `${basePath}/Generirana-porocila/${f.name}`));
         }
       }
 
