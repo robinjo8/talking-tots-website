@@ -1,67 +1,41 @@
 
 
-## Plan: Popravi stanje po 90 opravljenih sklopih
+## Plan: Popravi simulate-articulation-test — ne briši prejšnjih sej
 
 ### Problem
 
-Ko je 3×30 = 90 sklopov opravljenih, `MojiIzzivi.tsx` prikaže "Nov načrt se pripravlja..." s spinnerjem in kliče `generate-monthly-plan` z `mode: "renewal"` (vrstica 242-261). To je napačno — po 90 sklopih ni renewala, ampak je čas za **novo preverjanje izgovorjave**.
+`simulate-articulation-test` (vrstica 136-152) ima **hardcoded `sessionNumber = 1`** in pred ustvarjanjem nove seje **izbriše vse obstoječe seje** za tega otroka. Zato po 2. kliku na "Simuliraj celotno preverjanje" vidiš samo 1 sejo namesto 2.
 
-Poleg tega useEffect na vrstici 242 **vedno** sproži renewal ko zazna `allSetsCompleted`, ne glede na to, ali je bilo že 3× podaljšanje.
+### Pravilna logika
 
-### Sprememba
+1. **NE briši** obstoječih sej in rezultatov (odstrani vrstice 139-165)
+2. **Izračunaj session_number** dinamično: preštej obstoječe seje za tega otroka in nastavi `sessionNumber = existingCount + 1`
+3. **Storage mapa**: ustvari novo mapo `Seja-{sessionNumber}` namesto da briše stare
 
-**`src/pages/MojiIzzivi.tsx`:**
+### Sprememba v `supabase/functions/simulate-articulation-test/index.ts`
 
-1. **Preveri število načrtov za isti `report_id`** preden sproži renewal. Če so že 3 načrti (90 sklopov), NE kliči renewal.
+**Odstrani** (vrstice 136-165):
+- Hardcoded `const sessionNumber = 1`
+- Brisanje obstoječih sej (`articulation_test_sessions`, `articulation_word_results`, `articulation_test_results`)
+- Brisanje storage map
 
-2. **Prikaži pravo sporočilo** glede na stanje:
-   - Če so 3 načrti opravljeni → "Čestitke! Vseh 90 sklopov je opravljenih! Čas za novo preverjanje izgovorjave." + gumb "Preverjanje izgovorjave" (link na `/artikulacijski-test`)
-   - Če so manj kot 3 načrti → obstoječa logika z renewalom in spinnerjem
-
-3. **Dodaj poizvedbo** za štetje načrtov z istim `report_id`:
+**Dodaj** (~5 vrstic):
 ```ts
-const { data: plansForReport } = useQuery({
-  queryKey: ["plans-for-report", plan?.report_id],
-  queryFn: async () => {
-    const { count } = await supabase
-      .from("child_monthly_plans")
-      .select("id", { count: "exact", head: true })
-      .eq("report_id", plan!.report_id!);
-    return count || 0;
-  },
-  enabled: !!plan?.report_id,
-});
+// Preštej obstoječe seje za ta child
+const { count } = await supabaseAdmin
+  .from("articulation_test_sessions")
+  .select("id", { count: "exact", head: true })
+  .eq("child_id", childId);
+
+const sessionNumber = (count || 0) + 1;
 ```
 
-4. **V useEffect za renewal** dodaj pogoj `plansForReport < 3`.
+### Rezultat
 
-5. **V UI** zamenjaj statično sporočilo:
-```tsx
-{allSetsCompleted && plansForReport >= 3 ? (
-  // Konec cikla — čas za novo preverjanje
-  <div>
-    <PartyPopper />
-    <h2>Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
-    <p>Čas za novo preverjanje izgovorjave.</p>
-    <Button asChild><Link to="/artikulacijski-test">Preverjanje izgovorjave</Link></Button>
-  </div>
-) : allSetsCompleted ? (
-  // Renewal v teku
-  <div>
-    <Loader2 />
-    <p>Nov načrt se pripravlja...</p>
-  </div>
-) : ...}
-```
-
-### Kaj klikneš zdaj (po popravku)
-
-Po 3. kliku na "Zaključi vseh 30 sklopov" boš videl sporočilo s CTA gumbom za preverjanje. V simulaciji klikneš:
-1. **Simuliraj zamudo (90 dni)** — odkleni naslednji test
-2. **Simuliraj celotno preverjanje** — nov test
-3. **Simuliraj ocenjevanje + poročilo** — nova ocena + nov načrt
-4. Ponovi 3× "Zaključi vseh 30 sklopov"
+- 1. klik → Seja 1 (60 besed)
+- 2. klik (po 90 sklopih) → Seja 2 (60 besed), Seja 1 ostane
+- Admin portal: pod uporabnikom se prikažeta obe seji
 
 ### Obseg
-- 1 datoteka (`MojiIzzivi.tsx`) — ~20 vrstic spremenjenih
+- 1 Edge funkcija posodobljena (~30 vrstic odstranjenih, ~5 dodanih)
 
