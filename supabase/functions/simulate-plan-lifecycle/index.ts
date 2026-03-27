@@ -159,10 +159,11 @@ Deno.serve(async (req) => {
         if (planCount < 3) {
           // Less than 3 plans for this report — trigger renewal
           const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+          const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
           const renewResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
             method: "POST",
             headers: {
-              "Authorization": authHeader!,
+              "Authorization": `Bearer ${serviceKey}`,
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
