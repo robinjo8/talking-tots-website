@@ -57,6 +57,18 @@ export default function MojiIzzivi() {
   const { data: trackingEntries = [], refetch: refetchTracking } = useSetTracking(plan?.id, selectedChild?.id);
   const completeActivity = useCompleteActivity();
 
+  const { data: plansForReport = 0 } = useQuery({
+    queryKey: ["plans-for-report", plan?.report_id],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("child_monthly_plans")
+        .select("id", { count: "exact", head: true })
+        .eq("report_id", plan!.report_id!);
+      return count || 0;
+    },
+    enabled: !!plan?.report_id,
+  });
+
   const completionCountsBySet = useMemo(() => {
     return buildCompletionCountsBySet(completions);
   }, [completions]);
