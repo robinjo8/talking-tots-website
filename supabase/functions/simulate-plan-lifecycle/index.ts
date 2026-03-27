@@ -497,10 +497,11 @@ Deno.serve(async (req) => {
       let planResult: any = null;
       if (insertedReport?.id) {
         const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+        const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
         const planResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
           method: "POST",
           headers: {
-            "Authorization": authHeader!,
+            "Authorization": `Bearer ${serviceKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ reportId: insertedReport.id, mode: "report_update" }),
