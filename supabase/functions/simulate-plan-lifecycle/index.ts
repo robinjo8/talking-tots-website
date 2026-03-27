@@ -91,12 +91,28 @@ Deno.serve(async (req) => {
 
       const existingSetNumbers = new Set((existingSets || []).map((s: { set_number: number }) => s.set_number));
 
+      // === VIRTUAL DATE: Calculate set dates between last test and next test ===
+      // Get the last test result date for this child (the test that triggered this plan)
+      const { data: testResults } = await supabase
+        .from("articulation_test_results")
+        .select("completed_at")
+        .eq("child_id", childId)
+        .order("completed_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const planStartDate = testResults?.completed_at 
+        ? new Date(testResults.completed_at) 
+        : new Date();
+      
+      // Each set spans ~3 days (90 days / 30 sets = 3 days per set)
+      const daysPerSet = 3;
+
       // Only insert MISSING sets from 1 to totalSets
       const sets = [];
-      const now = new Date();
       for (let i = 1; i <= totalSets; i++) {
         if (existingSetNumbers.has(i)) continue;
-        const startedAt = new Date(now.getTime() - (totalSets - i) * 86400000);
+        const startedAt = new Date(planStartDate.getTime() + (i - 1) * daysPerSet * 86400000);
         sets.push({
           plan_id: plan.id,
           child_id: childId,
