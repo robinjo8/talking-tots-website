@@ -261,7 +261,7 @@ export default function MojiIzzivi() {
   }, [allSetsCompleted, plan?.report_id]);
 
   // Progress percentage
-  const progressPercent = Math.round((completedSetsCount / totalSets) * 100);
+  const progressPercent = Math.round(((completedSetsCount + setOffset) / (totalSets + setOffset)) * 100);
 
   return (
     <div className="min-h-screen bg-background">
