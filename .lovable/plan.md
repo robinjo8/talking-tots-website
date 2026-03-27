@@ -1,60 +1,49 @@
 
 
+## Plan: Popravi "Unauthorized" pri generiranju načrta + čiščenje poročil pri resetu
 
-## Plan: Popravi "Zaključi vseh 30 sklopov" — active sklop se ne zaključi
+### Problem 1: `planGenerated: {"error":"Unauthorized"}`
 
-### Problem
+V `simulate-plan-lifecycle` (vrstica 500-506) se `generate-monthly-plan` kliče z uporabnikovim JWT tokenom (`authHeader`). Funkcija `generate-monthly-plan` (vrstica 313-323) validira ta token z `getClaims()`. Ker je uporabnik **starš** (ne logoped), ali pa je token medtem potekel, `getClaims` vrne napako → "Unauthorized".
 
-Ko si odprl Sklop 1 (klik na darilo), se je ustvaril zapis v `plan_set_tracking` s statusom `active`. Ko si kliknil "Zaključi vseh 30 sklopov", funkcija preveri obstoječe zapise in **preskoči** set 1 (ker že obstaja kot `active`). Vstavi le sete 2-30 kot `completed`. Rezultat: 29 completed + 1 active = **29/30 sklopov**.
+Rešitev: `generate-monthly-plan` že podpira klic s service role key (vrstica 311: `isServiceRoleCall = token === serviceRoleKey`). Namesto uporabnikovega tokena pošljemo service role key.
 
-### Popravek
+### Problem 2: Poročila ostanejo po resetu
 
-**`supabase/functions/simulate-plan-lifecycle/index.ts`** — akcija `complete_all_sets`:
+`reset_full_lifecycle` (vrstica 654-673) briše datoteke iz `Porocila/` in `Preverjanje-izgovorjave/`, ampak **ne briše** mape `Generirana-porocila/`. Ker `auto_evaluate_and_report` shranjuje poročila v obe mapi, ostanejo kopije v `Generirana-porocila/`.
 
-Po vstavljanju manjkajočih setov, dodaj UPDATE za vse obstoječe sete, ki imajo status `active` ali `expired`, da jih postavi na `completed`:
+### Spremembe
 
+**`supabase/functions/simulate-plan-lifecycle/index.ts`:**
+
+1. **Vrstica 499-506** — zamenjaj `authHeader` s service role key pri klicu `generate-monthly-plan`:
 ```ts
-// Po insertu manjkajočih setov:
-await supabase
-  .from("plan_set_tracking")
-  .update({ status: "completed", total_stars: 5, completed_at: new Date().toISOString() })
-  .eq("plan_id", plan.id)
-  .eq("child_id", childId)
-  .in("status", ["active", "expired"]);
+const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const planResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
+  method: "POST",
+  headers: {
+    "Authorization": `Bearer ${serviceKey}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ reportId: insertedReport.id, mode: "report_update" }),
+});
+```
+
+2. **Isto za renewal klic v `complete_all_sets`** — tudi tam se kliče `generate-monthly-plan` z `authHeader`, zamenjaj s service role key.
+
+3. **Vrstica 658-673 (`reset_full_lifecycle`)** — dodaj brisanje mape `Generirana-porocila/`:
+```ts
+// Delete Generirana-porocila folder
+const { data: genFiles } = await supabase.storage
+  .from("uporabniski-profili")
+  .list(`${basePath}/Generirana-porocila`);
+if (genFiles && genFiles.length > 0) {
+  await supabase.storage
+    .from("uporabniski-profili")
+    .remove(genFiles.map(f => `${basePath}/Generirana-porocila/${f.name}`));
+}
 ```
 
 ### Obseg
-- 1 Edge funkcija, ~5 vrstic dodanih
+- 1 Edge funkcija, 3 popravki (~15 vrstic spremenjenih)
 
----
-
-## Postopkovnik za celotno letno simulacijo
-
-Po resetiranju celotnega cikla ("Ponastavi celoten cikel") sledi ta vrstni red:
-
-### Cikel 1 (mesec 0-3)
-
-| Korak | Gumb | Kaj naredi |
-|-------|------|------------|
-| 1 | **Simuliraj celotno preverjanje** | Ustvari test sejo + posnetke (status: pending) |
-| 2 | **Simuliraj ocenjevanje + poročilo** | Oceni glasove, generira poročilo, ustvari osebni načrt (30 sklopov) |
-| 3 | **Zaključi vseh 30 sklopov** | Označi vseh 30 sklopov kot opravljene |
-
-### Cikel 2 (mesec 3-6)
-
-| Korak | Gumb | Kaj naredi |
-|-------|------|------------|
-| 4 | **Simuliraj zamudo** (90 dni) | Premakne datum zadnjega testa 90 dni nazaj → cooldown poteče |
-| 5 | **Simuliraj celotno preverjanje** | Novo preverjanje izgovorjave |
-| 6 | **Simuliraj ocenjevanje + poročilo** | Nov načrt (report_update ali nov plan) |
-| 7 | **Zaključi vseh 30 sklopov** | Zaključi novih 30 sklopov |
-
-### Cikel 3 in 4
-
-Ponovi korake 4-7 še dvakrat.
-
-**Skupaj za 1 leto**: 4× preverjanje + 4× ocenjevanje + 4× zaključi sklope = **12 klikov** (+ 3× simuliraj zamudo).
-
-### Opomba
-
-Gumb "Simuliraj zamudo" je potreben, ker smart cooldown drugače ne dovoli novega preverjanja prej kot čez 90 dni. Z zamudo premikaš datum zadnjega testa v preteklost, s čimer "odklenješ" naslednje preverjanje.
