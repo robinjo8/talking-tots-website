@@ -417,8 +417,8 @@ Deno.serve(async (req) => {
         .from("articulation_test_sessions")
         .update({
           status: "completed",
-          reviewed_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
+          reviewed_at: reviewDate.toISOString(),
+          completed_at: reviewDate.toISOString(),
           assigned_to: logProfile.id,
         })
         .eq("id", session.id);
