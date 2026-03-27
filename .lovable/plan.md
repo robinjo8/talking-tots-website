@@ -1,43 +1,51 @@
 
 
-## Analiza: Kaj se zgodi po poteku naročnine
+## Plan: Popravi izračun pokala — uporabi `total_stars` namesto `completion_count`
 
-### Trenutno stanje
+### Problem
 
-**1. Podatki so varni — nikoli se ne brišejo**
-Vsi podatki (testi, poročila, osebni načrti, napredek) ostanejo v bazi ne glede na status naročnine. Tabele `articulation_test_sessions`, `child_monthly_plans`, `plan_set_tracking` itd. nimajo nobene logike za brisanje ob poteku.
+`TrophyContext.tsx` (vrstica 46-48) in `useEnhancedProgress.ts` (vrstica 79-84) oba uporabljata `a.completion_count` za izračun skupnih zvezdic. RPC `get_child_activity_summary` vrača tudi `a.total_stars` (= SUM of `stars_earned`), ki je pravo število zvezdic.
 
-**2. Zaščita dostopa — DELNO deluje**
-- `ActivityOptions.tsx` (glavna stran): Preverja `isPro` in blokira navigacijo na `/moji-izzivi` in `/artikulacijski-test` s toast sporočilom
-- `SubscriptionGate` se uporablja na: Govorne vaje, Klepet, Album, Moja stran, itd.
-- **PROBLEM: `MojiIzzivi.tsx` NIMA `SubscriptionGate`!** Če uporabnik pozna URL `/moji-izzivi`, lahko dostopa do osebnega načrta brez aktivne naročnine
+Ker motorika vaje podelijo 2 zvezdici na zaključek, se zgodi:
+- Uporabnik vidi na zaslonu 214 zvezdic (iz `total_stars`)
+- Pokal pa se sproži ko `completion_count` doseže 200 — kar je pri 214+ vidnih zvezdicah
 
-**3. Subscription status logika**
-`useSubscription.ts` pravilno obravnava:
-- `status: "expired"` → `isSubscribed = false` (ker ni `active` ali `trialing`)
-- `status: "canceled"` + `period_end > now()` → `isSubscribed = true` (do konca obdobja)
-- `status: "active"` → `isSubscribed = true`
+### Popravek
 
-**4. Podaljšanje po poteku**
-Ko uporabnik znova plača prek Stripe-a, webhook posodobi `user_subscriptions` → `status: "active"`, nov `current_period_end`. `useSubscription` ob naslednjem checku zazna spremembo → `isSubscribed = true` → vse se "odmrzne".
+**Datoteka 1: `src/contexts/TrophyContext.tsx` (vrstici 46-47)**
+```ts
+// PREJ:
+const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
+const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
 
-Obstoječi osebni načrt v `child_monthly_plans` ostane v bazi. Sistem nadaljuje tam kjer je bil, ker `useMonthlyPlan` bere zadnji aktivni plan ne glede na naročnino.
+// POTEM:
+const gamesTotalStars = gameActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
+const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
+const totalStars = gamesTotalStars + exercisesTotalStars;
+```
 
-### Kar je treba popraviti
+**Datoteka 2: `src/hooks/useEnhancedProgress.ts` (vrstici 79-84)**
+```ts
+// PREJ:
+const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
+const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
+const totalStars = gamesTotalCompletions + exercisesTotalCompletions;
 
-**Edini popravek: Dodaj `SubscriptionGate` na `MojiIzzivi.tsx`**
+// POTEM:
+const gamesTotalStars = gameActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
+const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
+const totalStars = gamesTotalStars + exercisesTotalStars;
 
-Trenutno je to edina Pro stran brez zaščite. Ko dodamo gate, bo ob poteku naročnine stran prikazala "Vsebina je zaščitena" namesto načrta.
+// completion_count obdržimo za prikaz "Skupaj opravljenih"
+const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
+const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
+```
 
-### Logika "pavze/zamrznitve"
+### Rezultat
+- Pokal se sproži natančno pri 100, 200, 300... **dejanskih zvezdicah**
+- Prikaz zvezdic, zmajčkov in pokalov je usklajen z dejanskim številom
+- "Skupaj opravljenih" še vedno kaže število zaključkov (ne zvezdic)
 
-Že deluje pravilno brez dodatnih sprememb:
-- **Potek** → `isSubscribed = false` → `ActivityOptions` blokira, `SubscriptionGate` blokira
-- **Ponovna naročnina** → Stripe webhook → `status: "active"` → vse se odmrzne
-- **Podatki** → Nikoli se ne brišejo, načrt ostane v bazi
-- **Nadaljevanje** → Uporabnik nadaljuje na istem sklopu kot pred potekom
-
-### Obseg spremembe
-- 1 datoteka (`MojiIzzivi.tsx`) — ovij vsebino v `SubscriptionGate`
-- Brez sprememb edge funkcij ali baze
+### Obseg
+- 2 datoteki, ~6 vrstic spremenjenih v vsaki
 
