@@ -87,6 +87,49 @@ function sanitizeForStorage(str: string): string {
     .replace(/[^a-zA-Z0-9_-]/g, '_');
 }
 
+/**
+ * Calculate virtual date for this test based on smart cooldown logic.
+ * Test 1 = today (or subscription start)
+ * Test 2+ = lastTestDate + 90 days (with smart cooldown near subscription end)
+ */
+function calculateVirtualDate(
+  existingTestDates: string[],
+  subscriptionEnd: string | null,
+): Date {
+  // If no previous tests, use today
+  if (existingTestDates.length === 0) {
+    return new Date();
+  }
+
+  // Sort dates ascending
+  const sorted = existingTestDates
+    .map(d => new Date(d))
+    .sort((a, b) => a.getTime() - b.getTime());
+  
+  const lastTestDate = sorted[sorted.length - 1];
+  let nextDate = new Date(lastTestDate);
+  nextDate.setDate(nextDate.getDate() + 90);
+
+  // Smart cooldown: if next test would overshoot subscriptionEnd - 7 days
+  if (subscriptionEnd) {
+    const subEndDate = new Date(subscriptionEnd);
+    const lastTestTarget = new Date(subEndDate);
+    lastTestTarget.setDate(lastTestTarget.getDate() - 7);
+
+    if (nextDate > lastTestTarget) {
+      const minNext = new Date(lastTestDate);
+      minNext.setDate(minNext.getDate() + 30);
+      if (lastTestTarget > minNext) {
+        nextDate = lastTestTarget;
+      } else {
+        nextDate = minNext;
+      }
+    }
+  }
+
+  return nextDate;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -133,6 +176,31 @@ serve(async (req) => {
       });
     }
 
+    // === VIRTUAL DATE CALCULATION ===
+    // 1. Get all existing test results for this child
+    const { data: existingTests } = await supabaseAdmin
+      .from("articulation_test_results")
+      .select("completed_at")
+      .eq("child_id", childId)
+      .order("completed_at", { ascending: true });
+
+    const existingTestDates = (existingTests || []).map((t: { completed_at: string }) => t.completed_at);
+
+    // 2. Get subscription end date
+    const { data: sub } = await supabaseAdmin
+      .from("user_subscriptions")
+      .select("current_period_end")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const subscriptionEnd = sub?.current_period_end || null;
+
+    // 3. Calculate virtual date using smart cooldown
+    const virtualDate = calculateVirtualDate(existingTestDates, subscriptionEnd);
+    console.log(`Virtual date for test ${existingTestDates.length + 1}: ${virtualDate.toISOString()} (previous tests: ${existingTestDates.length})`);
+
     // Dynamically determine session number
     const { count } = await supabaseAdmin
       .from("articulation_test_sessions")
@@ -142,7 +210,7 @@ serve(async (req) => {
     const sessionNumber = (count || 0) + 1;
     console.log(`Creating Seja-${sessionNumber} (existing sessions: ${count || 0})`);
 
-    // 1. Create session
+    // 1. Create session with virtual date
     const { data: session, error: sessionError } = await supabaseAdmin
       .from("articulation_test_sessions")
       .insert({
@@ -154,7 +222,7 @@ serve(async (req) => {
         current_word_index: 0,
         session_number: sessionNumber,
         source_type: "parent",
-        submitted_at: new Date().toISOString(),
+        submitted_at: virtualDate.toISOString(),
       })
       .select("id")
       .single();
@@ -185,7 +253,7 @@ serve(async (req) => {
       const audioData = await audioResponse.arrayBuffer();
 
       // Upload to user profile bucket
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const timestamp = virtualDate.toISOString().replace(/[:.]/g, "-");
       const safeLetter = sanitizeForStorage(w.letter);
       const safeWord = sanitizeForStorage(w.word);
       const storagePath = `${basePath}/${safeLetter}-${i}-${safeWord}-${timestamp}.m4a`;
@@ -240,18 +308,24 @@ serve(async (req) => {
       })
       .eq("id", sessionId);
 
-    // 4. Save test result for status tracking
+    // 4. Save test result with VIRTUAL DATE for status tracking
     await supabaseAdmin
       .from("articulation_test_results")
       .insert({
         child_id: childId,
-        completed_at: new Date().toISOString(),
+        completed_at: virtualDate.toISOString(),
       });
 
-    console.log(`Simulation complete! Session ${sessionId} with 60 words.`);
+    console.log(`Simulation complete! Session ${sessionId} with 60 words. Virtual date: ${virtualDate.toISOString()}`);
 
     return new Response(
-      JSON.stringify({ success: true, sessionId, sessionNumber }),
+      JSON.stringify({ 
+        success: true, 
+        sessionId, 
+        sessionNumber,
+        virtualDate: virtualDate.toISOString().split("T")[0],
+        testNumber: existingTestDates.length + 1,
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

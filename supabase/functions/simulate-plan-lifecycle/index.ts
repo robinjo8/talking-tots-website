@@ -91,12 +91,28 @@ Deno.serve(async (req) => {
 
       const existingSetNumbers = new Set((existingSets || []).map((s: { set_number: number }) => s.set_number));
 
+      // === VIRTUAL DATE: Calculate set dates between last test and next test ===
+      // Get the last test result date for this child (the test that triggered this plan)
+      const { data: testResults } = await supabase
+        .from("articulation_test_results")
+        .select("completed_at")
+        .eq("child_id", childId)
+        .order("completed_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const planStartDate = testResults?.completed_at 
+        ? new Date(testResults.completed_at) 
+        : new Date();
+      
+      // Each set spans ~3 days (90 days / 30 sets = 3 days per set)
+      const daysPerSet = 3;
+
       // Only insert MISSING sets from 1 to totalSets
       const sets = [];
-      const now = new Date();
       for (let i = 1; i <= totalSets; i++) {
         if (existingSetNumbers.has(i)) continue;
-        const startedAt = new Date(now.getTime() - (totalSets - i) * 86400000);
+        const startedAt = new Date(planStartDate.getTime() + (i - 1) * daysPerSet * 86400000);
         sets.push({
           plan_id: plan.id,
           child_id: childId,
@@ -335,7 +351,7 @@ Deno.serve(async (req) => {
       // 1. Find latest pending/assigned session for this child
       const { data: session } = await supabase
         .from("articulation_test_sessions")
-        .select("id, child_id, parent_id, session_number")
+        .select("id, child_id, parent_id, session_number, submitted_at")
         .eq("child_id", childId)
         .in("status", ["pending", "assigned", "in_review"])
         .order("created_at", { ascending: false })
@@ -348,6 +364,10 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      // === VIRTUAL DATE: Use session's submitted_at + 2 days as review date ===
+      const sessionDate = session.submitted_at ? new Date(session.submitted_at) : new Date();
+      const reviewDate = new Date(sessionDate.getTime() + 2 * 86400000); // +2 days
 
       // 2. Get logopedist profile for dev user
       const { data: logProfile } = await supabase
@@ -397,8 +417,8 @@ Deno.serve(async (req) => {
         .from("articulation_test_sessions")
         .update({
           status: "completed",
-          reviewed_at: new Date().toISOString(),
-          completed_at: new Date().toISOString(),
+          reviewed_at: reviewDate.toISOString(),
+          completed_at: reviewDate.toISOString(),
           assigned_to: logProfile.id,
         })
         .eq("id", session.id);
@@ -407,7 +427,7 @@ Deno.serve(async (req) => {
       const ugotovitve = "Glas R ni usvojen.";
 
       // 6. Build report text
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const timestamp = reviewDate.toISOString().replace(/[:.]/g, "-").slice(0, 19);
       const reportText = [
         "===== POROČILO LOGOPEDA =====",
         "",
