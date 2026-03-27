@@ -250,9 +250,10 @@ export default function MojiIzzivi() {
     [plan?.id, activeTracking, navigate]
   );
 
-  // Auto-renew plan when all 30 sets are completed
+  // Auto-renew plan when all 30 sets are completed (only if < 3 plans for this report)
   useEffect(() => {
     if (!allSetsCompleted || !plan?.report_id || !plan?.id) return;
+    if (plansForReport >= 3) return; // 90 sklopov opravljenih, čas za novo preverjanje
 
     const renewPlan = async () => {
       try {
@@ -264,13 +265,14 @@ export default function MojiIzzivi() {
         });
 
         queryClient.invalidateQueries({ queryKey: ["monthly-plan", selectedChild?.id] });
+        queryClient.invalidateQueries({ queryKey: ["plans-for-report", plan.report_id] });
       } catch (err) {
         console.error("Error auto-renewing plan:", err);
       }
     };
 
     renewPlan();
-  }, [allSetsCompleted, plan?.report_id]);
+  }, [allSetsCompleted, plan?.report_id, plansForReport]);
 
   // Progress percentage
   const progressPercent = Math.round(((completedSetsCount + setOffset) / (totalSets + setOffset)) * 100);
