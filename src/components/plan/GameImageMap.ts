@@ -10,6 +10,7 @@ export const GAME_IMAGE_MAP: Record<string, string> = {
   "drsna-sestavljanka": `${SUPABASE_URL}/slike-ostalo/drsna_sestavljanka_nova_2.webp`,
   "igra-ujemanja": `${SUPABASE_URL}/slike-ostalo/igra_ujemanja_2.webp`,
   "labirint": `${SUPABASE_URL}/slike-ostalo/labirint_nova_2.webp`,
+  "kace": `${SUPABASE_URL}/slike-ostalo/zabavna_pot_1.webp`,
   "met-kocke": `${SUPABASE_URL}/slike-ostalo/Smesne_besede_21.webp`,
   "ponovi-poved": `${SUPABASE_URL}/slike-ostalo/ponovi_poved_1.webp`,
   "motorika": `${SUPABASE_URL}/slike-ostalo/vaje_motorike_nova.webp`,
