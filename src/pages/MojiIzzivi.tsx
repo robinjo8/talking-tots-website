@@ -286,102 +286,104 @@ export default function MojiIzzivi() {
           <BreadcrumbNavigation />
         </div>
 
-        {isLoading ? (
-          <PlanSkeleton />
-        ) : isGenerating ? (
-          <GeneratingState />
-        ) : isActive && planData && isSetBased ? (
-          <div className="space-y-6">
-            {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20"
-            >
-              <h1 className="text-2xl font-bold text-center mb-2">Moj osebni načrt</h1>
-              {planData.summary && (
-                <p className="text-muted-foreground text-sm mt-1 text-justify">{planData.summary}</p>
-              )}
-              
-              {/* Progress bar */}
-              <div className="mt-4 space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Napredek</span>
-                  <span className="font-semibold">{completedSetsCount + setOffset}/{totalSets + setOffset} sklopov</span>
+        <SubscriptionGate>
+          {isLoading ? (
+            <PlanSkeleton />
+          ) : isGenerating ? (
+            <GeneratingState />
+          ) : isActive && planData && isSetBased ? (
+            <div className="space-y-6">
+              {/* Header */}
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent rounded-2xl p-6 border border-primary/20"
+              >
+                <h1 className="text-2xl font-bold text-center mb-2">Moj osebni načrt</h1>
+                {planData.summary && (
+                  <p className="text-muted-foreground text-sm mt-1 text-justify">{planData.summary}</p>
+                )}
+                
+                {/* Progress bar */}
+                <div className="mt-4 space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Napredek</span>
+                    <span className="font-semibold">{completedSetsCount + setOffset}/{totalSets + setOffset} sklopov</span>
+                  </div>
+                  <Progress value={progressPercent} className="h-3" />
                 </div>
-                <Progress value={progressPercent} className="h-3" />
-              </div>
 
-              {trackingEntries.length > 0 && (
-                <div className="flex justify-center mt-3">
-                  <Button variant="outline" size="sm" asChild className="gap-2">
-                    <Link to="/moji-izzivi/arhiv">
-                      <History className="h-4 w-4" />
-                      <span>Zgodovina</span>
+                {trackingEntries.length > 0 && (
+                  <div className="flex justify-center mt-3">
+                    <Button variant="outline" size="sm" asChild className="gap-2">
+                      <Link to="/moji-izzivi/arhiv">
+                        <History className="h-4 w-4" />
+                        <span>Zgodovina</span>
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+              </motion.div>
+
+              {/* Current set or state */}
+              {allSetsCompleted && plansForReport >= 3 ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-12 text-center"
+                >
+                  <PartyPopper className="h-12 w-12 text-primary mb-4" />
+                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                  <p className="text-muted-foreground mb-4">Čas je za novo preverjanje izgovorjave in osvežitev osebnega načrta.</p>
+                  <Button asChild className="gap-2">
+                    <Link to="/artikulacijski-test">
+                      <ClipboardCheck className="h-4 w-4" />
+                      Preverjanje izgovorjave
                     </Link>
                   </Button>
+                </motion.div>
+              ) : allSetsCompleted ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center justify-center py-12 text-center"
+                >
+                  <PartyPopper className="h-12 w-12 text-primary mb-4" />
+                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                  <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
+                  <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
+                </motion.div>
+              ) : activeTracking && currentSetData ? (
+                <PlanSetCard
+                  setNumber={activeTracking.set_number + setOffset}
+                  totalSets={totalSets + setOffset}
+                  activities={currentSetData.activities}
+                  totalStars={currentSetStars}
+                  completionCounts={completionCountsBySet.get(activeTracking.set_number) || new Map()}
+                  isActive={true}
+                  isCompleted={false}
+                  isExpired={false}
+                  isLocked={false}
+                  timeRemaining={timeRemaining}
+                  childAvatarUrl={selectedChild?.avatarUrl}
+                  onActivityPlay={handleActivityPlay}
+                />
+              ) : nextSetNumber && currentSetData ? (
+                <SetUnboxAnimation
+                  setNumber={nextSetNumber + setOffset}
+                  onComplete={handleStartSet}
+                  isProcessing={isProcessing}
+                />
+              ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                  <p>Ni več sklopov na voljo.</p>
                 </div>
               )}
-            </motion.div>
-
-            {/* Current set or state */}
-            {allSetsCompleted && plansForReport >= 3 ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center py-12 text-center"
-              >
-                <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
-                <p className="text-muted-foreground mb-4">Čas je za novo preverjanje izgovorjave in osvežitev osebnega načrta.</p>
-                <Button asChild className="gap-2">
-                  <Link to="/artikulacijski-test">
-                    <ClipboardCheck className="h-4 w-4" />
-                    Preverjanje izgovorjave
-                  </Link>
-                </Button>
-              </motion.div>
-            ) : allSetsCompleted ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center py-12 text-center"
-              >
-                <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
-                <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
-                <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
-              </motion.div>
-            ) : activeTracking && currentSetData ? (
-              <PlanSetCard
-                setNumber={activeTracking.set_number + setOffset}
-                totalSets={totalSets + setOffset}
-                activities={currentSetData.activities}
-                totalStars={currentSetStars}
-                completionCounts={completionCountsBySet.get(activeTracking.set_number) || new Map()}
-                isActive={true}
-                isCompleted={false}
-                isExpired={false}
-                isLocked={false}
-                timeRemaining={timeRemaining}
-                childAvatarUrl={selectedChild?.avatarUrl}
-                onActivityPlay={handleActivityPlay}
-              />
-            ) : nextSetNumber && currentSetData ? (
-              <SetUnboxAnimation
-                setNumber={nextSetNumber + setOffset}
-                onComplete={handleStartSet}
-                isProcessing={isProcessing}
-              />
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <p>Ni več sklopov na voljo.</p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <EmptyState />
-        )}
+            </div>
+          ) : (
+            <EmptyState />
+          )}
+        </SubscriptionGate>
       </div>
     </div>
   );
