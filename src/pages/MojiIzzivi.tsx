@@ -28,6 +28,7 @@ import { Loader2, Calendar, History, ClipboardCheck, PartyPopper } from "lucide-
 import { motion } from "framer-motion";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
 
