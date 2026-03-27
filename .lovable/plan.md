@@ -1,49 +1,37 @@
 
 
-## Plan: Popravi "Unauthorized" pri generiranju načrta + čiščenje poročil pri resetu
+## Plan: Popravi prikaz po "Zaključi vseh 30 sklopov"
 
-### Problem 1: `planGenerated: {"error":"Unauthorized"}`
+### Problem 1: UI prikaže stare podatke (cache)
 
-V `simulate-plan-lifecycle` (vrstica 500-506) se `generate-monthly-plan` kliče z uporabnikovim JWT tokenom (`authHeader`). Funkcija `generate-monthly-plan` (vrstica 313-323) validira ta token z `getClaims()`. Ker je uporabnik **starš** (ne logoped), ali pa je token medtem potekel, `getClaims` vrne napako → "Unauthorized".
+`PlanLifecycleTools.tsx` po uspešnem klicu NE invalidira React Query cache-a. Ko greš na `/moji-izzivi`, `useMonthlyPlan` vrne stari (cached) plan namesto novega. Zato vidiš "Sklop 1, 0/30" starega plana, čeprav je bil že arhiviran.
 
-Rešitev: `generate-monthly-plan` že podpira klic s service role key (vrstica 311: `isServiceRoleCall = token === serviceRoleKey`). Namesto uporabnikovega tokena pošljemo service role key.
+### Problem 2: Vedno "Sklop 1" namesto kumulativno štetje
 
-### Problem 2: Poročila ostanejo po resetu
-
-`reset_full_lifecycle` (vrstica 654-673) briše datoteke iz `Porocila/` in `Preverjanje-izgovorjave/`, ampak **ne briše** mape `Generirana-porocila/`. Ker `auto_evaluate_and_report` shranjuje poročila v obe mapi, ostanejo kopije v `Generirana-porocila/`.
+Vsak nov plan (renewal) ima sete oštevilčene 1-30. UI ne kaže, da si na 2. ali 3. seriji. Uporabnik pričakuje "Sklop 31" ali "Sklop 61", vidi pa vedno "Sklop 1".
 
 ### Spremembe
 
-**`supabase/functions/simulate-plan-lifecycle/index.ts`:**
+**1. `src/components/profile/PlanLifecycleTools.tsx`**
+- Po uspešnem `invoke` invalidiraj ključne React Query poizvedbe:
+  - `["monthly-plan", childId]`
+  - `["set-tracking"]`
+  - `["plan-completions"]`
+- To zagotovi, da `/moji-izzivi` ob navigaciji naloži sveže podatke.
 
-1. **Vrstica 499-506** — zamenjaj `authHeader` s service role key pri klicu `generate-monthly-plan`:
-```ts
-const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const planResponse = await fetch(`${supabaseUrl}/functions/v1/generate-monthly-plan`, {
-  method: "POST",
-  headers: {
-    "Authorization": `Bearer ${serviceKey}`,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({ reportId: insertedReport.id, mode: "report_update" }),
-});
-```
+**2. `src/pages/MojiIzzivi.tsx`** — kumulativno številčenje
+- Poizvedba za število arhiviranih načrtov z istim `report_id` (ali pa dodaj polje `set_offset` v `plan_data`)
+- Prikaži "Sklop 31" namesto "Sklop 1" za drugi plan, "Sklop 61" za tretjega
+- V napredku prikaži "30/90", "60/90" ali "61/90" namesto "0/30"
 
-2. **Isto za renewal klic v `complete_all_sets`** — tudi tam se kliče `generate-monthly-plan` z `authHeader`, zamenjaj s service role key.
+**Enostavnejši pristop za kumulativno štetje:** V Edge funkciji `generate-monthly-plan` pri renewalu dodaj `setOffset` v `plan_data` (0 za prvi plan, 30 za drugega, 60 za tretjega). UI potem prikaže `setOffset + setNumber` in `completedSetsCount + setOffset` / `totalSets * plansForReport`.
 
-3. **Vrstica 658-673 (`reset_full_lifecycle`)** — dodaj brisanje mape `Generirana-porocila/`:
-```ts
-// Delete Generirana-porocila folder
-const { data: genFiles } = await supabase.storage
-  .from("uporabniski-profili")
-  .list(`${basePath}/Generirana-porocila`);
-if (genFiles && genFiles.length > 0) {
-  await supabase.storage
-    .from("uporabniski-profili")
-    .remove(genFiles.map(f => `${basePath}/Generirana-porocila/${f.name}`));
-}
-```
+### Vprašanje glede reseta
+
+NE — ni treba ponastaviti. Ko popraviš cache invalidacijo, bo UI ob naslednjem obisku `/moji-izzivi` pravilno naložil zadnji aktivni plan (3. serija, sklopi 61-90).
 
 ### Obseg
-- 1 Edge funkcija, 3 popravki (~15 vrstic spremenjenih)
+- 1 Edge funkcija (`generate-monthly-plan`) — dodaj `setOffset` v `plan_data` pri renewal (~3 vrstice)
+- 1 UI komponenta (`PlanLifecycleTools.tsx`) — cache invalidacija po invoke (~5 vrstic)
+- 1 UI stran (`MojiIzzivi.tsx`) — uporabi `setOffset` za prikaz pravilnih številk (~10 vrstic)
 
