@@ -581,59 +581,94 @@ serve(async (req) => {
     } else {
       // report_update mode: update in-place if existing, else create new
       if (existingPlan) {
-        // Preserve completed/in-progress sets, update plan data for future sets
-        // Get completed set numbers to preserve their activity data
-        const { data: trackingData } = await supabase
-          .from("plan_set_tracking")
-          .select("set_number, status")
-          .eq("plan_id", existingPlan.id)
-          .eq("child_id", childId);
-
-        const completedOrActiveSetNums = new Set(
-          (trackingData || []).map(t => t.set_number)
-        );
-
-        // Get existing plan data to preserve completed sets
+        // Check if this is a new assessment cycle (different report_id)
         const { data: existingPlanFull } = await supabase
           .from("child_monthly_plans")
-          .select("plan_data")
+          .select("plan_data, report_id")
           .eq("id", existingPlan.id)
           .single();
 
-        const existingPlanData = existingPlanFull?.plan_data as any;
-        const existingSets = existingPlanData?.sets || [];
+        if (existingPlanFull?.report_id && existingPlanFull.report_id !== reportId) {
+          // New cycle — archive old plan and create fresh one
+          console.log(`New assessment cycle detected. Old report: ${existingPlanFull.report_id}, new report: ${reportId}. Archiving old plan ${existingPlan.id}`);
+          
+          await supabase
+            .from("child_monthly_plans")
+            .update({ status: "archived", updated_at: new Date().toISOString() })
+            .eq("id", existingPlan.id);
 
-        // Merge: keep old set data for tracked sets, use new data for untouched sets
-        const mergedSets = sets.map((newSet: PlanSet) => {
-          if (completedOrActiveSetNums.has(newSet.setNumber)) {
-            const oldSet = existingSets.find((s: any) => s.setNumber === newSet.setNumber);
-            return oldSet || newSet;
+          const { data: newPlan, error: planInsertError } = await supabase
+            .from("child_monthly_plans")
+            .insert({
+              child_id: childId,
+              report_id: reportId,
+              month: now.getMonth() + 1,
+              year: now.getFullYear(),
+              start_date: startDateStr,
+              end_date: null,
+              focus_letters: targetLetters,
+              status: "active",
+              plan_data: planData, // fresh plan, setOffset=0
+              expires_at: expiresAt,
+            })
+            .select("id")
+            .single();
+
+          if (planInsertError) {
+            console.error("Failed to create new cycle plan:", planInsertError);
+            return new Response(JSON.stringify({ error: "Failed to create new cycle plan" }), {
+              status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
           }
-          return newSet;
-        });
+          planRecord = newPlan;
+          console.log(`New cycle plan created: ${newPlan?.id}`);
+        } else {
+          // Same report — preserve completed/in-progress sets, update plan data for future sets
+          const { data: trackingData } = await supabase
+            .from("plan_set_tracking")
+            .select("set_number, status")
+            .eq("plan_id", existingPlan.id)
+            .eq("child_id", childId);
 
-        const mergedPlanData = { ...planData, sets: mergedSets };
+          const completedOrActiveSetNums = new Set(
+            (trackingData || []).map(t => t.set_number)
+          );
 
-        const { error: updateError } = await supabase
-          .from("child_monthly_plans")
-          .update({
-            report_id: reportId,
-            focus_letters: targetLetters,
-            plan_data: mergedPlanData,
-            status: "active", // reactivate if archived (orphan recovery)
-            updated_at: new Date().toISOString(),
-            expires_at: expiresAt,
-          })
-          .eq("id", existingPlan.id);
+          const existingPlanData = existingPlanFull?.plan_data as any;
+          const existingSets = existingPlanData?.sets || [];
 
-        if (updateError) {
-          console.error("Failed to update plan:", updateError);
-          return new Response(JSON.stringify({ error: "Failed to update plan" }), {
-            status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          // Merge: keep old set data for tracked sets, use new data for untouched sets
+          const mergedSets = sets.map((newSet: PlanSet) => {
+            if (completedOrActiveSetNums.has(newSet.setNumber)) {
+              const oldSet = existingSets.find((s: any) => s.setNumber === newSet.setNumber);
+              return oldSet || newSet;
+            }
+            return newSet;
           });
+
+          const mergedPlanData = { ...planData, sets: mergedSets };
+
+          const { error: updateError } = await supabase
+            .from("child_monthly_plans")
+            .update({
+              report_id: reportId,
+              focus_letters: targetLetters,
+              plan_data: mergedPlanData,
+              status: "active",
+              updated_at: new Date().toISOString(),
+              expires_at: expiresAt,
+            })
+            .eq("id", existingPlan.id);
+
+          if (updateError) {
+            console.error("Failed to update plan:", updateError);
+            return new Response(JSON.stringify({ error: "Failed to update plan" }), {
+              status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+            });
+          }
+          planRecord = { id: existingPlan.id };
+          console.log(`Plan updated in-place: ${existingPlan.id} (preserved ${completedOrActiveSetNums.size} tracked sets)`);
         }
-        planRecord = { id: existingPlan.id };
-        console.log(`Plan updated in-place: ${existingPlan.id} (preserved ${completedOrActiveSetNums.size} tracked sets)`);
       } else {
         // No existing plan at all — create new
         const { data: newPlan, error: planInsertError } = await supabase
