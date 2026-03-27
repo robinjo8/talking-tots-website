@@ -25,6 +25,7 @@ export const GAME_TITLE_MAP: Record<string, string> = {
   "drsna-sestavljanka": "Drsna igra",
   "igra-ujemanja": "Igra ujemanja",
   "labirint": "Labirint",
+  "kace": "Zabavna pot",
   "met-kocke": "Smešne povedi",
   "ponovi-poved": "Ponovi poved",
   "motorika": "Vaje za motoriko govoril",
