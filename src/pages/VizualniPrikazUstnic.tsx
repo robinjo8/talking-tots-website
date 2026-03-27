@@ -108,7 +108,7 @@ const VizualniPrikazUstnic = () => {
             "font-bold text-white mb-2",
             isMobile ? "text-2xl" : "text-4xl md:text-5xl"
           )}>
-            Vizualni prikaz ustnic
+            Vizualni prikaz govoril
           </h1>
           {!isMobile && (
             <p className="text-white/80 text-lg mt-2">
