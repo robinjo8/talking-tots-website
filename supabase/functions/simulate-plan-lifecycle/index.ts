@@ -673,6 +673,11 @@ Deno.serve(async (req) => {
             }
           }
         }
+        // Delete Generirana-porocila folder
+        const { data: genFiles } = await supabase.storage.from("uporabniski-profili").list(`${basePath}/Generirana-porocila`);
+        if (genFiles && genFiles.length > 0) {
+          await supabase.storage.from("uporabniski-profili").remove(genFiles.map((f: { name: string }) => `${basePath}/Generirana-porocila/${f.name}`));
+        }
       }
 
       result = { deleted, note: "Celoten cikel ponastavljen." };
