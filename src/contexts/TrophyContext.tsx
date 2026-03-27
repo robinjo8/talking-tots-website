@@ -43,9 +43,9 @@ export function TrophyProvider({ children }: { children: ReactNode }) {
         a.activity_type === 'exercise'
       );
 
-      const gamesTotalCompletions = gameActivities.reduce((sum: number, a: any) => sum + a.completion_count, 0);
-      const exercisesTotalCompletions = exerciseActivities.reduce((sum: number, a: any) => sum + a.completion_count, 0);
-      const totalStars = gamesTotalCompletions + exercisesTotalCompletions;
+      const gamesTotalStars = gameActivities.reduce((sum: number, a: any) => sum + (a.total_stars || 0), 0);
+      const exercisesTotalStars = exerciseActivities.reduce((sum: number, a: any) => sum + (a.total_stars || 0), 0);
+      const totalStars = gamesTotalStars + exercisesTotalStars;
       
       // Calculate trophies (every 100 stars = 1 trophy)
       const totalDragons = Math.floor(totalStars / 10);

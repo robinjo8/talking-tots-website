@@ -76,12 +76,17 @@ export const useEnhancedProgress = () => {
       );
 
       // Calculate individual category progress (for backwards compatibility)
+      // Use total_stars (actual stars earned) for milestone calculations
+      const gamesTotalStars = gameActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
+      const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
+
+      // Keep completion_count for "total completed" display
       const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
       const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
 
       // NEW UNIFIED LOGIC:
-      // Total stars = all completions combined
-      const totalStars = gamesTotalCompletions + exercisesTotalCompletions;
+      // Total stars = actual stars earned (not completion count)
+      const totalStars = gamesTotalStars + exercisesTotalStars;
       
       // Current stars = 0-9 stars towards next dragon
       const currentStars = totalStars % 10;
