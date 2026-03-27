@@ -1,37 +1,67 @@
 
 
-## Plan: Popravi prikaz po "Zaključi vseh 30 sklopov"
+## Plan: Popravi stanje po 90 opravljenih sklopih
 
-### Problem 1: UI prikaže stare podatke (cache)
+### Problem
 
-`PlanLifecycleTools.tsx` po uspešnem klicu NE invalidira React Query cache-a. Ko greš na `/moji-izzivi`, `useMonthlyPlan` vrne stari (cached) plan namesto novega. Zato vidiš "Sklop 1, 0/30" starega plana, čeprav je bil že arhiviran.
+Ko je 3×30 = 90 sklopov opravljenih, `MojiIzzivi.tsx` prikaže "Nov načrt se pripravlja..." s spinnerjem in kliče `generate-monthly-plan` z `mode: "renewal"` (vrstica 242-261). To je napačno — po 90 sklopih ni renewala, ampak je čas za **novo preverjanje izgovorjave**.
 
-### Problem 2: Vedno "Sklop 1" namesto kumulativno štetje
+Poleg tega useEffect na vrstici 242 **vedno** sproži renewal ko zazna `allSetsCompleted`, ne glede na to, ali je bilo že 3× podaljšanje.
 
-Vsak nov plan (renewal) ima sete oštevilčene 1-30. UI ne kaže, da si na 2. ali 3. seriji. Uporabnik pričakuje "Sklop 31" ali "Sklop 61", vidi pa vedno "Sklop 1".
+### Sprememba
 
-### Spremembe
+**`src/pages/MojiIzzivi.tsx`:**
 
-**1. `src/components/profile/PlanLifecycleTools.tsx`**
-- Po uspešnem `invoke` invalidiraj ključne React Query poizvedbe:
-  - `["monthly-plan", childId]`
-  - `["set-tracking"]`
-  - `["plan-completions"]`
-- To zagotovi, da `/moji-izzivi` ob navigaciji naloži sveže podatke.
+1. **Preveri število načrtov za isti `report_id`** preden sproži renewal. Če so že 3 načrti (90 sklopov), NE kliči renewal.
 
-**2. `src/pages/MojiIzzivi.tsx`** — kumulativno številčenje
-- Poizvedba za število arhiviranih načrtov z istim `report_id` (ali pa dodaj polje `set_offset` v `plan_data`)
-- Prikaži "Sklop 31" namesto "Sklop 1" za drugi plan, "Sklop 61" za tretjega
-- V napredku prikaži "30/90", "60/90" ali "61/90" namesto "0/30"
+2. **Prikaži pravo sporočilo** glede na stanje:
+   - Če so 3 načrti opravljeni → "Čestitke! Vseh 90 sklopov je opravljenih! Čas za novo preverjanje izgovorjave." + gumb "Preverjanje izgovorjave" (link na `/artikulacijski-test`)
+   - Če so manj kot 3 načrti → obstoječa logika z renewalom in spinnerjem
 
-**Enostavnejši pristop za kumulativno štetje:** V Edge funkciji `generate-monthly-plan` pri renewalu dodaj `setOffset` v `plan_data` (0 za prvi plan, 30 za drugega, 60 za tretjega). UI potem prikaže `setOffset + setNumber` in `completedSetsCount + setOffset` / `totalSets * plansForReport`.
+3. **Dodaj poizvedbo** za štetje načrtov z istim `report_id`:
+```ts
+const { data: plansForReport } = useQuery({
+  queryKey: ["plans-for-report", plan?.report_id],
+  queryFn: async () => {
+    const { count } = await supabase
+      .from("child_monthly_plans")
+      .select("id", { count: "exact", head: true })
+      .eq("report_id", plan!.report_id!);
+    return count || 0;
+  },
+  enabled: !!plan?.report_id,
+});
+```
 
-### Vprašanje glede reseta
+4. **V useEffect za renewal** dodaj pogoj `plansForReport < 3`.
 
-NE — ni treba ponastaviti. Ko popraviš cache invalidacijo, bo UI ob naslednjem obisku `/moji-izzivi` pravilno naložil zadnji aktivni plan (3. serija, sklopi 61-90).
+5. **V UI** zamenjaj statično sporočilo:
+```tsx
+{allSetsCompleted && plansForReport >= 3 ? (
+  // Konec cikla — čas za novo preverjanje
+  <div>
+    <PartyPopper />
+    <h2>Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+    <p>Čas za novo preverjanje izgovorjave.</p>
+    <Button asChild><Link to="/artikulacijski-test">Preverjanje izgovorjave</Link></Button>
+  </div>
+) : allSetsCompleted ? (
+  // Renewal v teku
+  <div>
+    <Loader2 />
+    <p>Nov načrt se pripravlja...</p>
+  </div>
+) : ...}
+```
+
+### Kaj klikneš zdaj (po popravku)
+
+Po 3. kliku na "Zaključi vseh 30 sklopov" boš videl sporočilo s CTA gumbom za preverjanje. V simulaciji klikneš:
+1. **Simuliraj zamudo (90 dni)** — odkleni naslednji test
+2. **Simuliraj celotno preverjanje** — nov test
+3. **Simuliraj ocenjevanje + poročilo** — nova ocena + nov načrt
+4. Ponovi 3× "Zaključi vseh 30 sklopov"
 
 ### Obseg
-- 1 Edge funkcija (`generate-monthly-plan`) — dodaj `setOffset` v `plan_data` pri renewal (~3 vrstice)
-- 1 UI komponenta (`PlanLifecycleTools.tsx`) — cache invalidacija po invoke (~5 vrstic)
-- 1 UI stran (`MojiIzzivi.tsx`) — uporabi `setOffset` za prikaz pravilnih številk (~10 vrstic)
+- 1 datoteka (`MojiIzzivi.tsx`) — ~20 vrstic spremenjenih
 
