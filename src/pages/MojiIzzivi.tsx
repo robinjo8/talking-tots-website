@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Loader2, Calendar, History, ClipboardCheck, PartyPopper } from "lucide-react";
 import { motion } from "framer-motion";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const PLAN_ACTIVITY_STORAGE_KEY = "plan-activity-tracking";
@@ -56,6 +56,18 @@ export default function MojiIzzivi() {
   const { data: completions = [] } = usePlanCompletions(plan?.id, selectedChild?.id);
   const { data: trackingEntries = [], refetch: refetchTracking } = useSetTracking(plan?.id, selectedChild?.id);
   const completeActivity = useCompleteActivity();
+
+  const { data: plansForReport = 0 } = useQuery({
+    queryKey: ["plans-for-report", plan?.report_id],
+    queryFn: async () => {
+      const { count } = await supabase
+        .from("child_monthly_plans")
+        .select("id", { count: "exact", head: true })
+        .eq("report_id", plan!.report_id!);
+      return count || 0;
+    },
+    enabled: !!plan?.report_id,
+  });
 
   const completionCountsBySet = useMemo(() => {
     return buildCompletionCountsBySet(completions);
@@ -238,9 +250,10 @@ export default function MojiIzzivi() {
     [plan?.id, activeTracking, navigate]
   );
 
-  // Auto-renew plan when all 30 sets are completed
+  // Auto-renew plan when all 30 sets are completed (only if < 3 plans for this report)
   useEffect(() => {
     if (!allSetsCompleted || !plan?.report_id || !plan?.id) return;
+    if (plansForReport >= 3) return; // 90 sklopov opravljenih, čas za novo preverjanje
 
     const renewPlan = async () => {
       try {
@@ -252,13 +265,14 @@ export default function MojiIzzivi() {
         });
 
         queryClient.invalidateQueries({ queryKey: ["monthly-plan", selectedChild?.id] });
+        queryClient.invalidateQueries({ queryKey: ["plans-for-report", plan.report_id] });
       } catch (err) {
         console.error("Error auto-renewing plan:", err);
       }
     };
 
     renewPlan();
-  }, [allSetsCompleted, plan?.report_id]);
+  }, [allSetsCompleted, plan?.report_id, plansForReport]);
 
   // Progress percentage
   const progressPercent = Math.round(((completedSetsCount + setOffset) / (totalSets + setOffset)) * 100);
@@ -310,7 +324,23 @@ export default function MojiIzzivi() {
             </motion.div>
 
             {/* Current set or state */}
-            {allSetsCompleted ? (
+            {allSetsCompleted && plansForReport >= 3 ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-12 text-center"
+              >
+                <PartyPopper className="h-12 w-12 text-primary mb-4" />
+                <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                <p className="text-muted-foreground mb-4">Čas je za novo preverjanje izgovorjave in osvežitev osebnega načrta.</p>
+                <Button asChild className="gap-2">
+                  <Link to="/artikulacijski-test">
+                    <ClipboardCheck className="h-4 w-4" />
+                    Preverjanje izgovorjave
+                  </Link>
+                </Button>
+              </motion.div>
+            ) : allSetsCompleted ? (
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
