@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 export function PlanLifecycleTools() {
   const { user, selectedChild } = useAuth();
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState<string | null>(null);
   const [daysAgo, setDaysAgo] = useState("100");
   const [cooldownPreview, setCooldownPreview] = useState<any>(null);
