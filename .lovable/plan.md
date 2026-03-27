@@ -1,81 +1,52 @@
 
 
-## Plan: Popravi generiranje novega načrta po novem preverjanju (nov cikel)
+## Plan: Dodaj naključno razporeditev iger v osebnem načrtu
 
-### Problem
+### Odgovor na vprašanja
 
-Ko po 90 sklopih izvedeš novo preverjanje in ocenjevanje, `auto_evaluate_and_report` pokliče `generate-monthly-plan` z `mode: "report_update"`. V tem načinu funkcija:
+**1. Dokumenti / Poročila**: Da, vsak klik na "Simuliraj ocenjevanje + poročilo" ustvari novo poročilo v Storage (mapa `Generirana-porocila/`), ki se prikaže pod "Dokumenti" na admin strani. Po 90 sklopih + novo preverjanje → novo poročilo. Po 180 sklopih + novo preverjanje → tretje poročilo itd. To deluje pravilno.
 
-1. Najde **stari aktivni plan** (ki ima 30 completed tracking zapisov)
-2. Ga **posodobi in-place** — zamenja `report_id`, ohrani vse stare tracking zapise
-3. Rezultat: UI vidi 30/30 opravljenih sklopov, ker stari tracking zapisi še vedno obstajajo
-
-**Pravilno vedenje**: Ko se začne nov cikel (nov `report_id`), mora stari plan biti **arhiviran** in ustvarjen **nov plan brez starih tracking zapisov**.
+**2. Osebni načrt je vedno enak**: To je dejanski problem. Funkcija `generateSetBasedPlan` v `generate-monthly-plan/index.ts` (vrstica 211-291) uporablja **deterministični round-robin** za razporejanje iger po sklopih. Ni nobene naključnosti — če ima otrok isto črko (npr. R) in isto starostno skupino, dobi **identičen načrt** kot vsak drug otrok z enakimi parametri. Tudi pri renewalu (2. in 3. serija 30 sklopov) so igre v enakem vrstnem redu.
 
 ### Sprememba
 
-**`supabase/functions/generate-monthly-plan/index.ts`** — v `report_update` veji (vrstica 583):
+**`supabase/functions/generate-monthly-plan/index.ts`** — funkcija `generateSetBasedPlan`:
 
-Dodaj preverjanje: če ima obstoječi plan **drug `report_id`** kot novi, ga ne posodobi in-place, ampak:
-1. Arhiviraj stari plan
-2. Ustvari nov plan (tako kot pri `renewal`, ampak brez `setOffset`)
+1. **Premešaj `combinations` array** pred generiranjem sklopov s Fisher-Yates shuffle algoritmom
+2. **Premešaj vrstni red iger znotraj vsakega sklopa** po tem ko so izbrane
 
-```text
-if (existingPlan) {
-  // Preveri ali je isti report_id
-  const existingPlanFull = ... (že se pridobi na vrstici 597)
-  
-  if (existingPlan ima drug report_id kot novi reportId) {
-    → arhiviraj stari plan
-    → ustvari nov plan z setOffset=0, nov report_id
-  } else {
-    → obstoječa logika (update in-place, merge sets)
-  }
-}
-```
-
-Konkretno: na vrstici 597 že pridobimo `existingPlanFull`. Dodamo preverjanje:
-
+Dodaj helper funkcijo:
 ```ts
-// Pridobi report_id starega plana
-const { data: existingPlanFull } = await supabase
-  .from("child_monthly_plans")
-  .select("plan_data, report_id")  // dodaj report_id
-  .eq("id", existingPlan.id)
-  .single();
-
-// Če je nov report_id → nov cikel, arhiviraj starega in ustvari novega
-if (existingPlanFull?.report_id !== reportId) {
-  await supabase
-    .from("child_monthly_plans")
-    .update({ status: "archived" })
-    .eq("id", existingPlan.id);
-  
-  // Ustvari nov plan (brez setOffset, ker je nov cikel)
-  const { data: newPlan } = await supabase
-    .from("child_monthly_plans")
-    .insert({
-      child_id: childId,
-      report_id: reportId,
-      month: now.getMonth() + 1,
-      year: now.getFullYear(),
-      start_date: startDateStr,
-      focus_letters: targetLetters,
-      status: "active",
-      plan_data: planData, // čist nov plan, setOffset=0
-      expires_at: expiresAt,
-    })
-    .select("id")
-    .single();
-  
-  planRecord = newPlan;
-} else {
-  // Obstoječa logika: isti report, merge sets
-  ...
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
 }
 ```
+
+V `generateSetBasedPlan` (vrstica 211):
+```ts
+function generateSetBasedPlan(totalSets: number, combinations: GameCombination[], motorika: MotorikaConfig): PlanSet[] {
+  const shuffledCombinations = shuffleArray(combinations);
+  // ... ostala logika ostane enaka, samo uporabi shuffledCombinations
+```
+
+In na koncu vsakega sklopa (pred `sets.push`):
+```ts
+// Premešaj igre znotraj sklopa (motorika ostane prva)
+const motorikaActivities = activities.filter(a => a.type === "motorika");
+const gameActivities = shuffleArray(activities.filter(a => a.type === "igra"));
+sets.push({ setNumber: i + 1, activities: [...motorikaActivities, ...gameActivities] });
+```
+
+### Rezultat
+- Vsak generiran načrt bo imel **unikatno zaporedje iger**, tudi za isto črko in starost
+- Motorika vaj ostane vedno na prvem mestu v sklopu
+- Igre so še vedno izbrane iz pravilnega nabora glede na pozicijo glasu
 
 ### Obseg
-- 1 Edge funkcija (`generate-monthly-plan`) — ~20 vrstic dodanih v `report_update` vejo
-- Po popravku: ponastavi cikel in testiraj znova
+- 1 Edge funkcija — ~15 vrstic dodanih/spremenjenih
 
