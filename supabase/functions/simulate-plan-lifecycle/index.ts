@@ -427,7 +427,7 @@ Deno.serve(async (req) => {
       const ugotovitve = "Glas R ni usvojen.";
 
       // 6. Build report text
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+      const timestamp = reviewDate.toISOString().replace(/[:.]/g, "-").slice(0, 19);
       const reportText = [
         "===== POROČILO LOGOPEDA =====",
         "",
