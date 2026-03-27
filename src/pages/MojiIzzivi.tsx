@@ -338,7 +338,7 @@ export default function MojiIzzivi() {
               />
             ) : nextSetNumber && currentSetData ? (
               <SetUnboxAnimation
-                setNumber={nextSetNumber}
+                setNumber={nextSetNumber + setOffset}
                 onComplete={handleStartSet}
                 isProcessing={isProcessing}
               />
