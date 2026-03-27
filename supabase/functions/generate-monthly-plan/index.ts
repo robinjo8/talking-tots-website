@@ -535,12 +535,24 @@ serve(async (req) => {
 
     if (mode === "renewal") {
       // Renewal mode: archive old, create new (used when 30/30 completed)
+      // Count existing plans for this report to calculate setOffset
+      const { data: plansForReport } = await supabase
+        .from("child_monthly_plans")
+        .select("id")
+        .eq("child_id", childId)
+        .eq("report_id", reportId);
+      const setOffset = (plansForReport?.length || 0) * TOTAL_SETS;
+      console.log(`Renewal: setOffset=${setOffset} (${plansForReport?.length || 0} existing plans for report)`);
+
       if (existingPlan) {
         await supabase
           .from("child_monthly_plans")
           .update({ status: "archived" })
           .eq("id", existingPlan.id);
       }
+
+      // Add setOffset to planData
+      const planDataWithOffset = { ...planData, setOffset };
 
       const { data: newPlan, error: planInsertError } = await supabase
         .from("child_monthly_plans")
@@ -553,7 +565,7 @@ serve(async (req) => {
           end_date: null,
           focus_letters: targetLetters,
           status: "active",
-          plan_data: planData,
+          plan_data: planDataWithOffset,
           expires_at: expiresAt,
         })
         .select("id")
