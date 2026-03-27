@@ -39,6 +39,7 @@ export interface MonthlyPlanData {
   // New set-based format
   totalSets?: number;
   sets?: PlanSet[];
+  setOffset?: number;
   // Legacy day-based format
   totalDays?: number;
   days?: PlanDay[];

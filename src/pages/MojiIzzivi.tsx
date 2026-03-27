@@ -51,6 +51,7 @@ export default function MojiIzzivi() {
 
   const isSetBased = !!(planData?.sets && planData.sets.length > 0);
   const totalSets = planData?.totalSets || 30;
+  const setOffset = planData?.setOffset || 0;
 
   const { data: completions = [] } = usePlanCompletions(plan?.id, selectedChild?.id);
   const { data: trackingEntries = [], refetch: refetchTracking } = useSetTracking(plan?.id, selectedChild?.id);
