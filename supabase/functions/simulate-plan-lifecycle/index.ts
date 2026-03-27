@@ -351,7 +351,7 @@ Deno.serve(async (req) => {
       // 1. Find latest pending/assigned session for this child
       const { data: session } = await supabase
         .from("articulation_test_sessions")
-        .select("id, child_id, parent_id, session_number")
+        .select("id, child_id, parent_id, session_number, submitted_at")
         .eq("child_id", childId)
         .in("status", ["pending", "assigned", "in_review"])
         .order("created_at", { ascending: false })
@@ -364,6 +364,10 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      // === VIRTUAL DATE: Use session's submitted_at + 2 days as review date ===
+      const sessionDate = session.submitted_at ? new Date(session.submitted_at) : new Date();
+      const reviewDate = new Date(sessionDate.getTime() + 2 * 86400000); // +2 days
 
       // 2. Get logopedist profile for dev user
       const { data: logProfile } = await supabase
