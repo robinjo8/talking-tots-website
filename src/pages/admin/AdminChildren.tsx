@@ -37,6 +37,7 @@ export default function AdminChildren() {
   const navigate = useNavigate();
   const { children, isLoading: childrenLoading } = useLogopedistChildren();
   const { license, hasLicense, isNearLimit, isAtLimit, isLoading: licenseLoading } = useLogopedistLicense();
+  const { profile } = useAdminAuth();
   
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingChild, setEditingChild] = useState<LogopedistChild | null>(null);
