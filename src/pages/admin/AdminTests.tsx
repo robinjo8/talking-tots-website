@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminTests, TestSessionData, calculateTestStats, groupSessionsByChild, ChildGroup } from '@/hooks/useAdminTests';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

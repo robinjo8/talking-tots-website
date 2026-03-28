@@ -184,6 +184,9 @@ export function useAdminTests() {
           assigned_to: session.assigned_to,
           source_type: (session.source_type || 'parent') as 'parent' | 'logopedist',
           logopedist_child_id: session.logopedist_child_id,
+          logopedist_id: (session.source_type === 'logopedist' && session.logopedist_child_id)
+            ? (logopedistChildrenMap.get(session.logopedist_child_id)?.logopedist_id || null)
+            : null,
           organization_id: session.organization_id,
           organization_name: organization?.name || null,
           logopedist_first_name: logopedistProfile?.first_name || null,

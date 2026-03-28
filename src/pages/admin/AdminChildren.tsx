@@ -224,32 +224,45 @@ export default function AdminChildren() {
 
                   {/* Akcije */}
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewDetails(child.id)}
-                    >
-                      <FileText className="h-4 w-4 mr-1" />
-                      <span className="hidden sm:inline">Podrobnosti</span>
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewProgress(child.id)}
-                    >
-                      <BarChart3 className="h-4 w-4 mr-1" />
-                      <span className="hidden sm:inline">Napredek</span>
-                    </Button>
-                    
-                    <Button
-                      size="sm"
-                      onClick={() => handleStartWork(child.id)}
-                      className="bg-dragon-green hover:bg-dragon-green/90"
-                    >
-                      <Play className="h-4 w-4 mr-1" />
-                      <span className="hidden sm:inline">Začni delo</span>
-                    </Button>
+                    {(() => {
+                      const canManage = !isOrgLicense || child.is_own_child || profile?.organization_type === 'internal';
+                      return (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewDetails(child.id)}
+                            disabled={!canManage}
+                            title={!canManage ? 'Lahko gledate samo podrobnosti svojih otrok' : undefined}
+                          >
+                            <FileText className="h-4 w-4 mr-1" />
+                            <span className="hidden sm:inline">Podrobnosti</span>
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleViewProgress(child.id)}
+                            disabled={!canManage}
+                            title={!canManage ? 'Lahko gledate samo napredek svojih otrok' : undefined}
+                          >
+                            <BarChart3 className="h-4 w-4 mr-1" />
+                            <span className="hidden sm:inline">Napredek</span>
+                          </Button>
+                          
+                          <Button
+                            size="sm"
+                            onClick={() => handleStartWork(child.id)}
+                            className="bg-dragon-green hover:bg-dragon-green/90"
+                            disabled={!canManage}
+                            title={!canManage ? 'Lahko delate samo s svojimi otroki' : undefined}
+                          >
+                            <Play className="h-4 w-4 mr-1" />
+                            <span className="hidden sm:inline">Začni delo</span>
+                          </Button>
+                        </>
+                      );
+                    })()}
                     
                     <Button
                       variant="ghost"
