@@ -264,7 +264,7 @@ export default function AdminChildren() {
                       size="icon"
                       className="text-destructive hover:text-destructive"
                       onClick={() => setDeletingChild(child)}
-                      disabled={isOrgLicense && !child.is_own_child}
+                      disabled={isOrgLicense && !child.is_own_child && profile?.organization_type !== 'internal'}
                       title={isOrgLicense && !child.is_own_child ? 'Lahko brišete samo svoje otroke' : undefined}
                     >
                       <Trash2 className="h-4 w-4" />
