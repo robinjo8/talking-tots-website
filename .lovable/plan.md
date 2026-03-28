@@ -1,5 +1,6 @@
 
 
+
 ## Plan: Interni logopedi (TomiTalk) lahko urejajo vse otroke organizacije
 
 ### Trenutno stanje
@@ -49,3 +50,8 @@ USING (is_internal_logopedist(auth.uid()));
 - 1 UI datoteka (`AdminChildren.tsx`) — 2 vrstici spremenjeni
 - 1 DB migracija — 2 novi RLS politiki
 
+## IMPLEMENTIRANO: Omeji upravljanje otrok za zunanje organizacije (ne TomiTalk)
+
+Logopedi zunanjih organizacij (npr. OŠ Test) na `/admin/children` ne morejo več klikniti Podrobnosti, Napredek, Začni delo za otroke drugih logopedov. Na `/admin/all-tests` je gumb Ogled onemogočen za seje tujih otrok. Neposreden dostop do URL `/admin/tests/:id` je zaščiten z redirectom.
+
+TomiTalk (internal) logopedi ostanejo nespremenjeni — popoln dostop.
