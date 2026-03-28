@@ -260,9 +260,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     .update({
       status: "inactive",
       stripe_subscription_id: null,
-      plan_id: null,
       cancel_at_period_end: false,
       updated_at: new Date().toISOString()
+      // plan_id in current_period_end OHRANIMO —
+      // useSubscription bo preveril isStillInPeriod za grace period
     })
     .eq("stripe_customer_id", customerId);
 

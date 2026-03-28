@@ -155,7 +155,7 @@ export function useSubscription() {
       }
 
       // Determine subscription state
-      const isActive = sub.status === 'active' || sub.status === 'trialing';
+      const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
       const isCanceled = sub.status === 'canceled' || sub.cancel_at_period_end;
       
       // If canceled but still in period, show as subscribed until period ends

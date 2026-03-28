@@ -76,10 +76,10 @@ serve(async (req) => {
     if (sub && sub.status !== 'inactive') {
       logStep("Found subscription in database", { status: sub.status, planId: sub.plan_id });
       
-      const isActive = sub.status === 'active' || sub.status === 'trialing';
       const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
-      const isStillInPeriod = periodEnd && periodEnd > new Date();
-      const isSubscribed = isActive || (sub.status === 'canceled' && isStillInPeriod);
+      const isStillInPeriod = periodEnd ? periodEnd > new Date() : null;
+      const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
+      const isSubscribed = isActive || (sub.status === 'canceled' && !!isStillInPeriod);
 
       return new Response(JSON.stringify({
         subscribed: isSubscribed,
