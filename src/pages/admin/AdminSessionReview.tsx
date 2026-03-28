@@ -84,6 +84,35 @@ export default function AdminSessionReview() {
     fetchExtraData();
   }, [data?.session?.parentId, data?.session?.childId]);
 
+  // Access guard: external org logopedists can only view sessions of their own children
+  useEffect(() => {
+    if (!data?.session || !logopedistProfile) return;
+    // Internal (TomiTalk) logopedists can view everything
+    if (logopedistProfile.organization_type === 'internal') return;
+    
+    const session = data.session;
+    // Parent sessions — only internal logopedists should access
+    if (session.sourceType === 'parent') {
+      toast.error('Nimate dostopa do te seje');
+      navigate('/admin/all-tests', { replace: true });
+      return;
+    }
+    // Logopedist session — check ownership via logopedist_child_id
+    if (session.sourceType === 'logopedist' && session.logopedistChildId) {
+      // Fetch the child to check logopedist_id
+      supabase
+        .from('logopedist_children')
+        .select('logopedist_id')
+        .eq('id', session.logopedistChildId)
+        .single()
+        .then(({ data: childData }) => {
+          if (childData && childData.logopedist_id !== logopedistProfile.id) {
+            toast.error('Lahko gledate samo seje svojih otrok');
+            navigate('/admin/all-tests', { replace: true });
+          }
+        });
+    }
+  }, [data?.session, logopedistProfile, navigate]);
   // Preveri spremembe
   const checkForChanges = useCallback(() => {
     for (const [letter, evaluation] of localEvaluations.entries()) {
