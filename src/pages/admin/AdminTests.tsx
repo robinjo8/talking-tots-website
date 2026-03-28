@@ -122,12 +122,14 @@ const GroupedTestCard = ({
   group, 
   isExpanded,
   onToggle,
-  onNavigate
+  onNavigate,
+  canViewSession,
 }: { 
   group: ChildGroup; 
   isExpanded: boolean;
   onToggle: () => void;
   onNavigate: (sessionId: string) => void;
+  canViewSession: (session: TestSessionData) => boolean;
 }) => {
   const source = formatSource(group);
   const gender = formatGender(group.child_gender);
