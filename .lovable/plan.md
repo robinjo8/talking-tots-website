@@ -1,109 +1,77 @@
 
 
-## Plan: Popravek kritičnih težav v naročniškem sistemu
+## Plan: Popravek preostalih odprtih težav (#3, #4, #12)
 
-### 1. `useSubscription.ts` — preverjanje `current_period_end` za `active` status
+### Prioriteta 1: Fallback `new Date()` za periode (#3)
 
-**Problem**: Vrstici 126 in 158 — `isActive` ne preverja ali je `current_period_end` še v prihodnosti. Če webhook zataji, uporabnik z `status: active` in preteklim datumom obdrži dostop.
+**Datoteka**: `supabase/functions/stripe-webhook/index.ts`, vrstici 222-223
 
-**Popravek** (na dveh mestih v datoteki):
-```ts
-// Vrstica 126 (fallback blok) IN vrstica 158 (glavni blok)
-// PREJ:
-const isActive = sub.status === 'active' || sub.status === 'trialing';
+Zamenjaj `new Date().toISOString()` z `null`. Dodaj opozorilo v log če ni datuma.
 
-// POTEM:
-const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
-```
-
-Uporabimo `!== false` namesto `&& isStillInPeriod` ker če `current_period_end` je `null` (logopedisti brez Stripe), ne smemo blokirati. `isStillInPeriod` je `null` ko ni datuma, `false` ko je preteklo, `true` ko je veljavno.
-
-Popraviti je treba tudi vrstici 133 (`isSubscribed` v fallback bloku):
 ```ts
 // PREJ:
-isSubscribed: isActive || (isCanceled && !!isStillInPeriod),
-// POTEM:
-isSubscribed: isActive || (isCanceled && !!isStillInPeriod),
-// Ta vrstica je že OK ker isActive zdaj vključuje isStillInPeriod preverjanje
-```
-
----
-
-### 2. `check-subscription/index.ts` — enako preverjanje (vrstice 79-82)
-
-```ts
-// PREJ (vrstica 79):
-const isActive = sub.status === 'active' || sub.status === 'trialing';
+const periodStart = safeTimestamp(...) || new Date().toISOString();
+const periodEnd = safeTimestamp(...) || new Date().toISOString();
 
 // POTEM:
-const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
-```
+const periodStart = safeTimestamp(item?.current_period_start) || safeTimestamp((subscription as any).current_period_start) || null;
+const periodEnd = safeTimestamp(item?.current_period_end) || safeTimestamp((subscription as any).current_period_end) || null;
 
----
-
-### 3. `stripe-webhook/index.ts` — `listUsers` paginacija (vrstici 44, 122)
-
-**Problem**: `supabase.auth.admin.listUsers()` privzeto vrne max 50 uporabnikov. Če jih je več, webhook ne najde novejših uporabnikov.
-
-**Popravek**: Zamenjaj obe mesti z iskanjem po emailu:
-```ts
-// PREJ (vrstica 44 in 122):
-const { data: users } = await supabase.auth.admin.listUsers();
-const user = users?.users?.find(u => u.email === customer.email);
-
-// POTEM:
-const { data: users } = await supabase.auth.admin.listUsers({ 
-  page: 1, perPage: 1000 
-});
-const user = users?.users?.find(u => u.email === targetEmail);
-```
-
-Še boljši pristop — uporabi `profiles` tabelo za iskanje po emailu namesto `listUsers`, kar je O(1) namesto O(n):
-```ts
-// Alternativa za findUserIdByCustomerId (vrstica 38-55):
-async function findUserIdByEmail(email: string): Promise<string | null> {
-  const { data: users } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
-  const user = users?.users?.find(u => u.email === email);
-  return user?.id || null;
+if (!periodEnd) {
+  logStep("WARNING: No period_end found", { subscriptionId: subscription.id });
 }
 ```
 
-Za `handleCheckoutCompleted` (vrstica 122) — enaka sprememba.
+---
+
+### Prioriteta 2: Periodično osveževanje naročnine (#4)
+
+**Datoteka**: `src/hooks/useSubscription.ts`, vrstice 197-216
+
+Dodaj `setInterval` vsakih 5 minut v obstoječi `useEffect`:
+
+```ts
+useEffect(() => {
+  if (!user) { /* ... obstoječa koda ... */ return; }
+
+  const timeoutId = setTimeout(() => { checkSubscription(); }, 100);
+
+  // Periodično osveževanje vsakih 5 minut
+  const intervalId = setInterval(() => {
+    lastCheckedUserIdRef.current = null;
+    checkSubscription();
+  }, 5 * 60 * 1000);
+
+  return () => {
+    clearTimeout(timeoutId);
+    clearInterval(intervalId);
+  };
+}, [user?.id, checkSubscription]);
+```
 
 ---
 
-### 4. `stripe-webhook/index.ts` — `handleSubscriptionDeleted` ohrani `plan_id` in `current_period_end`
+### Prioriteta 3: Zmanjšaj API klice v webhook (#12)
 
-**Problem**: Vrstice 259-267 — ob brisanju naročnine se `plan_id` takoj nastavi na `null`, kar lahko odvzame dostop pred koncem plačanega obdobja.
+**Datoteka**: `supabase/functions/stripe-webhook/index.ts`, vrstice 188-199
 
-**Popravek**:
+Namesto klicanja `admin.getUserById` za vsakega kandidata, omejimo na max 3 preverjanja:
+
 ```ts
-// PREJ:
-.update({
-  status: "inactive",
-  stripe_subscription_id: null,
-  plan_id: null,
-  cancel_at_period_end: false,
-  updated_at: new Date().toISOString()
-})
-
-// POTEM:
-.update({
-  status: "inactive",
-  stripe_subscription_id: null,
-  cancel_at_period_end: false,
-  updated_at: new Date().toISOString()
-  // plan_id in current_period_end OHRANIMO — 
-  // useSubscription bo preveril isStillInPeriod
-})
+for (const record of existingRecords.slice(0, 3)) {
+  // ... obstoječa logika ...
+}
 ```
-
-S tem uporabnik obdrži dostop do konca plačanega obdobja, nato `isStillInPeriod` postane `false` in dostop se samodejno zaklene.
 
 ---
 
 ### Obseg
-- `src/hooks/useSubscription.ts` — 2 vrstici spremenjeni
-- `supabase/functions/check-subscription/index.ts` — 1 vrstica spremenjena
-- `supabase/functions/stripe-webhook/index.ts` — 3 spremembe (~10 vrstic)
+- `supabase/functions/stripe-webhook/index.ts` — 2 spremembi (~8 vrstic)
+- `src/hooks/useSubscription.ts` — dodaj interval (~6 vrstic)
+
+### Ostale točke (5, 8, 9, 10, 11, 13, 15) — ne zahtevajo popravka zdaj
+- #5, #8, #9, #11: manjši UX/edge case, ni kritično
+- #10: `check-test-reminders` — smart cooldown že preverja `subscriptionEnd > now`
+- #13: `productToPlan` — vzdržljivostni dolg, ne vpliva na delovanje
+- #15: `past_due` — poslovna odločitev, trenutna logika (takojšen blok) je varna
 
