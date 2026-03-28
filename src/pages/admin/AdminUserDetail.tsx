@@ -308,10 +308,16 @@ export default function AdminUserDetail() {
   };
 
   const handleViewDocument = async (file: StorageFile) => {
+    const newTab = window.open('about:blank', '_blank');
     const url = await getFileUrl(file.path);
     if (url) {
-      window.open(url, '_blank');
+      if (newTab) {
+        newTab.location.href = url;
+      } else {
+        window.location.href = url;
+      }
     } else {
+      if (newTab) newTab.close();
       toast.error('Napaka pri odpiranju dokumenta');
     }
   };
