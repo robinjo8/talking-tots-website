@@ -119,7 +119,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Find user_id if not in metadata
   let targetUserId = userId;
   if (!targetUserId && session.customer_email) {
-    const { data: users } = await supabase.auth.admin.listUsers();
+    const { data: users } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const user = users?.users?.find(u => u.email === session.customer_email);
     if (user) {
       targetUserId = user.id;
