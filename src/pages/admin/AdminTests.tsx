@@ -221,6 +221,7 @@ const GroupedTestCard = ({
 
 export default function AdminTests() {
   const navigate = useNavigate();
+  const { profile } = useAdminAuth();
   const { data: sessions, isLoading, error } = useAdminTests();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
