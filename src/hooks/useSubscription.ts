@@ -123,10 +123,10 @@ export function useSubscription() {
                 .maybeSingle();
               
               if (refreshedSub && refreshedSub.status !== 'inactive') {
+                const periodEnd = refreshedSub.current_period_end ? new Date(refreshedSub.current_period_end) : null;
+                const isStillInPeriod = periodEnd ? periodEnd > new Date() : null;
                 const isActive = (refreshedSub.status === 'active' || refreshedSub.status === 'trialing') && isStillInPeriod !== false;
                 const isCanceled = refreshedSub.status === 'canceled' || refreshedSub.cancel_at_period_end;
-                const periodEnd = refreshedSub.current_period_end ? new Date(refreshedSub.current_period_end) : null;
-                const isStillInPeriod = periodEnd && periodEnd > new Date();
                 
                 lastCheckedUserIdRef.current = user.id;
                 setSubscription({
