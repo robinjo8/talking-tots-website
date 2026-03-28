@@ -1,57 +1,64 @@
 
 
+## Analiza: Zakaj uporabnik logopedskezgodbe@gmail.com lahko dela preverjanje pred 3 meseci
 
-## Plan: Interni logopedi (TomiTalk) lahko urejajo vse otroke organizacije
+### Ugotovitve
 
-### Trenutno stanje
+**Simulacijska orodja NISO kriva.** Dovoljena so samo za emaila `qjavec@gmail.com` in `kujavec.robert@gmail.com`. Uporabnik `logopedskezgodbe@gmail.com` jih ne more uporabiti.
 
-**UI** (`AdminChildren.tsx`): Gumba Uredi in Izbriši sta `disabled` za vse organizacijske otroke, ki niso "lastni" (`isOrgLicense && !child.is_own_child`). To velja enako za TomiTalk (internal) in šolske organizacije.
+### Dva problema
 
-**RLS** (`logopedist_children`): UPDATE in DELETE politike dovoljujejo samo operacije nad otroki, kjer je `logopedist_id` enak ID-ju prijavljenega logopeda. Torej tudi če UI omogoči gumb, baza zavrne posodobitev tujega otroka.
+**Problem 1 — Naročnina je potekla, ampak status je še vedno `active`**
 
-### Kaj je treba spremeniti
+Podatki v bazi za tega uporabnika:
+- `status: active`
+- `current_period_end: 2026-01-30` (skoraj 2 meseca nazaj!)
+- `cancel_at_period_end: false`
 
-**1. UI — `AdminChildren.tsx`**
-Sprememba pogoja za `disabled` na gumbih Uredi/Izbriši:
+Stripe webhook za potek naročnine (ali `invoice.payment_failed`) ni pravilno posodobil statusa v bazi. Zato `useSubscription` hook vrne `isSubscribed: true` in uporabnik ima še vedno dostop do Pro funkcionalnosti.
+
+**Problem 2 — Smart Cooldown se obnaša napačno za potekle naročnine**
+
+`calculateNextTestDate()` v `useArticulationTestStatus.ts` izračuna:
+1. Zadnji test: **5. feb 2026**
+2. Normalni naslednji test: 5. feb + 90 dni = **6. maj 2026**
+3. `subscriptionEnd = 30. jan 2026` (že preteklo!)
+4. `lastTestTarget = 30. jan - 7 dni = 23. jan` (v preteklosti!)
+5. Ker je `lastTestTarget < normalNext`, skrajša cooldown
+6. `minNext = 5. feb + 30 dni = 7. mar 2026`
+7. Ker je `lastTestTarget (23. jan) < minNext (7. mar)`, uporabi minimum 30 dni
+8. Danes (28. mar) > 7. mar → **test je odklenjen po 30 dneh namesto 90!**
+
+Smart cooldown je bil zasnovan za naročnine, ki *bodo kmalu potekle*, ne za naročnine, ki *so že potekle*.
+
+### Rešitev
+
+**1. Popravek `calculateNextTestDate` — ignoriraj pretekle `subscriptionEnd`**
+
+Če je `subscriptionEnd` že v preteklosti, uporabi normalni 90-dnevni cooldown:
 ```ts
-// PREJ:
-disabled={isOrgLicense && !child.is_own_child}
-
-// POTEM:
-disabled={isOrgLicense && !child.is_own_child && profile?.organization_type !== 'internal'}
-```
-Interni logopedi (TomiTalk) bodo lahko urejali in brisali vse otroke. Šolski logopedi ostanejo omejeni na svoje.
-
-**2. RLS — nova politika za UPDATE na `logopedist_children`**
-```sql
-CREATE POLICY "Internal logopedists can update org children"
-ON public.logopedist_children
-FOR UPDATE
-TO authenticated
-USING (is_internal_logopedist(auth.uid()))
-WITH CHECK (is_internal_logopedist(auth.uid()));
+function calculateNextTestDate(lastCompletedAt: Date, subscriptionEnd: string | null): Date {
+  const normalNext = addMonths(lastCompletedAt, 3);
+  if (!subscriptionEnd) return normalNext;
+  
+  const subEnd = new Date(subscriptionEnd);
+  // Če je naročnina že potekla, uporabi normalni cooldown
+  if (isBefore(subEnd, new Date())) return normalNext;
+  
+  // ... ostala logika ostane enaka
+}
 ```
 
-**3. RLS — nova politika za DELETE na `logopedist_children`**
-```sql
-CREATE POLICY "Internal logopedists can delete org children"
-ON public.logopedist_children
-FOR DELETE
-TO authenticated
-USING (is_internal_logopedist(auth.uid()));
-```
+**2. Popravek enake logike v edge funkciji `check-test-reminders/index.ts`**
 
-### Kaj ostane nespremenjeno
-- Šolske organizacije (`school`, `kindergarten`, `private`): samo lastne otroke lahko urejajo/brišejo
-- Vidnost: vsi člani organizacije še vedno vidijo vse otroke (obstoječa SELECT politika)
-- `useLogopedistChildren.ts` hook: brez sprememb (podatki se že pravilno nalagajo)
+Enako preverjanje dodaj v edge funkcijo za opomnike (vrstica ~115), da tudi tam smart cooldown ne skrajša intervala za že potekle naročnine.
+
+**3. Ročni popravek podatkov v bazi**
+
+Uporabnikova naročnina (`sub_1Ssec4GncjlOci0kHP3Xwp2W`) ima `current_period_end` v preteklosti ampak `status: active`. To je potrebno ročno popraviti na `expired` ali preveriti v Stripe dashboardu zakaj webhook ni sprožil posodobitve.
 
 ### Obseg
-- 1 UI datoteka (`AdminChildren.tsx`) — 2 vrstici spremenjeni
-- 1 DB migracija — 2 novi RLS politiki
+- `src/hooks/useArticulationTestStatus.ts` — 2 vrstici dodani v `calculateNextTestDate`
+- `supabase/functions/check-test-reminders/index.ts` — 3 vrstice dodane za enako preverjanje
+- Ročni popravek statusa naročnine v bazi (ali preveritev Stripe webhookov)
 
-## IMPLEMENTIRANO: Omeji upravljanje otrok za zunanje organizacije (ne TomiTalk)
-
-Logopedi zunanjih organizacij (npr. OŠ Test) na `/admin/children` ne morejo več klikniti Podrobnosti, Napredek, Začni delo za otroke drugih logopedov. Na `/admin/all-tests` je gumb Ogled onemogočen za seje tujih otrok. Neposreden dostop do URL `/admin/tests/:id` je zaščiten z redirectom.
-
-TomiTalk (internal) logopedi ostanejo nespremenjeni — popoln dostop.
