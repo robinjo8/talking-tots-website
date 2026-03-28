@@ -1,42 +1,51 @@
 
 
-## Plan: Popravi odpiranje PDF poročil na iOS/Safari
+## Plan: Interni logopedi (TomiTalk) lahko urejajo vse otroke organizacije
 
-### Problem
-Safari/iOS blokira `window.open()` ko je klican znotraj `async` funkcije. Med uporabnikovim klikom in `window.open` je `await` (za pridobitev signed URL), kar Safari interpretira kot popup brez uporabniške geste.
+### Trenutno stanje
 
-### Rešitev
-Odpri prazen zavihek **sinhrono** (v direktnem click handlerju), nato asinhrono nastavi URL:
+**UI** (`AdminChildren.tsx`): Gumba Uredi in Izbriši sta `disabled` za vse organizacijske otroke, ki niso "lastni" (`isOrgLicense && !child.is_own_child`). To velja enako za TomiTalk (internal) in šolske organizacije.
 
+**RLS** (`logopedist_children`): UPDATE in DELETE politike dovoljujejo samo operacije nad otroki, kjer je `logopedist_id` enak ID-ju prijavljenega logopeda. Torej tudi če UI omogoči gumb, baza zavrne posodobitev tujega otroka.
+
+### Kaj je treba spremeniti
+
+**1. UI — `AdminChildren.tsx`**
+Sprememba pogoja za `disabled` na gumbih Uredi/Izbriši:
 ```ts
-// PREJ (blokirano na Safari):
-const url = await getSignedUrl(path);
-window.open(url, '_blank');
+// PREJ:
+disabled={isOrgLicense && !child.is_own_child}
 
-// POTEM (deluje povsod):
-const newTab = window.open('about:blank', '_blank');
-const url = await getSignedUrl(path);
-if (newTab) {
-  newTab.location.href = url;
-} else {
-  // Fallback: redirect current window
-  window.location.href = url;
-}
+// POTEM:
+disabled={isOrgLicense && !child.is_own_child && profile?.organization_type !== 'internal'}
+```
+Interni logopedi (TomiTalk) bodo lahko urejali in brisali vse otroke. Šolski logopedi ostanejo omejeni na svoje.
+
+**2. RLS — nova politika za UPDATE na `logopedist_children`**
+```sql
+CREATE POLICY "Internal logopedists can update org children"
+ON public.logopedist_children
+FOR UPDATE
+TO authenticated
+USING (is_internal_logopedist(auth.uid()))
+WITH CHECK (is_internal_logopedist(auth.uid()));
 ```
 
-### Datoteke za spremembo
+**3. RLS — nova politika za DELETE na `logopedist_children`**
+```sql
+CREATE POLICY "Internal logopedists can delete org children"
+ON public.logopedist_children
+FOR DELETE
+TO authenticated
+USING (is_internal_logopedist(auth.uid()));
+```
 
-**1. `src/components/profile/MyDocumentsSection.tsx`** (vrstice 310-316)
-- Eye gumb za odpiranje poročila: dodaj sinhroni `window.open('about:blank')` pred `await`
-
-**2. `src/pages/admin/AdminReports.tsx`** (vrstice 93-104)
-- `handleView`: enaka sprememba
-
-**3. `src/pages/admin/AdminLogopedistChildDetail.tsx`** — preveri ali ima enak vzorec za odpiranje dokumentov
-
-**4. `src/pages/admin/AdminUserDetail.tsx`** — preveri ali ima enak vzorec
+### Kaj ostane nespremenjeno
+- Šolske organizacije (`school`, `kindergarten`, `private`): samo lastne otroke lahko urejajo/brišejo
+- Vidnost: vsi člani organizacije še vedno vidijo vse otroke (obstoječa SELECT politika)
+- `useLogopedistChildren.ts` hook: brez sprememb (podatki se že pravilno nalagajo)
 
 ### Obseg
-- 3-4 datoteke, ~5 vrstic spremenjenih v vsaki
-- Brez novih odvisnosti
+- 1 UI datoteka (`AdminChildren.tsx`) — 2 vrstici spremenjeni
+- 1 DB migracija — 2 novi RLS politiki
 
