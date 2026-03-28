@@ -106,11 +106,16 @@ export function MyDocumentsSection() {
   }, [profile?.children, user?.id, fetchDocuments]);
 
   const handleDownloadReport = useCallback(async (path: string) => {
+    const newTab = window.open('about:blank', '_blank');
     const { data } = await supabase.storage
       .from('uporabniski-profili')
       .createSignedUrl(path, 3600);
     if (data?.signedUrl) {
-      window.open(data.signedUrl, '_blank');
+      if (newTab) {
+        newTab.location.href = data.signedUrl;
+      } else {
+        window.location.href = data.signedUrl;
+      }
     }
   }, []);
   const handleDownload = async (storagePath: string) => {
