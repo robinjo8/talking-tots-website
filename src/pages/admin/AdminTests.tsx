@@ -345,6 +345,18 @@ export default function AdminTests() {
 
   const hasActiveFilters = searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all';
 
+  // Check if current logopedist can view a session (external orgs can only view own children's sessions)
+  const canViewSession = useCallback((session: TestSessionData): boolean => {
+    // Internal (TomiTalk) logopedists can view everything
+    if (profile?.organization_type === 'internal') return true;
+    // Parent sessions — only internal logopedists handle these
+    if (session.source_type === 'parent') return false;
+    // Logopedist session — can view only if it's own child
+    return session.logopedist_id === profile?.id;
+  }, [profile]);
+
+
+
   return (
     <div className="space-y-6">
       {/* Header */}
