@@ -17,6 +17,7 @@ export interface TestSessionData {
   assigned_to: string | null;
   source_type: 'parent' | 'logopedist';
   logopedist_child_id: string | null;
+  logopedist_id: string | null;
   organization_id: string | null;
   organization_name: string | null;
   logopedist_first_name: string | null;
