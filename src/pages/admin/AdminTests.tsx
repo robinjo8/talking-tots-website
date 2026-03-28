@@ -621,8 +621,9 @@ export default function AdminTests() {
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  title="Ogled podrobnosti"
+                                  title={canViewSession(session) ? "Ogled podrobnosti" : "Lahko gledate samo seje svojih otrok"}
                                   onClick={() => navigate(`/admin/tests/${session.id}`)}
+                                  disabled={!canViewSession(session)}
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
                                   Ogled
