@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminTests, TestSessionData, calculateTestStats, groupSessionsByChild, ChildGroup } from '@/hooks/useAdminTests';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -121,12 +122,14 @@ const GroupedTestCard = ({
   group, 
   isExpanded,
   onToggle,
-  onNavigate
+  onNavigate,
+  canViewSession,
 }: { 
   group: ChildGroup; 
   isExpanded: boolean;
   onToggle: () => void;
   onNavigate: (sessionId: string) => void;
+  canViewSession: (session: TestSessionData) => boolean;
 }) => {
   const source = formatSource(group);
   const gender = formatGender(group.child_gender);
@@ -201,6 +204,8 @@ const GroupedTestCard = ({
                     size="sm"
                     className="h-7 px-2"
                     onClick={() => onNavigate(session.id)}
+                    disabled={!canViewSession(session)}
+                    title={!canViewSession(session) ? 'Lahko gledate samo seje svojih otrok' : undefined}
                   >
                     <Eye className="h-3.5 w-3.5" />
                   </Button>
@@ -216,6 +221,7 @@ const GroupedTestCard = ({
 
 export default function AdminTests() {
   const navigate = useNavigate();
+  const { profile } = useAdminAuth();
   const { data: sessions, isLoading, error } = useAdminTests();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
@@ -338,6 +344,18 @@ export default function AdminTests() {
   }, [sessions]);
 
   const hasActiveFilters = searchQuery || ageFilter !== 'all' || genderFilter !== 'all' || statusFilter !== 'all' || dateFilter !== 'all';
+
+  // Check if current logopedist can view a session (external orgs can only view own children's sessions)
+  const canViewSession = useCallback((session: TestSessionData): boolean => {
+    // Internal (TomiTalk) logopedists can view everything
+    if (profile?.organization_type === 'internal') return true;
+    // Parent sessions — only internal logopedists handle these
+    if (session.source_type === 'parent') return false;
+    // Logopedist session — can view only if it's own child
+    return session.logopedist_id === profile?.id;
+  }, [profile]);
+
+
 
   return (
     <div className="space-y-6">
@@ -603,8 +621,9 @@ export default function AdminTests() {
                                 <Button 
                                   variant="ghost" 
                                   size="sm" 
-                                  title="Ogled podrobnosti"
+                                  title={canViewSession(session) ? "Ogled podrobnosti" : "Lahko gledate samo seje svojih otrok"}
                                   onClick={() => navigate(`/admin/tests/${session.id}`)}
+                                  disabled={!canViewSession(session)}
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
                                   Ogled
@@ -692,6 +711,7 @@ export default function AdminTests() {
                     isExpanded={expandedGroupId === group.childKey}
                     onToggle={() => toggleGroup(group.childKey)}
                     onNavigate={(sessionId) => navigate(`/admin/tests/${sessionId}`)}
+                    canViewSession={canViewSession}
                   />
                 ))
               )}
