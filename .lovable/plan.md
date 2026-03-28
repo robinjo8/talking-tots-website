@@ -1,51 +1,42 @@
 
 
-## Plan: Popravi izračun pokala — uporabi `total_stars` namesto `completion_count`
+## Plan: Popravi odpiranje PDF poročil na iOS/Safari
 
 ### Problem
+Safari/iOS blokira `window.open()` ko je klican znotraj `async` funkcije. Med uporabnikovim klikom in `window.open` je `await` (za pridobitev signed URL), kar Safari interpretira kot popup brez uporabniške geste.
 
-`TrophyContext.tsx` (vrstica 46-48) in `useEnhancedProgress.ts` (vrstica 79-84) oba uporabljata `a.completion_count` za izračun skupnih zvezdic. RPC `get_child_activity_summary` vrača tudi `a.total_stars` (= SUM of `stars_earned`), ki je pravo število zvezdic.
+### Rešitev
+Odpri prazen zavihek **sinhrono** (v direktnem click handlerju), nato asinhrono nastavi URL:
 
-Ker motorika vaje podelijo 2 zvezdici na zaključek, se zgodi:
-- Uporabnik vidi na zaslonu 214 zvezdic (iz `total_stars`)
-- Pokal pa se sproži ko `completion_count` doseže 200 — kar je pri 214+ vidnih zvezdicah
-
-### Popravek
-
-**Datoteka 1: `src/contexts/TrophyContext.tsx` (vrstici 46-47)**
 ```ts
-// PREJ:
-const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
-const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
+// PREJ (blokirano na Safari):
+const url = await getSignedUrl(path);
+window.open(url, '_blank');
 
-// POTEM:
-const gamesTotalStars = gameActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
-const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
-const totalStars = gamesTotalStars + exercisesTotalStars;
+// POTEM (deluje povsod):
+const newTab = window.open('about:blank', '_blank');
+const url = await getSignedUrl(path);
+if (newTab) {
+  newTab.location.href = url;
+} else {
+  // Fallback: redirect current window
+  window.location.href = url;
+}
 ```
 
-**Datoteka 2: `src/hooks/useEnhancedProgress.ts` (vrstici 79-84)**
-```ts
-// PREJ:
-const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
-const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
-const totalStars = gamesTotalCompletions + exercisesTotalCompletions;
+### Datoteke za spremembo
 
-// POTEM:
-const gamesTotalStars = gameActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
-const exercisesTotalStars = exerciseActivities.reduce((sum, a) => sum + (a.total_stars || 0), 0);
-const totalStars = gamesTotalStars + exercisesTotalStars;
+**1. `src/components/profile/MyDocumentsSection.tsx`** (vrstice 310-316)
+- Eye gumb za odpiranje poročila: dodaj sinhroni `window.open('about:blank')` pred `await`
 
-// completion_count obdržimo za prikaz "Skupaj opravljenih"
-const gamesTotalCompletions = gameActivities.reduce((sum, a) => sum + a.completion_count, 0);
-const exercisesTotalCompletions = exerciseActivities.reduce((sum, a) => sum + a.completion_count, 0);
-```
+**2. `src/pages/admin/AdminReports.tsx`** (vrstice 93-104)
+- `handleView`: enaka sprememba
 
-### Rezultat
-- Pokal se sproži natančno pri 100, 200, 300... **dejanskih zvezdicah**
-- Prikaz zvezdic, zmajčkov in pokalov je usklajen z dejanskim številom
-- "Skupaj opravljenih" še vedno kaže število zaključkov (ne zvezdic)
+**3. `src/pages/admin/AdminLogopedistChildDetail.tsx`** — preveri ali ima enak vzorec za odpiranje dokumentov
+
+**4. `src/pages/admin/AdminUserDetail.tsx`** — preveri ali ima enak vzorec
 
 ### Obseg
-- 2 datoteki, ~6 vrstic spremenjenih v vsaki
+- 3-4 datoteke, ~5 vrstic spremenjenih v vsaki
+- Brez novih odvisnosti
 
