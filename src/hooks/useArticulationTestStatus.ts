@@ -15,6 +15,8 @@ function calculateNextTestDate(lastCompletedAt: Date, subscriptionEnd: string | 
   if (!subscriptionEnd) return normalNext;
   
   const subEnd = new Date(subscriptionEnd);
+  // If subscription already expired, use normal 90-day cooldown
+  if (isBefore(subEnd, new Date())) return normalNext;
   const lastTestTarget = addDays(subEnd, -7); // 7 days before expiry
   
   if (isBefore(lastTestTarget, normalNext)) {

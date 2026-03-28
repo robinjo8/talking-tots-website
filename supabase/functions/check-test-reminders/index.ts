@@ -119,7 +119,8 @@ Deno.serve(async (req) => {
         : null
 
       let nextTestDays = 90
-      if (lastTestTarget) {
+      // If subscription already expired, skip smart cooldown
+      if (lastTestTarget && subscriptionEnd && subscriptionEnd.getTime() > now.getTime()) {
         const daysToLastTarget = Math.floor(
           (lastTestTarget.getTime() - completedAt.getTime()) / (1000 * 60 * 60 * 24)
         )
