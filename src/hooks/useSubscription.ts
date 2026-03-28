@@ -123,10 +123,10 @@ export function useSubscription() {
                 .maybeSingle();
               
               if (refreshedSub && refreshedSub.status !== 'inactive') {
-                const isActive = refreshedSub.status === 'active' || refreshedSub.status === 'trialing';
-                const isCanceled = refreshedSub.status === 'canceled' || refreshedSub.cancel_at_period_end;
                 const periodEnd = refreshedSub.current_period_end ? new Date(refreshedSub.current_period_end) : null;
-                const isStillInPeriod = periodEnd && periodEnd > new Date();
+                const isStillInPeriod = periodEnd ? periodEnd > new Date() : null;
+                const isActive = (refreshedSub.status === 'active' || refreshedSub.status === 'trialing') && isStillInPeriod !== false;
+                const isCanceled = refreshedSub.status === 'canceled' || refreshedSub.cancel_at_period_end;
                 
                 lastCheckedUserIdRef.current = user.id;
                 setSubscription({
@@ -155,14 +155,12 @@ export function useSubscription() {
       }
 
       // Determine subscription state
-      const isActive = sub.status === 'active' || sub.status === 'trialing';
+      const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
+      const isStillInPeriod = periodEnd ? periodEnd > new Date() : null;
+      const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
       const isCanceled = sub.status === 'canceled' || sub.cancel_at_period_end;
       
-      // If canceled but still in period, show as subscribed until period ends
-      const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
-      const isStillInPeriod = periodEnd && periodEnd > new Date();
-      
-      const isSubscribed = isActive || (isCanceled && isStillInPeriod);
+      const isSubscribed = isActive || (isCanceled && !!isStillInPeriod);
 
       console.log('Subscription check result:', { 
         status: sub.status,

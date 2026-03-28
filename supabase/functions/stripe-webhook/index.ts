@@ -41,7 +41,7 @@ async function findUserIdByCustomerId(customerId: string): Promise<string | null
       logStep("Customer not found or deleted", { customerId });
       return null;
     }
-    const { data: users } = await supabase.auth.admin.listUsers();
+    const { data: users } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const user = users?.users?.find(u => u.email === customer.email);
     if (user) {
       logStep("Found user by email fallback", { email: customer.email, userId: user.id });
@@ -119,7 +119,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   // Find user_id if not in metadata
   let targetUserId = userId;
   if (!targetUserId && session.customer_email) {
-    const { data: users } = await supabase.auth.admin.listUsers();
+    const { data: users } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const user = users?.users?.find(u => u.email === session.customer_email);
     if (user) {
       targetUserId = user.id;
@@ -260,9 +260,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     .update({
       status: "inactive",
       stripe_subscription_id: null,
-      plan_id: null,
       cancel_at_period_end: false,
       updated_at: new Date().toISOString()
+      // plan_id in current_period_end OHRANIMO —
+      // useSubscription bo preveril isStillInPeriod za grace period
     })
     .eq("stripe_customer_id", customerId);
 
