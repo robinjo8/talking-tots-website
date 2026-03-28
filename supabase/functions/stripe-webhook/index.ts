@@ -187,7 +187,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   // Filter to only users that still exist in auth.users
   let targetUserId: string | null = null;
   if (existingRecords && existingRecords.length > 0) {
-    for (const record of existingRecords) {
+    for (const record of existingRecords.slice(0, 3)) {
       const { data: authUser } = await supabase.auth.admin.getUserById(record.user_id);
       if (authUser?.user) {
         targetUserId = record.user_id;
