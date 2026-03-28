@@ -155,14 +155,12 @@ export function useSubscription() {
       }
 
       // Determine subscription state
+      const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
+      const isStillInPeriod = periodEnd ? periodEnd > new Date() : null;
       const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
       const isCanceled = sub.status === 'canceled' || sub.cancel_at_period_end;
       
-      // If canceled but still in period, show as subscribed until period ends
-      const periodEnd = sub.current_period_end ? new Date(sub.current_period_end) : null;
-      const isStillInPeriod = periodEnd && periodEnd > new Date();
-      
-      const isSubscribed = isActive || (isCanceled && isStillInPeriod);
+      const isSubscribed = isActive || (isCanceled && !!isStillInPeriod);
 
       console.log('Subscription check result:', { 
         status: sub.status,
