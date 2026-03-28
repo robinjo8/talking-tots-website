@@ -313,11 +313,18 @@ export function MyDocumentsSection() {
                                 size="sm" 
                                 className="h-8 w-8 p-0"
                                 onClick={async () => {
+                                  const newTab = window.open('about:blank', '_blank');
                                   const { data } = await supabase.storage
                                     .from('uporabniski-profili')
                                     .createSignedUrl(report.path, 3600);
                                   if (data?.signedUrl) {
-                                    window.open(data.signedUrl, '_blank');
+                                    if (newTab) {
+                                      newTab.location.href = data.signedUrl;
+                                    } else {
+                                      window.location.href = data.signedUrl;
+                                    }
+                                  } else if (newTab) {
+                                    newTab.close();
                                   }
                                 }}
                                 title="Odpri poročilo"

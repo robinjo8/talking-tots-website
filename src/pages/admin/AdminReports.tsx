@@ -95,10 +95,16 @@ export default function AdminReports() {
       toast.error('Poročilo nima priloženega PDF-ja');
       return;
     }
+    const newTab = window.open('about:blank', '_blank');
     const url = await getReportFileUrl(report.pdf_url);
     if (url) {
-      window.open(url, '_blank');
+      if (newTab) {
+        newTab.location.href = url;
+      } else {
+        window.location.href = url;
+      }
     } else {
+      if (newTab) newTab.close();
       toast.error('Napaka pri odpiranju poročila');
     }
   };
