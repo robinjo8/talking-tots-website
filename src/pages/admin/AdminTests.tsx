@@ -204,6 +204,8 @@ const GroupedTestCard = ({
                     size="sm"
                     className="h-7 px-2"
                     onClick={() => onNavigate(session.id)}
+                    disabled={!canViewSession(session)}
+                    title={!canViewSession(session) ? 'Lahko gledate samo seje svojih otrok' : undefined}
                   >
                     <Eye className="h-3.5 w-3.5" />
                   </Button>
