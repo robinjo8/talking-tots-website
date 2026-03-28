@@ -41,7 +41,7 @@ async function findUserIdByCustomerId(customerId: string): Promise<string | null
       logStep("Customer not found or deleted", { customerId });
       return null;
     }
-    const { data: users } = await supabase.auth.admin.listUsers();
+    const { data: users } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
     const user = users?.users?.find(u => u.email === customer.email);
     if (user) {
       logStep("Found user by email fallback", { email: customer.email, userId: user.id });
