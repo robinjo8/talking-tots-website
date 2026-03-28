@@ -1,51 +1,52 @@
 
 
-## Plan: Interni logopedi (TomiTalk) lahko urejajo vse otroke organizacije
+## Plan: Omeji upravljanje otrok za zunanje organizacije (ne TomiTalk)
 
-### Trenutno stanje
+### Problem
+Logopedi zunanjih organizacij (npr. OŠ Test) lahko na `/admin/children` kliknejo Podrobnosti, Napredek, Začni delo za otroke drugih logopedov. Na `/admin/all-tests` lahko kliknejo Ogled in odprejo seje/posnetke tujih otrok. To mora biti omejeno — samo za svoje otroke.
 
-**UI** (`AdminChildren.tsx`): Gumba Uredi in Izbriši sta `disabled` za vse organizacijske otroke, ki niso "lastni" (`isOrgLicense && !child.is_own_child`). To velja enako za TomiTalk (internal) in šolske organizacije.
+**TomiTalk (internal) logopedi ostanejo nespremenjeni** — popoln dostop kot doslej.
 
-**RLS** (`logopedist_children`): UPDATE in DELETE politike dovoljujejo samo operacije nad otroki, kjer je `logopedist_id` enak ID-ju prijavljenega logopeda. Torej tudi če UI omogoči gumb, baza zavrne posodobitev tujega otroka.
+### Spremembe
 
-### Kaj je treba spremeniti
+**1. `src/hooks/useAdminTests.ts` — dodaj `logopedist_id` v `TestSessionData`**
 
-**1. UI — `AdminChildren.tsx`**
-Sprememba pogoja za `disabled` na gumbih Uredi/Izbriši:
+Dodaj polje `logopedist_id: string | null` v interface `TestSessionData`. V build rezultatu nastavi vrednost iz `logopedistChildrenMap` (že se fetcha). Dodaj tudi v `ChildGroup` interface.
+
+**2. `src/pages/admin/AdminChildren.tsx` — omeji gumbe Podrobnosti, Napredek, Začni delo**
+
+Dodaj pogoj `canManage` za vse akcijske gumbe (ne samo Uredi/Izbriši):
 ```ts
-// PREJ:
-disabled={isOrgLicense && !child.is_own_child}
-
-// POTEM:
-disabled={isOrgLicense && !child.is_own_child && profile?.organization_type !== 'internal'}
+const canManage = !isOrgLicense || child.is_own_child || profile?.organization_type === 'internal';
 ```
-Interni logopedi (TomiTalk) bodo lahko urejali in brisali vse otroke. Šolski logopedi ostanejo omejeni na svoje.
+- Podrobnosti: `disabled={!canManage}`
+- Napredek: `disabled={!canManage}`
+- Začni delo: `disabled={!canManage}`
+- Uredi, Izbriši: že imajo pogoj — ostanejo kot so
 
-**2. RLS — nova politika za UPDATE na `logopedist_children`**
-```sql
-CREATE POLICY "Internal logopedists can update org children"
-ON public.logopedist_children
-FOR UPDATE
-TO authenticated
-USING (is_internal_logopedist(auth.uid()))
-WITH CHECK (is_internal_logopedist(auth.uid()));
-```
+**3. `src/pages/admin/AdminTests.tsx` — omeji gumb Ogled**
 
-**3. RLS — nova politika za DELETE na `logopedist_children`**
-```sql
-CREATE POLICY "Internal logopedists can delete org children"
-ON public.logopedist_children
-FOR DELETE
-TO authenticated
-USING (is_internal_logopedist(auth.uid()));
+Uvozi `useAdminAuth`. Za vsako sejo v razširjeni vrstici (desktop + mobile) preveri:
+```ts
+const canView = profile?.organization_type === 'internal' 
+  || session.source_type === 'parent'  // parent sessions vidijo samo interni
+  || session.logopedist_id === profile?.id;  // svoja seja
 ```
+Gumb Ogled dobi `disabled={!canView}` s tooltipom "Lahko gledate samo seje svojih otrok".
+
+**4. `src/pages/admin/AdminSessionReview.tsx` — zaščita na nivoju strani**
+
+Dodaj preverjanje po nalaganju podatkov: če logopedist ni interni IN seja ne pripada njegovemu otroku (`logopedist_child_id` → `logopedist_children.logopedist_id !== profile.id`), preusmeri na `/admin/all-tests` s toast sporočilom.
 
 ### Kaj ostane nespremenjeno
-- Šolske organizacije (`school`, `kindergarten`, `private`): samo lastne otroke lahko urejajo/brišejo
-- Vidnost: vsi člani organizacije še vedno vidijo vse otroke (obstoječa SELECT politika)
-- `useLogopedistChildren.ts` hook: brez sprememb (podatki se že pravilno nalagajo)
+- TomiTalk (internal) logopedi: brez kakršnihkoli sprememb
+- Vidnost seznama otrok na `/admin/children`: vsi v org še vedno vidijo vse otroke
+- Vidnost seznama sej na `/admin/all-tests`: vsi v org še vedno vidijo vse seje v tabeli
+- RLS politike: brez sprememb (UI omejitev zadošča, RLS že preprečuje nepooblaščene operacije)
 
 ### Obseg
-- 1 UI datoteka (`AdminChildren.tsx`) — 2 vrstici spremenjeni
-- 1 DB migracija — 2 novi RLS politiki
+- `src/hooks/useAdminTests.ts` — dodaj `logopedist_id` polje (~5 vrstic)
+- `src/pages/admin/AdminChildren.tsx` — dodaj `disabled` na 3 gumbe (~6 vrstic)
+- `src/pages/admin/AdminTests.tsx` — pogojno onemogoči Ogled (~15 vrstic)
+- `src/pages/admin/AdminSessionReview.tsx` — zaščita dostopa (~10 vrstic)
 
