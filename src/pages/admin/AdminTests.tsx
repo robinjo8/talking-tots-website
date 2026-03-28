@@ -710,6 +710,7 @@ export default function AdminTests() {
                     isExpanded={expandedGroupId === group.childKey}
                     onToggle={() => toggleGroup(group.childKey)}
                     onNavigate={(sessionId) => navigate(`/admin/tests/${sessionId}`)}
+                    canViewSession={canViewSession}
                   />
                 ))
               )}
