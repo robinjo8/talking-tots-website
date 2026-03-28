@@ -1,64 +1,109 @@
 
 
-## Analiza: Zakaj uporabnik logopedskezgodbe@gmail.com lahko dela preverjanje pred 3 meseci
+## Plan: Popravek kritičnih težav v naročniškem sistemu
 
-### Ugotovitve
+### 1. `useSubscription.ts` — preverjanje `current_period_end` za `active` status
 
-**Simulacijska orodja NISO kriva.** Dovoljena so samo za emaila `qjavec@gmail.com` in `kujavec.robert@gmail.com`. Uporabnik `logopedskezgodbe@gmail.com` jih ne more uporabiti.
+**Problem**: Vrstici 126 in 158 — `isActive` ne preverja ali je `current_period_end` še v prihodnosti. Če webhook zataji, uporabnik z `status: active` in preteklim datumom obdrži dostop.
 
-### Dva problema
-
-**Problem 1 — Naročnina je potekla, ampak status je še vedno `active`**
-
-Podatki v bazi za tega uporabnika:
-- `status: active`
-- `current_period_end: 2026-01-30` (skoraj 2 meseca nazaj!)
-- `cancel_at_period_end: false`
-
-Stripe webhook za potek naročnine (ali `invoice.payment_failed`) ni pravilno posodobil statusa v bazi. Zato `useSubscription` hook vrne `isSubscribed: true` in uporabnik ima še vedno dostop do Pro funkcionalnosti.
-
-**Problem 2 — Smart Cooldown se obnaša napačno za potekle naročnine**
-
-`calculateNextTestDate()` v `useArticulationTestStatus.ts` izračuna:
-1. Zadnji test: **5. feb 2026**
-2. Normalni naslednji test: 5. feb + 90 dni = **6. maj 2026**
-3. `subscriptionEnd = 30. jan 2026` (že preteklo!)
-4. `lastTestTarget = 30. jan - 7 dni = 23. jan` (v preteklosti!)
-5. Ker je `lastTestTarget < normalNext`, skrajša cooldown
-6. `minNext = 5. feb + 30 dni = 7. mar 2026`
-7. Ker je `lastTestTarget (23. jan) < minNext (7. mar)`, uporabi minimum 30 dni
-8. Danes (28. mar) > 7. mar → **test je odklenjen po 30 dneh namesto 90!**
-
-Smart cooldown je bil zasnovan za naročnine, ki *bodo kmalu potekle*, ne za naročnine, ki *so že potekle*.
-
-### Rešitev
-
-**1. Popravek `calculateNextTestDate` — ignoriraj pretekle `subscriptionEnd`**
-
-Če je `subscriptionEnd` že v preteklosti, uporabi normalni 90-dnevni cooldown:
+**Popravek** (na dveh mestih v datoteki):
 ```ts
-function calculateNextTestDate(lastCompletedAt: Date, subscriptionEnd: string | null): Date {
-  const normalNext = addMonths(lastCompletedAt, 3);
-  if (!subscriptionEnd) return normalNext;
-  
-  const subEnd = new Date(subscriptionEnd);
-  // Če je naročnina že potekla, uporabi normalni cooldown
-  if (isBefore(subEnd, new Date())) return normalNext;
-  
-  // ... ostala logika ostane enaka
+// Vrstica 126 (fallback blok) IN vrstica 158 (glavni blok)
+// PREJ:
+const isActive = sub.status === 'active' || sub.status === 'trialing';
+
+// POTEM:
+const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
+```
+
+Uporabimo `!== false` namesto `&& isStillInPeriod` ker če `current_period_end` je `null` (logopedisti brez Stripe), ne smemo blokirati. `isStillInPeriod` je `null` ko ni datuma, `false` ko je preteklo, `true` ko je veljavno.
+
+Popraviti je treba tudi vrstici 133 (`isSubscribed` v fallback bloku):
+```ts
+// PREJ:
+isSubscribed: isActive || (isCanceled && !!isStillInPeriod),
+// POTEM:
+isSubscribed: isActive || (isCanceled && !!isStillInPeriod),
+// Ta vrstica je že OK ker isActive zdaj vključuje isStillInPeriod preverjanje
+```
+
+---
+
+### 2. `check-subscription/index.ts` — enako preverjanje (vrstice 79-82)
+
+```ts
+// PREJ (vrstica 79):
+const isActive = sub.status === 'active' || sub.status === 'trialing';
+
+// POTEM:
+const isActive = (sub.status === 'active' || sub.status === 'trialing') && isStillInPeriod !== false;
+```
+
+---
+
+### 3. `stripe-webhook/index.ts` — `listUsers` paginacija (vrstici 44, 122)
+
+**Problem**: `supabase.auth.admin.listUsers()` privzeto vrne max 50 uporabnikov. Če jih je več, webhook ne najde novejših uporabnikov.
+
+**Popravek**: Zamenjaj obe mesti z iskanjem po emailu:
+```ts
+// PREJ (vrstica 44 in 122):
+const { data: users } = await supabase.auth.admin.listUsers();
+const user = users?.users?.find(u => u.email === customer.email);
+
+// POTEM:
+const { data: users } = await supabase.auth.admin.listUsers({ 
+  page: 1, perPage: 1000 
+});
+const user = users?.users?.find(u => u.email === targetEmail);
+```
+
+Še boljši pristop — uporabi `profiles` tabelo za iskanje po emailu namesto `listUsers`, kar je O(1) namesto O(n):
+```ts
+// Alternativa za findUserIdByCustomerId (vrstica 38-55):
+async function findUserIdByEmail(email: string): Promise<string | null> {
+  const { data: users } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+  const user = users?.users?.find(u => u.email === email);
+  return user?.id || null;
 }
 ```
 
-**2. Popravek enake logike v edge funkciji `check-test-reminders/index.ts`**
+Za `handleCheckoutCompleted` (vrstica 122) — enaka sprememba.
 
-Enako preverjanje dodaj v edge funkcijo za opomnike (vrstica ~115), da tudi tam smart cooldown ne skrajša intervala za že potekle naročnine.
+---
 
-**3. Ročni popravek podatkov v bazi**
+### 4. `stripe-webhook/index.ts` — `handleSubscriptionDeleted` ohrani `plan_id` in `current_period_end`
 
-Uporabnikova naročnina (`sub_1Ssec4GncjlOci0kHP3Xwp2W`) ima `current_period_end` v preteklosti ampak `status: active`. To je potrebno ročno popraviti na `expired` ali preveriti v Stripe dashboardu zakaj webhook ni sprožil posodobitve.
+**Problem**: Vrstice 259-267 — ob brisanju naročnine se `plan_id` takoj nastavi na `null`, kar lahko odvzame dostop pred koncem plačanega obdobja.
+
+**Popravek**:
+```ts
+// PREJ:
+.update({
+  status: "inactive",
+  stripe_subscription_id: null,
+  plan_id: null,
+  cancel_at_period_end: false,
+  updated_at: new Date().toISOString()
+})
+
+// POTEM:
+.update({
+  status: "inactive",
+  stripe_subscription_id: null,
+  cancel_at_period_end: false,
+  updated_at: new Date().toISOString()
+  // plan_id in current_period_end OHRANIMO — 
+  // useSubscription bo preveril isStillInPeriod
+})
+```
+
+S tem uporabnik obdrži dostop do konca plačanega obdobja, nato `isStillInPeriod` postane `false` in dostop se samodejno zaklene.
+
+---
 
 ### Obseg
-- `src/hooks/useArticulationTestStatus.ts` — 2 vrstici dodani v `calculateNextTestDate`
-- `supabase/functions/check-test-reminders/index.ts` — 3 vrstice dodane za enako preverjanje
-- Ročni popravek statusa naročnine v bazi (ali preveritev Stripe webhookov)
+- `src/hooks/useSubscription.ts` — 2 vrstici spremenjeni
+- `supabase/functions/check-subscription/index.ts` — 1 vrstica spremenjena
+- `supabase/functions/stripe-webhook/index.ts` — 3 spremembe (~10 vrstic)
 
