@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAdminAuth } from '@/contexts/AdminAuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +38,7 @@ export default function AdminChildren() {
   const navigate = useNavigate();
   const { children, isLoading: childrenLoading } = useLogopedistChildren();
   const { license, hasLicense, isNearLimit, isAtLimit, isLoading: licenseLoading } = useLogopedistLicense();
+  const { profile } = useAdminAuth();
   
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingChild, setEditingChild] = useState<LogopedistChild | null>(null);
@@ -253,7 +255,7 @@ export default function AdminChildren() {
                       variant="ghost"
                       size="icon"
                       onClick={() => setEditingChild(child)}
-                      disabled={isOrgLicense && !child.is_own_child}
+                      disabled={isOrgLicense && !child.is_own_child && profile?.organization_type !== 'internal'}
                       title={isOrgLicense && !child.is_own_child ? 'Lahko urejate samo svoje otroke' : undefined}
                     >
                       <Pencil className="h-4 w-4" />
@@ -264,7 +266,7 @@ export default function AdminChildren() {
                       size="icon"
                       className="text-destructive hover:text-destructive"
                       onClick={() => setDeletingChild(child)}
-                      disabled={isOrgLicense && !child.is_own_child}
+                      disabled={isOrgLicense && !child.is_own_child && profile?.organization_type !== 'internal'}
                       title={isOrgLicense && !child.is_own_child ? 'Lahko brišete samo svoje otroke' : undefined}
                     >
                       <Trash2 className="h-4 w-4" />
