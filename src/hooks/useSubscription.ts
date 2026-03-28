@@ -211,8 +211,17 @@ export function useSubscription() {
     const timeoutId = setTimeout(() => {
       checkSubscription();
     }, 100);
+
+    // Periodično osveževanje vsakih 5 minut
+    const intervalId = setInterval(() => {
+      lastCheckedUserIdRef.current = null;
+      checkSubscription();
+    }, 5 * 60 * 1000);
     
-    return () => clearTimeout(timeoutId);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
+    };
   }, [user?.id, checkSubscription]);
 
   return {

@@ -187,7 +187,7 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
   // Filter to only users that still exist in auth.users
   let targetUserId: string | null = null;
   if (existingRecords && existingRecords.length > 0) {
-    for (const record of existingRecords) {
+    for (const record of existingRecords.slice(0, 3)) {
       const { data: authUser } = await supabase.auth.admin.getUserById(record.user_id);
       if (authUser?.user) {
         targetUserId = record.user_id;
@@ -219,8 +219,12 @@ async function handleSubscriptionUpdate(subscription: Stripe.Subscription) {
 
   // Read period dates from subscription items (required for API versions 2025-01-27.basil+)
   const item = subscription.items?.data?.[0];
-  const periodStart = safeTimestamp(item?.current_period_start) || safeTimestamp((subscription as any).current_period_start) || new Date().toISOString();
-  const periodEnd = safeTimestamp(item?.current_period_end) || safeTimestamp((subscription as any).current_period_end) || new Date().toISOString();
+  const periodStart = safeTimestamp(item?.current_period_start) || safeTimestamp((subscription as any).current_period_start) || null;
+  const periodEnd = safeTimestamp(item?.current_period_end) || safeTimestamp((subscription as any).current_period_end) || null;
+
+  if (!periodEnd) {
+    logStep("WARNING: No period_end found, subscription period dates missing", { subscriptionId: subscription.id });
+  }
 
   logStep("Period dates resolved", { periodStart, periodEnd, fromItem: !!item?.current_period_start });
 
