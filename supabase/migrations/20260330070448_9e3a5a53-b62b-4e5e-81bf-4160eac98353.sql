@@ -1,0 +1,1 @@
+DELETE FROM articulation_test_results WHERE id = '1e8051ff-f6e4-4f0a-8c27-79fb991eb590';
