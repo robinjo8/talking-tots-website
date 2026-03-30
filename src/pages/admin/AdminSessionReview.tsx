@@ -401,7 +401,7 @@ export default function AdminSessionReview() {
 
       {/* Sejin - za dodatno preverjanje samo 1 seja, sicer 5 */}
       <div className="space-y-4">
-        {(isAdditionalTest ? [1] : [1, 2, 3, 4, 5]).map(sessionNum => {
+        {(isAdditionalTest ? [1] : displaySessions).map(sessionNum => {
           const hasSessionData = sessionNum === 1;
           
           return (
