@@ -563,10 +563,12 @@ Deno.serve(async (req) => {
 
       // Get all completed tests for this child
       const { data: tests } = await supabase
-        .from("articulation_test_results")
-        .select("completed_at")
+        .from("articulation_test_sessions")
+        .select("submitted_at")
         .eq("child_id", childId)
-        .order("completed_at", { ascending: true });
+        .eq("is_completed", true)
+        .not("submitted_at", "is", null)
+        .order("submitted_at", { ascending: true });
 
       // Get subscription end
       const { data: sub } = await supabase
