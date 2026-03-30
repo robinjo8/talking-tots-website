@@ -131,7 +131,7 @@ export function PlanLifecycleTools() {
             value={daysAgo}
             onChange={(e) => setDaysAgo(e.target.value)}
             className="w-24"
-            placeholder="Dni nazaj"
+            placeholder="Dni zamude"
           />
           <Button
             variant="outline"
@@ -140,7 +140,7 @@ export function PlanLifecycleTools() {
             disabled={!!loading}
           >
             <BtnIcon action="simulate_delayed_test" />
-            Simuliraj zamudo
+            Simuliraj zamudo ({daysAgo}d)
           </Button>
         </div>
 

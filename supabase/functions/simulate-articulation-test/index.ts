@@ -204,7 +204,7 @@ serve(async (req) => {
     const subscriptionEnd = sub?.current_period_end || null;
 
     // 3. Calculate virtual date using smart cooldown
-    const virtualDate = calculateVirtualDate(existingTestDates, subscriptionEnd);
+    const virtualDate = calculateVirtualDate(existingTestDates, subscriptionEnd, delayDays || 0);
     console.log(`Virtual date for test ${existingTestDates.length + 1}: ${virtualDate.toISOString()} (previous tests: ${existingTestDates.length})`);
 
     // Dynamically determine session number
