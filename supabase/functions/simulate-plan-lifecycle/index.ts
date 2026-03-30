@@ -283,7 +283,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      const lastTestDate = new Date(lastTest.completed_at);
+      const lastTestDate = new Date(lastTest.submitted_at);
       const normalNextDate = new Date(lastTestDate);
       normalNextDate.setDate(normalNextDate.getDate() + 90);
       
