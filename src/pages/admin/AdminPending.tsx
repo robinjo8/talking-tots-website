@@ -319,12 +319,13 @@ export default function AdminPending() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Uporabnik</TableHead>
-                      <TableHead>Otrok</TableHead>
-                      <TableHead>Starost</TableHead>
-                      <TableHead>Spol</TableHead>
-                      <TableHead>Datum oddaje</TableHead>
-                      <TableHead className="text-right">Dejanje</TableHead>
+                      <TableHead className="w-[20%]">Uporabnik</TableHead>
+                      <TableHead className="w-[18%]">Otrok</TableHead>
+                      <TableHead className="w-[10%]">Starost</TableHead>
+                      <TableHead className="w-[8%]">Spol</TableHead>
+                      <TableHead className="w-[8%]">Seja</TableHead>
+                      <TableHead className="w-[16%]">Datum oddaje</TableHead>
+                      <TableHead className="w-[20%] text-right">Dejanje</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
