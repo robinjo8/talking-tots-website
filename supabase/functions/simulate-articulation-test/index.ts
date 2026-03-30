@@ -128,6 +128,11 @@ function calculateVirtualDate(
     }
   }
 
+  // Add delay days (simulates user being late for next test)
+  if (delayDays > 0) {
+    nextDate.setDate(nextDate.getDate() + delayDays);
+  }
+
   return nextDate;
 }
 
