@@ -13,7 +13,7 @@ export function PlanLifecycleTools() {
   const { user, selectedChild } = useAuth();
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState<string | null>(null);
-  const [daysAgo, setDaysAgo] = useState("100");
+  const [daysAgo, setDaysAgo] = useState("50");
   const [cooldownPreview, setCooldownPreview] = useState<any>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
