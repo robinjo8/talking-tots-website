@@ -275,8 +275,9 @@ export default function MojiIzzivi() {
     renewPlan();
   }, [allSetsCompleted, plan?.report_id, plansForReport]);
 
-  // Progress percentage
-  const progressPercent = Math.round(((completedSetsCount + setOffset) / (totalSets + setOffset)) * 100);
+  // Progress percentage — always show 90 as the cycle target (3 × 30 sets)
+  const MAX_CYCLE_SETS = 90;
+  const progressPercent = Math.round(((completedSetsCount + setOffset) / MAX_CYCLE_SETS) * 100);
 
   return (
     <div className="min-h-screen bg-background">
