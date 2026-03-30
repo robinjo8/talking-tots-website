@@ -1,77 +1,32 @@
 
 
-## Plan: Popravek preostalih odprtih težav (#3, #4, #12)
+## Plan: Dodaj stolpec "Seja" na stran V čakanju + poenoti širine stolpcev
 
-### Prioriteta 1: Fallback `new Date()` za periode (#3)
+### Spremembe
 
-**Datoteka**: `supabase/functions/stripe-webhook/index.ts`, vrstici 222-223
+**1. `src/hooks/usePendingTests.ts`** — dodaj `session_number` v query in interface
 
-Zamenjaj `new Date().toISOString()` z `null`. Dodaj opozorilo v log če ni datuma.
+- Dodaj `session_number` v SELECT poizvedbo (vrstica 43)
+- Dodaj `session_number: number` v interface `PendingTestSession`
+- Mapiraj `session_number` v rezultat
 
-```ts
-// PREJ:
-const periodStart = safeTimestamp(...) || new Date().toISOString();
-const periodEnd = safeTimestamp(...) || new Date().toISOString();
+**2. `src/pages/admin/AdminPending.tsx`** — dodaj stolpec "Seja" + poenoti širine
 
-// POTEM:
-const periodStart = safeTimestamp(item?.current_period_start) || safeTimestamp((subscription as any).current_period_start) || null;
-const periodEnd = safeTimestamp(item?.current_period_end) || safeTimestamp((subscription as any).current_period_end) || null;
+- Dodaj `<TableHead>Seja</TableHead>` med "Datum oddaje" in "Dejanje"
+- Dodaj `<TableCell>` ki prikaže `session.session_number` (npr. "1", "2")
+- Nastavi enakomerene širine stolpcev z uporabo `className="w-[...]"` ali `table-fixed` za enakomerno razporeditev:
+  - Uporabnik, Otrok, Datum oddaje: večji stolpci
+  - Starost, Spol, Seja: manjši stolpci
+  - Dejanje: fiksna širina za gumb
+- Dodaj "Seja" info tudi v mobilno kartico (`PendingCard`)
 
-if (!periodEnd) {
-  logStep("WARNING: No period_end found", { subscriptionId: subscription.id });
-}
-```
-
----
-
-### Prioriteta 2: Periodično osveževanje naročnine (#4)
-
-**Datoteka**: `src/hooks/useSubscription.ts`, vrstice 197-216
-
-Dodaj `setInterval` vsakih 5 minut v obstoječi `useEffect`:
-
-```ts
-useEffect(() => {
-  if (!user) { /* ... obstoječa koda ... */ return; }
-
-  const timeoutId = setTimeout(() => { checkSubscription(); }, 100);
-
-  // Periodično osveževanje vsakih 5 minut
-  const intervalId = setInterval(() => {
-    lastCheckedUserIdRef.current = null;
-    checkSubscription();
-  }, 5 * 60 * 1000);
-
-  return () => {
-    clearTimeout(timeoutId);
-    clearInterval(intervalId);
-  };
-}, [user?.id, checkSubscription]);
-```
-
----
-
-### Prioriteta 3: Zmanjšaj API klice v webhook (#12)
-
-**Datoteka**: `supabase/functions/stripe-webhook/index.ts`, vrstice 188-199
-
-Namesto klicanja `admin.getUserById` za vsakega kandidata, omejimo na max 3 preverjanja:
-
-```ts
-for (const record of existingRecords.slice(0, 3)) {
-  // ... obstoječa logika ...
-}
-```
-
----
+**3. Preveri ostale admin tabele** za konsistentnost širine stolpcev:
+- `AdminTests.tsx` — že ima "Seje" stolpec, preveri razmerja
+- `AdminMyReviews.tsx` — preveri razmerja
+- `AdminUsers.tsx` — preveri razmerja
 
 ### Obseg
-- `supabase/functions/stripe-webhook/index.ts` — 2 spremembi (~8 vrstic)
-- `src/hooks/useSubscription.ts` — dodaj interval (~6 vrstic)
-
-### Ostale točke (5, 8, 9, 10, 11, 13, 15) — ne zahtevajo popravka zdaj
-- #5, #8, #9, #11: manjši UX/edge case, ni kritično
-- #10: `check-test-reminders` — smart cooldown že preverja `subscriptionEnd > now`
-- #13: `productToPlan` — vzdržljivostni dolg, ne vpliva na delovanje
-- #15: `past_due` — poslovna odločitev, trenutna logika (takojšen blok) je varna
+- `usePendingTests.ts` — 3 vrstice dodane/spremenjene
+- `AdminPending.tsx` — ~10 vrstic spremenjenih (stolpec + širine)
+- Ostale datoteke: le popravek širine stolpcev če je nesorazmerno
 
