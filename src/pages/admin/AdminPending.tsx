@@ -136,6 +136,9 @@ function PendingCard({
               <span>Oddano: {formatDate(session.submitted_at)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
+              <span>Seja: {session.session_number ?? '-'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
               <span>Spol: {formatGender(session.child_gender)}</span>
             </div>
             <AlertDialog>
