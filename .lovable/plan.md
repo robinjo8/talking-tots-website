@@ -1,32 +1,33 @@
 
 
-## Plan: Dodaj stolpec "Seja" na stran V čakanju + poenoti širine stolpcev
+## Plan: Prikaži vedno 90 kot cilj v osebnem načrtu
+
+### Problem
+Sistem pravilno ustvarja načrte (3× po 30 sklopov), ampak **prikaz** na `/moji-izzivi` kaže samo `totalSets + setOffset` kot denominator. Ko je uporabnik na planu 2 (setOffset=30), vidi "30/60" namesto "30/90". Uporabnik pričakuje, da je cilj vedno 90 sklopov.
+
+Logika v ozadju NI pokvarjena — načrti se pravilno ustvarjajo in obnavljajo. Gre zgolj za UI prikaz.
 
 ### Spremembe
 
-**1. `src/hooks/usePendingTests.ts`** — dodaj `session_number` v query in interface
+**`src/pages/MojiIzzivi.tsx`**
 
-- Dodaj `session_number` v SELECT poizvedbo (vrstica 43)
-- Dodaj `session_number: number` v interface `PendingTestSession`
-- Mapiraj `session_number` v rezultat
+Zamenjaj denominator `totalSets + setOffset` z `MAX_CYCLE_SETS = 90` (ali `3 * totalSets`) na vseh mestih:
 
-**2. `src/pages/admin/AdminPending.tsx`** — dodaj stolpec "Seja" + poenoti širine
+1. **Vrstica 279** — `progressPercent`: uporabi `90` kot denominator
+2. **Vrstica 311** — prikaz "X/90 sklopov" namesto "X/60 sklopov"
+3. **Vrstica 336, 352** — čestitke tekst: "Vseh 90 sklopov"
+4. **Vrstica 359** — `PlanSetCard` totalSets prop: `90`
 
-- Dodaj `<TableHead>Seja</TableHead>` med "Datum oddaje" in "Dejanje"
-- Dodaj `<TableCell>` ki prikaže `session.session_number` (npr. "1", "2")
-- Nastavi enakomerene širine stolpcev z uporabo `className="w-[...]"` ali `table-fixed` za enakomerno razporeditev:
-  - Uporabnik, Otrok, Datum oddaje: večji stolpci
-  - Starost, Spol, Seja: manjši stolpci
-  - Dejanje: fiksna širina za gumb
-- Dodaj "Seja" info tudi v mobilno kartico (`PendingCard`)
+Dodaj konstanto na vrhu:
+```ts
+const MAX_CYCLE_SETS = 90; // 3 × 30 sets per assessment cycle
+```
 
-**3. Preveri ostale admin tabele** za konsistentnost širine stolpcev:
-- `AdminTests.tsx` — že ima "Seje" stolpec, preveri razmerja
-- `AdminMyReviews.tsx` — preveri razmerja
-- `AdminUsers.tsx` — preveri razmerja
+Numerator ostane enak: `completedSetsCount + setOffset`.
+
+**`src/pages/admin/AdminOsebniNacrt.tsx`** — ista sprememba za admin pregled (vrstica 17, 54)
 
 ### Obseg
-- `usePendingTests.ts` — 3 vrstice dodane/spremenjene
-- `AdminPending.tsx` — ~10 vrstic spremenjenih (stolpec + širine)
-- Ostale datoteke: le popravek širine stolpcev če je nesorazmerno
+- 2 datoteki, ~10 vrstic spremenjenih
+- Brez sprememb v logiki načrtov ali edge funkcijah
 
