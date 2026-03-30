@@ -275,8 +275,9 @@ export default function MojiIzzivi() {
     renewPlan();
   }, [allSetsCompleted, plan?.report_id, plansForReport]);
 
-  // Progress percentage
-  const progressPercent = Math.round(((completedSetsCount + setOffset) / (totalSets + setOffset)) * 100);
+  // Progress percentage — always show 90 as the cycle target (3 × 30 sets)
+  const MAX_CYCLE_SETS = 90;
+  const progressPercent = Math.round(((completedSetsCount + setOffset) / MAX_CYCLE_SETS) * 100);
 
   return (
     <div className="min-h-screen bg-background">
@@ -308,7 +309,7 @@ export default function MojiIzzivi() {
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Napredek</span>
-                    <span className="font-semibold">{completedSetsCount + setOffset}/{totalSets + setOffset} sklopov</span>
+                    <span className="font-semibold">{completedSetsCount + setOffset}/{MAX_CYCLE_SETS} sklopov</span>
                   </div>
                   <Progress value={progressPercent} className="h-3" />
                 </div>
@@ -333,7 +334,7 @@ export default function MojiIzzivi() {
                   className="flex flex-col items-center justify-center py-12 text-center"
                 >
                   <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {MAX_CYCLE_SETS} sklopov je opravljenih!</h2>
                   <p className="text-muted-foreground mb-4">Čas je za novo preverjanje izgovorjave in osvežitev osebnega načrta.</p>
                   <Button asChild className="gap-2">
                     <Link to="/artikulacijski-test">
@@ -349,14 +350,14 @@ export default function MojiIzzivi() {
                   className="flex flex-col items-center justify-center py-12 text-center"
                 >
                   <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {MAX_CYCLE_SETS} sklopov je opravljenih!</h2>
                   <p className="text-muted-foreground">Nov načrt se pripravlja...</p>
                   <Loader2 className="h-6 w-6 text-primary animate-spin mt-4" />
                 </motion.div>
               ) : activeTracking && currentSetData ? (
                 <PlanSetCard
                   setNumber={activeTracking.set_number + setOffset}
-                  totalSets={totalSets + setOffset}
+                  totalSets={MAX_CYCLE_SETS}
                   activities={currentSetData.activities}
                   totalStars={currentSetStars}
                   completionCounts={completionCountsBySet.get(activeTracking.set_number) || new Map()}
