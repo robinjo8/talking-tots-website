@@ -334,7 +334,7 @@ export default function MojiIzzivi() {
                   className="flex flex-col items-center justify-center py-12 text-center"
                 >
                   <PartyPopper className="h-12 w-12 text-primary mb-4" />
-                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {totalSets + setOffset} sklopov je opravljenih!</h2>
+                  <h2 className="text-xl font-bold mb-2">Čestitke! Vseh {MAX_CYCLE_SETS} sklopov je opravljenih!</h2>
                   <p className="text-muted-foreground mb-4">Čas je za novo preverjanje izgovorjave in osvežitev osebnega načrta.</p>
                   <Button asChild className="gap-2">
                     <Link to="/artikulacijski-test">
