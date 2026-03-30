@@ -1,39 +1,53 @@
 
 
-## Plan: Popravi cooldown predogled — zamuda mora zamakniti naslednji predvideni test
+## Plan: Popravi prikaz sej na admin straneh
 
-### Problem
+### Problemi
 
-Admin stran kaže 4 opravljene seje (Seja 1-4), ker je bila Seja 4 ustvarjena s simulacijo "Simuliraj celotno preverjanje". Cooldown predogled zdaj bere iz `articulation_test_sessions` in vidi 4 opravljene teste, zato zamuda (+50d) velja šele za Test 5. Prej (ko je bral iz `articulation_test_results` s samo 3 zapisi) je pravilno kazal Test 4 kot "predviden (140d)".
+1. **AdminUserDetail** (Podrobnosti uporabnika) — prikaže seje iz **storage map** (`Preverjanje-izgovorjave/Seja-1`, `Seja-2`, itd.). V storage so ostale mape od prejšnjih simulacij (5 map namesto 3), ena mapa ima 100 datotek. To je problem odvečnih storage podatkov.
 
-### Rešitev
+2. **AdminSessionReview** (Pregled preverjanja) — na vrstici 400 je **hardcodirano** `[1, 2, 3, 4, 5]`:
+   ```ts
+   (isAdditionalTest ? [1] : [1, 2, 3, 4, 5]).map(sessionNum => {
+   ```
+   To vedno prikaže 5 sej ne glede na dejansko stanje v bazi. Pravilno bi moralo biti **dinamično** glede na dejansko število sej v bazi + morda 1 predvidena naslednja seja.
 
-Uporabnik želi videti: "Kaj se zgodi, če po 3. testu zamudim 50 dni?" Zato moramo izbrisati Sejo 4 (ki je bila ustvarjena s simulacijo, ne z dejansko zamudo), da se vrnemo na 3 opravljene teste. Potem bo predogled s +50d zamudo pravilno kazal:
+### Popravki
 
-```text
-Test 1: 2026-03-30  opravljen
-Test 2: 2026-06-28  opravljen
-Test 3: 2026-09-26  opravljen
-Test 4: 2027-02-13  predviden (140d = 90 + 50)
-Test 5: 2027-03-19  predviden (34d, smart cooldown)
-Test 6: blokiran
+**1. `src/pages/admin/AdminSessionReview.tsx` (vrstica 400)**
+
+Zamenjaj hardcodirano `[1, 2, 3, 4, 5]` z dinamičnim seznamom na podlagi `actualSessionDates` (ki že vsebuje dejanske seje iz baze). Prikaži samo seje, ki obstajajo v bazi:
+
+```ts
+// Dinamičen seznam sej iz baze
+const sessionNumbers = Array.from(actualSessionDates.keys()).sort((a, b) => a - b);
+// Če ni podatkov, prikaži vsaj sejo 1 (trenutno odprto)
+const displaySessions = sessionNumbers.length > 0 ? sessionNumbers : [1];
+
+// ...
+{(isAdditionalTest ? [1] : displaySessions).map(sessionNum => {
 ```
 
-### Spremembe
+S tem bo prikazalo le seje, ki dejansko obstajajo (3 za Testni otrok).
 
-**1. SQL migracija — izbriši Sejo 4 za Testni otrok**
+**2. `src/pages/admin/AdminUserDetail.tsx` — ni potrebne spremembe kode**
 
-Izbriši:
-- `articulation_test_sessions` zapis s `session_number = 4` za tega otroka
-- Pripadajoče `articulation_word_results` za to sejo
-- Pripadajoči `articulation_test_results` zapis (če obstaja, z datumom ~2026-12-25)
-- Pripadajoče datoteke v `articulation_evaluations` za to sejo
+Prikaz sej je pravilen (bere iz storage). Problem je v **odvečnih storage mapah** od prejšnjih simulacij. Potrebno je počistiti storage.
 
-To bo sinhroniziralo admin stran (3 seje) in predogled (3 opravljeni testi).
+**3. Storage čiščenje — `Seja-4` in `Seja-5` mape**
 
-**2. Brez sprememb v kodi** — logika v `calculate_cooldown_preview` že pravilno aplicira `delayDays` na prvi predvideni test po opravljenih. Problem so bili odvečni podatki, ne logika.
+Izbriši odvečne storage mape za Testni otrok:
+- `2a5e4550-413a-4f46-893a-c94b1eaa9215/fd0dbb8a-3ee6-4414-9af9-688bf0534c6a/Preverjanje-izgovorjave/Seja-4/` (100 datotek)
+- `2a5e4550-413a-4f46-893a-c94b1eaa9215/fd0dbb8a-3ee6-4414-9af9-688bf0534c6a/Preverjanje-izgovorjave/Seja-5/` (60 datotek)
+
+To zahteva edge function ali ročno brisanje v Supabase Storage dashboardu.
+
+**4. Posodobi `simulate-articulation-test` edge function**
+
+Preveri ali `Ponastavi celoten cikel` že čisti storage mape. Če ne, dodaj čiščenje da se odvečne mape ne nabirajo.
 
 ### Obseg
-- 1 SQL migracija za čiščenje podatkov
-- Admin stran bo po tem kazala 3 seje, predogled bo s +50d zamudo pravilno kazal Test 4 kot predviden
+- `src/pages/admin/AdminSessionReview.tsx` — ~5 vrstic spremenjenih (dinamičen seznam sej)
+- Storage čiščenje za Testni otrok (Seja-4, Seja-5 mapi)
+- Preveri reset logiko v edge function
 
