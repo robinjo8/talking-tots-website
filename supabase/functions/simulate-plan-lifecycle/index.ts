@@ -581,7 +581,7 @@ Deno.serve(async (req) => {
 
       const subEnd = sub?.current_period_end || null;
       const subEndDate = subEnd ? new Date(subEnd) : null;
-      const completedTests = (tests || []).map((t: { completed_at: string }) => t.completed_at);
+      const completedTests = (tests || []).map((t: { submitted_at: string }) => t.submitted_at);
 
       // Show completed tests
       const allTests: any[] = [];
