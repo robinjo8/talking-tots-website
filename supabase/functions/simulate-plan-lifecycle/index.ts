@@ -261,30 +261,40 @@ Deno.serve(async (req) => {
       }
 
     } else if (action === "simulate_delayed_test") {
+      // READ-ONLY: Calculate what would happen if user delays next test by X days
+      // Does NOT create any records — just returns predicted dates
       const delayDays = body.daysAgo || 50;
 
-      // Create a NEW test with delay: calls simulate-articulation-test with delayDays
-      // This means the next test happens delayDays LATER than normal cooldown
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const simResponse = await fetch(`${supabaseUrl}/functions/v1/simulate-articulation-test`, {
-        method: "POST",
-        headers: {
-          "Authorization": authHeader!,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ childId, delayDays }),
-      });
+      // Get last completed test
+      const { data: lastTest } = await supabase
+        .from("articulation_test_results")
+        .select("completed_at")
+        .eq("child_id", childId)
+        .order("completed_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-      if (!simResponse.ok) {
-        const errText = await simResponse.text();
-        return new Response(JSON.stringify({ error: `simulate-articulation-test failed: ${errText}` }), {
-          status: 500,
+      if (!lastTest) {
+        return new Response(JSON.stringify({ error: "Ni opravljenih preverjanj za tega otroka" }), {
+          status: 404,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      const simResult = await simResponse.json();
-      result = { ...simResult, delayDays, note: `Test ustvarjen z zamudo ${delayDays} dni` };
+      const lastTestDate = new Date(lastTest.completed_at);
+      const normalNextDate = new Date(lastTestDate);
+      normalNextDate.setDate(normalNextDate.getDate() + 90);
+      
+      const delayedNextDate = new Date(normalNextDate);
+      delayedNextDate.setDate(delayedNextDate.getDate() + delayDays);
+
+      result = {
+        lastTestDate: lastTestDate.toISOString().split("T")[0],
+        normalNextDate: normalNextDate.toISOString().split("T")[0],
+        delayedNextDate: delayedNextDate.toISOString().split("T")[0],
+        delayDays,
+        note: `Predvideni datum naslednjega testa se premakne za ${delayDays} dni naprej. Baza NI spremenjena — uporabi "Predogled cooldown datumov" za celotno sliko.`,
+      };
 
     } else if (action === "simulate_subscription_change") {
       const subAction = body.subAction; // extend, cancel, expire
