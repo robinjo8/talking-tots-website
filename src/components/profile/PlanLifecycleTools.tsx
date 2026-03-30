@@ -195,7 +195,11 @@ export function PlanLifecycleTools() {
             {cooldownPreview.tests?.map((t: any, i: number) => (
               <div key={i} className="flex justify-between">
                 <span>Test {i + 1}: {t.date}</span>
-                <span className={t.status === 'opravljen' ? 'text-dragon-green' : 'text-muted-foreground'}>
+                <span className={
+                  t.status === 'opravljen' ? 'text-dragon-green' : 
+                  t.status.startsWith('blokiran') ? 'text-destructive font-semibold' :
+                  'text-muted-foreground'
+                }>
                   {t.status} {t.cooldownDays ? `(${t.cooldownDays}d)` : ''}
                 </span>
               </div>
