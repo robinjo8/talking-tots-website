@@ -176,6 +176,7 @@ export function usePendingTests() {
           logopedist_first_name: logopedistProfile?.first_name || null,
           logopedist_last_name: logopedistProfile?.last_name || null,
           additional_assignment_id: (session as any).additional_assignment_id || null,
+          session_number: session.session_number ?? null,
         };
       });
 
