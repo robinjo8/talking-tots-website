@@ -95,6 +95,7 @@ function sanitizeForStorage(str: string): string {
 function calculateVirtualDate(
   existingTestDates: string[],
   subscriptionEnd: string | null,
+  delayDays: number = 0,
 ): Date {
   // If no previous tests, use today
   if (existingTestDates.length === 0) {
@@ -125,6 +126,11 @@ function calculateVirtualDate(
         nextDate = minNext;
       }
     }
+  }
+
+  // Add delay days (simulates user being late for next test)
+  if (delayDays > 0) {
+    nextDate.setDate(nextDate.getDate() + delayDays);
   }
 
   return nextDate;
@@ -159,7 +165,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { childId } = await req.json();
+    const { childId, delayDays } = await req.json();
     if (!childId) {
       return new Response(JSON.stringify({ error: "childId is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -198,7 +204,7 @@ serve(async (req) => {
     const subscriptionEnd = sub?.current_period_end || null;
 
     // 3. Calculate virtual date using smart cooldown
-    const virtualDate = calculateVirtualDate(existingTestDates, subscriptionEnd);
+    const virtualDate = calculateVirtualDate(existingTestDates, subscriptionEnd, delayDays || 0);
     console.log(`Virtual date for test ${existingTestDates.length + 1}: ${virtualDate.toISOString()} (previous tests: ${existingTestDates.length})`);
 
     // Dynamically determine session number

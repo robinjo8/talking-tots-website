@@ -261,57 +261,30 @@ Deno.serve(async (req) => {
       }
 
     } else if (action === "simulate_delayed_test") {
-      const daysAgo = body.daysAgo || 100;
+      const delayDays = body.daysAgo || 50;
 
-      // Find the last test result to UPDATE (not insert a new one)
-      const { data: lastResult } = await supabase
-        .from("articulation_test_results")
-        .select("id, completed_at")
-        .eq("child_id", childId)
-        .order("completed_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+      // Create a NEW test with delay: calls simulate-articulation-test with delayDays
+      // This means the next test happens delayDays LATER than normal cooldown
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const simResponse = await fetch(`${supabaseUrl}/functions/v1/simulate-articulation-test`, {
+        method: "POST",
+        headers: {
+          "Authorization": authHeader!,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ childId, delayDays }),
+      });
 
-      if (!lastResult) {
-        return new Response(JSON.stringify({ error: "Ni test rezultata za premik" }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-
-      const testDate = new Date(lastResult.completed_at);
-      testDate.setDate(testDate.getDate() - daysAgo);
-
-      // UPDATE the existing record instead of inserting a new one
-      const { error: updateError } = await supabase
-        .from("articulation_test_results")
-        .update({ completed_at: testDate.toISOString() })
-        .eq("id", lastResult.id);
-
-      if (updateError) {
-        return new Response(JSON.stringify({ error: updateError.message }), {
+      if (!simResponse.ok) {
+        const errText = await simResponse.text();
+        return new Response(JSON.stringify({ error: `simulate-articulation-test failed: ${errText}` }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      // Also update submitted_at in articulation_test_sessions
-      const { data: lastSession } = await supabase
-        .from("articulation_test_sessions")
-        .select("id")
-        .eq("child_id", childId)
-        .order("submitted_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (lastSession) {
-        await supabase
-          .from("articulation_test_sessions")
-          .update({ submitted_at: testDate.toISOString() })
-          .eq("id", lastSession.id);
-      }
-
-      result = { simulatedDate: testDate.toISOString(), originalDate: lastResult.completed_at, daysAgo };
+      const simResult = await simResponse.json();
+      result = { ...simResult, delayDays, note: `Test ustvarjen z zamudo ${delayDays} dni` };
 
     } else if (action === "simulate_subscription_change") {
       const subAction = body.subAction; // extend, cancel, expire
