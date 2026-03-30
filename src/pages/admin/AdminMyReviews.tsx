@@ -398,14 +398,14 @@ export default function AdminMyReviews() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Uporabnik</TableHead>
-                      <TableHead>Otrok</TableHead>
-                      <TableHead>Vrsta</TableHead>
-                      <TableHead>Starost</TableHead>
-                      <TableHead>Spol</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Prevzeto</TableHead>
-                      <TableHead className="text-right">Dejanje</TableHead>
+                      <TableHead className="w-[16%]">Uporabnik</TableHead>
+                      <TableHead className="w-[14%]">Otrok</TableHead>
+                      <TableHead className="w-[10%]">Vrsta</TableHead>
+                      <TableHead className="w-[8%]">Starost</TableHead>
+                      <TableHead className="w-[8%]">Spol</TableHead>
+                      <TableHead className="w-[12%]">Status</TableHead>
+                      <TableHead className="w-[14%]">Prevzeto</TableHead>
+                      <TableHead className="w-[18%] text-right">Dejanje</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

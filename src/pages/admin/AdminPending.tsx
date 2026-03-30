@@ -136,6 +136,9 @@ function PendingCard({
               <span>Oddano: {formatDate(session.submitted_at)}</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
+              <span>Seja: {session.session_number ?? '-'}</span>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
               <span>Spol: {formatGender(session.child_gender)}</span>
             </div>
             <AlertDialog>
@@ -316,12 +319,13 @@ export default function AdminPending() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Uporabnik</TableHead>
-                      <TableHead>Otrok</TableHead>
-                      <TableHead>Starost</TableHead>
-                      <TableHead>Spol</TableHead>
-                      <TableHead>Datum oddaje</TableHead>
-                      <TableHead className="text-right">Dejanje</TableHead>
+                      <TableHead className="w-[20%]">Uporabnik</TableHead>
+                      <TableHead className="w-[18%]">Otrok</TableHead>
+                      <TableHead className="w-[10%]">Starost</TableHead>
+                      <TableHead className="w-[8%]">Spol</TableHead>
+                      <TableHead className="w-[8%]">Seja</TableHead>
+                      <TableHead className="w-[16%]">Datum oddaje</TableHead>
+                      <TableHead className="w-[20%] text-right">Dejanje</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -342,6 +346,7 @@ export default function AdminPending() {
                             {session.child_age ? `${session.child_age} let` : '-'}
                           </TableCell>
                           <TableCell>{formatGender(session.child_gender)}</TableCell>
+                          <TableCell>{session.session_number ?? '-'}</TableCell>
                           <TableCell>{formatDate(session.submitted_at)}</TableCell>
                           <TableCell className="text-right">
                             <AlertDialog>

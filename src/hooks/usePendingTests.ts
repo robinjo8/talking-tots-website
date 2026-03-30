@@ -23,6 +23,8 @@ export interface PendingTestSession {
   logopedist_last_name: string | null;
   // Additional test flag
   additional_assignment_id: string | null;
+  // Session number
+  session_number: number | null;
 }
 
 export function usePendingTests() {
@@ -40,7 +42,7 @@ export function usePendingTests() {
       // Build query based on organization type
       let query = supabase
         .from('articulation_test_sessions')
-        .select('id, status, submitted_at, child_id, parent_id, source_type, logopedist_child_id, organization_id, additional_assignment_id')
+        .select('id, status, submitted_at, child_id, parent_id, source_type, logopedist_child_id, organization_id, additional_assignment_id, session_number')
         .eq('status', 'pending')
         .eq('is_completed', true)
         .is('assigned_to', null)
@@ -174,6 +176,7 @@ export function usePendingTests() {
           logopedist_first_name: logopedistProfile?.first_name || null,
           logopedist_last_name: logopedistProfile?.last_name || null,
           additional_assignment_id: (session as any).additional_assignment_id || null,
+          session_number: session.session_number ?? null,
         };
       });
 

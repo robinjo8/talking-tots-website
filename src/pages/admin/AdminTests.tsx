@@ -509,14 +509,14 @@ export default function AdminTests() {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="w-8"></TableHead>
-                    <TableHead>Uporabnik</TableHead>
-                    <TableHead>Ime otroka</TableHead>
-                    <TableHead>Starost</TableHead>
-                    <TableHead>Spol</TableHead>
-                    <TableHead>Seje</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Oddano</TableHead>
-                    <TableHead className="text-right">Akcije</TableHead>
+                    <TableHead className="w-[18%]">Uporabnik</TableHead>
+                    <TableHead className="w-[16%]">Ime otroka</TableHead>
+                    <TableHead className="w-[8%]">Starost</TableHead>
+                    <TableHead className="w-[8%]">Spol</TableHead>
+                    <TableHead className="w-[8%]">Seje</TableHead>
+                    <TableHead className="w-[12%]">Status</TableHead>
+                    <TableHead className="w-[14%]">Oddano</TableHead>
+                    <TableHead className="w-[16%] text-right">Akcije</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
