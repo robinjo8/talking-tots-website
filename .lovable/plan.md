@@ -1,33 +1,62 @@
 
 
-## Plan: Prikaži vedno 90 kot cilj v osebnem načrtu
+## Plan: Popravi "Simuliraj zamudo" in cooldown predogled
 
 ### Problem
-Sistem pravilno ustvarja načrte (3× po 30 sklopov), ampak **prikaz** na `/moji-izzivi` kaže samo `totalSets + setOffset` kot denominator. Ko je uporabnik na planu 2 (setOffset=30), vidi "30/60" namesto "30/90". Uporabnik pričakuje, da je cilj vedno 90 sklopov.
-
-Logika v ozadju NI pokvarjena — načrti se pravilno ustvarjajo in obnavljajo. Gre zgolj za UI prikaz.
+`simulate_delayed_test` **doda nov zapis** v `articulation_test_results` namesto da **posodobi zadnjega**. Ko simuliraš zamudo 50 dni, se ustvari 4. zapis z datumom `2026-02-08` (danes minus 50 dni), ki se nato prikaže kot "Test 1" v predogledu.
 
 ### Spremembe
 
-**`src/pages/MojiIzzivi.tsx`**
+**1. `supabase/functions/simulate-plan-lifecycle/index.ts` — akcija `simulate_delayed_test` (vrstice 263-282)**
 
-Zamenjaj denominator `totalSets + setOffset` z `MAX_CYCLE_SETS = 90` (ali `3 * totalSets`) na vseh mestih:
+Namesto `INSERT` novega zapisa, **UPDATE** zadnjega zapisa v `articulation_test_results`:
 
-1. **Vrstica 279** — `progressPercent`: uporabi `90` kot denominator
-2. **Vrstica 311** — prikaz "X/90 sklopov" namesto "X/60 sklopov"
-3. **Vrstica 336, 352** — čestitke tekst: "Vseh 90 sklopov"
-4. **Vrstica 359** — `PlanSetCard` totalSets prop: `90`
-
-Dodaj konstanto na vrhu:
 ```ts
-const MAX_CYCLE_SETS = 90; // 3 × 30 sets per assessment cycle
+// Poišči zadnji test result
+const { data: lastResult } = await supabase
+  .from("articulation_test_results")
+  .select("id, completed_at")
+  .eq("child_id", childId)
+  .order("completed_at", { ascending: false })
+  .limit(1)
+  .maybeSingle();
+
+if (!lastResult) {
+  return error("Ni test rezultata za premik");
+}
+
+const testDate = new Date(lastResult.completed_at);
+testDate.setDate(testDate.getDate() - daysAgo);
+
+// UPDATE namesto INSERT
+await supabase
+  .from("articulation_test_results")
+  .update({ completed_at: testDate.toISOString() })
+  .eq("id", lastResult.id);
+
+// Posodobi tudi submitted_at v articulation_test_sessions
+const { data: lastSession } = await supabase
+  .from("articulation_test_sessions")
+  .select("id")
+  .eq("child_id", childId)
+  .order("submitted_at", { ascending: false })
+  .limit(1)
+  .maybeSingle();
+
+if (lastSession) {
+  await supabase
+    .from("articulation_test_sessions")
+    .update({ submitted_at: testDate.toISOString() })
+    .eq("id", lastSession.id);
+}
 ```
 
-Numerator ostane enak: `completedSetsCount + setOffset`.
+**2. Ročni popravek podatkov** — izbriši odvečni zapis za "Testni otrok"
 
-**`src/pages/admin/AdminOsebniNacrt.tsx`** — ista sprememba za admin pregled (vrstica 17, 54)
+Po deployu je potrebno izbrisati odvečni `articulation_test_results` zapis z datumom ~`2026-02-08`, ki ga je ustvarila napačna simulacija.
 
 ### Obseg
-- 2 datoteki, ~10 vrstic spremenjenih
-- Brez sprememb v logiki načrtov ali edge funkcijah
+- 1 datoteka: `supabase/functions/simulate-plan-lifecycle/index.ts` — ~15 vrstic spremenjenih
+- 1 ročni SQL `DELETE` za čiščenje odvečnega zapisa
+- Deploy edge function
 
