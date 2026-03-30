@@ -309,7 +309,7 @@ export default function MojiIzzivi() {
                 <div className="mt-4 space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Napredek</span>
-                    <span className="font-semibold">{completedSetsCount + setOffset}/{totalSets + setOffset} sklopov</span>
+                    <span className="font-semibold">{completedSetsCount + setOffset}/{MAX_CYCLE_SETS} sklopov</span>
                   </div>
                   <Progress value={progressPercent} className="h-3" />
                 </div>
