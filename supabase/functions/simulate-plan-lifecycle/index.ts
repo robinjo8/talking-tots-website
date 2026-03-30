@@ -556,6 +556,9 @@ Deno.serve(async (req) => {
       };
 
     } else if (action === "calculate_cooldown_preview") {
+      // Accept optional delayDays from UI to simulate "what if" scenario
+      const delayDays = body.delayDays || 0;
+
       // Get all completed tests for this child
       const { data: tests } = await supabase
         .from("articulation_test_results")
@@ -573,9 +576,10 @@ Deno.serve(async (req) => {
         .maybeSingle();
 
       const subEnd = sub?.current_period_end || null;
+      const subEndDate = subEnd ? new Date(subEnd) : null;
       const completedTests = (tests || []).map((t: { completed_at: string }) => t.completed_at);
 
-      // Calculate upcoming test dates
+      // Show completed tests
       const allTests: any[] = [];
       for (const ct of completedTests) {
         allTests.push({
@@ -590,10 +594,20 @@ Deno.serve(async (req) => {
         : null;
 
       if (lastDate) {
-        for (let i = allTests.length; i < 5; i++) {
+        let isFirstPredicted = true;
+        for (let i = allTests.length; i < 8; i++) {
           let nextDate = new Date(lastDate);
           nextDate.setDate(nextDate.getDate() + 90);
           let cooldownDays = 90;
+
+          // Apply delay only to the FIRST predicted test
+          if (isFirstPredicted && delayDays > 0) {
+            nextDate.setDate(nextDate.getDate() + delayDays);
+            cooldownDays += delayDays;
+            isFirstPredicted = false;
+          } else {
+            isFirstPredicted = false;
+          }
 
           // Smart cooldown: if next test would overshoot sub end - 7 days
           if (subEnd) {
@@ -606,10 +620,29 @@ Deno.serve(async (req) => {
                 nextDate = lastTestTarget;
                 cooldownDays = Math.round((nextDate.getTime() - lastDate.getTime()) / 86400000);
               } else {
+                // Even minimum 30d overshoots — check if past sub end entirely
+                if (minNext > subEndDate!) {
+                  allTests.push({
+                    date: minNext.toISOString().split("T")[0],
+                    status: "blokiran (naročnina potečena)",
+                    cooldownDays: 30,
+                  });
+                  break; // No more tests possible
+                }
                 nextDate = minNext;
                 cooldownDays = 30;
               }
             }
+          }
+
+          // Check if this predicted test is after subscription end
+          if (subEndDate && nextDate > subEndDate) {
+            allTests.push({
+              date: nextDate.toISOString().split("T")[0],
+              status: "blokiran (naročnina potečena)",
+              cooldownDays,
+            });
+            break; // No more tests after subscription expires
           }
 
           // Calculate notification dates
@@ -635,6 +668,7 @@ Deno.serve(async (req) => {
         tests: allTests,
         subscriptionEnd: subEnd ? subEnd.split("T")[0] : null,
         planId: sub?.plan_id || null,
+        delayDaysApplied: delayDays > 0 ? delayDays : undefined,
       };
 
     } else if (action === "reset_full_lifecycle") {

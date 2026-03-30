@@ -182,12 +182,12 @@ export function PlanLifecycleTools() {
         <Button
           variant="outline"
           className="w-full justify-start hover:bg-dragon-green/10 hover:border-dragon-green"
-          onClick={() => invoke("calculate_cooldown_preview")}
+          onClick={() => invoke("calculate_cooldown_preview", { delayDays: parseInt(daysAgo) || 0 })}
           disabled={!!loading}
         >
           <BtnIcon action="calculate_cooldown_preview" />
           {!isLoading("calculate_cooldown_preview") && <Eye className="h-4 w-4 mr-2 text-dragon-green" />}
-          Predogled cooldown datumov
+          Predogled cooldown datumov {parseInt(daysAgo) > 0 ? `(+${daysAgo}d zamude)` : ''}
         </Button>
 
         {cooldownPreview && (
