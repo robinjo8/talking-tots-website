@@ -267,10 +267,12 @@ Deno.serve(async (req) => {
 
       // Get last completed test
       const { data: lastTest } = await supabase
-        .from("articulation_test_results")
-        .select("completed_at")
+        .from("articulation_test_sessions")
+        .select("submitted_at")
         .eq("child_id", childId)
-        .order("completed_at", { ascending: false })
+        .eq("is_completed", true)
+        .not("submitted_at", "is", null)
+        .order("submitted_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
