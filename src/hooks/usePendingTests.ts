@@ -23,6 +23,8 @@ export interface PendingTestSession {
   logopedist_last_name: string | null;
   // Additional test flag
   additional_assignment_id: string | null;
+  // Session number
+  session_number: number | null;
 }
 
 export function usePendingTests() {
