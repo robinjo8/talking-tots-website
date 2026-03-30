@@ -165,7 +165,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { childId } = await req.json();
+    const { childId, delayDays } = await req.json();
     if (!childId) {
       return new Response(JSON.stringify({ error: "childId is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
