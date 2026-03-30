@@ -267,10 +267,12 @@ Deno.serve(async (req) => {
 
       // Get last completed test
       const { data: lastTest } = await supabase
-        .from("articulation_test_results")
-        .select("completed_at")
+        .from("articulation_test_sessions")
+        .select("submitted_at")
         .eq("child_id", childId)
-        .order("completed_at", { ascending: false })
+        .eq("is_completed", true)
+        .not("submitted_at", "is", null)
+        .order("submitted_at", { ascending: false })
         .limit(1)
         .maybeSingle();
 
@@ -281,7 +283,7 @@ Deno.serve(async (req) => {
         });
       }
 
-      const lastTestDate = new Date(lastTest.completed_at);
+      const lastTestDate = new Date(lastTest.submitted_at);
       const normalNextDate = new Date(lastTestDate);
       normalNextDate.setDate(normalNextDate.getDate() + 90);
       
@@ -561,10 +563,12 @@ Deno.serve(async (req) => {
 
       // Get all completed tests for this child
       const { data: tests } = await supabase
-        .from("articulation_test_results")
-        .select("completed_at")
+        .from("articulation_test_sessions")
+        .select("submitted_at")
         .eq("child_id", childId)
-        .order("completed_at", { ascending: true });
+        .eq("is_completed", true)
+        .not("submitted_at", "is", null)
+        .order("submitted_at", { ascending: true });
 
       // Get subscription end
       const { data: sub } = await supabase
@@ -577,7 +581,7 @@ Deno.serve(async (req) => {
 
       const subEnd = sub?.current_period_end || null;
       const subEndDate = subEnd ? new Date(subEnd) : null;
-      const completedTests = (tests || []).map((t: { completed_at: string }) => t.completed_at);
+      const completedTests = (tests || []).map((t: { submitted_at: string }) => t.submitted_at);
 
       // Show completed tests
       const allTests: any[] = [];
