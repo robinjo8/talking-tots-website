@@ -140,7 +140,7 @@ export function PlanLifecycleTools() {
             disabled={!!loading}
           >
             <BtnIcon action="simulate_delayed_test" />
-            Simuliraj zamudo ({daysAgo}d)
+            Izračunaj zamudo ({daysAgo}d)
           </Button>
         </div>
 
@@ -182,12 +182,12 @@ export function PlanLifecycleTools() {
         <Button
           variant="outline"
           className="w-full justify-start hover:bg-dragon-green/10 hover:border-dragon-green"
-          onClick={() => invoke("calculate_cooldown_preview")}
+          onClick={() => invoke("calculate_cooldown_preview", { delayDays: parseInt(daysAgo) || 0 })}
           disabled={!!loading}
         >
           <BtnIcon action="calculate_cooldown_preview" />
           {!isLoading("calculate_cooldown_preview") && <Eye className="h-4 w-4 mr-2 text-dragon-green" />}
-          Predogled cooldown datumov
+          Predogled cooldown datumov {parseInt(daysAgo) > 0 ? `(+${daysAgo}d zamude)` : ''}
         </Button>
 
         {cooldownPreview && (
@@ -195,7 +195,11 @@ export function PlanLifecycleTools() {
             {cooldownPreview.tests?.map((t: any, i: number) => (
               <div key={i} className="flex justify-between">
                 <span>Test {i + 1}: {t.date}</span>
-                <span className={t.status === 'opravljen' ? 'text-dragon-green' : 'text-muted-foreground'}>
+                <span className={
+                  t.status === 'opravljen' ? 'text-dragon-green' : 
+                  t.status.startsWith('blokiran') ? 'text-destructive font-semibold' :
+                  'text-muted-foreground'
+                }>
                   {t.status} {t.cooldownDays ? `(${t.cooldownDays}d)` : ''}
                 </span>
               </div>
