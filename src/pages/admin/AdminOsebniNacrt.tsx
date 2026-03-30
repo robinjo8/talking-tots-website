@@ -14,7 +14,8 @@ export default function AdminOsebniNacrt() {
   const { data: plan, isLoading: planLoading } = useMonthlyPlan(childId);
   const { data: trackingEntries = [] } = useSetTracking(plan?.id, childId);
 
-  const totalSets = plan?.plan_data?.totalSets || 30;
+  const MAX_CYCLE_SETS = 90;
+  const totalSets = MAX_CYCLE_SETS;
   const completedSets = trackingEntries.filter(e => e.status === "completed").length;
   const expiredSets = trackingEntries.filter(e => e.status === "expired").length;
   const progressPercent = Math.round((completedSets / totalSets) * 100);

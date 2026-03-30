@@ -357,7 +357,7 @@ export default function MojiIzzivi() {
               ) : activeTracking && currentSetData ? (
                 <PlanSetCard
                   setNumber={activeTracking.set_number + setOffset}
-                  totalSets={totalSets + setOffset}
+                  totalSets={MAX_CYCLE_SETS}
                   activities={currentSetData.activities}
                   totalStars={currentSetStars}
                   completionCounts={completionCountsBySet.get(activeTracking.set_number) || new Map()}
