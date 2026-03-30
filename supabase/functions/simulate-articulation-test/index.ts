@@ -95,6 +95,7 @@ function sanitizeForStorage(str: string): string {
 function calculateVirtualDate(
   existingTestDates: string[],
   subscriptionEnd: string | null,
+  delayDays: number = 0,
 ): Date {
   // If no previous tests, use today
   if (existingTestDates.length === 0) {
