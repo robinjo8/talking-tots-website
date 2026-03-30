@@ -330,6 +330,10 @@ export default function AdminSessionReview() {
   const isAdditionalTest = !!data.session.additionalAssignmentId;
   const letterOrder = isAdditionalTest ? Array.from(data.recordingsByLetter.keys()) : undefined;
 
+  // Dinamičen seznam sej iz baze (namesto hardcodiranega [1,2,3,4,5])
+  const sessionNumbers = Array.from(actualSessionDates.keys()).sort((a, b) => a - b);
+  const displaySessions = sessionNumbers.length > 0 ? sessionNumbers : [1];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -397,7 +401,7 @@ export default function AdminSessionReview() {
 
       {/* Sejin - za dodatno preverjanje samo 1 seja, sicer 5 */}
       <div className="space-y-4">
-        {(isAdditionalTest ? [1] : [1, 2, 3, 4, 5]).map(sessionNum => {
+        {(isAdditionalTest ? [1] : displaySessions).map(sessionNum => {
           const hasSessionData = sessionNum === 1;
           
           return (
