@@ -262,24 +262,56 @@ Deno.serve(async (req) => {
 
     } else if (action === "simulate_delayed_test") {
       const daysAgo = body.daysAgo || 100;
-      const testDate = new Date();
+
+      // Find the last test result to UPDATE (not insert a new one)
+      const { data: lastResult } = await supabase
+        .from("articulation_test_results")
+        .select("id, completed_at")
+        .eq("child_id", childId)
+        .order("completed_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!lastResult) {
+        return new Response(JSON.stringify({ error: "Ni test rezultata za premik" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const testDate = new Date(lastResult.completed_at);
       testDate.setDate(testDate.getDate() - daysAgo);
 
-      const { error } = await supabase
+      // UPDATE the existing record instead of inserting a new one
+      const { error: updateError } = await supabase
         .from("articulation_test_results")
-        .insert({
-          child_id: childId,
-          completed_at: testDate.toISOString(),
-        });
+        .update({ completed_at: testDate.toISOString() })
+        .eq("id", lastResult.id);
 
-      if (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+      if (updateError) {
+        return new Response(JSON.stringify({ error: updateError.message }), {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      result = { simulatedDate: testDate.toISOString(), daysAgo };
+      // Also update submitted_at in articulation_test_sessions
+      const { data: lastSession } = await supabase
+        .from("articulation_test_sessions")
+        .select("id")
+        .eq("child_id", childId)
+        .order("submitted_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (lastSession) {
+        await supabase
+          .from("articulation_test_sessions")
+          .update({ submitted_at: testDate.toISOString() })
+          .eq("id", lastSession.id);
+      }
+
+      result = { simulatedDate: testDate.toISOString(), originalDate: lastResult.completed_at, daysAgo };
 
     } else if (action === "simulate_subscription_change") {
       const subAction = body.subAction; // extend, cancel, expire
