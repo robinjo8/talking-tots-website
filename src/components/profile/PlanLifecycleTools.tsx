@@ -140,7 +140,7 @@ export function PlanLifecycleTools() {
             disabled={!!loading}
           >
             <BtnIcon action="simulate_delayed_test" />
-            Simuliraj zamudo ({daysAgo}d)
+            Izračunaj zamudo ({daysAgo}d)
           </Button>
         </div>
 
