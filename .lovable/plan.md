@@ -1,41 +1,39 @@
 
 
-## Plan: Popravi neskladje v cooldown predogledu
+## Plan: Popravi cooldown predogled — zamuda mora zamakniti naslednji predvideni test
 
 ### Problem
 
-Cooldown predogled bere podatke iz tabele `articulation_test_results`, medtem ko admin portal kaže podatke iz `articulation_test_sessions`. Ti dve tabeli sta lahko nesinhronizirani — `articulation_test_sessions` ima 4 zapise (Seja 1-4), `articulation_test_results` pa morda samo 3. Zato prvi klik predogleda vidi 3 teste in predvidi 4. ob drugem potek naslednje poizvedbe, ko se podatki morda že sinhronizirajo, vidi 4 teste.
+Admin stran kaže 4 opravljene seje (Seja 1-4), ker je bila Seja 4 ustvarjena s simulacijo "Simuliraj celotno preverjanje". Cooldown predogled zdaj bere iz `articulation_test_sessions` in vidi 4 opravljene teste, zato zamuda (+50d) velja šele za Test 5. Prej (ko je bral iz `articulation_test_results` s samo 3 zapisi) je pravilno kazal Test 4 kot "predviden (140d)".
 
-Poleg tega: `simulate_delayed_test` prav tako bere iz `articulation_test_results`, kar pomeni da obe orodji delata na morebitno nepopolnih podatkih.
+### Rešitev
 
-### Popravek
+Uporabnik želi videti: "Kaj se zgodi, če po 3. testu zamudim 50 dni?" Zato moramo izbrisati Sejo 4 (ki je bila ustvarjena s simulacijo, ne z dejansko zamudo), da se vrnemo na 3 opravljene teste. Potem bo predogled s +50d zamudo pravilno kazal:
 
-**1. `supabase/functions/simulate-plan-lifecycle/index.ts`**
-
-Zamenjaj vir podatkov za cooldown predogled in simulate_delayed_test:
-
-```
-// PREJ (vrstica 563):
-.from("articulation_test_results")
-.select("completed_at")
-
-// POTEM:
-.from("articulation_test_sessions")
-.select("submitted_at")
-.eq("is_completed", true)
-.not("submitted_at", "is", null)
+```text
+Test 1: 2026-03-30  opravljen
+Test 2: 2026-06-28  opravljen
+Test 3: 2026-09-26  opravljen
+Test 4: 2027-02-13  predviden (140d = 90 + 50)
+Test 5: 2027-03-19  predviden (34d, smart cooldown)
+Test 6: blokiran
 ```
 
-Isto za `simulate_delayed_test` (vrstica 270).
+### Spremembe
 
-S tem bo predogled bral iste podatke kot admin portal — `articulation_test_sessions` je vir resnice za opravljene teste.
+**1. SQL migracija — izbriši Sejo 4 za Testni otrok**
 
-**2. Preveri podatke za Testni otrok**
+Izbriši:
+- `articulation_test_sessions` zapis s `session_number = 4` za tega otroka
+- Pripadajoče `articulation_word_results` za to sejo
+- Pripadajoči `articulation_test_results` zapis (če obstaja, z datumom ~2026-12-25)
+- Pripadajoče datoteke v `articulation_evaluations` za to sejo
 
-Po deployu preveri ali `articulation_test_results` in `articulation_test_sessions` vsebujeta enako število zapisov za tega otroka. Če ne, sinhroniziraj manjkajoči zapis.
+To bo sinhroniziralo admin stran (3 seje) in predogled (3 opravljeni testi).
+
+**2. Brez sprememb v kodi** — logika v `calculate_cooldown_preview` že pravilno aplicira `delayDays` na prvi predvideni test po opravljenih. Problem so bili odvečni podatki, ne logika.
 
 ### Obseg
-- 1 datoteka: `supabase/functions/simulate-plan-lifecycle/index.ts` — 2 poizvedbi spremenjeni
-- Deploy edge function
-- Preverba podatkov
+- 1 SQL migracija za čiščenje podatkov
+- Admin stran bo po tem kazala 3 seje, predogled bo s +50d zamudo pravilno kazal Test 4 kot predviden
 
