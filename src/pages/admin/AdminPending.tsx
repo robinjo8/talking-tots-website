@@ -346,6 +346,7 @@ export default function AdminPending() {
                             {session.child_age ? `${session.child_age} let` : '-'}
                           </TableCell>
                           <TableCell>{formatGender(session.child_gender)}</TableCell>
+                          <TableCell>{session.session_number ?? '-'}</TableCell>
                           <TableCell>{formatDate(session.submitted_at)}</TableCell>
                           <TableCell className="text-right">
                             <AlertDialog>
