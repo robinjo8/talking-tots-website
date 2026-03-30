@@ -330,6 +330,10 @@ export default function AdminSessionReview() {
   const isAdditionalTest = !!data.session.additionalAssignmentId;
   const letterOrder = isAdditionalTest ? Array.from(data.recordingsByLetter.keys()) : undefined;
 
+  // Dinamičen seznam sej iz baze (namesto hardcodiranega [1,2,3,4,5])
+  const sessionNumbers = Array.from(actualSessionDates.keys()).sort((a, b) => a - b);
+  const displaySessions = sessionNumbers.length > 0 ? sessionNumbers : [1];
+
   return (
     <div className="space-y-6">
       {/* Header */}
