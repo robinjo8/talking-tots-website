@@ -50,9 +50,16 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Email check
-    const { data: userData } = await supabase.auth.admin.getUserById(userId);
-    if (!userData?.user?.email || !ALLOWED_EMAILS.includes(userData.user.email)) {
+    // Admin permissions check (replaces hardcoded email list)
+    const { data: adminData } = await supabase
+      .from("admin_permissions")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("is_active", true)
+      .in("role", ["super_admin"])
+      .maybeSingle();
+
+    if (!adminData) {
       return new Response(JSON.stringify({ error: "Forbidden" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
