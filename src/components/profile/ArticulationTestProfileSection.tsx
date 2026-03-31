@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
-import { isDevUser } from "@/lib/devAccess";
+import { useDevAccess } from "@/hooks/useDevAccess";
 
 export function ArticulationTestProfileSection() {
   const { lastCompletedAt, nextTestDate, isTestAvailable, isLoading, resetTest, refetch } = useArticulationTestStatus();
