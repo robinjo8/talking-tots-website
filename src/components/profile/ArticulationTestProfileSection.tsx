@@ -10,12 +10,13 @@ import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Progress } from "@/components/ui/progress";
 import { useNavigate } from "react-router-dom";
-import { isDevUser } from "@/lib/devAccess";
+import { useDevAccess } from "@/hooks/useDevAccess";
 
 export function ArticulationTestProfileSection() {
   const { lastCompletedAt, nextTestDate, isTestAvailable, isLoading, resetTest, refetch } = useArticulationTestStatus();
   const { selectedChild, user } = useAuth();
   const navigate = useNavigate();
+  const { isDev } = useDevAccess();
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationProgress, setSimulationProgress] = useState(0);
   const [isResettingAdditional, setIsResettingAdditional] = useState(false);
@@ -196,7 +197,7 @@ export function ArticulationTestProfileSection() {
         )}
 
         {/* Simulation & Reset - for testing (dev users only) */}
-        {isDevUser(user?.email) && (
+        {isDev && (
         <div className="rounded-lg border border-dragon-green/30 overflow-hidden">
           <div className="bg-dragon-green/10 px-4 py-2 border-b border-dragon-green/20">
             <p className="font-medium text-dragon-green text-sm">🧪 Orodja za testiranje</p>

@@ -286,39 +286,187 @@ Deno.serve(async (req) => {
       console.log("No storage files found for user");
     }
 
+    // Collect child IDs for cascade deletion
+    const childIds = children?.map(c => c.id) || [];
+
+    // Delete word results for test sessions
     if (sessionIds.length > 0) {
       const { error: wordDeleteError } = await adminClient
         .from("articulation_word_results")
         .delete()
         .in("session_id", sessionIds);
-      
-      if (wordDeleteError) {
-        console.error("Failed to delete word results:", wordDeleteError);
-      }
+      if (wordDeleteError) console.error("Failed to delete word results:", wordDeleteError);
+
+      // Delete evaluations for test sessions
+      const { error: evalDeleteError } = await adminClient
+        .from("articulation_evaluations")
+        .delete()
+        .in("session_id", sessionIds);
+      if (evalDeleteError) console.error("Failed to delete evaluations:", evalDeleteError);
     }
 
+    // Delete test sessions
     if (testSessions && testSessions.length > 0) {
       const { error: sessionDeleteError } = await adminClient
         .from("articulation_test_sessions")
         .delete()
         .eq("parent_id", targetUserId);
+      if (sessionDeleteError) console.error("Failed to delete test sessions:", sessionDeleteError);
+    }
+
+    // Delete child-related data
+    if (childIds.length > 0) {
+      // Progress
+      const { error: progressErr } = await adminClient
+        .from("progress")
+        .delete()
+        .in("child_id", childIds);
+      if (progressErr) console.error("Failed to delete progress:", progressErr);
+
+      // Stickers
+      const { error: stickersErr } = await adminClient
+        .from("child_stickers")
+        .delete()
+        .in("child_id", childIds);
+      if (stickersErr) console.error("Failed to delete child_stickers:", stickersErr);
+
+      // Album stats
+      const { error: albumErr } = await adminClient
+        .from("child_album_stats")
+        .delete()
+        .in("child_id", childIds);
+      if (albumErr) console.error("Failed to delete child_album_stats:", albumErr);
+
+      // Plan activity completions
+      const { error: planCompErr } = await adminClient
+        .from("plan_activity_completions")
+        .delete()
+        .in("child_id", childIds);
+      if (planCompErr) console.error("Failed to delete plan_activity_completions:", planCompErr);
+
+      // Plan set tracking
+      const { error: planSetErr } = await adminClient
+        .from("plan_set_tracking")
+        .delete()
+        .in("child_id", childIds);
+      if (planSetErr) console.error("Failed to delete plan_set_tracking:", planSetErr);
+
+      // Monthly plans
+      const { error: plansErr } = await adminClient
+        .from("child_monthly_plans")
+        .delete()
+        .in("child_id", childIds);
+      if (plansErr) console.error("Failed to delete child_monthly_plans:", plansErr);
+
+      // Articulation test results
+      const { error: resultsErr } = await adminClient
+        .from("articulation_test_results")
+        .delete()
+        .in("child_id", childIds);
+      if (resultsErr) console.error("Failed to delete articulation_test_results:", resultsErr);
+
+      // Child documents
+      const { error: docsErr } = await adminClient
+        .from("child_documents")
+        .delete()
+        .in("child_id", childIds);
+      if (docsErr) console.error("Failed to delete child_documents:", docsErr);
+
+      // Access log
+      const { error: accessErr } = await adminClient
+        .from("children_access_log")
+        .delete()
+        .in("child_id", childIds);
+      if (accessErr) console.error("Failed to delete children_access_log:", accessErr);
+
+      // Additional test words (via assignments)
+      const { data: assignments } = await adminClient
+        .from("additional_test_assignments")
+        .select("id")
+        .in("child_id", childIds);
       
-      if (sessionDeleteError) {
-        console.error("Failed to delete test sessions:", sessionDeleteError);
+      if (assignments && assignments.length > 0) {
+        const assignmentIds = assignments.map(a => a.id);
+        const { error: wordsErr } = await adminClient
+          .from("additional_test_words")
+          .delete()
+          .in("assignment_id", assignmentIds);
+        if (wordsErr) console.error("Failed to delete additional_test_words:", wordsErr);
+
+        const { error: assignErr } = await adminClient
+          .from("additional_test_assignments")
+          .delete()
+          .in("child_id", childIds);
+        if (assignErr) console.error("Failed to delete additional_test_assignments:", assignErr);
       }
     }
 
-    // Delete user_subscriptions record to prevent orphaned records
+    // Delete children
+    if (children && children.length > 0) {
+      const { error: childrenDeleteError } = await adminClient
+        .from("children")
+        .delete()
+        .eq("parent_id", targetUserId);
+      if (childrenDeleteError) console.error("Failed to delete children:", childrenDeleteError);
+    }
+
+    // Delete chat messages and conversations
+    const { data: conversations } = await adminClient
+      .from("chat_conversations")
+      .select("id")
+      .eq("user_id", targetUserId);
+
+    if (conversations && conversations.length > 0) {
+      const convIds = conversations.map(c => c.id);
+      const { error: msgErr } = await adminClient
+        .from("chat_messages")
+        .delete()
+        .in("conversation_id", convIds);
+      if (msgErr) console.error("Failed to delete chat_messages:", msgErr);
+
+      const { error: convErr } = await adminClient
+        .from("chat_conversations")
+        .delete()
+        .eq("user_id", targetUserId);
+      if (convErr) console.error("Failed to delete chat_conversations:", convErr);
+    }
+
+    // Delete MFA codes
+    const { error: mfaErr } = await adminClient
+      .from("mfa_codes")
+      .delete()
+      .eq("user_id", targetUserId);
+    if (mfaErr) console.error("Failed to delete mfa_codes:", mfaErr);
+
+    // Delete email preferences
+    const { error: emailPrefErr } = await adminClient
+      .from("email_preferences")
+      .delete()
+      .eq("user_id", targetUserId);
+    if (emailPrefErr) console.error("Failed to delete email_preferences:", emailPrefErr);
+
+    // Delete notification reads
+    const { error: notifReadErr } = await adminClient
+      .from("notification_reads")
+      .delete()
+      .eq("user_id", targetUserId);
+    if (notifReadErr) console.error("Failed to delete notification_reads:", notifReadErr);
+
+    // Delete user_subscriptions
     const { error: subDeleteError } = await adminClient
       .from("user_subscriptions")
       .delete()
       .eq("user_id", targetUserId);
+    if (subDeleteError) console.error("Failed to delete user subscription:", subDeleteError);
 
-    if (subDeleteError) {
-      console.error("Failed to delete user subscription:", subDeleteError);
-    } else {
-      console.log("Deleted user_subscriptions record for user:", targetUserId);
-    }
+    // Delete profile
+    const { error: profileErr } = await adminClient
+      .from("profiles")
+      .delete()
+      .eq("id", targetUserId);
+    if (profileErr) console.error("Failed to delete profile:", profileErr);
+
+    console.log("All user data deleted for:", targetUserId);
 
     const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetUserId);
 
