@@ -1,13 +1,24 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+const allowedOrigins = [
+  "https://tomitalk.com",
+  "https://www.tomitalk.com",
+  "https://tomitalk.lovable.app",
+];
 
-const ALLOWED_EMAILS = ["qjavec@gmail.com", "kujavec.robert@gmail.com"];
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get("Origin") || "";
+  const isAllowed = allowedOrigins.includes(origin) || (origin.startsWith("https://") && (origin.endsWith(".lovable.app") || origin.endsWith(".lovableproject.com")));
+  const allowOrigin = isAllowed ? origin : allowedOrigins[0];
+  return {
+    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  };
+}
 
 Deno.serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
