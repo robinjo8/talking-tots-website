@@ -5,19 +5,20 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { isDevUser } from "@/lib/devAccess";
+import { useDevAccess } from "@/hooks/useDevAccess";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function PlanLifecycleTools() {
   const { user, selectedChild } = useAuth();
   const queryClient = useQueryClient();
+  const { isDev, loading: devLoading } = useDevAccess();
   const [loading, setLoading] = useState<string | null>(null);
   const [daysAgo, setDaysAgo] = useState("50");
   const [cooldownPreview, setCooldownPreview] = useState<any>(null);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
 
-  if (!isDevUser(user?.email)) return null;
+  if (devLoading || !isDev) return null;
 
   const invoke = async (action: string, extra: Record<string, any> = {}) => {
     if (!selectedChild?.id) {

@@ -2,8 +2,7 @@ import { User, Users, CircleDollarSign, CreditCard, Shield, FileText, ClipboardC
 import { cn } from "@/lib/utils";
 import { useSubscriptionContext } from "@/contexts/SubscriptionContext";
 import { useUserNotifications } from "@/hooks/useUserNotifications";
-import { useAuth } from "@/contexts/AuthContext";
-import { isDevUser } from "@/lib/devAccess";
+import { useDevAccess } from "@/hooks/useDevAccess";
 
 type ProfileSidebarProps = {
   activeSection: string;
@@ -25,8 +24,7 @@ const menuItems = [
 export function ProfileSidebar({ activeSection, setActiveSection, childrenCount }: ProfileSidebarProps) {
   const { isPro } = useSubscriptionContext();
   const { unreadCount } = useUserNotifications();
-  const { user } = useAuth();
-  const isDev = isDevUser(user?.email);
+  const { isDev } = useDevAccess();
 
   const allItems = isDev
     ? [...menuItems, { id: "lifecycleTools", label: "Lifecycle orodja", icon: FlaskConical }]
