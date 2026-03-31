@@ -197,7 +197,7 @@ export function ArticulationTestProfileSection() {
         )}
 
         {/* Simulation & Reset - for testing (dev users only) */}
-        {isDevUser(user?.email) && (
+        {isDev && (
         <div className="rounded-lg border border-dragon-green/30 overflow-hidden">
           <div className="bg-dragon-green/10 px-4 py-2 border-b border-dragon-green/20">
             <p className="font-medium text-dragon-green text-sm">🧪 Orodja za testiranje</p>
