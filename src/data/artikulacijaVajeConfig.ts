@@ -555,12 +555,16 @@ export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   // Wheel games (začetek)
   'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO BESED - C', wordsData: wordsDataC, lipsImage: 'Glas_SZC.png' },
   'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO BESED - Č', wordsData: wordsDataCH, lipsImage: 'Glas_ShZhCh.png' },
+  'f': { letter: 'F', displayLetter: 'F', gameType: 'wheel', title: 'KOLO BESED - F', wordsData: wordsDataF },
+  'g': { letter: 'G', displayLetter: 'G', gameType: 'wheel', title: 'KOLO BESED - G', wordsData: wordsDataG },
+  'h': { letter: 'H', displayLetter: 'H', gameType: 'wheel', title: 'KOLO BESED - H', wordsData: wordsDataH },
   'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK, lipsImage: 'Glas_K.png' },
   'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL, lipsImage: 'Glas_L.png' },
   'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR, lipsImage: 'Glas_R.png' },
   'r-zacetek': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R začetne vaje', wordsData: wordsDataRZacetek, lipsImage: 'Glas_R.png' },
   's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO BESED - S', wordsData: wordsDataS, lipsImage: 'Glas_SZC.png' },
   'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH, lipsImage: 'Glas_ShZhCh.png' },
+  'v': { letter: 'V', displayLetter: 'V', gameType: 'wheel', title: 'KOLO BESED - V', wordsData: wordsDataV },
   'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ, lipsImage: 'Glas_SZC.png' },
   'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO BESED - Ž', wordsData: wordsDataZH, lipsImage: 'Glas_ShZhCh.png' },
   
