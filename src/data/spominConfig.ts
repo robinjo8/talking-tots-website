@@ -5,8 +5,9 @@ export interface SpominConfig {
   urlKey: string;         // ASCII-safe URL key (e.g., 'c', 'ch', 'k')
   displayLetter: string;  // Display letter (e.g., 'C', 'Č', 'K')
   displayName?: string;   // Optional full display name (e.g., 'R - začetne vaje')
-  tableName: string;      // Supabase table name
+  tableName?: string;     // Supabase table name (optional if localData provided)
   queryKey: string;       // React Query cache key
+  localData?: { word: string; image_url: string; audio_url: string }[]; // Local data fallback
 }
 
 export const spominConfig: Record<string, SpominConfig> = {
