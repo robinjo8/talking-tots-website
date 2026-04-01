@@ -12,6 +12,7 @@ import { MemoryExitConfirmationDialog } from "@/components/games/MemoryExitConfi
 import { SequenceGameBase, SequenceGameConfig } from "@/components/exercises/SequenceGameBase";
 import { SequenceGame56Base } from "@/components/exercises/SequenceGame56Base";
 import { SequenceGameC } from "@/components/exercises/SequenceGameC";
+import { SequenceGameLocal } from "@/components/exercises/SequenceGameLocal";
 import { SequenceGameK } from "@/components/exercises/SequenceGameK";
 import { SequenceGameL } from "@/components/exercises/SequenceGameL";
 import { SequenceGameR } from "@/components/exercises/SequenceGameR";
