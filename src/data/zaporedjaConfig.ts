@@ -17,12 +17,16 @@ export interface ZaporedjaGameConfig {
 const letterTableMap: Record<string, string> = {
   'c': 'memory_cards_c',
   'č': 'memory_cards_Č',
+  'f': 'memory_cards_c',  // F uses local data, placeholder
+  'g': 'memory_cards_c',  // G uses local data, placeholder
+  'h': 'memory_cards_c',  // H uses local data, placeholder
   'k': 'memory_cards_K',
   'l': 'memory_cards_l',
   'r': 'memory_cards',  // R uses base table
   'r-zacetek': 'memory_cards_r_zacetek',
   's': 'memory_cards_S',
-  'š': 'memory_cards_Š_duplicate',  // Š uses duplicate table
+  'š': 'memory_cards_Š_duplicate',
+  'v': 'memory_cards_c',  // V uses local data, placeholder
   'z': 'memory_cards_z',
   'ž': 'memory_cards_Ž'
 };
