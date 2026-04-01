@@ -258,6 +258,10 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
 
     // For 3-4 age group, use the original SequenceGame components
     if (config.gameType === '34') {
+      // Letters with local data use SequenceGameC-like component with localData passed to useSequenceGame
+      if (config.localData) {
+        return <SequenceGameLocal {...commonProps} localData={config.localData} />;
+      }
       switch (config.urlKey) {
         case 'c': return <SequenceGameC {...commonProps} />;
         case 'ch': return <SequenceGameČ {...commonProps} />;
@@ -281,6 +285,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
           isLandscape={isLandscape}
           tableName={config.tableName}
           queryKey={config.queryKey}
+          localData={config.localData}
         />
       );
     }
@@ -295,6 +300,7 @@ export function GenericZaporedjaGame({ config, backPath = '/govorne-igre/zapored
         tableName={config.tableName}
         queryKey={config.queryKey}
         config={gameConfig}
+        localData={config.localData}
       />
     );
   };
