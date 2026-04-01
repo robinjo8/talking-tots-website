@@ -126,6 +126,16 @@ export const labirintConfigs: LabirintConfig[] = [
     trackingId: 'labirint-z'
   },
   {
+    letter: 'v',
+    displayLetter: 'V',
+    urlKey: 'v',
+    gradient: 'from-app-purple/20 to-app-teal/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_V.webp',
+    description: 'Poišči pot skozi labirint s črko V',
+    images: vImages,
+    trackingId: 'labirint-v'
+  },
+  {
     letter: 'ž',
     displayLetter: 'Ž',
     urlKey: 'zh',
