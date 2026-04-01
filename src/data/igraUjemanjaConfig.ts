@@ -105,20 +105,27 @@ export const letterToDigraph: Record<string, string> = {
   'š': 'sh',
   'ž': 'zh',
   'c': 'c',
+  'f': 'f',
+  'g': 'g',
+  'h': 'h',
   'k': 'k',
   'l': 'l',
   'r': 'r',
   's': 's',
+  'v': 'v',
   'z': 'z',
-  // Uppercase versions
   'Č': 'ch',
   'Š': 'sh',
   'Ž': 'zh',
   'C': 'c',
+  'F': 'f',
+  'G': 'g',
+  'H': 'h',
   'K': 'k',
   'L': 'l',
   'R': 'r',
   'S': 's',
+  'V': 'v',
   'Z': 'z'
 };
 
