@@ -42,12 +42,16 @@ const ageGroupSettings: Record<string, {
 const letterConfigs: { letter: string; urlKey: string }[] = [
   { letter: 'C', urlKey: 'c' },
   { letter: 'Č', urlKey: 'ch' },
+  { letter: 'F', urlKey: 'f' },
+  { letter: 'G', urlKey: 'g' },
+  { letter: 'H', urlKey: 'h' },
   { letter: 'K', urlKey: 'k' },
   { letter: 'L', urlKey: 'l' },
   { letter: 'R', urlKey: 'r' },
   { letter: 'R-zacetek', urlKey: 'r-zacetek' },
   { letter: 'S', urlKey: 's' },
   { letter: 'Š', urlKey: 'sh' },
+  { letter: 'V', urlKey: 'v' },
   { letter: 'Z', urlKey: 'z' },
   { letter: 'Ž', urlKey: 'zh' }
 ];
