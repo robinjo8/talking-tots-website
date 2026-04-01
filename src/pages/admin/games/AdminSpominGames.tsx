@@ -5,12 +5,16 @@ import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 const memoryGames = [
   { id: "spomin-c", letter: "C", title: "Glas C", description: "Poišči pare slik z glasom C in nato ponovi besedo", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
   { id: "spomin-ch", letter: "Č", title: "Glas Č", description: "Poišči pare slik z glasom Č in nato ponovi besedo", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png" },
+  { id: "spomin-f", letter: "F", title: "Glas F", description: "Poišči pare slik z glasom F in nato ponovi besedo", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_F.webp" },
+  { id: "spomin-g", letter: "G", title: "Glas G", description: "Poišči pare slik z glasom G in nato ponovi besedo", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_G.webp" },
+  { id: "spomin-h", letter: "H", title: "Glas H", description: "Poišči pare slik z glasom H in nato ponovi besedo", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_H.webp" },
   { id: "spomin-k", letter: "K", title: "Glas K", description: "Poišči pare slik z glasom K in nato ponovi besedo", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
   { id: "spomin-l", letter: "L", title: "Glas L", description: "Poišči pare slik z glasom L in nato ponovi besedo", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png" },
   { id: "spomin-r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Poišči pare slik z glasom R in nato ponovi besedo - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "spomin-r", letter: "R", title: "Glas R", description: "Poišči pare slik z glasom R in nato ponovi besedo", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "spomin-s", letter: "S", title: "Glas S", description: "Poišči pare slik z glasom S in nato ponovi besedo", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png" },
   { id: "spomin-sh", letter: "Š", title: "Glas Š", description: "Poišči pare slik z glasom Š in nato ponovi besedo", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png" },
+  { id: "spomin-v", letter: "V", title: "Glas V", description: "Poišči pare slik z glasom V in nato ponovi besedo", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_V.webp" },
   { id: "spomin-z", letter: "Z", title: "Glas Z", description: "Poišči pare slik z glasom Z in nato ponovi besedo", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
   { id: "spomin-zh", letter: "Ž", title: "Glas Ž", description: "Poišči pare slik z glasom Ž in nato ponovi besedo", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png" },
 ];

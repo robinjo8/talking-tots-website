@@ -7,12 +7,16 @@ import { getAgeGroup } from "@/utils/ageUtils";
 const igraUjemanjaLetters = [
   { id: "c", letter: "C", title: "Glas C", description: "Poveži besedo z glasom C s pravo sliko", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
   { id: "ch", letter: "Č", title: "Glas Č", description: "Poveži besedo z glasom Č s pravo sliko", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png" },
+  { id: "f", letter: "F", title: "Glas F", description: "Poveži besedo z glasom F s pravo sliko", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_F.webp" },
+  { id: "g", letter: "G", title: "Glas G", description: "Poveži besedo z glasom G s pravo sliko", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_G.webp" },
+  { id: "h", letter: "H", title: "Glas H", description: "Poveži besedo z glasom H s pravo sliko", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_H.webp" },
   { id: "k", letter: "K", title: "Glas K", description: "Poveži besedo z glasom K s pravo sliko", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", title: "Glas L", description: "Poveži besedo z glasom L s pravo sliko", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Poveži besedo z glasom R s pravo sliko - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "r", letter: "R", title: "Glas R", description: "Poveži besedo z glasom R s pravo sliko", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "s", letter: "S", title: "Glas S", description: "Poveži besedo z glasom S s pravo sliko", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png" },
   { id: "sh", letter: "Š", title: "Glas Š", description: "Poveži besedo z glasom Š s pravo sliko", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png" },
+  { id: "v", letter: "V", title: "Glas V", description: "Poveži besedo z glasom V s pravo sliko", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_V.webp" },
   { id: "z", letter: "Z", title: "Glas Z", description: "Poveži besedo z glasom Z s pravo sliko", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
   { id: "zh", letter: "Ž", title: "Glas Ž", description: "Poveži besedo z glasom Ž s pravo sliko", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png" },
 ];

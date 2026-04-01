@@ -8,9 +8,13 @@ const LIPS_IMAGE_MAP: Record<string, string> = {
   'Č': 'Glas_ShZhCh.png',
   'Š': 'Glas_ShZhCh.png',
   'Ž': 'Glas_ShZhCh.png',
+  'F': 'Glas_F.png',
+  'G': 'Glas_G.png',
+  'H': 'Glas_H.png',
   'K': 'Glas_K.png',
   'L': 'Glas_L.png',
   'R': 'Glas_R.png',
+  'V': 'Glas_V.png',
 };
 
 /**
