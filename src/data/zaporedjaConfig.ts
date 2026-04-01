@@ -10,6 +10,7 @@ export interface ZaporedjaGameConfig {
   queryKey: string;         // React Query cache key
   trackingId: string;       // e.g., "sequence_c_3-4"
   gameType: '34' | '56' | '78' | '910'; // Which game variant to use
+  localData?: { word: string; image_url: string; audio_url: string }[]; // Local data fallback for letters without DB tables
 }
 
 // Table name mapping for each letter
