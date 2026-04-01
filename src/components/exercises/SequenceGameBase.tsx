@@ -33,14 +33,23 @@ export const SequenceGameBase = ({
   isLandscape = false, 
   tableName, 
   queryKey,
-  config 
+  config,
+  localData
 }: SequenceGameBaseProps) => {
   const { imageCount, preCountdownSeconds, countdownSeconds, helpAttempts, helpDuration } = config;
   const extraImageCount = Math.min(imageCount, 5);
 
   const { data: allImages, isLoading } = useQuery({
-    queryKey: ["sequenceImages", queryKey],
+    queryKey: ["sequenceImages", localData ? `local_${queryKey}` : queryKey],
     queryFn: async () => {
+      if (localData) {
+        return localData.map((item, index) => ({
+          id: `local-${index}-${item.word}`,
+          word: item.word,
+          image_url: item.image_url,
+          audio_url: item.audio_url,
+        })) as SequenceImage[];
+      }
       const { data, error } = await supabase
         .from(tableName as any)
         .select("*");

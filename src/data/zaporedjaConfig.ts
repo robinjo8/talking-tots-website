@@ -78,6 +78,8 @@ letterConfigs.forEach(({ letter, urlKey }) => {
   const tableKey = urlKey === 'ch' ? 'č' : urlKey === 'sh' ? 'š' : urlKey === 'zh' ? 'ž' : urlKey === 'r-zacetek' ? 'r-zacetek' : urlKey;
   const tableName = letterTableMap[tableKey];
   
+  const localData = localDataMap[tableKey];
+  
   Object.entries(ageGroupSettings).forEach(([ageKey, settings]) => {
     zaporedjaConfigs.push({
       letter,
@@ -87,7 +89,8 @@ letterConfigs.forEach(({ letter, urlKey }) => {
       tableName,
       queryKey: `${tableName}_${ageKey}`,
       trackingId: `sequence_${letter.toLowerCase()}_${settings.requiredAgeGroup}`,
-      gameType: settings.gameType
+      gameType: settings.gameType,
+      ...(localData ? { localData } : {})
     });
   });
 });
