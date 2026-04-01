@@ -13,6 +13,7 @@ interface SequenceGame56BaseProps {
   isLandscape?: boolean;
   tableName: string;
   queryKey: string;
+  localData?: { word: string; image_url: string; audio_url: string }[];
 }
 
 type GamePhase = "pre-countdown" | "memorize" | "select";
@@ -22,10 +23,18 @@ const PRE_COUNTDOWN_SECONDS = 5;
 const MEMORIZE_COUNTDOWN_SECONDS = 10;
 const HELP_USES = 1;
 
-export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableName, queryKey }: SequenceGame56BaseProps) => {
+export const SequenceGame56Base = ({ onGameComplete, isLandscape = false, tableName, queryKey, localData }: SequenceGame56BaseProps) => {
   const { data: allImages, isLoading } = useQuery({
-    queryKey: ["sequenceImages56", queryKey],
+    queryKey: ["sequenceImages56", localData ? `local_${queryKey}` : queryKey],
     queryFn: async () => {
+      if (localData) {
+        return localData.map((item, index) => ({
+          id: `local-${index}-${item.word}`,
+          word: item.word,
+          image_url: item.image_url,
+          audio_url: item.audio_url,
+        })) as SequenceImage[];
+      }
       const { data, error } = await supabase
         .from(tableName as any)
         .select("*");

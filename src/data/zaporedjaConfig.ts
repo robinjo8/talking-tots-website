@@ -10,6 +10,7 @@ export interface ZaporedjaGameConfig {
   queryKey: string;         // React Query cache key
   trackingId: string;       // e.g., "sequence_c_3-4"
   gameType: '34' | '56' | '78' | '910'; // Which game variant to use
+  localData?: { word: string; image_url: string; audio_url: string }[]; // Local data fallback for letters without DB tables
 }
 
 // Table name mapping for each letter
@@ -17,18 +18,28 @@ export interface ZaporedjaGameConfig {
 const letterTableMap: Record<string, string> = {
   'c': 'memory_cards_c',
   'č': 'memory_cards_Č',
-  'f': 'memory_cards_c',  // F uses local data, placeholder
-  'g': 'memory_cards_c',  // G uses local data, placeholder
-  'h': 'memory_cards_c',  // H uses local data, placeholder
+  'f': 'local',
+  'g': 'local',
+  'h': 'local',
   'k': 'memory_cards_K',
   'l': 'memory_cards_l',
-  'r': 'memory_cards',  // R uses base table
+  'r': 'memory_cards',
   'r-zacetek': 'memory_cards_r_zacetek',
   's': 'memory_cards_S',
   'š': 'memory_cards_Š_duplicate',
-  'v': 'memory_cards_c',  // V uses local data, placeholder
+  'v': 'local',
   'z': 'memory_cards_z',
   'ž': 'memory_cards_Ž'
+};
+
+// Import local data from spominConfig for letters without DB tables
+import { spominConfig } from './spominConfig';
+
+const localDataMap: Record<string, { word: string; image_url: string; audio_url: string }[]> = {
+  'f': spominConfig['f']?.localData || [],
+  'g': spominConfig['g']?.localData || [],
+  'h': spominConfig['h']?.localData || [],
+  'v': spominConfig['v']?.localData || [],
 };
 
 // Age group settings
@@ -67,6 +78,8 @@ letterConfigs.forEach(({ letter, urlKey }) => {
   const tableKey = urlKey === 'ch' ? 'č' : urlKey === 'sh' ? 'š' : urlKey === 'zh' ? 'ž' : urlKey === 'r-zacetek' ? 'r-zacetek' : urlKey;
   const tableName = letterTableMap[tableKey];
   
+  const localData = localDataMap[tableKey];
+  
   Object.entries(ageGroupSettings).forEach(([ageKey, settings]) => {
     zaporedjaConfigs.push({
       letter,
@@ -76,7 +89,8 @@ letterConfigs.forEach(({ letter, urlKey }) => {
       tableName,
       queryKey: `${tableName}_${ageKey}`,
       trackingId: `sequence_${letter.toLowerCase()}_${settings.requiredAgeGroup}`,
-      gameType: settings.gameType
+      gameType: settings.gameType,
+      ...(localData ? { localData } : {})
     });
   });
 });

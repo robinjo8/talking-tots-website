@@ -10,7 +10,7 @@ export interface SequenceImage {
   audio_url: string | null;
 }
 
-export const useSequenceGame = (tableName: string, count: number = 4) => {
+export const useSequenceGame = (tableName: string, count: number = 4, localData?: { word: string; image_url: string; audio_url: string }[]) => {
   const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
   const [currentSequence, setCurrentSequence] = useState<SequenceImage[]>([]);
   const [isComplete, setIsComplete] = useState(false);
@@ -20,8 +20,16 @@ export const useSequenceGame = (tableName: string, count: number = 4) => {
   const sequentialPlaybackRef = useRef(false);
 
   const { data: imagesData, isLoading } = useQuery({
-    queryKey: ["sequenceImages", tableName],
+    queryKey: ["sequenceImages", localData ? `local_${tableName}` : tableName],
     queryFn: async () => {
+      if (localData) {
+        return localData.map((item, index) => ({
+          id: `local-${index}-${item.word}`,
+          word: item.word,
+          image_url: item.image_url,
+          audio_url: item.audio_url,
+        })) as SequenceImage[];
+      }
       const { data, error } = await supabase
         .from(tableName as any)
         .select("*");
