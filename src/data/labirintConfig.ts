@@ -26,6 +26,36 @@ export const labirintConfigs: LabirintConfig[] = [
     trackingId: 'labirint-c'
   },
   {
+    letter: 'f',
+    displayLetter: 'F',
+    urlKey: 'f',
+    gradient: 'from-app-orange/20 to-app-yellow/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_F.webp',
+    description: 'Poišči pot skozi labirint s črko F',
+    images: fImages,
+    trackingId: 'labirint-f'
+  },
+  {
+    letter: 'g',
+    displayLetter: 'G',
+    urlKey: 'g',
+    gradient: 'from-dragon-green/20 to-app-teal/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_G.webp',
+    description: 'Poišči pot skozi labirint s črko G',
+    images: gImages,
+    trackingId: 'labirint-g'
+  },
+  {
+    letter: 'h',
+    displayLetter: 'H',
+    urlKey: 'h',
+    gradient: 'from-app-blue/20 to-app-purple/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_H.webp',
+    description: 'Poišči pot skozi labirint s črko H',
+    images: hImages,
+    trackingId: 'labirint-h'
+  },
+  {
     letter: 'č',
     displayLetter: 'Č',
     urlKey: 'ch',
