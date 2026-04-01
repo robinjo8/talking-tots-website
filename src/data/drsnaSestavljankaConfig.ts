@@ -1,7 +1,7 @@
 // Centralized configuration for all DrsnaSestavljanka (Sliding Puzzle) games
 // This eliminates the need for 36 separate page components
 
-import { cImages, čImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, zImages, žImages, type PuzzleImage } from './puzzleImages';
+import { cImages, čImages, fImages, gImages, hImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, vImages, zImages, žImages, type PuzzleImage } from './puzzleImages';
 
 export interface DrsnaSestavljankaGameConfig {
   letter: string;           // Display letter: "C", "Č", "Š", "Ž", etc.
