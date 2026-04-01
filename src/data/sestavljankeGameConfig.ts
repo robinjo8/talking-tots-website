@@ -93,10 +93,14 @@ export const digraphToLetter: Record<string, string> = {
   'sh': 'Š',
   'zh': 'Ž',
   'c': 'C',
+  'f': 'F',
+  'g': 'G',
+  'h': 'H',
   'k': 'K',
   'l': 'L',
   'r': 'R',
   's': 'S',
+  'v': 'V',
   'z': 'Z'
 };
 
