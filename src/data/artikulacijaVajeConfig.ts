@@ -424,6 +424,87 @@ const bingoDataZHSredinaKonec: BingoWordData[] = [
   { word: "VERIŽICA", image: "verizica1.webp", audio: "Verizica.mp3" },
 ];
 
+// F words (13 words)
+const wordsDataF: WordData[] = [
+  { word: "FARAON", image: "faraon.webp", audio: "Faraon.mp3" },
+  { word: "FAZAN", image: "fazan.webp", audio: "Fazan.mp3" },
+  { word: "FEFERON", image: "feferon.webp", audio: "Feferon.mp3" },
+  { word: "FIGA", image: "figa.webp", audio: "Figa.mp3" },
+  { word: "FLAVTA", image: "flavta.webp", audio: "Flavta.mp3" },
+  { word: "FORMULA", image: "formula.webp", audio: "Formula.mp3" },
+  { word: "FOTELJ", image: "fotelj.webp", audio: "Fotelj.mp3" },
+  { word: "FRAČA", image: "fraca.webp", audio: "Fraca.mp3" },
+  { word: "FRIZER", image: "frizer.webp", audio: "Frizer.mp3" },
+  { word: "FRNIKOLA", image: "frnikola.webp", audio: "Frnikola.mp3" },
+  { word: "FANT", image: "fant1.webp", audio: "Fant.mp3" },
+  { word: "FEN", image: "fen1.webp", audio: "Fen.mp3" },
+  { word: "FIŽOL", image: "fizol1.webp", audio: "Fizol.mp3" },
+];
+
+// G words (16 words)
+const wordsDataG: WordData[] = [
+  { word: "GASILEC", image: "gasilec.webp", audio: "Gasilec.mp3" },
+  { word: "GLAVNIK", image: "glavnik.webp", audio: "Glavnik.mp3" },
+  { word: "GOLOB", image: "golob.webp", audio: "Golob.mp3" },
+  { word: "GOS", image: "gos.webp", audio: "Gos.mp3" },
+  { word: "GOZDAR", image: "gozdar.webp", audio: "Gozdar.mp3" },
+  { word: "GRAD", image: "grad.webp", audio: "Grad.mp3" },
+  { word: "GRAH", image: "grah.webp", audio: "Grah.mp3" },
+  { word: "GUGALNICA", image: "gugalnica.webp", audio: "Gugalnica.mp3" },
+  { word: "GUSAR", image: "gusar.webp", audio: "Gusar.mp3" },
+  { word: "GOBA", image: "goba1.webp", audio: "Goba.mp3" },
+  { word: "GOL", image: "gol1.webp", audio: "Gol.mp3" },
+  { word: "GUMA", image: "guma1.webp", audio: "Guma.mp3" },
+  { word: "GARAŽA", image: "garaza1.webp", audio: "Garaza.mp3" },
+  { word: "GNEZDO", image: "gnezdo1.webp", audio: "Gnezdo.mp3" },
+  { word: "GROZDJE", image: "grozdje1.webp", audio: "Grozdje.mp3" },
+  { word: "GLAVA", image: "glava1.webp", audio: "Glava.mp3" },
+];
+
+// H words (14 words)
+const wordsDataH: WordData[] = [
+  { word: "HARFA", image: "harfa.webp", audio: "Harfa.mp3" },
+  { word: "HARMONIKA", image: "harmonika.webp", audio: "Harmonika.mp3" },
+  { word: "HELIKOPTER", image: "helikopter.webp", audio: "Helikopter.mp3" },
+  { word: "HIJENA", image: "hijena.webp", audio: "Hijena.mp3" },
+  { word: "HLEV", image: "hlev.webp", audio: "Hlev.mp3" },
+  { word: "HOBOTNICA", image: "hobotnica.webp", audio: "Hobotnica.mp3" },
+  { word: "HOKEJ", image: "hokej.webp", audio: "Hokej.mp3" },
+  { word: "HOTEL", image: "hotel.webp", audio: "Hotel.mp3" },
+  { word: "HRČEK", image: "hrcek.webp", audio: "Hrcek.mp3" },
+  { word: "HRIB", image: "hrib.webp", audio: "Hrib.mp3" },
+  { word: "HUPA", image: "hupa.webp", audio: "Hupa.mp3" },
+  { word: "HIŠA", image: "hisa1.webp", audio: "Hisa.mp3" },
+  { word: "HLAČE", image: "hlace1.webp", audio: "Hlace.mp3" },
+  { word: "HRUŠKA", image: "hruska1.webp", audio: "Hruska.mp3" },
+];
+
+// V words (22 words)
+const wordsDataV: WordData[] = [
+  { word: "VAFELJ", image: "vafelj.webp", audio: "Vafelj.mp3" },
+  { word: "VEDRO", image: "vedro.webp", audio: "Vedro.mp3" },
+  { word: "VESLO", image: "veslo.webp", audio: "Veslo.mp3" },
+  { word: "VEVERICA", image: "veverica.webp", audio: "Veverica.mp3" },
+  { word: "VILE", image: "vile.webp", audio: "Vile.mp3" },
+  { word: "VITEZ", image: "vitez.webp", audio: "Vitez.mp3" },
+  { word: "VOLK", image: "volk.webp", audio: "Volk.mp3" },
+  { word: "VOLNA", image: "volna.webp", audio: "Volna.mp3" },
+  { word: "VOZIČEK", image: "vozicek.webp", audio: "Vozicek.mp3" },
+  { word: "VRATA", image: "vrata.webp", audio: "Vrata.mp3" },
+  { word: "VULKAN", image: "vulkan.webp", audio: "Vulkan.mp3" },
+  { word: "VAZA", image: "vaza1.webp", audio: "Vaza.mp3" },
+  { word: "VEJA", image: "veja1.webp", audio: "Veja.mp3" },
+  { word: "VETRNICA", image: "veternica1.webp", audio: "Vetrnica.mp3" },
+  { word: "VILICE", image: "vilica1.webp", audio: "Vilice.mp3" },
+  { word: "VODA", image: "voda1.webp", audio: "Voda.mp3" },
+  { word: "VOLAN", image: "volan1.webp", audio: "Volan.mp3" },
+  { word: "VOZ", image: "voz1.webp", audio: "Voz.mp3" },
+  { word: "VERIŽICA", image: "verizica1.webp", audio: "Verizica.mp3" },
+  { word: "VEZALKE", image: "vezalke1.webp", audio: "Vezalke.mp3" },
+  { word: "VIŠNJA", image: "visnja1.webp", audio: "Visnja.mp3" },
+  { word: "VRABEC", image: "vrabec1.webp", audio: "Vrabec.mp3" },
+];
+
 // R začetne vaje - wheel data (18 words with consonant clusters)
 const wordsDataRZacetek: WordData[] = [
   { word: "DREVO", image: "drevo1.webp", audio: "Drevo.mp3" },
@@ -474,12 +555,16 @@ export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   // Wheel games (začetek)
   'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO BESED - C', wordsData: wordsDataC, lipsImage: 'Glas_SZC.png' },
   'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO BESED - Č', wordsData: wordsDataCH, lipsImage: 'Glas_ShZhCh.png' },
+  'f': { letter: 'F', displayLetter: 'F', gameType: 'wheel', title: 'KOLO BESED - F', wordsData: wordsDataF },
+  'g': { letter: 'G', displayLetter: 'G', gameType: 'wheel', title: 'KOLO BESED - G', wordsData: wordsDataG },
+  'h': { letter: 'H', displayLetter: 'H', gameType: 'wheel', title: 'KOLO BESED - H', wordsData: wordsDataH },
   'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK, lipsImage: 'Glas_K.png' },
   'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL, lipsImage: 'Glas_L.png' },
   'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR, lipsImage: 'Glas_R.png' },
   'r-zacetek': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R začetne vaje', wordsData: wordsDataRZacetek, lipsImage: 'Glas_R.png' },
   's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO BESED - S', wordsData: wordsDataS, lipsImage: 'Glas_SZC.png' },
   'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH, lipsImage: 'Glas_ShZhCh.png' },
+  'v': { letter: 'V', displayLetter: 'V', gameType: 'wheel', title: 'KOLO BESED - V', wordsData: wordsDataV },
   'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ, lipsImage: 'Glas_SZC.png' },
   'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO BESED - Ž', wordsData: wordsDataZH, lipsImage: 'Glas_ShZhCh.png' },
   

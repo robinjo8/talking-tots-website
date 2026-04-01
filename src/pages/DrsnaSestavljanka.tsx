@@ -13,86 +13,20 @@ import { ArrowLeft } from "lucide-react";
 import { toAsciiUrl } from "@/data/drsnaSestavljankaConfig";
 
 const memoryGames = [
-  {
-    id: "drsna-sestavljanka-c",
-    letter: "C",
-    gradient: "from-dragon-green/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Drsna igra z glasom C in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-č",
-    letter: "Č",
-    gradient: "from-app-blue/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Drsna igra z glasom Č in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-k",
-    letter: "K",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Drsna igra z glasom K in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-l",
-    letter: "L",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Drsna igra z glasom L in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-r-zacetek",
-    letter: "R-zacetek",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Drsna igra z glasom R in nato glasno ponovi besedo - začetne vaje",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Drsna igra z glasom R in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Drsna igra z glasom S in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Drsna igra z glasom Š in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Drsna igra z glasom Z in nato glasno ponovi besedo",
-    available: true
-  },
-  {
-    id: "drsna-sestavljanka-ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Drsna igra z glasom Ž in nato glasno ponovi besedo",
-    available: true
-  }
+  { id: "drsna-sestavljanka-c", letter: "C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png", description: "Drsna igra z glasom C in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-č", letter: "Č", gradient: "from-app-blue/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png", description: "Drsna igra z glasom Č in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-f", letter: "F", gradient: "from-app-orange/20 to-app-yellow/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_F.webp", description: "Drsna igra z glasom F in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-g", letter: "G", gradient: "from-dragon-green/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_G.webp", description: "Drsna igra z glasom G in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-h", letter: "H", gradient: "from-app-blue/20 to-app-purple/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_H.webp", description: "Drsna igra z glasom H in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-k", letter: "K", gradient: "from-app-orange/20 to-app-yellow/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png", description: "Drsna igra z glasom K in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-l", letter: "L", gradient: "from-app-purple/20 to-app-blue/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png", description: "Drsna igra z glasom L in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-r-zacetek", letter: "R-zacetek", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png", description: "Drsna igra z glasom R in nato glasno ponovi besedo - začetne vaje", available: true },
+  { id: "drsna-sestavljanka-r", letter: "R", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png", description: "Drsna igra z glasom R in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-s", letter: "S", gradient: "from-dragon-green/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png", description: "Drsna igra z glasom S in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-š", letter: "Š", gradient: "from-app-blue/20 to-app-purple/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png", description: "Drsna igra z glasom Š in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-v", letter: "V", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_V.webp", description: "Drsna igra z glasom V in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-z", letter: "Z", gradient: "from-app-teal/20 to-dragon-green/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png", description: "Drsna igra z glasom Z in nato glasno ponovi besedo", available: true },
+  { id: "drsna-sestavljanka-ž", letter: "Ž", gradient: "from-app-purple/20 to-app-blue/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png", description: "Drsna igra z glasom Ž in nato glasno ponovi besedo", available: true }
 ];
 
 export default function DrsnaSestavljanka() {

@@ -34,6 +34,17 @@ export const useGenericMemoryGame = (config: SpominConfig) => {
   const { data: memoryCardsData, isLoading, error } = useQuery({
     queryKey: [config.queryKey],
     queryFn: async () => {
+      // If localData is provided, use it directly (no DB query needed)
+      if (config.localData) {
+        console.log(`Using local data for ${config.displayLetter} (${config.localData.length} items)`);
+        return config.localData.map((item, idx) => ({
+          id: `local-${config.urlKey}-${idx}`,
+          word: item.word,
+          image_url: item.image_url,
+          audio_url: item.audio_url,
+        }));
+      }
+
       console.log(`Fetching ALL memory cards for ${config.displayLetter} from ${config.tableName}...`);
       const { data, error } = await supabase
         .from(config.tableName as any)

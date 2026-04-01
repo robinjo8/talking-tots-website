@@ -1,7 +1,7 @@
 // Centralized configuration for Labirint (Maze) games
 // Uses ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 
-import { PuzzleImage, cImages, čImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, zImages, žImages } from './puzzleImages';
+import { PuzzleImage, cImages, čImages, fImages, gImages, hImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, vImages, zImages, žImages } from './puzzleImages';
 
 export interface LabirintConfig {
   letter: string;         // Original Slovenian letter
@@ -24,6 +24,36 @@ export const labirintConfigs: LabirintConfig[] = [
     description: 'Poišči pot skozi labirint s črko C',
     images: cImages,
     trackingId: 'labirint-c'
+  },
+  {
+    letter: 'f',
+    displayLetter: 'F',
+    urlKey: 'f',
+    gradient: 'from-app-orange/20 to-app-yellow/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_F.webp',
+    description: 'Poišči pot skozi labirint s črko F',
+    images: fImages,
+    trackingId: 'labirint-f'
+  },
+  {
+    letter: 'g',
+    displayLetter: 'G',
+    urlKey: 'g',
+    gradient: 'from-dragon-green/20 to-app-teal/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_G.webp',
+    description: 'Poišči pot skozi labirint s črko G',
+    images: gImages,
+    trackingId: 'labirint-g'
+  },
+  {
+    letter: 'h',
+    displayLetter: 'H',
+    urlKey: 'h',
+    gradient: 'from-app-blue/20 to-app-purple/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_H.webp',
+    description: 'Poišči pot skozi labirint s črko H',
+    images: hImages,
+    trackingId: 'labirint-h'
   },
   {
     letter: 'č',
@@ -94,6 +124,16 @@ export const labirintConfigs: LabirintConfig[] = [
     description: 'Poišči pot skozi labirint s črko Z',
     images: zImages,
     trackingId: 'labirint-z'
+  },
+  {
+    letter: 'v',
+    displayLetter: 'V',
+    urlKey: 'v',
+    gradient: 'from-app-purple/20 to-app-teal/20',
+    image: 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_V.webp',
+    description: 'Poišči pot skozi labirint s črko V',
+    images: vImages,
+    trackingId: 'labirint-v'
   },
   {
     letter: 'ž',

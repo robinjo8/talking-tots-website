@@ -1,7 +1,7 @@
 // Centralized configuration for all DrsnaSestavljanka (Sliding Puzzle) games
 // This eliminates the need for 36 separate page components
 
-import { cImages, čImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, zImages, žImages, type PuzzleImage } from './puzzleImages';
+import { cImages, čImages, fImages, gImages, hImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, vImages, zImages, žImages, type PuzzleImage } from './puzzleImages';
 
 export interface DrsnaSestavljankaGameConfig {
   letter: string;           // Display letter: "C", "Č", "Š", "Ž", etc.
@@ -33,12 +33,16 @@ const ageGroupSettings: Record<string, {
 const letterConfigs: { letter: string; urlKey: string; images: PuzzleImage[] }[] = [
   { letter: 'C', urlKey: 'c', images: cImages },
   { letter: 'Č', urlKey: 'ch', images: čImages },
+  { letter: 'F', urlKey: 'f', images: fImages },
+  { letter: 'G', urlKey: 'g', images: gImages },
+  { letter: 'H', urlKey: 'h', images: hImages },
   { letter: 'K', urlKey: 'k', images: kImages },
   { letter: 'L', urlKey: 'l', images: lImages },
   { letter: 'R', urlKey: 'r', images: rImages },
   { letter: 'R-zacetek', urlKey: 'r-zacetek', images: rZacetekImages },
   { letter: 'S', urlKey: 's', images: sImages },
   { letter: 'Š', urlKey: 'sh', images: šImages },
+  { letter: 'V', urlKey: 'v', images: vImages },
   { letter: 'Z', urlKey: 'z', images: zImages },
   { letter: 'Ž', urlKey: 'zh', images: žImages }
 ];
@@ -84,10 +88,14 @@ export const digraphToLetter: Record<string, string> = {
   'sh': 'Š',
   'zh': 'Ž',
   'c': 'C',
+  'f': 'F',
+  'g': 'G',
+  'h': 'H',
   'k': 'K',
   'l': 'L',
   'r': 'R',
   's': 'S',
+  'v': 'V',
   'z': 'Z'
 };
 
@@ -97,20 +105,28 @@ export const letterToDigraph: Record<string, string> = {
   'š': 'sh',
   'ž': 'zh',
   'c': 'c',
+  'f': 'f',
+  'g': 'g',
+  'h': 'h',
   'k': 'k',
   'l': 'l',
   'r': 'r',
   's': 's',
+  'v': 'v',
   'z': 'z',
   // Uppercase versions
   'Č': 'ch',
   'Š': 'sh',
   'Ž': 'zh',
   'C': 'c',
+  'F': 'f',
+  'G': 'g',
+  'H': 'h',
   'K': 'k',
   'L': 'l',
   'R': 'r',
   'S': 's',
+  'V': 'v',
   'Z': 'z'
 };
 

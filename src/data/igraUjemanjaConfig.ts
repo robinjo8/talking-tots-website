@@ -33,12 +33,16 @@ const ageGroupSettings: Record<string, {
 const letterConfigs: { letter: string; urlKey: string }[] = [
   { letter: 'C', urlKey: 'c' },
   { letter: 'Č', urlKey: 'ch' },
+  { letter: 'F', urlKey: 'f' },
+  { letter: 'G', urlKey: 'g' },
+  { letter: 'H', urlKey: 'h' },
   { letter: 'K', urlKey: 'k' },
   { letter: 'L', urlKey: 'l' },
   { letter: 'R', urlKey: 'r' },
   { letter: 'R-zacetek', urlKey: 'r-zacetek' },
   { letter: 'S', urlKey: 's' },
   { letter: 'Š', urlKey: 'sh' },
+  { letter: 'V', urlKey: 'v' },
   { letter: 'Z', urlKey: 'z' },
   { letter: 'Ž', urlKey: 'zh' }
 ];
@@ -84,10 +88,14 @@ export const digraphToLetter: Record<string, string> = {
   'sh': 'Š',
   'zh': 'Ž',
   'c': 'C',
+  'f': 'F',
+  'g': 'G',
+  'h': 'H',
   'k': 'K',
   'l': 'L',
   'r': 'R',
   's': 'S',
+  'v': 'V',
   'z': 'Z'
 };
 
@@ -97,20 +105,27 @@ export const letterToDigraph: Record<string, string> = {
   'š': 'sh',
   'ž': 'zh',
   'c': 'c',
+  'f': 'f',
+  'g': 'g',
+  'h': 'h',
   'k': 'k',
   'l': 'l',
   'r': 'r',
   's': 's',
+  'v': 'v',
   'z': 'z',
-  // Uppercase versions
   'Č': 'ch',
   'Š': 'sh',
   'Ž': 'zh',
   'C': 'c',
+  'F': 'f',
+  'G': 'g',
+  'H': 'h',
   'K': 'k',
   'L': 'l',
   'R': 'r',
   'S': 's',
+  'V': 'v',
   'Z': 'z'
 };
 

@@ -202,16 +202,101 @@ export const getRandomImage = (images: PuzzleImage[]): PuzzleImage => {
   return images[randomIndex];
 };
 
+// F images (13 images)
+export const fImages: PuzzleImage[] = [
+  { filename: 'faraon.webp', word: 'FARAON' },
+  { filename: 'fazan.webp', word: 'FAZAN' },
+  { filename: 'feferon.webp', word: 'FEFERON' },
+  { filename: 'figa.webp', word: 'FIGA' },
+  { filename: 'flavta.webp', word: 'FLAVTA' },
+  { filename: 'formula.webp', word: 'FORMULA' },
+  { filename: 'fotelj.webp', word: 'FOTELJ' },
+  { filename: 'fraca.webp', word: 'FRAČA' },
+  { filename: 'frizer.webp', word: 'FRIZER' },
+  { filename: 'frnikola.webp', word: 'FRNIKOLA' },
+  { filename: 'fant1.webp', word: 'FANT' },
+  { filename: 'fen1.webp', word: 'FEN' },
+  { filename: 'fizol1.webp', word: 'FIŽOL' },
+];
+
+// G images (16 images)
+export const gImages: PuzzleImage[] = [
+  { filename: 'gasilec.webp', word: 'GASILEC' },
+  { filename: 'glavnik.webp', word: 'GLAVNIK' },
+  { filename: 'golob.webp', word: 'GOLOB' },
+  { filename: 'gos.webp', word: 'GOS' },
+  { filename: 'gozdar.webp', word: 'GOZDAR' },
+  { filename: 'grad.webp', word: 'GRAD' },
+  { filename: 'grah.webp', word: 'GRAH' },
+  { filename: 'gugalnica.webp', word: 'GUGALNICA' },
+  { filename: 'gusar.webp', word: 'GUSAR' },
+  { filename: 'goba1.webp', word: 'GOBA' },
+  { filename: 'gol1.webp', word: 'GOL' },
+  { filename: 'guma1.webp', word: 'GUMA' },
+  { filename: 'garaza1.webp', word: 'GARAŽA' },
+  { filename: 'gnezdo1.webp', word: 'GNEZDO' },
+  { filename: 'grozdje1.webp', word: 'GROZDJE' },
+  { filename: 'glava1.webp', word: 'GLAVA' },
+];
+
+// H images (14 images)
+export const hImages: PuzzleImage[] = [
+  { filename: 'harfa.webp', word: 'HARFA' },
+  { filename: 'harmonika.webp', word: 'HARMONIKA' },
+  { filename: 'helikopter.webp', word: 'HELIKOPTER' },
+  { filename: 'hijena.webp', word: 'HIJENA' },
+  { filename: 'hlev.webp', word: 'HLEV' },
+  { filename: 'hobotnica.webp', word: 'HOBOTNICA' },
+  { filename: 'hokej.webp', word: 'HOKEJ' },
+  { filename: 'hotel.webp', word: 'HOTEL' },
+  { filename: 'hrcek.webp', word: 'HRČEK' },
+  { filename: 'hrib.webp', word: 'HRIB' },
+  { filename: 'hupa.webp', word: 'HUPA' },
+  { filename: 'hisa1.webp', word: 'HIŠA' },
+  { filename: 'hlace1.webp', word: 'HLAČE' },
+  { filename: 'hruska1.webp', word: 'HRUŠKA' },
+];
+
+// V images (22 images)
+export const vImages: PuzzleImage[] = [
+  { filename: 'vafelj.webp', word: 'VAFELJ' },
+  { filename: 'vedro.webp', word: 'VEDRO' },
+  { filename: 'veslo.webp', word: 'VESLO' },
+  { filename: 'veverica.webp', word: 'VEVERICA' },
+  { filename: 'vile.webp', word: 'VILE' },
+  { filename: 'vitez.webp', word: 'VITEZ' },
+  { filename: 'volk.webp', word: 'VOLK' },
+  { filename: 'volna.webp', word: 'VOLNA' },
+  { filename: 'vozicek.webp', word: 'VOZIČEK' },
+  { filename: 'vrata.webp', word: 'VRATA' },
+  { filename: 'vulkan.webp', word: 'VULKAN' },
+  { filename: 'vaza1.webp', word: 'VAZA' },
+  { filename: 'veja1.webp', word: 'VEJA' },
+  { filename: 'veternica1.webp', word: 'VETRNICA' },
+  { filename: 'vilica1.webp', word: 'VILICE' },
+  { filename: 'voda1.webp', word: 'VODA' },
+  { filename: 'volan1.webp', word: 'VOLAN' },
+  { filename: 'voz1.webp', word: 'VOZ' },
+  { filename: 'verizica1.webp', word: 'VERIŽICA' },
+  { filename: 'vezalke1.webp', word: 'VEZALKE' },
+  { filename: 'visnja1.webp', word: 'VIŠNJA' },
+  { filename: 'vrabec1.webp', word: 'VRABEC' },
+];
+
 // Map of letter to images
 export const imagesByLetter: Record<string, PuzzleImage[]> = {
   c: cImages,
   č: čImages,
+  f: fImages,
+  g: gImages,
+  h: hImages,
   k: kImages,
   l: lImages,
   r: rImages,
   'r-zacetek': rZacetekImages,
   s: sImages,
   š: šImages,
+  v: vImages,
   z: zImages,
   ž: žImages
 };
