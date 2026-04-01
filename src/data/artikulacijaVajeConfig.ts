@@ -564,7 +564,7 @@ export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   'r-zacetek': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R začetne vaje', wordsData: wordsDataRZacetek, lipsImage: 'Glas_R.png' },
   's': { letter: 'S', displayLetter: 'S', gameType: 'wheel', title: 'KOLO BESED - S', wordsData: wordsDataS, lipsImage: 'Glas_SZC.png' },
   'sh': { letter: 'Š', displayLetter: 'Š', gameType: 'wheel', title: 'KOLO BESED - Š', wordsData: wordsDataSH, lipsImage: 'Glas_ShZhCh.png' },
-  'v': { letter: 'V', displayLetter: 'V', gameType: 'wheel', title: 'KOLO BESED - V', wordsData: wordsDataV },
+  'v': { letter: 'V', displayLetter: 'V', gameType: 'wheel', title: 'KOLO BESED - V', wordsData: wordsDataV, lipsImage: 'Glas_V.png' },
   'z': { letter: 'Z', displayLetter: 'Z', gameType: 'wheel', title: 'KOLO BESED - Z', wordsData: wordsDataZ, lipsImage: 'Glas_SZC.png' },
   'zh': { letter: 'Ž', displayLetter: 'Ž', gameType: 'wheel', title: 'KOLO BESED - Ž', wordsData: wordsDataZH, lipsImage: 'Glas_ShZhCh.png' },
   

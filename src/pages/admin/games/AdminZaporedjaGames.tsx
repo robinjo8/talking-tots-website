@@ -7,12 +7,16 @@ import { getAgeGroup } from "@/utils/ageUtils";
 const zaporedjaLetters = [
   { id: "c", letter: "C", title: "Glas C", description: "Uredi zaporedje besed z glasom C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
   { id: "ch", letter: "Č", title: "Glas Č", description: "Uredi zaporedje besed z glasom Č", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png" },
+  { id: "f", letter: "F", title: "Glas F", description: "Uredi zaporedje besed z glasom F", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_F.webp" },
+  { id: "g", letter: "G", title: "Glas G", description: "Uredi zaporedje besed z glasom G", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_G.webp" },
+  { id: "h", letter: "H", title: "Glas H", description: "Uredi zaporedje besed z glasom H", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_H.webp" },
   { id: "k", letter: "K", title: "Glas K", description: "Uredi zaporedje besed z glasom K", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", title: "Glas L", description: "Uredi zaporedje besed z glasom L", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Uredi zaporedje besed z glasom R - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "r", letter: "R", title: "Glas R", description: "Uredi zaporedje besed z glasom R", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "s", letter: "S", title: "Glas S", description: "Uredi zaporedje besed z glasom S", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png" },
   { id: "sh", letter: "Š", title: "Glas Š", description: "Uredi zaporedje besed z glasom Š", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png" },
+  { id: "v", letter: "V", title: "Glas V", description: "Uredi zaporedje besed z glasom V", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_V.webp" },
   { id: "z", letter: "Z", title: "Glas Z", description: "Uredi zaporedje besed z glasom Z", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
   { id: "zh", letter: "Ž", title: "Glas Ž", description: "Uredi zaporedje besed z glasom Ž", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png" },
 ];

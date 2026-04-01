@@ -5,12 +5,16 @@ import { AdminGameWrapper } from "@/components/admin/games/AdminGameWrapper";
 const labirintLetters = [
   { id: "c", letter: "C", title: "Glas C", description: "Poišči pot skozi labirint z glasom C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
   { id: "ch", letter: "Č", title: "Glas Č", description: "Poišči pot skozi labirint z glasom Č", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png" },
+  { id: "f", letter: "F", title: "Glas F", description: "Poišči pot skozi labirint z glasom F", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_F.webp" },
+  { id: "g", letter: "G", title: "Glas G", description: "Poišči pot skozi labirint z glasom G", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_G.webp" },
+  { id: "h", letter: "H", title: "Glas H", description: "Poišči pot skozi labirint z glasom H", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_H.webp" },
   { id: "k", letter: "K", title: "Glas K", description: "Poišči pot skozi labirint z glasom K", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", title: "Glas L", description: "Poišči pot skozi labirint z glasom L", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png" },
-  { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Poišči pot skozi labirint z glasom R - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "r", letter: "R", title: "Glas R", description: "Poišči pot skozi labirint z glasom R", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
+  { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Poišči pot skozi labirint z glasom R - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "s", letter: "S", title: "Glas S", description: "Poišči pot skozi labirint z glasom S", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png" },
   { id: "sh", letter: "Š", title: "Glas Š", description: "Poišči pot skozi labirint z glasom Š", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png" },
+  { id: "v", letter: "V", title: "Glas V", description: "Poišči pot skozi labirint z glasom V", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_V.webp" },
   { id: "z", letter: "Z", title: "Glas Z", description: "Poišči pot skozi labirint z glasom Z", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
   { id: "zh", letter: "Ž", title: "Glas Ž", description: "Poišči pot skozi labirint z glasom Ž", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png" },
 ];

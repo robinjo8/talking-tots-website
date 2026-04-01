@@ -7,12 +7,16 @@ import { getAgeGroup } from "@/utils/ageUtils";
 const drsnaSestavljankaLetters = [
   { id: "c", letter: "C", title: "Glas C", description: "Drsna igra z glasom C in nato glasno ponovi besedo", gradient: "from-dragon-green/20 to-dragon-green/20", image: "zmajcek_crka_C.png" },
   { id: "ch", letter: "Č", title: "Glas Č", description: "Drsna igra z glasom Č in nato glasno ponovi besedo", gradient: "from-app-blue/20 to-app-teal/20", image: "zmajcek_crka_CH.png" },
+  { id: "f", letter: "F", title: "Glas F", description: "Drsna igra z glasom F in nato glasno ponovi besedo", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_F.webp" },
+  { id: "g", letter: "G", title: "Glas G", description: "Drsna igra z glasom G in nato glasno ponovi besedo", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_G.webp" },
+  { id: "h", letter: "H", title: "Glas H", description: "Drsna igra z glasom H in nato glasno ponovi besedo", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_H.webp" },
   { id: "k", letter: "K", title: "Glas K", description: "Drsna igra z glasom K in nato glasno ponovi besedo", gradient: "from-app-orange/20 to-app-yellow/20", image: "zmajcek_crka_K.png" },
   { id: "l", letter: "L", title: "Glas L", description: "Drsna igra z glasom L in nato glasno ponovi besedo", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_L.png" },
   { id: "r-zacetek", letter: "R", title: "Glas R - začetne vaje", description: "Drsna igra z glasom R in nato glasno ponovi besedo - začetne vaje", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "r", letter: "R", title: "Glas R", description: "Drsna igra z glasom R in nato glasno ponovi besedo", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_R.png" },
   { id: "s", letter: "S", title: "Glas S", description: "Drsna igra z glasom S in nato glasno ponovi besedo", gradient: "from-dragon-green/20 to-app-teal/20", image: "zmajcek_crka_S.png" },
   { id: "sh", letter: "Š", title: "Glas Š", description: "Drsna igra z glasom Š in nato glasno ponovi besedo", gradient: "from-app-blue/20 to-app-purple/20", image: "zmajcek_crka_SH.png" },
+  { id: "v", letter: "V", title: "Glas V", description: "Drsna igra z glasom V in nato glasno ponovi besedo", gradient: "from-app-purple/20 to-app-teal/20", image: "zmajcek_crka_V.webp" },
   { id: "z", letter: "Z", title: "Glas Z", description: "Drsna igra z glasom Z in nato glasno ponovi besedo", gradient: "from-app-teal/20 to-dragon-green/20", image: "zmajcek_crka_Z.png" },
   { id: "zh", letter: "Ž", title: "Glas Ž", description: "Drsna igra z glasom Ž in nato glasno ponovi besedo", gradient: "from-app-purple/20 to-app-blue/20", image: "zmajcek_crka_ZH.png" },
 ];
