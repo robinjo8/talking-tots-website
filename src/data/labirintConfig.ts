@@ -1,7 +1,7 @@
 // Centralized configuration for Labirint (Maze) games
 // Uses ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 
-import { PuzzleImage, cImages, čImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, zImages, žImages } from './puzzleImages';
+import { PuzzleImage, cImages, čImages, fImages, gImages, hImages, kImages, lImages, rImages, rZacetekImages, sImages, šImages, vImages, zImages, žImages } from './puzzleImages';
 
 export interface LabirintConfig {
   letter: string;         // Original Slovenian letter
