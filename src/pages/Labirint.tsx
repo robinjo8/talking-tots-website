@@ -12,96 +12,20 @@ import { ArrowLeft } from "lucide-react";
 
 // Use ASCII-safe URL keys for Slovenian diacritics (č→ch, š→sh, ž→zh)
 const labirintGames = [
-  {
-    id: "c",
-    letter: "C",
-    gradient: "from-dragon-green/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poišči pot skozi labirint z glasom C",
-    path: "/govorne-igre/labirint/c",
-    available: true
-  },
-  {
-    id: "č",
-    letter: "Č",
-    gradient: "from-app-blue/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poišči pot skozi labirint z glasom Č",
-    path: "/govorne-igre/labirint/ch",
-    available: true
-  },
-  {
-    id: "k",
-    letter: "K",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poišči pot skozi labirint z glasom K",
-    path: "/govorne-igre/labirint/k",
-    available: true
-  },
-  {
-    id: "l",
-    letter: "L",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poišči pot skozi labirint z glasom L",
-    path: "/govorne-igre/labirint/l",
-    available: true
-  },
-  {
-    id: "r-zacetek",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pot skozi labirint z glasom R - začetne vaje",
-    path: "/govorne-igre/labirint/r-zacetek",
-    available: true
-  },
-  {
-    id: "r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poišči pot skozi labirint z glasom R",
-    path: "/govorne-igre/labirint/r",
-    available: true
-  },
-  {
-    id: "s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poišči pot skozi labirint z glasom S",
-    path: "/govorne-igre/labirint/s",
-    available: true
-  },
-  {
-    id: "š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poišči pot skozi labirint z glasom Š",
-    path: "/govorne-igre/labirint/sh",
-    available: true
-  },
-  {
-    id: "z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poišči pot skozi labirint z glasom Z",
-    path: "/govorne-igre/labirint/z",
-    available: true
-  },
-  {
-    id: "ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poišči pot skozi labirint z glasom Ž",
-    path: "/govorne-igre/labirint/zh",
-    available: true
-  },
+  { id: "c", letter: "C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png", description: "Poišči pot skozi labirint z glasom C", path: "/govorne-igre/labirint/c", available: true },
+  { id: "č", letter: "Č", gradient: "from-app-blue/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png", description: "Poišči pot skozi labirint z glasom Č", path: "/govorne-igre/labirint/ch", available: true },
+  { id: "f", letter: "F", gradient: "from-app-orange/20 to-app-yellow/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_F.webp", description: "Poišči pot skozi labirint z glasom F", path: "/govorne-igre/labirint/f", available: true },
+  { id: "g", letter: "G", gradient: "from-dragon-green/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_G.webp", description: "Poišči pot skozi labirint z glasom G", path: "/govorne-igre/labirint/g", available: true },
+  { id: "h", letter: "H", gradient: "from-app-blue/20 to-app-purple/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_H.webp", description: "Poišči pot skozi labirint z glasom H", path: "/govorne-igre/labirint/h", available: true },
+  { id: "k", letter: "K", gradient: "from-app-orange/20 to-app-yellow/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png", description: "Poišči pot skozi labirint z glasom K", path: "/govorne-igre/labirint/k", available: true },
+  { id: "l", letter: "L", gradient: "from-app-purple/20 to-app-blue/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png", description: "Poišči pot skozi labirint z glasom L", path: "/govorne-igre/labirint/l", available: true },
+  { id: "r-zacetek", letter: "R", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png", description: "Poišči pot skozi labirint z glasom R - začetne vaje", path: "/govorne-igre/labirint/r-zacetek", available: true },
+  { id: "r", letter: "R", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png", description: "Poišči pot skozi labirint z glasom R", path: "/govorne-igre/labirint/r", available: true },
+  { id: "s", letter: "S", gradient: "from-dragon-green/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png", description: "Poišči pot skozi labirint z glasom S", path: "/govorne-igre/labirint/s", available: true },
+  { id: "š", letter: "Š", gradient: "from-app-blue/20 to-app-purple/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png", description: "Poišči pot skozi labirint z glasom Š", path: "/govorne-igre/labirint/sh", available: true },
+  { id: "v", letter: "V", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_V.webp", description: "Poišči pot skozi labirint z glasom V", path: "/govorne-igre/labirint/v", available: true },
+  { id: "z", letter: "Z", gradient: "from-app-teal/20 to-dragon-green/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png", description: "Poišči pot skozi labirint z glasom Z", path: "/govorne-igre/labirint/z", available: true },
+  { id: "ž", letter: "Ž", gradient: "from-app-purple/20 to-app-blue/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png", description: "Poišči pot skozi labirint z glasom Ž", path: "/govorne-igre/labirint/zh", available: true },
 ];
 
 export default function Labirint() {

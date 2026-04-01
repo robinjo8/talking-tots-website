@@ -13,86 +13,20 @@ import { ArrowLeft } from "lucide-react";
 import { toAsciiUrl } from "@/data/igraUjemanjaConfig";
 
 const matchingGames = [
-  {
-    id: "igra-ujemanja-c",
-    letter: "C",
-    gradient: "from-dragon-green/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png",
-    description: "Poveži besedo z glasom C s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-č",
-    letter: "Č",
-    gradient: "from-app-blue/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png",
-    description: "Poveži besedo z glasom Č s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-k",
-    letter: "K",
-    gradient: "from-app-orange/20 to-app-yellow/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png",
-    description: "Poveži besedo z glasom K s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-l",
-    letter: "L",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png",
-    description: "Poveži besedo z glasom L s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-r-zacetek",
-    letter: "R-zacetek",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poveži besedo z glasom R s pravo sliko - začetne vaje",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-r",
-    letter: "R",
-    gradient: "from-app-purple/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png",
-    description: "Poveži besedo z glasom R s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-s",
-    letter: "S",
-    gradient: "from-dragon-green/20 to-app-teal/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png",
-    description: "Poveži besedo z glasom S s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-š",
-    letter: "Š",
-    gradient: "from-app-blue/20 to-app-purple/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png",
-    description: "Poveži besedo z glasom Š s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-z",
-    letter: "Z",
-    gradient: "from-app-teal/20 to-dragon-green/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png",
-    description: "Poveži besedo z glasom Z s pravo sliko",
-    available: true
-  },
-  {
-    id: "igra-ujemanja-ž",
-    letter: "Ž",
-    gradient: "from-app-purple/20 to-app-blue/20",
-    image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png",
-    description: "Poveži besedo z glasom Ž s pravo sliko",
-    available: true
-  }
+  { id: "igra-ujemanja-c", letter: "C", gradient: "from-dragon-green/20 to-dragon-green/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_C.png", description: "Poveži besedo z glasom C s pravo sliko", available: true },
+  { id: "igra-ujemanja-č", letter: "Č", gradient: "from-app-blue/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_CH.png", description: "Poveži besedo z glasom Č s pravo sliko", available: true },
+  { id: "igra-ujemanja-f", letter: "F", gradient: "from-app-orange/20 to-app-yellow/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_F.webp", description: "Poveži besedo z glasom F s pravo sliko", available: true },
+  { id: "igra-ujemanja-g", letter: "G", gradient: "from-dragon-green/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_G.webp", description: "Poveži besedo z glasom G s pravo sliko", available: true },
+  { id: "igra-ujemanja-h", letter: "H", gradient: "from-app-blue/20 to-app-purple/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_H.webp", description: "Poveži besedo z glasom H s pravo sliko", available: true },
+  { id: "igra-ujemanja-k", letter: "K", gradient: "from-app-orange/20 to-app-yellow/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_K.png", description: "Poveži besedo z glasom K s pravo sliko", available: true },
+  { id: "igra-ujemanja-l", letter: "L", gradient: "from-app-purple/20 to-app-blue/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_L.png", description: "Poveži besedo z glasom L s pravo sliko", available: true },
+  { id: "igra-ujemanja-r-zacetek", letter: "R-zacetek", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png", description: "Poveži besedo z glasom R s pravo sliko - začetne vaje", available: true },
+  { id: "igra-ujemanja-r", letter: "R", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_R.png", description: "Poveži besedo z glasom R s pravo sliko", available: true },
+  { id: "igra-ujemanja-s", letter: "S", gradient: "from-dragon-green/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_S.png", description: "Poveži besedo z glasom S s pravo sliko", available: true },
+  { id: "igra-ujemanja-š", letter: "Š", gradient: "from-app-blue/20 to-app-purple/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_SH.png", description: "Poveži besedo z glasom Š s pravo sliko", available: true },
+  { id: "igra-ujemanja-v", letter: "V", gradient: "from-app-purple/20 to-app-teal/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_V.webp", description: "Poveži besedo z glasom V s pravo sliko", available: true },
+  { id: "igra-ujemanja-z", letter: "Z", gradient: "from-app-teal/20 to-dragon-green/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_Z.png", description: "Poveži besedo z glasom Z s pravo sliko", available: true },
+  { id: "igra-ujemanja-ž", letter: "Ž", gradient: "from-app-purple/20 to-app-blue/20", image: "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/zmajcek_crka_ZH.png", description: "Poveži besedo z glasom Ž s pravo sliko", available: true }
 ];
 
 export default function IgraUjemanja() {
