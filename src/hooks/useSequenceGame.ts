@@ -10,7 +10,7 @@ export interface SequenceImage {
   audio_url: string | null;
 }
 
-export const useSequenceGame = (tableName: string, count: number = 4) => {
+export const useSequenceGame = (tableName: string, count: number = 4, localData?: { word: string; image_url: string; audio_url: string }[]) => {
   const [targetSequence, setTargetSequence] = useState<SequenceImage[]>([]);
   const [currentSequence, setCurrentSequence] = useState<SequenceImage[]>([]);
   const [isComplete, setIsComplete] = useState(false);
