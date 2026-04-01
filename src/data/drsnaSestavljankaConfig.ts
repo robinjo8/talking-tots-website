@@ -33,12 +33,16 @@ const ageGroupSettings: Record<string, {
 const letterConfigs: { letter: string; urlKey: string; images: PuzzleImage[] }[] = [
   { letter: 'C', urlKey: 'c', images: cImages },
   { letter: 'Č', urlKey: 'ch', images: čImages },
+  { letter: 'F', urlKey: 'f', images: fImages },
+  { letter: 'G', urlKey: 'g', images: gImages },
+  { letter: 'H', urlKey: 'h', images: hImages },
   { letter: 'K', urlKey: 'k', images: kImages },
   { letter: 'L', urlKey: 'l', images: lImages },
   { letter: 'R', urlKey: 'r', images: rImages },
   { letter: 'R-zacetek', urlKey: 'r-zacetek', images: rZacetekImages },
   { letter: 'S', urlKey: 's', images: sImages },
   { letter: 'Š', urlKey: 'sh', images: šImages },
+  { letter: 'V', urlKey: 'v', images: vImages },
   { letter: 'Z', urlKey: 'z', images: zImages },
   { letter: 'Ž', urlKey: 'zh', images: žImages }
 ];
