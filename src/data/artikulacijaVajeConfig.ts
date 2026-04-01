@@ -555,9 +555,9 @@ export const artikulacijaConfigs: Record<string, ArtikulacijaConfig> = {
   // Wheel games (začetek)
   'c': { letter: 'C', displayLetter: 'C', gameType: 'wheel', title: 'KOLO BESED - C', wordsData: wordsDataC, lipsImage: 'Glas_SZC.png' },
   'ch': { letter: 'Č', displayLetter: 'Č', gameType: 'wheel', title: 'KOLO BESED - Č', wordsData: wordsDataCH, lipsImage: 'Glas_ShZhCh.png' },
-  'f': { letter: 'F', displayLetter: 'F', gameType: 'wheel', title: 'KOLO BESED - F', wordsData: wordsDataF },
-  'g': { letter: 'G', displayLetter: 'G', gameType: 'wheel', title: 'KOLO BESED - G', wordsData: wordsDataG },
-  'h': { letter: 'H', displayLetter: 'H', gameType: 'wheel', title: 'KOLO BESED - H', wordsData: wordsDataH },
+  'f': { letter: 'F', displayLetter: 'F', gameType: 'wheel', title: 'KOLO BESED - F', wordsData: wordsDataF, lipsImage: 'Glas_F.png' },
+  'g': { letter: 'G', displayLetter: 'G', gameType: 'wheel', title: 'KOLO BESED - G', wordsData: wordsDataG, lipsImage: 'Glas_G.png' },
+  'h': { letter: 'H', displayLetter: 'H', gameType: 'wheel', title: 'KOLO BESED - H', wordsData: wordsDataH, lipsImage: 'Glas_H.png' },
   'k': { letter: 'K', displayLetter: 'K', gameType: 'wheel', title: 'KOLO BESED - K', wordsData: wordsDataK, lipsImage: 'Glas_K.png' },
   'l': { letter: 'L', displayLetter: 'L', gameType: 'wheel', title: 'KOLO BESED - L', wordsData: wordsDataL, lipsImage: 'Glas_L.png' },
   'r': { letter: 'R', displayLetter: 'R', gameType: 'wheel', title: 'KOLO BESED - R', wordsData: wordsDataR, lipsImage: 'Glas_R.png' },
