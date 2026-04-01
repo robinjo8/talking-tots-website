@@ -13,6 +13,7 @@ interface SequenceGame56BaseProps {
   isLandscape?: boolean;
   tableName: string;
   queryKey: string;
+  localData?: { word: string; image_url: string; audio_url: string }[];
 }
 
 type GamePhase = "pre-countdown" | "memorize" | "select";
