@@ -13,6 +13,8 @@ export default function Album() {
   const { stickersByWorld, stats, totalStickers, ownedCount, isLoading } = useAlbumData();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isFullscreen = isMobile || isTablet;
   const navigate = useNavigate();
 
   if (isLoading) {
