@@ -99,12 +99,30 @@ serve(async (req) => {
       customer: customerId, status: 'trialing', limit: 1
     });
 
-    if (existingSubscriptions.data.length > 0 || trialingSubscriptions.data.length > 0) {
-      const existingSub = existingSubscriptions.data[0] || trialingSubscriptions.data[0];
-      logStep("User already has active subscription", { 
-        customerId, subscriptionId: existingSub.id, status: existingSub.status
-      });
-      throw new Error("Že imate aktivno naročnino. Za spremembo paketa uporabite upravljanje naročnine.");
+    const allExisting = [...existingSubscriptions.data, ...trialingSubscriptions.data];
+    
+    if (allExisting.length > 0) {
+      // Check if existing subscriptions are actually expired (past current_period_end)
+      const now = Math.floor(Date.now() / 1000);
+      const trulyActive = allExisting.filter(sub => sub.current_period_end > now);
+      
+      if (trulyActive.length > 0) {
+        logStep("User has truly active subscription", { 
+          customerId, subscriptionId: trulyActive[0].id, status: trulyActive[0].status
+        });
+        throw new Error("Že imate aktivno naročnino. Za spremembo paketa uporabite upravljanje naročnine.");
+      }
+      
+      // Cancel expired-but-still-listed subscriptions
+      for (const expiredSub of allExisting) {
+        logStep("Cancelling expired subscription", { subscriptionId: expiredSub.id, periodEnd: expiredSub.current_period_end });
+        try {
+          await stripe.subscriptions.cancel(expiredSub.id);
+        } catch (cancelErr) {
+          logStep("Warning: Could not cancel expired subscription", { error: String(cancelErr) });
+        }
+      }
+      logStep("Expired subscriptions cleaned up, proceeding with checkout");
     }
     
     logStep("No existing subscriptions found, proceeding with checkout");

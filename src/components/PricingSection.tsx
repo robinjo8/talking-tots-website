@@ -70,7 +70,8 @@ export function PricingSection() {
 
       if (error) {
         console.error('Checkout error:', error);
-        toast.error("Napaka pri ustvarjanju naročnine. Poskusite znova.");
+        const errorMsg = data?.error || "Napaka pri ustvarjanju naročnine. Poskusite znova.";
+        toast.error(errorMsg);
         return;
       }
 
