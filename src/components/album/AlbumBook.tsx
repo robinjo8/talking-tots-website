@@ -124,7 +124,7 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
     }),
   };
 
-  if (isMobile) {
+  if (isFullscreen) {
     return (
       <div className="w-full h-full flex flex-col">
         <div 
