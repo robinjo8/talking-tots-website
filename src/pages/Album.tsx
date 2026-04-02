@@ -6,7 +6,7 @@ import { useAlbumData } from "@/components/album/useAlbumData";
 import { AlbumBook } from "@/components/album/AlbumBook";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WORLDS_ORDER, WORLD_CONFIG } from "@/components/album/albumTypes";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { LandscapeOverlay } from "@/components/album/LandscapeOverlay";
 
 export default function Album() {
