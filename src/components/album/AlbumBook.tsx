@@ -11,6 +11,7 @@ const ALBUM_COVER_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/obj
 
 interface AlbumBookProps {
   stickersByWorld: Record<StickerWorld, DisplaySticker[]>;
+  isTablet?: boolean;
 }
 
 interface PageContent {
