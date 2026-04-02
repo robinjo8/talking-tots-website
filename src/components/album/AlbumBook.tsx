@@ -67,9 +67,10 @@ function buildSpreads(pages: PageContent[], isMobile: boolean): [PageContent, Pa
   return spreads;
 }
 
-export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
+export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps) {
   const pages = buildPages(stickersByWorld);
   const isMobile = useIsMobile();
+  const isFullscreen = isMobile || isTablet;
   const spreads = buildSpreads(pages, isMobile);
   const [currentSpread, setCurrentSpread] = useState(0);
   const [direction, setDirection] = useState(0);
