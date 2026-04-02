@@ -6,13 +6,15 @@ import { useAlbumData } from "@/components/album/useAlbumData";
 import { AlbumBook } from "@/components/album/AlbumBook";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WORLDS_ORDER, WORLD_CONFIG } from "@/components/album/albumTypes";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
 import { LandscapeOverlay } from "@/components/album/LandscapeOverlay";
 
 export default function Album() {
   const { stickersByWorld, stats, totalStickers, ownedCount, isLoading } = useAlbumData();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const isTablet = useIsTablet();
+  const isFullscreen = isMobile || isTablet;
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -25,11 +27,11 @@ export default function Album() {
 
   return (
     <SubscriptionGate>
-      {isMobile ? (
+      {isFullscreen ? (
         <div className="fixed inset-0 overflow-hidden bg-[hsl(30,20%,88%)] z-40" style={{ overscrollBehaviorY: 'contain' }}>
-          <LandscapeOverlay />
+          {isMobile && <LandscapeOverlay />}
           <div className="w-full h-full flex flex-col">
-            <AlbumBook stickersByWorld={stickersByWorld} />
+            <AlbumBook stickersByWorld={stickersByWorld} isTablet={isTablet} />
           </div>
 
           {/* Back button - bottom left */}
@@ -57,7 +59,7 @@ export default function Album() {
       )}
 
       {/* ? button desktop - bottom right */}
-      {!isMobile && (
+      {!isFullscreen && (
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform z-50"

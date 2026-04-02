@@ -11,6 +11,7 @@ const ALBUM_COVER_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/obj
 
 interface AlbumBookProps {
   stickersByWorld: Record<StickerWorld, DisplaySticker[]>;
+  isTablet?: boolean;
 }
 
 interface PageContent {
@@ -66,9 +67,10 @@ function buildSpreads(pages: PageContent[], isMobile: boolean): [PageContent, Pa
   return spreads;
 }
 
-export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
+export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps) {
   const pages = buildPages(stickersByWorld);
   const isMobile = useIsMobile();
+  const isFullscreen = isMobile || isTablet;
   const spreads = buildSpreads(pages, isMobile);
   const [currentSpread, setCurrentSpread] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -122,7 +124,7 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
     }),
   };
 
-  if (isMobile) {
+  if (isFullscreen) {
     return (
       <div className="w-full h-full flex flex-col">
         <div 
@@ -244,17 +246,12 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
           <ChevronLeft className="w-5 h-5 text-foreground" />
         </button>
         
-        <div className="flex gap-1.5">
-          {spreads.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setDirection(i > currentSpread ? 1 : -1); setCurrentSpread(i); }}
-              className={`w-2 h-2 rounded-full transition-all ${
-                i === currentSpread ? 'bg-dragon-green scale-125' : 'bg-muted-foreground/30'
-              }`}
-            />
-          ))}
-        </div>
+        <button
+          onClick={() => setShowPagePicker(true)}
+          className="text-sm font-medium text-muted-foreground border-b border-dashed border-muted-foreground/50 pb-0.5 hover:text-foreground transition-colors"
+        >
+          {currentSpread + 1} / {totalSpreads}
+        </button>
         
         <button
           onClick={goNext}
@@ -264,6 +261,36 @@ export function AlbumBook({ stickersByWorld }: AlbumBookProps) {
           <ChevronRight className="w-5 h-5 text-foreground" />
         </button>
       </div>
+
+      {/* Desktop page picker dialog */}
+      <Dialog open={showPagePicker} onOpenChange={setShowPagePicker}>
+        <DialogContent className="max-w-xs rounded-2xl" hideCloseButton>
+          <DialogHeader>
+            <DialogTitle className="text-center text-base font-bold">
+              IZBERI STRAN
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-3 gap-2 max-h-[60vh] overflow-y-auto py-2">
+            {Array.from({ length: totalSpreads }).map((_, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setDirection(i > currentSpread ? 1 : -1);
+                  setCurrentSpread(i);
+                  setShowPagePicker(false);
+                }}
+                className={`h-10 rounded-lg text-sm font-semibold transition-colors ${
+                  i === currentSpread
+                    ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-white shadow-sm'
+                    : 'bg-muted text-foreground hover:bg-muted/80'
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
