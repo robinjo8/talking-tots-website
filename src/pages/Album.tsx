@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CircleHelp, ArrowLeft } from "lucide-react";
+import { safeRequestFullscreen, safeExitFullscreen } from "@/utils/appleDetection";
 import { useNavigate } from "react-router-dom";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 import { useAlbumData } from "@/components/album/useAlbumData";
@@ -14,6 +15,16 @@ export default function Album() {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isTouchDevice = 'ontouchstart' in window && Math.min(window.innerWidth, window.innerHeight) <= 900;
+    if (isTouchDevice) {
+      safeRequestFullscreen();
+    }
+    return () => {
+      safeExitFullscreen();
+    };
+  }, []);
 
   if (isLoading) {
     return (
