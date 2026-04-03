@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ProgressSection } from "@/components/ProgressSection";
 import { TipSection } from "@/components/TipSection";
 import { AlbumSection } from "@/components/progress/AlbumSection";
-import { ArticulationTestSection } from "@/components/progress/ArticulationTestSection";
+
 import { BreadcrumbNavigation } from "@/components/BreadcrumbNavigation";
 import { FooterSection } from "@/components/FooterSection";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
@@ -58,9 +58,6 @@ const MojaStran = () => {
                 <AlbumSection />
               </div>
 
-              <div className="mb-12">
-                <ArticulationTestSection />
-              </div>
               
               <TipSection childName={selectedChild.name} />
 
