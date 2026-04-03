@@ -42,10 +42,9 @@ interface GameImage extends PuzzleImage {
 
 // Add audio to image if not present (derive from filename)
 const enrichImageWithAudio = (image: PuzzleImage): GameImage => {
+  if (image.audio) return { ...image } as GameImage;
   let baseName = image.filename.replace('.webp', '').replace('.png', '');
-  // Remove trailing "1" suffix (e.g., "cekin1" → "cekin")
   baseName = baseName.replace(/1$/, '');
-  // Capitalize first letter and use .mp3
   const audioName = baseName.charAt(0).toUpperCase() + baseName.slice(1) + '.mp3';
   return {
     ...image,
