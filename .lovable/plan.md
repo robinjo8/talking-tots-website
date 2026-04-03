@@ -1,59 +1,45 @@
 
-Cilj: Album na tablici v ležečem položaju narediti po istem principu kot Labirint — resnično fullscreen, brez vertikalnega scrollanja, z vsebino fizično prilagojeno vidnemu viewportu.
+Plan: Uskladim /album z fullscreen principom igre Labirint tudi na desktopu
 
-1. Ugotovljen vzrok
-- `/album` je sicer v `fixed inset-0`, vendar `AlbumBook` ne računa dejanske vidne višine tablice.
-- Trenutno uporablja statične paddige in razmerja (`p-2`, spodnja navigacija, fiksna gumba spodaj), vsebina strani pa ima `h-full`, zato se na nižjih landscape viewportih seštevek elementov ne prilega.
-- Labirint deluje bolje, ker uporablja fullscreen pristop z dejanskim viewportom in brez “naravne” višine vsebine, ki bi potiskala layout čez ekran.
+Problem
+- `Album.tsx` ima za desktop še vedno “navaden” page layout (`min-h-screen pt-24 pb-12`), zato lahko stran raste po vsebini in povzroča vertikalni scroll.
+- `AlbumBook.tsx` v desktop načinu še vedno uporablja `min-h-[650px]`, navigacija `1/15` pa je pod knjigo, zato na nižjih zaslonih pade izven vidnega dela.
+- Oranžen gumb za nazaj obstaja samo v fullscreen mobilni/tablični veji.
 
-2. Kaj bom uskladil z Labirint pristopom
-- V `AlbumBook.tsx` dodam merjenje realnega viewporta prek `window.visualViewport` (fallback `window.innerWidth/innerHeight`), enako kot pri drugih fullscreen igrah.
-- Za fullscreen album izračunam razpoložljivo višino:
-  - minus prostor za spodnjo navigacijo `1/15 + puščice`
-  - minus safe area
-  - minus prostor, da se ne tepe z lebdečima gumboma Nazaj in `?`
-- Knjiga/page container bo dobila eksplicitno izračunano višino in `overflow-hidden`, namesto da raste po vsebini.
+Popravki
 
-3. Konkretne spremembe
+1. `src/pages/Album.tsx`
+- Tudi desktop preklopim na enak fullscreen shell kot tablica: `fixed inset-0 overflow-hidden`.
+- `LandscapeOverlay` ostane samo za telefon.
+- Oranžen gumb za nazaj dodam tudi na desktop, enako kot na tablici/mobilu.
+- `?` gumb ostane fiksen spodaj desno na vseh napravah.
+
+2. `src/components/album/AlbumBook.tsx`
+- Desktop layout preuredim iz “naravne višine” v pravo fullscreen postavitev z `visualViewport`, enako kot pri Labirintu.
+- Odstranim odvisnost od `min-h-[650px]`.
+- Izračunam dejansko razpoložljivo višino za knjigo:
+  - minus spodnja navigacija `1/15`
+  - minus prostor za spodnja fiksna gumba
+- Knjiga dobi eksplicitno višino in `overflow-hidden`, da nič več ne potisne strani navzdol.
+- Desktop ohrani dvojno stran, mobilni enojno stran, tablica ostane kot zdaj.
+- “Compact” način razširim tudi na nizke desktop/tablične višine, ne samo na tablet landscape.
+
+3. `src/components/album/AlbumPage.tsx`
+- Dodam kompaktnejši layout za omejeno višino:
+  - manj paddinga
+  - nekoliko manjši sticker sloti / bolj tesne pozicije
+- Številka strani na posamezni strani ostane znotraj vidnega dela knjige.
+
+4. `src/components/album/AlbumWorldCover.tsx`
+- Compact stil uporabim tudi pri nizkih viewportih na desktopu, da naslovne strani svetov ne povzročajo overflowa.
+
+Rezultat
+- `/album` bo na tablici v ležečem položaju in na desktopu deloval po istem principu kot Labirint: full screen, brez scrollanja gor/dol.
+- `1/15` in puščice bodo vedno vidni.
+- Oranžen gumb za nazaj bo tudi na desktop verziji.
+
+Obseg
+- `src/pages/Album.tsx`
 - `src/components/album/AlbumBook.tsx`
-  - dodam state/effect za `viewportWidth` in `viewportHeight`
-  - fullscreen wrapper spremenim v natančno razdeljen layout:
-    - zgoraj: page area z izračunano višino
-    - spodaj: kompakten navigation bar
-  - `motion.div` in page wrapper dobita strogo omejeno višino
-  - za tablico v landscape zmanjšam notranje paddinge in gap-e
-  - po potrebi ločim mobile fullscreen in tablet fullscreen stil, da tablica ne uporablja enakih dimenzij kot telefon
-- `src/components/album/AlbumPage.tsx`
-  - za fullscreen/tablični prikaz zmanjšam razmik in velikost sticker slotov, da se vseh 6 sličic vedno prilega brez overflowa
-  - page number ostane znotraj vidnega dela strani
-- `src/components/album/AlbumWorldCover.tsx`
-  - zmanjšam `gap`, `p-6`, velikost ikone in naslova v fullscreen landscape varianti, da se naslovne strani svetov prilegajo brez rezanja
-- po potrebi tudi `InstructionsPage` v `AlbumBook.tsx`
-  - zmanjšam vertikalne razmake (`space-y`, `mb`, `pb`) za landscape tablice, ker je ta stran pogosto previsoka
-
-4. Oblikovni princip
-- Ohranjen bo obstoječ videz albuma.
-- Ne bom spreminjal logike listanja ali page pickerja.
-- Sprememba bo samo v “physical fit” pristopu: vse se mora prilegati znotraj viewporta, tako kot pri Labirintu.
-
-5. Zakaj trenutni popravek ni bil dovolj
-- Prejšnji popravek je zmanjšal samo spodnji padding navigacije.
-- Glavni problem pa ni samo navigation bar, ampak to, da sama vsebina strani albuma nima dinamično omejene višine glede na dejanski landscape viewport tablice.
-
-6. Datoteke za spremembo
-- `src/components/album/AlbumBook.tsx`
 - `src/components/album/AlbumPage.tsx`
 - `src/components/album/AlbumWorldCover.tsx`
-- verjetno še notranji `InstructionsPage` v `AlbumBook.tsx`
-
-7. Pričakovan rezultat po popravku
-- Na tablici v ležečem položaju `/album` zapolni cel zaslon kot Labirint
-- brez scrollanja gor/dol
-- `1/15` in puščici vedno ostanejo vidni
-- vsebina posamezne strani se zmanjša/prilagodi glede na višino zaslona
-- mobilni in desktop prikaz ostaneta funkcionalno enaka
-
-Tehnična opomba
-- Labirint uporablja fullscreen shell + dinamično prilagajanje vidnemu viewportu.
-- Album trenutno uporablja fullscreen shell, ne pa še dinamičnega “fit-to-viewport” izračuna za samo vsebino.
-- Popravek je torej: album preklopiti iz statičnega fullscreen layouta v dinamično izračunan fullscreen layout.
