@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CircleHelp, ArrowLeft } from "lucide-react";
+import { safeRequestFullscreen, safeExitFullscreen } from "@/utils/appleDetection";
 import { useNavigate } from "react-router-dom";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 import { useAlbumData } from "@/components/album/useAlbumData";
