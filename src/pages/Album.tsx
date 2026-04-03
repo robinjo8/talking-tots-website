@@ -6,15 +6,13 @@ import { useAlbumData } from "@/components/album/useAlbumData";
 import { AlbumBook } from "@/components/album/AlbumBook";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { WORLDS_ORDER, WORLD_CONFIG } from "@/components/album/albumTypes";
-import { useIsMobile, useIsTablet } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { LandscapeOverlay } from "@/components/album/LandscapeOverlay";
 
 export default function Album() {
   const { stickersByWorld, stats, totalStickers, ownedCount, isLoading } = useAlbumData();
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
-  const isTablet = useIsTablet();
-  const isFullscreen = isMobile || isTablet;
   const navigate = useNavigate();
 
   if (isLoading) {
@@ -27,46 +25,29 @@ export default function Album() {
 
   return (
     <SubscriptionGate>
-      {isFullscreen ? (
-        <div className="fixed inset-0 overflow-hidden bg-[hsl(30,20%,88%)] z-40" style={{ overscrollBehaviorY: 'contain' }}>
-          {isMobile && <LandscapeOverlay />}
-          <div className="w-full h-full flex flex-col">
-            <AlbumBook stickersByWorld={stickersByWorld} isTablet={isTablet} />
-          </div>
-
-          {/* Back button - bottom left */}
-          <button
-            onClick={() => navigate('/moja-stran')}
-            className="fixed bottom-6 left-6 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform z-50"
-          >
-            <ArrowLeft className="w-8 h-8 text-white" />
-          </button>
-
-          {/* ? button - bottom right */}
-          <button
-            onClick={() => setIsOpen(true)}
-            className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform z-50"
-          >
-            <CircleHelp className="w-8 h-8 text-white" />
-          </button>
+      {/* Fullscreen shell for ALL devices */}
+      <div className="fixed inset-0 overflow-hidden bg-[hsl(30,20%,88%)] z-40" style={{ overscrollBehaviorY: 'contain' }}>
+        {isMobile && <LandscapeOverlay />}
+        <div className="w-full h-full flex flex-col">
+          <AlbumBook stickersByWorld={stickersByWorld} />
         </div>
-      ) : (
-        <div className="min-h-screen pt-24 pb-12 px-4">
-          <div className="max-w-4xl mx-auto">
-            <AlbumBook stickersByWorld={stickersByWorld} />
-          </div>
-        </div>
-      )}
 
-      {/* ? button desktop - bottom right */}
-      {!isFullscreen && (
+        {/* Back button - bottom left */}
+        <button
+          onClick={() => navigate('/moja-stran')}
+          className="fixed bottom-6 left-6 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform z-50"
+        >
+          <ArrowLeft className="w-8 h-8 text-white" />
+        </button>
+
+        {/* ? button - bottom right */}
         <button
           onClick={() => setIsOpen(true)}
           className="fixed bottom-6 right-6 w-16 h-16 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center shadow-lg border-2 border-white/50 backdrop-blur-sm hover:scale-105 transition-transform z-50"
         >
           <CircleHelp className="w-8 h-8 text-white" />
         </button>
-      )}
+      </div>
 
       {/* World breakdown dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
