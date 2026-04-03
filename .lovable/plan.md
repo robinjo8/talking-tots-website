@@ -1,51 +1,39 @@
 
 
-## Plan: Puščice za navigacijo v fullscreen + popravek landscape prikaza na tablici
+## Plan: Popravi naslov Album sekcije + odstrani ArticulationTestSection iz /moja-stran
 
-### Problemi
+### 1. Naslov "Album zmajčka Tomija" — poenoti stil
 
-1. **Fullscreen layout (mobilni/tablični)** nima puščic levo/desno ob "1/15" — samo swipe
-2. **Landscape na tablici**: navigacijska vrstica ima `pb-20` (80px padding), kar potisne "1/15" izven zaslona. Vsebina strani ni omejena na viewport in zahteva scrollanje
-
-### Popravki
-
-**1. `src/components/album/AlbumBook.tsx` — fullscreen blok (vrstice 155-163)**
-
-Zamenjaj navigacijsko vrstico z vrstico ki vsebuje puščice + page picker (enako kot desktop):
-
-```tsx
-<div className="flex items-center justify-center gap-4 py-2 pb-6">
-  <button
-    onClick={goPrev}
-    disabled={currentSpread === 0}
-    className="p-2 rounded-full bg-white/30 backdrop-blur-sm disabled:opacity-30"
-  >
-    <ChevronLeft className="w-5 h-5 text-[hsl(30,30%,30%)]" />
-  </button>
-  
-  <button
-    onClick={() => setShowPagePicker(true)}
-    className="text-sm font-medium ..."
-  >
-    {currentSpread + 1} / {totalSpreads}
-  </button>
-  
-  <button
-    onClick={goNext}
-    disabled={currentSpread >= totalSpreads - 1}
-    className="p-2 rounded-full bg-white/30 backdrop-blur-sm disabled:opacity-30"
-  >
-    <ChevronRight className="w-5 h-5 text-[hsl(30,30%,30%)]" />
-  </button>
-</div>
+Trenutno ima `AlbumSection.tsx` naslov s stilom:
+```
+text-xs font-bold tracking-widest text-muted-foreground uppercase
 ```
 
-Ključna sprememba: `pb-20` → `pb-6` — zmanjša spodnji padding, da navigacija ostane vidna tudi v landscape. Gumba Nazaj in ? sta `fixed bottom-6`, zato `pb-6` zadostuje.
+Naslov "IGRE IN VAJE" v `UnifiedProgressDisplay.tsx` pa ima stil:
+```
+text-2xl font-bold text-center text-app-blue
+```
 
-**2. Landscape vsebina** — flex-1 z overflow-hidden na vsebinskem delu že pravilno omejuje višino. Problem je samo prekomeren `pb-20`. Z `pb-6` bo navigacija vidna, vsebina pa zapolni preostali prostor brez scrollanja.
+To sta dva različna pristopa — "IGRE IN VAJE" je znotraj kartice kot naslov kartice, medtem ko "Album zmajčka Tomija" je zunaj kartice kot sekcijski podnaslov.
+
+**Popravek**: V `AlbumSection.tsx` zamenjam naslov `<h2>` z enakim stilom kot imajo naslovi kartic v ProgressSection — `text-2xl font-bold text-center text-amber-500` (ali `text-app-blue`), da bo konsistenten z ostalimi sekcijami na tej strani.
+
+### 2. PREVERJANJE IZGOVORJAVE — odstrani iz /moja-stran
+
+**Datumi**: Prikaz je pravilen — zadnji test 26. september 2026, naslednji test 3 mesece pozneje (26. december 2026). To je normalno delovanje "Smart Cooldown" logike (90 dni).
+
+**Podvajanje**: Ista informacija je že prikazana na strani `/profile` v zavihku "Preverjanje izgovorjave" (`ArticulationTestProfileSection`), kjer je bolj podrobna in vključuje tudi gumb za začetek testa, reset itd.
+
+**Popravek**: Odstranim `<ArticulationTestSection />` iz `MojaStran.tsx`. Stran `/moja-stran` naj prikazuje samo napredek (pokali, zmajčki, zvezdice) in album — preverjanje izgovorjave pa ostane na `/profile`.
+
+### Spremembe
+
+| Datoteka | Sprememba |
+|----------|-----------|
+| `src/components/progress/AlbumSection.tsx` | Naslov `<h2>` dobi stil `text-2xl font-bold text-center text-amber-500 mb-4` |
+| `src/pages/MojaStran.tsx` | Odstrani import in uporabo `ArticulationTestSection` |
 
 ### Obseg
-- 1 datoteka: `AlbumBook.tsx`
-- ~15 vrstic spremenjenih (zamenjava navigacijske vrstice v fullscreen bloku)
-- Desktop in mobilni prikaz ostaneta nespremenjena
+- 2 datoteki, ~5 vrstic spremenjenih
+- Brez novih komponent ali routov
 
