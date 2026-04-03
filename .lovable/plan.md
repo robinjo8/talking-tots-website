@@ -1,45 +1,57 @@
 
-## Analiza: Uporabnica logopedskezgodbe@gmail.com ne more dostopati do vsebine in ne more kupiti nove naročnine
 
-### Ugotovitve
+## Plan: Popravi zvočne posnetke za KOŽA in ostale dvoumne besede
 
-**Uporabnica**: Ema Vidmar (logopedskezgodbe@gmail.com), otrok Tristan
+### Problem
 
-**Stanje v bazi** (`user_subscriptions`):
-- `status`: **active** (napačno — naročnina je potekla)
-- `current_period_end`: **2026-01-30** (pred 2 mesecema!)
-- `stripe_product_id`: **prod_TmbZ19RhCaSzrp** — to je **STAR** product ID, ki ni v trenutni konfiguraciji (`stripeTiers` pozna samo `prod_TuvCF2Vlvmvp3M` za Start in `prod_TwXXpvPhSYVzvN` za Pro)
-- `stripe_subscription_id`: sub_1Ssec4GncjlOci0kHP3Xwp2W
+Beseda KOŽA (`koza_skin1.webp`) nima nastavljenega `audio` polja v `puzzleImages.ts`. Poleg tega funkcija `enrichImageWithAudio` v Sestavljanki in Labirintu **ignorira** obstoječe `audio` polje in vedno izpelje ime iz datoteke slike.
 
-**Zakaj ne vidi vsebin**: Hook `useSubscription` pravilno preverja `current_period_end > now()` — ker je datum v preteklosti, jo obravnava kot nenaročeno. Pravilno vedenje.
+Rezultat: `koza_skin1.webp` → `Koza_skin.mp3` (ne obstaja). Pravilno bi moralo biti `Koza_cutilo.mp3`.
 
-**Zakaj ne more kupiti nove naročnine**: Funkcija `create-checkout` (vrstica 94-108) preverja v Stripe API ali ima uporabnica `active` ali `trialing` naročnino. Če Stripe še vedno vodi staro naročnino kot aktivno (npr. `past_due` ali nezaključeno), jo blokira z napako. Ker frontend ujame napako generično, vidi le "Napaka pri ustvarjanju naročnine."
+### Prizadete igre
+
+| Igra | Kako resolve-a audio | Problem |
+|------|----------------------|---------|
+| **Sestavljanka** | `enrichImageWithAudio` ignorira `audio` polje | Da — narobe |
+| **Labirint** | `enrichImageWithAudio` ignorira `audio` polje | Da — narobe |
+| **Drsna sestavljanka** | Uporablja `img.audio` direktno | Da — ker KOŽA nima `audio` polja, je `undefined` |
+| **Kolo besed** | `artikulacijaVajeConfig.ts` z eksplicitnim `audio` | OK ✅ |
+| **Igra ujemanja** | `matchingGameData.ts` z eksplicitnim `audio_url` | OK ✅ |
+| **Spomin** | `threeColumnMatchingData.ts` z eksplicitnim `audioFile` | OK ✅ |
+| **Bingo** | `bingoWordsZHSredinaKonec.ts` z eksplicitnim `audio` | OK ✅ |
+| **Kače in lestve** | `kaceLestveConfig.ts` z eksplicitnim `audio` | OK ✅ |
+
+### Prizadete besede (4 brez `audio` polja v puzzleImages.ts)
+
+| Slika | Beseda | enrichImage naredi | Pravilno |
+|-------|--------|-------------------|----------|
+| `koza_skin1.webp` | KOŽA | `Koza_skin.mp3` ❌ | `Koza_cutilo.mp3` |
+| `kokos1.webp` | KOKOŠ | `Kokos.mp3` ❌ | `Kokos_zival.mp3` |
+| `kos1.webp` | KOŠ | `Kos.mp3` ❌ | `Kos_predmet.mp3` |
+| `koza1.webp` | KOZA | `Koza.mp3` ❌ | `Koza_zival.mp3` |
 
 ### Popravki
 
-**1. Podatkovni popravek (SQL migracija)**
+**1. `src/data/puzzleImages.ts`** — dodaj manjkajoča `audio` polja
 
-Posodobi njen zapis v `user_subscriptions`:
-- `status` → `'expired'` (ker je `current_period_end` v preteklosti)
+```
+{ filename: 'kokos1.webp', word: 'KOKOŠ', audio: 'Kokos_zival.mp3' }
+{ filename: 'kos1.webp', word: 'KOŠ', audio: 'Kos_predmet.mp3' }
+{ filename: 'koza1.webp', word: 'KOZA', audio: 'Koza_zival.mp3' }
+{ filename: 'koza_skin1.webp', word: 'KOŽA', audio: 'Koza_cutilo.mp3' }
+```
 
-To ne bo rešilo checkout težave (ta je na Stripe strani), ampak bo baza pravilna.
+**2. `src/components/games/GenericSestavljankaGame.tsx`** — popravi `enrichImageWithAudio`
 
-**2. Izboljšaj `create-checkout` edge function**
+Če ima slika že nastavljen `audio`, ga uporabi namesto izpeljevanja iz datoteke:
+```
+if (image.audio) return { ...image };
+// ... sicer izpelji kot doslej
+```
 
-Trenutna logika (vrstice 94-108) preverja samo `active` in `trialing` naročnine v Stripe. Če ima uporabnik staro naročnino ki je `past_due`, `unpaid` ali kako drugače "živa" v Stripe, jo mora najprej preklicati preden lahko kupi novo.
-
-Popravek: Če najde obstoječo naročnino, preveri ali je `current_period_end` v preteklosti. Če je, naročnino avtomatsko prekliče v Stripe (ali pa jo ignorira) in nadaljuje z novim checkoutom. Dodaj tudi boljše sporočilo napake ki se vrne frontendu.
-
-**3. Izboljšaj frontend error handling**
-
-V `PricingSection.tsx` in `SubscriptionSection.tsx`: namesto generične napake prikaži specifično sporočilo iz edge function (npr. "Že imate aktivno naročnino" ali "Stara naročnina je bila preklicana, poskusite znova").
-
-### Takojšnji ročni popravek za to uporabnico
-
-Preveri stanje naročnine v Stripe dashboardu za `cus_TqLHHHderinuGR` / `sub_1Ssec4GncjlOci0kHP3Xwp2W`. Če je naročnina še "active" ali "past_due", jo ročno prekliči v Stripe. Nato posodobi DB status na `expired`.
+**3. `src/components/games/GenericLabirintGame.tsx`** — enaka popravka `enrichImageWithAudio`
 
 ### Obseg
-- `supabase/functions/create-checkout/index.ts` — dodaj logiko za preklic starih potečenih naročnin (~15 vrstic)
-- `src/components/PricingSection.tsx` + `src/components/profile/SubscriptionSection.tsx` — boljši error handling (~5 vrstic vsaka)
-- 1 SQL migracija za popravek statusa te uporabnice
-- Deploy edge function
+- 3 datoteke, ~10 vrstic spremenjenih
+- Brez sprememb za igre ki že delujejo pravilno (Kolo besed, Igra ujemanja, Spomin, Bingo, Kače)
+
