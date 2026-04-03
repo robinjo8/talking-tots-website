@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -6,6 +6,36 @@ import { DisplaySticker, StickerWorld, WORLDS_ORDER } from "./albumTypes";
 import { AlbumPage } from "./AlbumPage";
 import { AlbumWorldCover } from "./AlbumWorldCover";
 import { useIsMobile } from "@/hooks/use-mobile";
+
+function useViewportSize() {
+  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+  useEffect(() => {
+    const update = () => {
+      const vv = window.visualViewport;
+      setSize({
+        width: vv ? vv.width : window.innerWidth,
+        height: vv ? vv.height : window.innerHeight,
+      });
+    };
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('orientationchange', update);
+    const vv = window.visualViewport;
+    if (vv) {
+      vv.addEventListener('resize', update);
+      vv.addEventListener('scroll', update);
+    }
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+      if (vv) {
+        vv.removeEventListener('resize', update);
+        vv.removeEventListener('scroll', update);
+      }
+    };
+  }, []);
+  return size;
+}
 
 const ALBUM_COVER_URL = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zmajcki/Zmajcek_album_naslovna.webp";
 
@@ -71,6 +101,8 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
   const pages = buildPages(stickersByWorld);
   const isMobile = useIsMobile();
   const isFullscreen = isMobile || isTablet;
+  const { width: vpWidth, height: vpHeight } = useViewportSize();
+  const isLandscape = vpWidth > vpHeight;
   const spreads = buildSpreads(pages, isMobile);
   const [currentSpread, setCurrentSpread] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -125,11 +157,15 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
   };
 
   if (isFullscreen) {
+    // Navigation bar height ~44px, reserve space for fixed Back/? buttons (bottom-6 + h-16 = ~88px)
+    const navBarHeight = 44;
+    const pageAreaHeight = vpHeight - navBarHeight;
+
     return (
-      <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full flex flex-col overflow-hidden" style={{ height: vpHeight }}>
         <div 
-          className="flex-1 relative"
-          style={{ perspective: '1200px' }}
+          className="relative overflow-hidden"
+          style={{ height: pageAreaHeight, perspective: '1200px' }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -142,18 +178,18 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
               animate="center"
               exit="exit"
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-0 p-2"
+              className="absolute inset-0 p-1"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="w-full h-full">
-                <RenderPage page={currentPages[0]} />
+              <div className="w-full h-full overflow-hidden">
+                <RenderPage page={currentPages[0]} isLandscapeTablet={isTablet && isLandscape} />
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
         {/* Navigation arrows + page number */}
-        <div className="flex items-center justify-center gap-4 py-2 pb-6">
+        <div className="flex items-center justify-center gap-4 shrink-0" style={{ height: navBarHeight }}>
           <button
             onClick={goPrev}
             disabled={currentSpread === 0}
@@ -309,35 +345,35 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
   );
 }
 
-function InstructionsPage() {
+function InstructionsPage({ compact }: { compact?: boolean }) {
   return (
-    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-4 md:p-6 flex flex-col justify-center">
-      <h2 className="text-center text-lg md:text-xl font-bold text-[hsl(30,40%,25%)] mb-5 font-rounded">
+    <div className={`w-full h-full bg-[hsl(40,30%,95%)] rounded-sm ${compact ? 'p-2' : 'p-4 md:p-6'} flex flex-col justify-center overflow-hidden`}>
+      <h2 className={`text-center font-bold text-[hsl(30,40%,25%)] ${compact ? 'text-base mb-2' : 'text-lg md:text-xl mb-5'} font-rounded`}>
         Kako zbiram sličice?
       </h2>
-      <div className="space-y-4 text-[hsl(30,30%,30%)]">
-        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
-          <p className="text-sm md:text-base font-semibold">7 dni zaporedne vadbe</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">5 sličic + 1 zlata sličica</p>
+      <div className={`${compact ? 'space-y-1' : 'space-y-4'} text-[hsl(30,30%,30%)]`}>
+        <div className={`border-b border-[hsl(30,20%,80%)] ${compact ? 'pb-1' : 'pb-3'}`}>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>7 dni zaporedne vadbe</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>5 sličic + 1 zlata sličica</p>
         </div>
-        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
-          <p className="text-sm md:text-base font-semibold">Artikulacijski test</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">2 sličici</p>
+        <div className={`border-b border-[hsl(30,20%,80%)] ${compact ? 'pb-1' : 'pb-3'}`}>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>Artikulacijski test</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>2 sličici</p>
         </div>
-        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
-          <p className="text-sm md:text-base font-semibold">5 različnih iger na dan</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">1 sličica</p>
+        <div className={`border-b border-[hsl(30,20%,80%)] ${compact ? 'pb-1' : 'pb-3'}`}>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>5 različnih iger na dan</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>1 sličica</p>
         </div>
         <div>
-          <p className="text-sm md:text-base font-semibold">Vsakih 20 setov vaj</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">5 sličic + 1 zlata sličica</p>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>Vsakih 20 setov vaj</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>5 sličic + 1 zlata sličica</p>
         </div>
       </div>
     </div>
   );
 }
 
-function RenderPage({ page }: { page: PageContent }) {
+function RenderPage({ page, isLandscapeTablet }: { page: PageContent; isLandscapeTablet?: boolean }) {
   if (page.type === 'album_cover') {
     return (
       <div className="w-full h-full rounded-sm overflow-hidden">
@@ -350,14 +386,15 @@ function RenderPage({ page }: { page: PageContent }) {
     );
   }
   if (page.type === 'instructions') {
-    return <InstructionsPage />;
+    return <InstructionsPage compact={isLandscapeTablet} />;
   }
   if (page.type === 'cover') {
     return (
       <AlbumWorldCover 
         world={page.world!} 
         ownedCount={page.ownedCount || 0} 
-        totalCount={page.totalCount || 0} 
+        totalCount={page.totalCount || 0}
+        compact={isLandscapeTablet}
       />
     );
   }
