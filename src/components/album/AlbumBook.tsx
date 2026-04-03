@@ -345,35 +345,35 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
   );
 }
 
-function InstructionsPage() {
+function InstructionsPage({ compact }: { compact?: boolean }) {
   return (
-    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-4 md:p-6 flex flex-col justify-center">
-      <h2 className="text-center text-lg md:text-xl font-bold text-[hsl(30,40%,25%)] mb-5 font-rounded">
+    <div className={`w-full h-full bg-[hsl(40,30%,95%)] rounded-sm ${compact ? 'p-2' : 'p-4 md:p-6'} flex flex-col justify-center overflow-hidden`}>
+      <h2 className={`text-center font-bold text-[hsl(30,40%,25%)] ${compact ? 'text-base mb-2' : 'text-lg md:text-xl mb-5'} font-rounded`}>
         Kako zbiram sličice?
       </h2>
-      <div className="space-y-4 text-[hsl(30,30%,30%)]">
-        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
-          <p className="text-sm md:text-base font-semibold">7 dni zaporedne vadbe</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">5 sličic + 1 zlata sličica</p>
+      <div className={`${compact ? 'space-y-1' : 'space-y-4'} text-[hsl(30,30%,30%)]`}>
+        <div className={`border-b border-[hsl(30,20%,80%)] ${compact ? 'pb-1' : 'pb-3'}`}>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>7 dni zaporedne vadbe</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>5 sličic + 1 zlata sličica</p>
         </div>
-        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
-          <p className="text-sm md:text-base font-semibold">Artikulacijski test</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">2 sličici</p>
+        <div className={`border-b border-[hsl(30,20%,80%)] ${compact ? 'pb-1' : 'pb-3'}`}>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>Artikulacijski test</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>2 sličici</p>
         </div>
-        <div className="border-b border-[hsl(30,20%,80%)] pb-3">
-          <p className="text-sm md:text-base font-semibold">5 različnih iger na dan</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">1 sličica</p>
+        <div className={`border-b border-[hsl(30,20%,80%)] ${compact ? 'pb-1' : 'pb-3'}`}>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>5 različnih iger na dan</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>1 sličica</p>
         </div>
         <div>
-          <p className="text-sm md:text-base font-semibold">Vsakih 20 setov vaj</p>
-          <p className="text-xs md:text-sm text-[hsl(30,20%,50%)] mt-0.5">5 sličic + 1 zlata sličica</p>
+          <p className={`${compact ? 'text-xs' : 'text-sm md:text-base'} font-semibold`}>Vsakih 20 setov vaj</p>
+          <p className={`${compact ? 'text-[10px]' : 'text-xs md:text-sm'} text-[hsl(30,20%,50%)] mt-0.5`}>5 sličic + 1 zlata sličica</p>
         </div>
       </div>
     </div>
   );
 }
 
-function RenderPage({ page }: { page: PageContent }) {
+function RenderPage({ page, isLandscapeTablet }: { page: PageContent; isLandscapeTablet?: boolean }) {
   if (page.type === 'album_cover') {
     return (
       <div className="w-full h-full rounded-sm overflow-hidden">
@@ -386,14 +386,15 @@ function RenderPage({ page }: { page: PageContent }) {
     );
   }
   if (page.type === 'instructions') {
-    return <InstructionsPage />;
+    return <InstructionsPage compact={isLandscapeTablet} />;
   }
   if (page.type === 'cover') {
     return (
       <AlbumWorldCover 
         world={page.world!} 
         ownedCount={page.ownedCount || 0} 
-        totalCount={page.totalCount || 0} 
+        totalCount={page.totalCount || 0}
+        compact={isLandscapeTablet}
       />
     );
   }
