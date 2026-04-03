@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 
 // Only letters that have video navodila
-const VIDEO_LETTERS = ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'];
+const VIDEO_LETTERS = ['C', 'Č', 'F', 'G', 'H', 'K', 'L', 'R', 'S', 'Š', 'V', 'Z', 'Ž'];
 
 interface VideoLetterSelectorProps {
   selectedLetters: string[];
