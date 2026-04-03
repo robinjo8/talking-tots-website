@@ -48,7 +48,7 @@ export const kImages: PuzzleImage[] = [
   { filename: 'knjiga1.webp', word: 'KNJIGA' },
   { filename: 'kocka1.webp', word: 'KOCKA' },
   { filename: 'kokos_sadez1.webp', word: 'KOKOS', audio: 'Kokos_sadez.mp3' },
-  { filename: 'kokos1.webp', word: 'KOKOŠ' },
+  { filename: 'kokos1.webp', word: 'KOKOŠ', audio: 'Kokos_zival.mp3' },
   { filename: 'kolac1.webp', word: 'KOLAČ' },
   { filename: 'kolo1.webp', word: 'KOLO' },
   { filename: 'koruza1.webp', word: 'KORUZA' },
