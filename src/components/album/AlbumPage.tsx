@@ -32,7 +32,7 @@ export function AlbumPage({ stickers, pageIndex }: AlbumPageProps) {
   const positions = isMobile ? MOBILE_POSITIONS : DESKTOP_POSITIONS;
 
   return (
-    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-2 md:p-4 flex flex-col relative">
+    <div className="w-full h-full bg-[hsl(40,30%,95%)] rounded-sm p-2 md:p-4 flex flex-col relative overflow-hidden">
       <div className="relative flex-1">
         {stickers.map((sticker, i) => {
           const pos = positions[i] || positions[0];
