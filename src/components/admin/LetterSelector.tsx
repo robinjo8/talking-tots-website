@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 
-const ALL_LETTERS = ['C', 'Č', 'K', 'L', 'R', 'S', 'Š', 'Z', 'Ž'];
+const ALL_LETTERS = ['C', 'Č', 'F', 'G', 'H', 'K', 'L', 'R', 'S', 'Š', 'V', 'Z', 'Ž'];
 
 export interface RecommendedLetter {
   letter: string;
