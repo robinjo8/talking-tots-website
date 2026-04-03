@@ -152,13 +152,27 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
           </AnimatePresence>
         </div>
 
-        {/* Page number - clickable for page picker */}
-        <div className="text-center py-2 pb-20">
+        {/* Navigation arrows + page number */}
+        <div className="flex items-center justify-center gap-4 py-2 pb-6">
+          <button
+            onClick={goPrev}
+            disabled={currentSpread === 0}
+            className="p-2 rounded-full bg-white/30 backdrop-blur-sm disabled:opacity-30 active:scale-95 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5 text-[hsl(30,30%,30%)]" />
+          </button>
           <button
             onClick={() => setShowPagePicker(true)}
             className="text-sm font-medium text-[hsl(30,20%,50%)] border-b border-dashed border-[hsl(30,20%,60%)] pb-0.5 active:opacity-70 transition-opacity"
           >
             {currentSpread + 1} / {totalSpreads}
+          </button>
+          <button
+            onClick={goNext}
+            disabled={currentSpread >= totalSpreads - 1}
+            className="p-2 rounded-full bg-white/30 backdrop-blur-sm disabled:opacity-30 active:scale-95 transition-all"
+          >
+            <ChevronRight className="w-5 h-5 text-[hsl(30,30%,30%)]" />
           </button>
         </div>
 
