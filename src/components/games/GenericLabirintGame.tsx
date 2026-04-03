@@ -325,6 +325,11 @@ export function GenericLabirintGame({ config, backPath = '/govorne-igre/labirint
           allImages={starImages}
           onStarClaimed={handleStarClaimed}
         />
+
+        {(() => {
+          const lipsImage = getLipsImageForLetter(config.letter);
+          return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+        })()}
       </div>
     );
   }

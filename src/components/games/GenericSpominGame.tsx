@@ -335,6 +335,11 @@ export function GenericSpominGame({ config, backPath, onGameComplete }: GenericS
           onConfirm={handleConfirmBravoClose}
           onCancel={() => setShowBravoConfirm(false)}
         />
+
+        {(() => {
+          const lipsImage = getLipsImageForLetter(config.displayLetter);
+          return lipsImage ? <LipsImageButton lipsImage={lipsImage} /> : null;
+        })()}
       </div>
     );
   }
