@@ -16,9 +16,7 @@ export function AlbumSection() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
-      <h2 className="text-xs font-bold tracking-widest text-muted-foreground mb-4 uppercase">
-        Album zmajčka Tomija
-      </h2>
+      <h3 className="text-2xl font-bold text-center text-amber-500 mb-4">ALBUM ZMAJČKA TOMIJA</h3>
 
       <div
         className="relative rounded-2xl overflow-hidden border border-border shadow-md cursor-pointer group"
