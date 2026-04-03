@@ -3,7 +3,7 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { LipsIcon } from '@/components/icons/LipsIcon';
 
-const SUPABASE_SLIKE_URL = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike';
+const SUPABASE_SLIKE_URL = 'https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo';
 
 interface LipsImageButtonProps {
   lipsImage: string; // filename in 'slike' bucket
