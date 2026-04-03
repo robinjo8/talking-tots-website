@@ -157,11 +157,15 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
   };
 
   if (isFullscreen) {
+    // Navigation bar height ~44px, reserve space for fixed Back/? buttons (bottom-6 + h-16 = ~88px)
+    const navBarHeight = 44;
+    const pageAreaHeight = vpHeight - navBarHeight;
+
     return (
-      <div className="w-full h-full flex flex-col">
+      <div className="w-full h-full flex flex-col overflow-hidden" style={{ height: vpHeight }}>
         <div 
-          className="flex-1 relative"
-          style={{ perspective: '1200px' }}
+          className="relative overflow-hidden"
+          style={{ height: pageAreaHeight, perspective: '1200px' }}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -174,18 +178,18 @@ export function AlbumBook({ stickersByWorld, isTablet = false }: AlbumBookProps)
               animate="center"
               exit="exit"
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className="absolute inset-0 p-2"
+              className="absolute inset-0 p-1"
               style={{ transformStyle: 'preserve-3d' }}
             >
-              <div className="w-full h-full">
-                <RenderPage page={currentPages[0]} />
+              <div className="w-full h-full overflow-hidden">
+                <RenderPage page={currentPages[0]} isLandscapeTablet={isTablet && isLandscape} />
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
         {/* Navigation arrows + page number */}
-        <div className="flex items-center justify-center gap-4 py-2 pb-6">
+        <div className="flex items-center justify-center gap-4 shrink-0" style={{ height: navBarHeight }}>
           <button
             onClick={goPrev}
             disabled={currentSpread === 0}
