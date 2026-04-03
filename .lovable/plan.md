@@ -1,39 +1,59 @@
 
+Cilj: Album na tablici v ležečem položaju narediti po istem principu kot Labirint — resnično fullscreen, brez vertikalnega scrollanja, z vsebino fizično prilagojeno vidnemu viewportu.
 
-## Plan: Popravi naslov Album sekcije + odstrani ArticulationTestSection iz /moja-stran
+1. Ugotovljen vzrok
+- `/album` je sicer v `fixed inset-0`, vendar `AlbumBook` ne računa dejanske vidne višine tablice.
+- Trenutno uporablja statične paddige in razmerja (`p-2`, spodnja navigacija, fiksna gumba spodaj), vsebina strani pa ima `h-full`, zato se na nižjih landscape viewportih seštevek elementov ne prilega.
+- Labirint deluje bolje, ker uporablja fullscreen pristop z dejanskim viewportom in brez “naravne” višine vsebine, ki bi potiskala layout čez ekran.
 
-### 1. Naslov "Album zmajčka Tomija" — poenoti stil
+2. Kaj bom uskladil z Labirint pristopom
+- V `AlbumBook.tsx` dodam merjenje realnega viewporta prek `window.visualViewport` (fallback `window.innerWidth/innerHeight`), enako kot pri drugih fullscreen igrah.
+- Za fullscreen album izračunam razpoložljivo višino:
+  - minus prostor za spodnjo navigacijo `1/15 + puščice`
+  - minus safe area
+  - minus prostor, da se ne tepe z lebdečima gumboma Nazaj in `?`
+- Knjiga/page container bo dobila eksplicitno izračunano višino in `overflow-hidden`, namesto da raste po vsebini.
 
-Trenutno ima `AlbumSection.tsx` naslov s stilom:
-```
-text-xs font-bold tracking-widest text-muted-foreground uppercase
-```
+3. Konkretne spremembe
+- `src/components/album/AlbumBook.tsx`
+  - dodam state/effect za `viewportWidth` in `viewportHeight`
+  - fullscreen wrapper spremenim v natančno razdeljen layout:
+    - zgoraj: page area z izračunano višino
+    - spodaj: kompakten navigation bar
+  - `motion.div` in page wrapper dobita strogo omejeno višino
+  - za tablico v landscape zmanjšam notranje paddinge in gap-e
+  - po potrebi ločim mobile fullscreen in tablet fullscreen stil, da tablica ne uporablja enakih dimenzij kot telefon
+- `src/components/album/AlbumPage.tsx`
+  - za fullscreen/tablični prikaz zmanjšam razmik in velikost sticker slotov, da se vseh 6 sličic vedno prilega brez overflowa
+  - page number ostane znotraj vidnega dela strani
+- `src/components/album/AlbumWorldCover.tsx`
+  - zmanjšam `gap`, `p-6`, velikost ikone in naslova v fullscreen landscape varianti, da se naslovne strani svetov prilegajo brez rezanja
+- po potrebi tudi `InstructionsPage` v `AlbumBook.tsx`
+  - zmanjšam vertikalne razmake (`space-y`, `mb`, `pb`) za landscape tablice, ker je ta stran pogosto previsoka
 
-Naslov "IGRE IN VAJE" v `UnifiedProgressDisplay.tsx` pa ima stil:
-```
-text-2xl font-bold text-center text-app-blue
-```
+4. Oblikovni princip
+- Ohranjen bo obstoječ videz albuma.
+- Ne bom spreminjal logike listanja ali page pickerja.
+- Sprememba bo samo v “physical fit” pristopu: vse se mora prilegati znotraj viewporta, tako kot pri Labirintu.
 
-To sta dva različna pristopa — "IGRE IN VAJE" je znotraj kartice kot naslov kartice, medtem ko "Album zmajčka Tomija" je zunaj kartice kot sekcijski podnaslov.
+5. Zakaj trenutni popravek ni bil dovolj
+- Prejšnji popravek je zmanjšal samo spodnji padding navigacije.
+- Glavni problem pa ni samo navigation bar, ampak to, da sama vsebina strani albuma nima dinamično omejene višine glede na dejanski landscape viewport tablice.
 
-**Popravek**: V `AlbumSection.tsx` zamenjam naslov `<h2>` z enakim stilom kot imajo naslovi kartic v ProgressSection — `text-2xl font-bold text-center text-amber-500` (ali `text-app-blue`), da bo konsistenten z ostalimi sekcijami na tej strani.
+6. Datoteke za spremembo
+- `src/components/album/AlbumBook.tsx`
+- `src/components/album/AlbumPage.tsx`
+- `src/components/album/AlbumWorldCover.tsx`
+- verjetno še notranji `InstructionsPage` v `AlbumBook.tsx`
 
-### 2. PREVERJANJE IZGOVORJAVE — odstrani iz /moja-stran
+7. Pričakovan rezultat po popravku
+- Na tablici v ležečem položaju `/album` zapolni cel zaslon kot Labirint
+- brez scrollanja gor/dol
+- `1/15` in puščici vedno ostanejo vidni
+- vsebina posamezne strani se zmanjša/prilagodi glede na višino zaslona
+- mobilni in desktop prikaz ostaneta funkcionalno enaka
 
-**Datumi**: Prikaz je pravilen — zadnji test 26. september 2026, naslednji test 3 mesece pozneje (26. december 2026). To je normalno delovanje "Smart Cooldown" logike (90 dni).
-
-**Podvajanje**: Ista informacija je že prikazana na strani `/profile` v zavihku "Preverjanje izgovorjave" (`ArticulationTestProfileSection`), kjer je bolj podrobna in vključuje tudi gumb za začetek testa, reset itd.
-
-**Popravek**: Odstranim `<ArticulationTestSection />` iz `MojaStran.tsx`. Stran `/moja-stran` naj prikazuje samo napredek (pokali, zmajčki, zvezdice) in album — preverjanje izgovorjave pa ostane na `/profile`.
-
-### Spremembe
-
-| Datoteka | Sprememba |
-|----------|-----------|
-| `src/components/progress/AlbumSection.tsx` | Naslov `<h2>` dobi stil `text-2xl font-bold text-center text-amber-500 mb-4` |
-| `src/pages/MojaStran.tsx` | Odstrani import in uporabo `ArticulationTestSection` |
-
-### Obseg
-- 2 datoteki, ~5 vrstic spremenjenih
-- Brez novih komponent ali routov
-
+Tehnična opomba
+- Labirint uporablja fullscreen shell + dinamično prilagajanje vidnemu viewportu.
+- Album trenutno uporablja fullscreen shell, ne pa še dinamičnega “fit-to-viewport” izračuna za samo vsebino.
+- Popravek je torej: album preklopiti iz statičnega fullscreen layouta v dinamično izračunan fullscreen layout.
