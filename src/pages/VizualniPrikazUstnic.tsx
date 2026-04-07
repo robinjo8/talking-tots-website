@@ -226,9 +226,9 @@ const VizualniPrikazUstnic = () => {
                             ) : (
                               <div className="flex flex-col items-center gap-4 p-6" style={{ minHeight: cardHeight }}>
                                 <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[360px] cursor-pointer" loading="lazy" onClick={() => handleCardClick(card.id)} />
-                                <Button variant="outline" className="w-full gap-2" disabled={!card.audioUrl}>
+                                <Button variant="outline" className="w-full gap-2" onClick={() => card.audioUrl && handlePlayAudio(card.audioUrl)}>
                                   <Volume2 className="w-4 h-4" />
-                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                  Zvočna navodila
                                 </Button>
                               </div>
                             )}
