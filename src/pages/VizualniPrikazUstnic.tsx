@@ -17,7 +17,7 @@ const soundCards = [
     title: "Glas K",
     sounds: ["K"],
     image: `${STORAGE_BASE}/Glas_K.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_karticaK.mp3`,
     color: "bg-gradient-to-br from-app-purple to-app-purple/80",
   },
   {
@@ -25,7 +25,7 @@ const soundCards = [
     title: "Glas L",
     sounds: ["L"],
     image: `${STORAGE_BASE}/Glas_L.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_karticaL.mp3`,
     color: "bg-gradient-to-br from-app-blue to-app-blue/80",
   },
   {
@@ -33,7 +33,7 @@ const soundCards = [
     title: "Glas R",
     sounds: ["R"],
     image: `${STORAGE_BASE}/Glas_R.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_karticaR.mp3`,
     color: "bg-gradient-to-br from-app-orange to-app-orange/80",
   },
   {
@@ -41,7 +41,7 @@ const soundCards = [
     title: "Glasovi C, S, Z",
     sounds: ["C", "S", "Z"],
     image: `${STORAGE_BASE}/Glas_SZC.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_SICNIKI.mp3`,
     color: "bg-gradient-to-br from-app-yellow to-app-yellow/80",
   },
   {
@@ -49,7 +49,7 @@ const soundCards = [
     title: "Glasovi Č, Š, Ž",
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_SUMNIKI.mp3`,
     color: "bg-gradient-to-br from-app-red to-app-red/80 text-white",
   },
 ];
