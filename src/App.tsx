@@ -33,12 +33,11 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // Temporarily disabled to always show splash screen for testing
-    // const splashShown = sessionStorage.getItem("splashShown");
-    // if (splashShown === "true") {
-    //   setShowSplash(false);
-    //   setHasShownSplash(true);
-    // }
+    const splashShown = sessionStorage.getItem("splashShown");
+    if (splashShown === "true") {
+      setShowSplash(false);
+      setHasShownSplash(true);
+    }
   }, []);
 
   const handleSplashComplete = () => {
