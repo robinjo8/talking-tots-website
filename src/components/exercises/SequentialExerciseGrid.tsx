@@ -69,7 +69,7 @@ export const SequentialExerciseGrid = ({ exerciseProgressHook, gridClassName = "
   };
 
   const getAudioUrl = (cardNumber: number) => {
-    return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/vaje-motorike-govoril/${cardNumber}.m4a`;
+    return `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki/Motorikagovoril_${cardNumber}.mp3`;
   };
 
   const renderedCards = useMemo(() => {
