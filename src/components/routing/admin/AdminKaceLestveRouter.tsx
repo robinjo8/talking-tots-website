@@ -3,7 +3,7 @@ import { KaceLestveGame } from "@/components/games/KaceLestveGame";
 import { getKaceWordList } from "@/data/kaceLestveConfig";
 import { getLipsImageForLetter } from "@/utils/lipsImageMap";
 
-const VALID_LETTERS = ["c", "s", "z", "r-zacetek", "sh", "zh", "ch", "k", "l", "r"];
+const VALID_LETTERS = ["c", "s", "z", "r-zacetek", "sh", "zh", "ch", "f", "g", "h", "k", "l", "r", "v"];
 
 export default function AdminKaceLestveRouter() {
   const { childId, letter } = useParams<{ childId: string; letter: string }>();
