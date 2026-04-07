@@ -1,38 +1,39 @@
 
 
-## Plan: Zamenjaj SplashScreen z intro videom
+## Analiza: Ikona se prikaže pred videom ob zagonu PWA
 
-### Problem
-Trenutni splash screen prikazuje animirano TOMITALK besedilo + zmajčka. Uporabnik želi namesto tega predvajati video `Intro_video.mp4` iz Supabase bucketa `video`.
+### Kaj se dogaja
 
-### Popravek
+Ko zaženete PWA aplikacijo s klikom na ikono, operacijski sistem (Android/iOS) najprej prikaže **nativni splash screen** — to je sistemska funkcija, ki jo brskalnik/OS generira avtomatsko iz `manifest.json` (ikona + ime + bela barva ozadja). Šele ko se aplikacija naloži, se prikaže vaš video splash screen.
 
-**1 datoteka: `src/components/SplashScreen.tsx`**
+Ta nativni splash screen **ni pod nadzorom spletne aplikacije** — ga generira OS. Ne moremo ga popolnoma odstraniti, lahko pa ga minimiziramo.
 
-Celotna komponenta se prepiše:
-- Odstrani se vsa Framer Motion animacija (zvezdice, črke, zmajček)
-- Namesto tega se prikaže `<video>` element s `src` iz Supabase: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video/Intro_video.mp4`
-- Video se avtomatsko predvaja (`autoPlay`, `muted` za dovoljenje brskalnika, `playsInline`)
-- Ko se video konča (`onEnded`), pokliče `onComplete()` za prehod na aplikacijo
-- Dodan tudi "Preskoči" gumb za uporabnike, ki ne želijo čakati
+### Kaj lahko naredimo
 
-**Prikaz videa:**
-- **Telefon (pokončno):** `fixed inset-0`, video zapolni celoten zaslon z `object-cover`, belo/temno ozadje za morebitne robove
-- **Tablica (pokončno ali ležeče):** Enako — `object-contain` ali `object-cover` za prilagoditev obema orientacijama
-- **Desktop:** Video centriran na sredini zaslona z `object-contain`, da je viden v celoti brez obrezovanja, belo ozadje
+**iOS (iPhone/iPad):** Že imamo nastavljene `apple-touch-startup-image` slike kot bele 1×1 piksle — torej na iOS bi moral biti splash že bel. Če še vedno vidite ikono, je potrebno generirati **prave polne bele slike** v pravih resolucijah za vsako napravo.
 
-Konkretno:
-- Zunanji `div`: `fixed inset-0 z-[100] bg-white flex items-center justify-center`
-- Video: `w-full h-full object-contain` — video se prikaže v celoti, brez obrezovanja, z belim ozadjem za morebitne prazne dele
-- Fade-out animacija z `AnimatePresence` ostane (lep prehod ko se video konča)
-- Gumb "Preskoči" v spodnjem desnem kotu
+**Android:** Nativni splash screen vedno prikaže ikono iz manifesta. Edina možnost za minimizacijo:
+1. Naredimo poseben set ikon z `purpose: "any"` ki so **samo bele** (prazne) — te se uporabijo za splash screen
+2. Obstoječe ikone z zmajčkom označimo kot `purpose: "maskable"` — te se uporabijo za ikono na domačem zaslonu
 
-**2 datoteka: `src/App.tsx`**
+### Plan popravka
 
-- Ponovno omogočim `sessionStorage` preverjanje, da se video prikaže samo enkrat na sejo (ne ob vsakem osveževanju)
+**1. Generiranje belih splash ikon**
+- Ustvarim bele PNG ikone (72, 144, 192, 512px) brez vsebine — samo belo ozadje
+- Shranim jih kot `/public/icons/splash-72x72.png` itd.
+
+**2. `public/manifest.json`**
+- Dodam bele ikone s `purpose: "any"` (OS jih uporabi za splash)
+- Obstoječe zmajček ikone obdržim samo s `purpose: "maskable"` (za ikono na zaslonu)
+
+**3. `index.html`**
+- Generiram prave polne bele slike za `apple-touch-startup-image` v pravilnih resolucijah namesto 1×1 pikselnih base64 slik
+
+### Opozorilo
+Na Androidu se kratek prikaz nativnega splash screena **ne da popolnoma izogniti** — je vgrajen v OS. S tem popravkom bo namesto zmajčka prikazan samo bel zaslon za ~0.5s pred videom, kar bo delovalo kot gladek prehod v video.
 
 ### Obseg
-- 2 datoteki
-- SplashScreen se poenostavi (manj kode kot prej)
-- Video URL: `https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/video/Intro_video.mp4`
+- 2 datoteki (`manifest.json`, `index.html`)
+- Generiranje belih PNG slik
+- Brez sprememb logike aplikacije
 
