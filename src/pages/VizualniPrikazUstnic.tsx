@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -9,6 +9,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, type CarouselApi } from "@/components/ui/carousel";
 import { SubscriptionGate } from "@/components/subscription/SubscriptionGate";
 const STORAGE_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/slike-ostalo";
+const AUDIO_BASE = "https://ecmtctwovkheohqwahvt.supabase.co/storage/v1/object/public/zvocni-posnetki";
 
 const soundCards = [
   {
@@ -16,7 +17,7 @@ const soundCards = [
     title: "Glas K",
     sounds: ["K"],
     image: `${STORAGE_BASE}/Glas_K.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_karticaK.mp3`,
     color: "bg-gradient-to-br from-app-purple to-app-purple/80",
   },
   {
@@ -24,7 +25,7 @@ const soundCards = [
     title: "Glas L",
     sounds: ["L"],
     image: `${STORAGE_BASE}/Glas_L.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_karticaL.mp3`,
     color: "bg-gradient-to-br from-app-blue to-app-blue/80",
   },
   {
@@ -32,7 +33,7 @@ const soundCards = [
     title: "Glas R",
     sounds: ["R"],
     image: `${STORAGE_BASE}/Glas_R.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_karticaR.mp3`,
     color: "bg-gradient-to-br from-app-orange to-app-orange/80",
   },
   {
@@ -40,7 +41,7 @@ const soundCards = [
     title: "Glasovi C, S, Z",
     sounds: ["C", "S", "Z"],
     image: `${STORAGE_BASE}/Glas_SZC.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_SICNIKI.mp3`,
     color: "bg-gradient-to-br from-app-yellow to-app-yellow/80",
   },
   {
@@ -48,7 +49,7 @@ const soundCards = [
     title: "Glasovi Č, Š, Ž",
     sounds: ["Č", "Š", "Ž"],
     image: `${STORAGE_BASE}/Glas_ShZhCh.png`,
-    audioUrl: null as string | null,
+    audioUrl: `${AUDIO_BASE}/Polozajust_SUMNIKI.mp3`,
     color: "bg-gradient-to-br from-app-red to-app-red/80 text-white",
   },
 ];
@@ -60,6 +61,17 @@ const VizualniPrikazUstnic = () => {
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handlePlayAudio = (audioUrl: string) => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    audioRef.current.src = audioUrl;
+    audioRef.current.play().catch(e => console.error("Audio error:", e));
+  };
 
   const onSelect = useCallback(() => {
     if (!carouselApi) return;
@@ -180,9 +192,9 @@ const VizualniPrikazUstnic = () => {
                             ) : (
                               <div className="flex-1 flex flex-col items-center gap-3 p-4 overflow-hidden">
                                 <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[320px]" loading="lazy" onClick={() => handleCardClick(card.id)} />
-                                <Button variant="outline" size="sm" className="w-full gap-2" disabled={!card.audioUrl}>
+                                <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => card.audioUrl && handlePlayAudio(card.audioUrl)}>
                                   <Volume2 className="w-4 h-4" />
-                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                  Zvočna navodila
                                 </Button>
                               </div>
                             )}
@@ -214,9 +226,9 @@ const VizualniPrikazUstnic = () => {
                             ) : (
                               <div className="flex flex-col items-center gap-4 p-6" style={{ minHeight: cardHeight }}>
                                 <img src={card.image} alt={card.title} className="w-full object-contain rounded-lg flex-1 min-h-0 max-h-[360px] cursor-pointer" loading="lazy" onClick={() => handleCardClick(card.id)} />
-                                <Button variant="outline" className="w-full gap-2" disabled={!card.audioUrl}>
+                                <Button variant="outline" className="w-full gap-2" onClick={() => card.audioUrl && handlePlayAudio(card.audioUrl)}>
                                   <Volume2 className="w-4 h-4" />
-                                  {card.audioUrl ? "Zvočna navodila" : "Zvočna navodila – kmalu"}
+                                  Zvočna navodila
                                 </Button>
                               </div>
                             )}
