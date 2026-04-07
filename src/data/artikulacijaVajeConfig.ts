@@ -424,6 +424,93 @@ const bingoDataZHSredinaKonec: BingoWordData[] = [
   { word: "VERIŽICA", image: "verizica1.webp", audio: "Verizica.mp3" },
 ];
 
+// Bingo data for F (sredina/konec)
+const bingoDataFSredinaKonec: BingoWordData[] = [
+  { word: "COF", image: "cof.webp", audio: "Cof.mp3" },
+  { word: "DELFIN", image: "delfin.webp", audio: "Delfin.mp3" },
+  { word: "FEFERON", image: "feferon.webp", audio: "Feferon.mp3" },
+  { word: "HARFA", image: "harfa.webp", audio: "Harfa.mp3" },
+  { word: "KROF", image: "krof1.webp", audio: "Krof.mp3" },
+  { word: "MAFIN", image: "mafin1.webp", audio: "Mafin.mp3" },
+  { word: "POMFRIT", image: "pomfrit.webp", audio: "Pomfri.mp3" },
+  { word: "SEMAFOR", image: "semafor.webp", audio: "Semafor.mp3" },
+  { word: "ŠKAF", image: "skaf.webp", audio: "Skaf.mp3" },
+  { word: "ŠOFER", image: "sofer1.webp", audio: "Sofer.mp3" },
+  { word: "TELEFON", image: "telefon1.webp", audio: "Telefon.mp3" },
+  { word: "VAFELJ", image: "vafelj.webp", audio: "Vafelj.mp3" },
+  { word: "ŽIRAFA", image: "zirafa1.webp", audio: "Zirafa.mp3" },
+  { word: "FRNIKOLA", image: "frnikola.webp", audio: "Frnikola.mp3" },
+];
+
+// Bingo data for G (sredina/konec)
+const bingoDataGSredinaKonec: BingoWordData[] = [
+  { word: "ANGEL", image: "angel1.webp", audio: "Angel.mp3" },
+  { word: "DRAGULJ", image: "dragulj1.webp", audio: "Dragulj.mp3" },
+  { word: "FIGA", image: "figa.webp", audio: "Figa.mp3" },
+  { word: "JAGODA", image: "jagoda.webp", audio: "Jagoda.mp3" },
+  { word: "JOGURT", image: "jogurt.webp", audio: "Jogurt.mp3" },
+  { word: "KNJIGA", image: "knjiga1.webp", audio: "Knjiga.mp3" },
+  { word: "MOŽGANI", image: "mozgani1.webp", audio: "Mozgani.mp3" },
+  { word: "NOGA", image: "noga1.webp", audio: "Noga.mp3" },
+  { word: "NOGAVICE", image: "nogavice1.webp", audio: "Nogavice.mp3" },
+  { word: "NOGOMETAŠ", image: "nogometas1.webp", audio: "Nogometas.mp3" },
+  { word: "OGENJ", image: "ogenj.webp", audio: "Ogenj.mp3" },
+  { word: "OGRAJA", image: "ograja.webp", audio: "Ograja.mp3" },
+  { word: "PAPIGA", image: "papiga.webp", audio: "Papiga.mp3" },
+  { word: "ŽAGA", image: "zaga1.webp", audio: "Zaga.mp3" },
+  { word: "ŽOGA", image: "zoga1.webp", audio: "Zoga.mp3" },
+];
+
+// Bingo data for H (sredina/konec)
+const bingoDataHSredinaKonec: BingoWordData[] = [
+  { word: "DUH", image: "duh.webp", audio: "Duh.mp3" },
+  { word: "GRAH", image: "grah.webp", audio: "Grah.mp3" },
+  { word: "JUHA", image: "juha1.webp", audio: "Juha.mp3" },
+  { word: "KAHLA", image: "kahla.webp", audio: "Kahla.mp3" },
+  { word: "KRUH", image: "kruh1.webp", audio: "Kruh.mp3" },
+  { word: "KUHAR", image: "kuhar.webp", audio: "Kuhar.mp3" },
+  { word: "MAH", image: "mah.webp", audio: "Mah.mp3" },
+  { word: "MEHURČKI", image: "mehurcki.webp", audio: "Mehurcki.mp3" },
+  { word: "MUHA", image: "muha1.webp", audio: "Muha.mp3" },
+  { word: "OREH", image: "oreh.webp", audio: "Oreh.mp3" },
+  { word: "POLH", image: "polh.webp", audio: "Polh.mp3" },
+  { word: "ŠAH", image: "sah1.webp", audio: "Sah.mp3" },
+  { word: "STREHA", image: "streha.webp", audio: "Streha.mp3" },
+  { word: "UHAN", image: "uhan.webp", audio: "Uhan.mp3" },
+  { word: "UHO", image: "uho.webp", audio: "Uho.mp3" },
+];
+
+// Bingo data for V (sredina/konec)
+const bingoDataVSredinaKonec: BingoWordData[] = [
+  { word: "AVOKADO", image: "avokado1.webp", audio: "Avokado.mp3" },
+  { word: "BARVICA", image: "barvica.webp", audio: "Barvica.mp3" },
+  { word: "BOROVNICE", image: "borovnice1.webp", audio: "Borovnice.mp3" },
+  { word: "CVET", image: "cvet1.webp", audio: "Cvet.mp3" },
+  { word: "DINOZAVER", image: "dinozaver1.webp", audio: "Dinozaver.mp3" },
+  { word: "DREVO", image: "drevo1.webp", audio: "Drevo.mp3" },
+  { word: "GLAVA", image: "glava1.webp", audio: "Glava.mp3" },
+  { word: "KAVA", image: "kava1.webp", audio: "Kava.mp3" },
+  { word: "KIVI", image: "kivi.webp", audio: "Kivi.mp3" },
+  { word: "KLAVIR", image: "klavir1.webp", audio: "Klavir.mp3" },
+  { word: "KRAVA", image: "krava1.webp", audio: "Krava.mp3" },
+  { word: "LIZIKA", image: "lizika1.webp", audio: "Lizika.mp3" },
+  { word: "LOVEC", image: "lovec1.webp", audio: "Lovec.mp3" },
+  { word: "MEDVED", image: "medved.webp", audio: "Medved.mp3" },
+  { word: "NOGAVICE", image: "nogavice1.webp", audio: "Nogavice.mp3" },
+  { word: "ROKAVICE", image: "rokavice.webp", audio: "Rokavice.mp3" },
+  { word: "SOVA", image: "sova1.webp", audio: "Sova.mp3" },
+  { word: "SVETILKA", image: "svetilka1.webp", audio: "Svetilka.mp3" },
+  { word: "SVINČNIK", image: "svincnik1.webp", audio: "Svincnik.mp3" },
+  { word: "TELEVIZIJA", image: "televizija1.webp", audio: "Televizija.mp3" },
+  { word: "TRAVA", image: "trava1.webp", audio: "Trava.mp3" },
+  { word: "VEVERICA", image: "veverica.webp", audio: "Veverica.mp3" },
+  { word: "ZAVESA", image: "zavesa1.webp", audio: "Zavesa.mp3" },
+  { word: "ŽELVA", image: "zelva1.webp", audio: "Zelva.mp3" },
+  { word: "ZVEZDA", image: "zvezda1.webp", audio: "Zvezda.mp3" },
+  { word: "ZVEZEK", image: "zvezek1.webp", audio: "Zvezek.mp3" },
+  { word: "ZVOČNIK", image: "zvocnik1.webp", audio: "Zvocnik.mp3" },
+];
+
 // F words (13 words)
 const wordsDataF: WordData[] = [
   { word: "FARAON", image: "faraon.webp", audio: "Faraon.mp3" },
