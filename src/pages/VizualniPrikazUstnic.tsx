@@ -61,6 +61,17 @@ const VizualniPrikazUstnic = () => {
   const [flippedCardId, setFlippedCardId] = useState<string | null>(null);
   const [carouselApi, setCarouselApi] = useState<CarouselApi>();
   const [currentSlide, setCurrentSlide] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const handlePlayAudio = (audioUrl: string) => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+    }
+    audioRef.current.pause();
+    audioRef.current.currentTime = 0;
+    audioRef.current.src = audioUrl;
+    audioRef.current.play().catch(e => console.error("Audio error:", e));
+  };
 
   const onSelect = useCallback(() => {
     if (!carouselApi) return;
