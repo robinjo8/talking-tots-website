@@ -189,6 +189,91 @@ export const matchingGameData: LetterData[] = [
       { word: "ROPOTULJICA", filename: "ropotuljica1.webp", url: `${SUPABASE_STORAGE_URL}/ropotuljica1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Ropotuljica.mp3` },
       { word: "ROŽA", filename: "roza1.webp", url: `${SUPABASE_STORAGE_URL}/roza1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Roza.mp3` }
     ]
+  },
+  {
+    letter: "F",
+    images: [
+      { word: "FARAON", filename: "faraon.webp", url: `${SUPABASE_STORAGE_URL}/faraon.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Faraon.mp3` },
+      { word: "FAZAN", filename: "fazan.webp", url: `${SUPABASE_STORAGE_URL}/fazan.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Fazan.mp3` },
+      { word: "FEFERON", filename: "feferon.webp", url: `${SUPABASE_STORAGE_URL}/feferon.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Feferon.mp3` },
+      { word: "FIGA", filename: "figa.webp", url: `${SUPABASE_STORAGE_URL}/figa.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Figa.mp3` },
+      { word: "FLAVTA", filename: "flavta.webp", url: `${SUPABASE_STORAGE_URL}/flavta.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Flavta.mp3` },
+      { word: "FORMULA", filename: "formula.webp", url: `${SUPABASE_STORAGE_URL}/formula.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Formula.mp3` },
+      { word: "FOTELJ", filename: "fotelj.webp", url: `${SUPABASE_STORAGE_URL}/fotelj.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Fotelj.mp3` },
+      { word: "FRAČA", filename: "fraca.webp", url: `${SUPABASE_STORAGE_URL}/fraca.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Fraca.mp3` },
+      { word: "FRIZER", filename: "frizer.webp", url: `${SUPABASE_STORAGE_URL}/frizer.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Frizer.mp3` },
+      { word: "FRNIKOLA", filename: "frnikola.webp", url: `${SUPABASE_STORAGE_URL}/frnikola.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Frnikola.mp3` },
+      { word: "FANT", filename: "fant1.webp", url: `${SUPABASE_STORAGE_URL}/fant1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Fant.mp3` },
+      { word: "FEN", filename: "fen1.webp", url: `${SUPABASE_STORAGE_URL}/fen1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Fen.mp3` },
+      { word: "FIŽOL", filename: "fizol1.webp", url: `${SUPABASE_STORAGE_URL}/fizol1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Fizol.mp3` }
+    ]
+  },
+  {
+    letter: "G",
+    images: [
+      { word: "GASILEC", filename: "gasilec.webp", url: `${SUPABASE_STORAGE_URL}/gasilec.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gasilec.mp3` },
+      { word: "GLAVNIK", filename: "glavnik.webp", url: `${SUPABASE_STORAGE_URL}/glavnik.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Glavnik.mp3` },
+      { word: "GOLOB", filename: "golob.webp", url: `${SUPABASE_STORAGE_URL}/golob.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Golob.mp3` },
+      { word: "GOS", filename: "gos.webp", url: `${SUPABASE_STORAGE_URL}/gos.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gos.mp3` },
+      { word: "GOZDAR", filename: "gozdar.webp", url: `${SUPABASE_STORAGE_URL}/gozdar.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gozdar.mp3` },
+      { word: "GRAD", filename: "grad.webp", url: `${SUPABASE_STORAGE_URL}/grad.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Grad.mp3` },
+      { word: "GRAH", filename: "grah.webp", url: `${SUPABASE_STORAGE_URL}/grah.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Grah.mp3` },
+      { word: "GUGALNICA", filename: "gugalnica.webp", url: `${SUPABASE_STORAGE_URL}/gugalnica.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gugalnica.mp3` },
+      { word: "GUSAR", filename: "gusar.webp", url: `${SUPABASE_STORAGE_URL}/gusar.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gusar.mp3` },
+      { word: "GOBA", filename: "goba1.webp", url: `${SUPABASE_STORAGE_URL}/goba1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Goba.mp3` },
+      { word: "GOL", filename: "gol1.webp", url: `${SUPABASE_STORAGE_URL}/gol1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gol.mp3` },
+      { word: "GUMA", filename: "guma1.webp", url: `${SUPABASE_STORAGE_URL}/guma1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Guma.mp3` },
+      { word: "GARAŽA", filename: "garaza1.webp", url: `${SUPABASE_STORAGE_URL}/garaza1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Garaza.mp3` },
+      { word: "GNEZDO", filename: "gnezdo1.webp", url: `${SUPABASE_STORAGE_URL}/gnezdo1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Gnezdo.mp3` },
+      { word: "GROZDJE", filename: "grozdje1.webp", url: `${SUPABASE_STORAGE_URL}/grozdje1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Grozdje.mp3` },
+      { word: "GLAVA", filename: "glava1.webp", url: `${SUPABASE_STORAGE_URL}/glava1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Glava.mp3` }
+    ]
+  },
+  {
+    letter: "H",
+    images: [
+      { word: "HARFA", filename: "harfa.webp", url: `${SUPABASE_STORAGE_URL}/harfa.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Harfa.mp3` },
+      { word: "HARMONIKA", filename: "harmonika.webp", url: `${SUPABASE_STORAGE_URL}/harmonika.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Harmonika.mp3` },
+      { word: "HELIKOPTER", filename: "helikopter.webp", url: `${SUPABASE_STORAGE_URL}/helikopter.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Helikopter.mp3` },
+      { word: "HIJENA", filename: "hijena.webp", url: `${SUPABASE_STORAGE_URL}/hijena.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hijena.mp3` },
+      { word: "HLEV", filename: "hlev.webp", url: `${SUPABASE_STORAGE_URL}/hlev.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hlev.mp3` },
+      { word: "HOBOTNICA", filename: "hobotnica.webp", url: `${SUPABASE_STORAGE_URL}/hobotnica.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hobotnica.mp3` },
+      { word: "HOKEJ", filename: "hokej.webp", url: `${SUPABASE_STORAGE_URL}/hokej.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hokej.mp3` },
+      { word: "HOTEL", filename: "hotel.webp", url: `${SUPABASE_STORAGE_URL}/hotel.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hotel.mp3` },
+      { word: "HRČEK", filename: "hrcek.webp", url: `${SUPABASE_STORAGE_URL}/hrcek.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hrcek.mp3` },
+      { word: "HRIB", filename: "hrib.webp", url: `${SUPABASE_STORAGE_URL}/hrib.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hrib.mp3` },
+      { word: "HUPA", filename: "hupa.webp", url: `${SUPABASE_STORAGE_URL}/hupa.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hupa.mp3` },
+      { word: "HIŠA", filename: "hisa1.webp", url: `${SUPABASE_STORAGE_URL}/hisa1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hisa.mp3` },
+      { word: "HLAČE", filename: "hlace1.webp", url: `${SUPABASE_STORAGE_URL}/hlace1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hlace.mp3` },
+      { word: "HRUŠKA", filename: "hruska1.webp", url: `${SUPABASE_STORAGE_URL}/hruska1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Hruska.mp3` }
+    ]
+  },
+  {
+    letter: "V",
+    images: [
+      { word: "VAFELJ", filename: "vafelj.webp", url: `${SUPABASE_STORAGE_URL}/vafelj.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vafelj.mp3` },
+      { word: "VEDRO", filename: "vedro.webp", url: `${SUPABASE_STORAGE_URL}/vedro.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vedro.mp3` },
+      { word: "VESLO", filename: "veslo.webp", url: `${SUPABASE_STORAGE_URL}/veslo.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Veslo.mp3` },
+      { word: "VEVERICA", filename: "veverica.webp", url: `${SUPABASE_STORAGE_URL}/veverica.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Veverica.mp3` },
+      { word: "VILE", filename: "vile.webp", url: `${SUPABASE_STORAGE_URL}/vile.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vile.mp3` },
+      { word: "VITEZ", filename: "vitez.webp", url: `${SUPABASE_STORAGE_URL}/vitez.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vitez.mp3` },
+      { word: "VOLK", filename: "volk.webp", url: `${SUPABASE_STORAGE_URL}/volk.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Volk.mp3` },
+      { word: "VOLNA", filename: "volna.webp", url: `${SUPABASE_STORAGE_URL}/volna.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Volna.mp3` },
+      { word: "VOZIČEK", filename: "vozicek.webp", url: `${SUPABASE_STORAGE_URL}/vozicek.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vozicek.mp3` },
+      { word: "VRATA", filename: "vrata.webp", url: `${SUPABASE_STORAGE_URL}/vrata.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vrata.mp3` },
+      { word: "VULKAN", filename: "vulkan.webp", url: `${SUPABASE_STORAGE_URL}/vulkan.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vulkan.mp3` },
+      { word: "VAZA", filename: "vaza1.webp", url: `${SUPABASE_STORAGE_URL}/vaza1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vaza.mp3` },
+      { word: "VEJA", filename: "veja1.webp", url: `${SUPABASE_STORAGE_URL}/veja1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Veja.mp3` },
+      { word: "VETRNICA", filename: "veternica1.webp", url: `${SUPABASE_STORAGE_URL}/veternica1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vetrnica.mp3` },
+      { word: "VILICE", filename: "vilica1.webp", url: `${SUPABASE_STORAGE_URL}/vilica1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vilice.mp3` },
+      { word: "VODA", filename: "voda1.webp", url: `${SUPABASE_STORAGE_URL}/voda1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Voda.mp3` },
+      { word: "VOLAN", filename: "volan1.webp", url: `${SUPABASE_STORAGE_URL}/volan1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Volan.mp3` },
+      { word: "VOZ", filename: "voz1.webp", url: `${SUPABASE_STORAGE_URL}/voz1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Voz.mp3` },
+      { word: "VERIŽICA", filename: "verizica1.webp", url: `${SUPABASE_STORAGE_URL}/verizica1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Verizica.mp3` },
+      { word: "VEZALKE", filename: "vezalke1.webp", url: `${SUPABASE_STORAGE_URL}/vezalke1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vezalke.mp3` },
+      { word: "VIŠNJA", filename: "visnja1.webp", url: `${SUPABASE_STORAGE_URL}/visnja1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Visnja.mp3` },
+      { word: "VRABEC", filename: "vrabec1.webp", url: `${SUPABASE_STORAGE_URL}/vrabec1.webp`, audio_url: `${SUPABASE_AUDIO_URL}/Vrabec.mp3` }
+    ]
   }
 ];
 

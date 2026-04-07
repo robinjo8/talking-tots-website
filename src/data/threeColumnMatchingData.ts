@@ -349,6 +349,168 @@ export const fourColumnMatchingDataŽ: FourColumnMatchingItem[] = [
   { id: 'zolna', word: 'žolna', audioFile: 'Zolna.mp3', writtenWord: 'ŽOLNA', shadowImage: 'zolna1_senca.png', originalImage: 'zolna1.webp' }
 ];
 
+// Data for letter F
+export const threeColumnMatchingDataF: ThreeColumnMatchingItem[] = [
+  { id: 'faraon', word: 'FARAON', audioFile: 'Faraon.mp3', shadowImage: 'faraon_senca.png', originalImage: 'faraon.webp' },
+  { id: 'fazan', word: 'FAZAN', audioFile: 'Fazan.mp3', shadowImage: 'fazan_senca.png', originalImage: 'fazan.webp' },
+  { id: 'feferon', word: 'FEFERON', audioFile: 'Feferon.mp3', shadowImage: 'feferon_senca.png', originalImage: 'feferon.webp' },
+  { id: 'figa', word: 'FIGA', audioFile: 'Figa.mp3', shadowImage: 'figa_senca.png', originalImage: 'figa.webp' },
+  { id: 'flavta', word: 'FLAVTA', audioFile: 'Flavta.mp3', shadowImage: 'flavta_senca.png', originalImage: 'flavta.webp' },
+  { id: 'formula', word: 'FORMULA', audioFile: 'Formula.mp3', shadowImage: 'formula_senca.png', originalImage: 'formula.webp' },
+  { id: 'fotelj', word: 'FOTELJ', audioFile: 'Fotelj.mp3', shadowImage: 'fotelj_senca.png', originalImage: 'fotelj.webp' },
+  { id: 'fraca', word: 'FRAČA', audioFile: 'Fraca.mp3', shadowImage: 'fraca_senca.png', originalImage: 'fraca.webp' },
+  { id: 'frizer', word: 'FRIZER', audioFile: 'Frizer.mp3', shadowImage: 'frizer_senca.png', originalImage: 'frizer.webp' },
+  { id: 'frnikola', word: 'FRNIKOLA', audioFile: 'Frnikola.mp3', shadowImage: 'frnikola_senca.png', originalImage: 'frnikola.webp' },
+  { id: 'fant', word: 'FANT', audioFile: 'Fant.mp3', shadowImage: 'fant1_senca.png', originalImage: 'fant1.webp' },
+  { id: 'fen', word: 'FEN', audioFile: 'Fen.mp3', shadowImage: 'fen1_senca.png', originalImage: 'fen1.webp' },
+  { id: 'fizol', word: 'FIŽOL', audioFile: 'Fizol.mp3', shadowImage: 'fizol1_senca.png', originalImage: 'fizol1.webp' }
+];
+
+// Data for letter G
+export const threeColumnMatchingDataG: ThreeColumnMatchingItem[] = [
+  { id: 'gasilec', word: 'GASILEC', audioFile: 'Gasilec.mp3', shadowImage: 'gasilec_senca.png', originalImage: 'gasilec.webp' },
+  { id: 'glavnik', word: 'GLAVNIK', audioFile: 'Glavnik.mp3', shadowImage: 'glavnik_senca.png', originalImage: 'glavnik.webp' },
+  { id: 'golob', word: 'GOLOB', audioFile: 'Golob.mp3', shadowImage: 'golob_senca.png', originalImage: 'golob.webp' },
+  { id: 'gos', word: 'GOS', audioFile: 'Gos.mp3', shadowImage: 'gos_senca.png', originalImage: 'gos.webp' },
+  { id: 'gozdar', word: 'GOZDAR', audioFile: 'Gozdar.mp3', shadowImage: 'gozdar_senca.png', originalImage: 'gozdar.webp' },
+  { id: 'grad', word: 'GRAD', audioFile: 'Grad.mp3', shadowImage: 'grad_senca.png', originalImage: 'grad.webp' },
+  { id: 'grah', word: 'GRAH', audioFile: 'Grah.mp3', shadowImage: 'grah_senca.png', originalImage: 'grah.webp' },
+  { id: 'gugalnica', word: 'GUGALNICA', audioFile: 'Gugalnica.mp3', shadowImage: 'gugalnica_senca.png', originalImage: 'gugalnica.webp' },
+  { id: 'gusar', word: 'GUSAR', audioFile: 'Gusar.mp3', shadowImage: 'gusar_senca.png', originalImage: 'gusar.webp' },
+  { id: 'goba', word: 'GOBA', audioFile: 'Goba.mp3', shadowImage: 'goba1_senca.png', originalImage: 'goba1.webp' },
+  { id: 'gol', word: 'GOL', audioFile: 'Gol.mp3', shadowImage: 'gol1_senca.png', originalImage: 'gol1.webp' },
+  { id: 'guma', word: 'GUMA', audioFile: 'Guma.mp3', shadowImage: 'guma1_senca.png', originalImage: 'guma1.webp' },
+  { id: 'garaza', word: 'GARAŽA', audioFile: 'Garaza.mp3', shadowImage: 'garaza1_senca.png', originalImage: 'garaza1.webp' },
+  { id: 'gnezdo', word: 'GNEZDO', audioFile: 'Gnezdo.mp3', shadowImage: 'gnezdo1_senca.png', originalImage: 'gnezdo1.webp' },
+  { id: 'grozdje', word: 'GROZDJE', audioFile: 'Grozdje.mp3', shadowImage: 'grozdje1_senca.png', originalImage: 'grozdje1.webp' },
+  { id: 'glava', word: 'GLAVA', audioFile: 'Glava.mp3', shadowImage: 'glava1_senca.png', originalImage: 'glava1.webp' }
+];
+
+// Data for letter H
+export const threeColumnMatchingDataH: ThreeColumnMatchingItem[] = [
+  { id: 'harfa', word: 'HARFA', audioFile: 'Harfa.mp3', shadowImage: 'harfa_senca.png', originalImage: 'harfa.webp' },
+  { id: 'harmonika', word: 'HARMONIKA', audioFile: 'Harmonika.mp3', shadowImage: 'harmonika_senca.png', originalImage: 'harmonika.webp' },
+  { id: 'helikopter', word: 'HELIKOPTER', audioFile: 'Helikopter.mp3', shadowImage: 'helikopter_senca.png', originalImage: 'helikopter.webp' },
+  { id: 'hijena', word: 'HIJENA', audioFile: 'Hijena.mp3', shadowImage: 'hijena_senca.png', originalImage: 'hijena.webp' },
+  { id: 'hlev', word: 'HLEV', audioFile: 'Hlev.mp3', shadowImage: 'hlev_senca.png', originalImage: 'hlev.webp' },
+  { id: 'hobotnica', word: 'HOBOTNICA', audioFile: 'Hobotnica.mp3', shadowImage: 'hobotnica_senca.png', originalImage: 'hobotnica.webp' },
+  { id: 'hokej', word: 'HOKEJ', audioFile: 'Hokej.mp3', shadowImage: 'hokej_senca.png', originalImage: 'hokej.webp' },
+  { id: 'hotel', word: 'HOTEL', audioFile: 'Hotel.mp3', shadowImage: 'hotel_senca.png', originalImage: 'hotel.webp' },
+  { id: 'hrcek', word: 'HRČEK', audioFile: 'Hrcek.mp3', shadowImage: 'hrcek_senca.png', originalImage: 'hrcek.webp' },
+  { id: 'hrib', word: 'HRIB', audioFile: 'Hrib.mp3', shadowImage: 'hrib_senca.png', originalImage: 'hrib.webp' },
+  { id: 'hupa', word: 'HUPA', audioFile: 'Hupa.mp3', shadowImage: 'hupa_senca.png', originalImage: 'hupa.webp' },
+  { id: 'hisa', word: 'HIŠA', audioFile: 'Hisa.mp3', shadowImage: 'hisa1_senca.png', originalImage: 'hisa1.webp' },
+  { id: 'hlace', word: 'HLAČE', audioFile: 'Hlace.mp3', shadowImage: 'hlace1_senca.png', originalImage: 'hlace1.webp' },
+  { id: 'hruska', word: 'HRUŠKA', audioFile: 'Hruska.mp3', shadowImage: 'hruska1_senca.png', originalImage: 'hruska1.webp' }
+];
+
+// Data for letter V
+export const threeColumnMatchingDataV: ThreeColumnMatchingItem[] = [
+  { id: 'vafelj', word: 'VAFELJ', audioFile: 'Vafelj.mp3', shadowImage: 'vafelj_senca.png', originalImage: 'vafelj.webp' },
+  { id: 'vedro', word: 'VEDRO', audioFile: 'Vedro.mp3', shadowImage: 'vedro_senca.png', originalImage: 'vedro.webp' },
+  { id: 'veslo', word: 'VESLO', audioFile: 'Veslo.mp3', shadowImage: 'veslo_senca.png', originalImage: 'veslo.webp' },
+  { id: 'veverica', word: 'VEVERICA', audioFile: 'Veverica.mp3', shadowImage: 'veverica_senca.png', originalImage: 'veverica.webp' },
+  { id: 'vile', word: 'VILE', audioFile: 'Vile.mp3', shadowImage: 'vile_senca.png', originalImage: 'vile.webp' },
+  { id: 'vitez', word: 'VITEZ', audioFile: 'Vitez.mp3', shadowImage: 'vitez_senca.png', originalImage: 'vitez.webp' },
+  { id: 'volk', word: 'VOLK', audioFile: 'Volk.mp3', shadowImage: 'volk_senca.png', originalImage: 'volk.webp' },
+  { id: 'volna', word: 'VOLNA', audioFile: 'Volna.mp3', shadowImage: 'volna_senca.png', originalImage: 'volna.webp' },
+  { id: 'vozicek', word: 'VOZIČEK', audioFile: 'Vozicek.mp3', shadowImage: 'vozicek_senca.png', originalImage: 'vozicek.webp' },
+  { id: 'vrata', word: 'VRATA', audioFile: 'Vrata.mp3', shadowImage: 'vrata_senca.png', originalImage: 'vrata.webp' },
+  { id: 'vulkan', word: 'VULKAN', audioFile: 'Vulkan.mp3', shadowImage: 'vulkan_senca.png', originalImage: 'vulkan.webp' },
+  { id: 'vaza', word: 'VAZA', audioFile: 'Vaza.mp3', shadowImage: 'vaza1_senca.png', originalImage: 'vaza1.webp' },
+  { id: 'veja', word: 'VEJA', audioFile: 'Veja.mp3', shadowImage: 'veja1_senca.png', originalImage: 'veja1.webp' },
+  { id: 'vetrnica', word: 'VETRNICA', audioFile: 'Vetrnica.mp3', shadowImage: 'veternica1_senca.png', originalImage: 'veternica1.webp' },
+  { id: 'vilice', word: 'VILICE', audioFile: 'Vilice.mp3', shadowImage: 'vilica1_senca.png', originalImage: 'vilica1.webp' },
+  { id: 'voda', word: 'VODA', audioFile: 'Voda.mp3', shadowImage: 'voda1_senca.png', originalImage: 'voda1.webp' },
+  { id: 'volan', word: 'VOLAN', audioFile: 'Volan.mp3', shadowImage: 'volan1_senca.png', originalImage: 'volan1.webp' },
+  { id: 'voz', word: 'VOZ', audioFile: 'Voz.mp3', shadowImage: 'voz1_senca.png', originalImage: 'voz1.webp' },
+  { id: 'verizica', word: 'VERIŽICA', audioFile: 'Verizica.mp3', shadowImage: 'verizica1_senca.png', originalImage: 'verizica1.webp' },
+  { id: 'vezalke', word: 'VEZALKE', audioFile: 'Vezalke.mp3', shadowImage: 'vezalke1_senca.png', originalImage: 'vezalke1.webp' },
+  { id: 'visnja', word: 'VIŠNJA', audioFile: 'Visnja.mp3', shadowImage: 'visnja1_senca.png', originalImage: 'visnja1.webp' },
+  { id: 'vrabec', word: 'VRABEC', audioFile: 'Vrabec.mp3', shadowImage: 'vrabec1_senca.png', originalImage: 'vrabec1.webp' }
+];
+
+// Four-column data for letter F
+export const fourColumnMatchingDataF: FourColumnMatchingItem[] = [
+  { id: 'faraon', word: 'faraon', audioFile: 'Faraon.mp3', writtenWord: 'FARAON', shadowImage: 'faraon_senca.png', originalImage: 'faraon.webp' },
+  { id: 'fazan', word: 'fazan', audioFile: 'Fazan.mp3', writtenWord: 'FAZAN', shadowImage: 'fazan_senca.png', originalImage: 'fazan.webp' },
+  { id: 'feferon', word: 'feferon', audioFile: 'Feferon.mp3', writtenWord: 'FEFERON', shadowImage: 'feferon_senca.png', originalImage: 'feferon.webp' },
+  { id: 'figa', word: 'figa', audioFile: 'Figa.mp3', writtenWord: 'FIGA', shadowImage: 'figa_senca.png', originalImage: 'figa.webp' },
+  { id: 'flavta', word: 'flavta', audioFile: 'Flavta.mp3', writtenWord: 'FLAVTA', shadowImage: 'flavta_senca.png', originalImage: 'flavta.webp' },
+  { id: 'formula', word: 'formula', audioFile: 'Formula.mp3', writtenWord: 'FORMULA', shadowImage: 'formula_senca.png', originalImage: 'formula.webp' },
+  { id: 'fotelj', word: 'fotelj', audioFile: 'Fotelj.mp3', writtenWord: 'FOTELJ', shadowImage: 'fotelj_senca.png', originalImage: 'fotelj.webp' },
+  { id: 'fraca', word: 'frača', audioFile: 'Fraca.mp3', writtenWord: 'FRAČA', shadowImage: 'fraca_senca.png', originalImage: 'fraca.webp' },
+  { id: 'frizer', word: 'frizer', audioFile: 'Frizer.mp3', writtenWord: 'FRIZER', shadowImage: 'frizer_senca.png', originalImage: 'frizer.webp' },
+  { id: 'frnikola', word: 'frnikola', audioFile: 'Frnikola.mp3', writtenWord: 'FRNIKOLA', shadowImage: 'frnikola_senca.png', originalImage: 'frnikola.webp' },
+  { id: 'fant', word: 'fant', audioFile: 'Fant.mp3', writtenWord: 'FANT', shadowImage: 'fant1_senca.png', originalImage: 'fant1.webp' },
+  { id: 'fen', word: 'fen', audioFile: 'Fen.mp3', writtenWord: 'FEN', shadowImage: 'fen1_senca.png', originalImage: 'fen1.webp' },
+  { id: 'fizol', word: 'fižol', audioFile: 'Fizol.mp3', writtenWord: 'FIŽOL', shadowImage: 'fizol1_senca.png', originalImage: 'fizol1.webp' }
+];
+
+// Four-column data for letter G
+export const fourColumnMatchingDataG: FourColumnMatchingItem[] = [
+  { id: 'gasilec', word: 'gasilec', audioFile: 'Gasilec.mp3', writtenWord: 'GASILEC', shadowImage: 'gasilec_senca.png', originalImage: 'gasilec.webp' },
+  { id: 'glavnik', word: 'glavnik', audioFile: 'Glavnik.mp3', writtenWord: 'GLAVNIK', shadowImage: 'glavnik_senca.png', originalImage: 'glavnik.webp' },
+  { id: 'golob', word: 'golob', audioFile: 'Golob.mp3', writtenWord: 'GOLOB', shadowImage: 'golob_senca.png', originalImage: 'golob.webp' },
+  { id: 'gos', word: 'gos', audioFile: 'Gos.mp3', writtenWord: 'GOS', shadowImage: 'gos_senca.png', originalImage: 'gos.webp' },
+  { id: 'gozdar', word: 'gozdar', audioFile: 'Gozdar.mp3', writtenWord: 'GOZDAR', shadowImage: 'gozdar_senca.png', originalImage: 'gozdar.webp' },
+  { id: 'grad', word: 'grad', audioFile: 'Grad.mp3', writtenWord: 'GRAD', shadowImage: 'grad_senca.png', originalImage: 'grad.webp' },
+  { id: 'grah', word: 'grah', audioFile: 'Grah.mp3', writtenWord: 'GRAH', shadowImage: 'grah_senca.png', originalImage: 'grah.webp' },
+  { id: 'gugalnica', word: 'gugalnica', audioFile: 'Gugalnica.mp3', writtenWord: 'GUGALNICA', shadowImage: 'gugalnica_senca.png', originalImage: 'gugalnica.webp' },
+  { id: 'gusar', word: 'gusar', audioFile: 'Gusar.mp3', writtenWord: 'GUSAR', shadowImage: 'gusar_senca.png', originalImage: 'gusar.webp' },
+  { id: 'goba', word: 'goba', audioFile: 'Goba.mp3', writtenWord: 'GOBA', shadowImage: 'goba1_senca.png', originalImage: 'goba1.webp' },
+  { id: 'gol', word: 'gol', audioFile: 'Gol.mp3', writtenWord: 'GOL', shadowImage: 'gol1_senca.png', originalImage: 'gol1.webp' },
+  { id: 'guma', word: 'guma', audioFile: 'Guma.mp3', writtenWord: 'GUMA', shadowImage: 'guma1_senca.png', originalImage: 'guma1.webp' },
+  { id: 'garaza', word: 'garaža', audioFile: 'Garaza.mp3', writtenWord: 'GARAŽA', shadowImage: 'garaza1_senca.png', originalImage: 'garaza1.webp' },
+  { id: 'gnezdo', word: 'gnezdo', audioFile: 'Gnezdo.mp3', writtenWord: 'GNEZDO', shadowImage: 'gnezdo1_senca.png', originalImage: 'gnezdo1.webp' },
+  { id: 'grozdje', word: 'grozdje', audioFile: 'Grozdje.mp3', writtenWord: 'GROZDJE', shadowImage: 'grozdje1_senca.png', originalImage: 'grozdje1.webp' },
+  { id: 'glava', word: 'glava', audioFile: 'Glava.mp3', writtenWord: 'GLAVA', shadowImage: 'glava1_senca.png', originalImage: 'glava1.webp' }
+];
+
+// Four-column data for letter H
+export const fourColumnMatchingDataH: FourColumnMatchingItem[] = [
+  { id: 'harfa', word: 'harfa', audioFile: 'Harfa.mp3', writtenWord: 'HARFA', shadowImage: 'harfa_senca.png', originalImage: 'harfa.webp' },
+  { id: 'harmonika', word: 'harmonika', audioFile: 'Harmonika.mp3', writtenWord: 'HARMONIKA', shadowImage: 'harmonika_senca.png', originalImage: 'harmonika.webp' },
+  { id: 'helikopter', word: 'helikopter', audioFile: 'Helikopter.mp3', writtenWord: 'HELIKOPTER', shadowImage: 'helikopter_senca.png', originalImage: 'helikopter.webp' },
+  { id: 'hijena', word: 'hijena', audioFile: 'Hijena.mp3', writtenWord: 'HIJENA', shadowImage: 'hijena_senca.png', originalImage: 'hijena.webp' },
+  { id: 'hlev', word: 'hlev', audioFile: 'Hlev.mp3', writtenWord: 'HLEV', shadowImage: 'hlev_senca.png', originalImage: 'hlev.webp' },
+  { id: 'hobotnica', word: 'hobotnica', audioFile: 'Hobotnica.mp3', writtenWord: 'HOBOTNICA', shadowImage: 'hobotnica_senca.png', originalImage: 'hobotnica.webp' },
+  { id: 'hokej', word: 'hokej', audioFile: 'Hokej.mp3', writtenWord: 'HOKEJ', shadowImage: 'hokej_senca.png', originalImage: 'hokej.webp' },
+  { id: 'hotel', word: 'hotel', audioFile: 'Hotel.mp3', writtenWord: 'HOTEL', shadowImage: 'hotel_senca.png', originalImage: 'hotel.webp' },
+  { id: 'hrcek', word: 'hrček', audioFile: 'Hrcek.mp3', writtenWord: 'HRČEK', shadowImage: 'hrcek_senca.png', originalImage: 'hrcek.webp' },
+  { id: 'hrib', word: 'hrib', audioFile: 'Hrib.mp3', writtenWord: 'HRIB', shadowImage: 'hrib_senca.png', originalImage: 'hrib.webp' },
+  { id: 'hupa', word: 'hupa', audioFile: 'Hupa.mp3', writtenWord: 'HUPA', shadowImage: 'hupa_senca.png', originalImage: 'hupa.webp' },
+  { id: 'hisa', word: 'hiša', audioFile: 'Hisa.mp3', writtenWord: 'HIŠA', shadowImage: 'hisa1_senca.png', originalImage: 'hisa1.webp' },
+  { id: 'hlace', word: 'hlače', audioFile: 'Hlace.mp3', writtenWord: 'HLAČE', shadowImage: 'hlace1_senca.png', originalImage: 'hlace1.webp' },
+  { id: 'hruska', word: 'hruška', audioFile: 'Hruska.mp3', writtenWord: 'HRUŠKA', shadowImage: 'hruska1_senca.png', originalImage: 'hruska1.webp' }
+];
+
+// Four-column data for letter V
+export const fourColumnMatchingDataV: FourColumnMatchingItem[] = [
+  { id: 'vafelj', word: 'vafelj', audioFile: 'Vafelj.mp3', writtenWord: 'VAFELJ', shadowImage: 'vafelj_senca.png', originalImage: 'vafelj.webp' },
+  { id: 'vedro', word: 'vedro', audioFile: 'Vedro.mp3', writtenWord: 'VEDRO', shadowImage: 'vedro_senca.png', originalImage: 'vedro.webp' },
+  { id: 'veslo', word: 'veslo', audioFile: 'Veslo.mp3', writtenWord: 'VESLO', shadowImage: 'veslo_senca.png', originalImage: 'veslo.webp' },
+  { id: 'veverica', word: 'veverica', audioFile: 'Veverica.mp3', writtenWord: 'VEVERICA', shadowImage: 'veverica_senca.png', originalImage: 'veverica.webp' },
+  { id: 'vile', word: 'vile', audioFile: 'Vile.mp3', writtenWord: 'VILE', shadowImage: 'vile_senca.png', originalImage: 'vile.webp' },
+  { id: 'vitez', word: 'vitez', audioFile: 'Vitez.mp3', writtenWord: 'VITEZ', shadowImage: 'vitez_senca.png', originalImage: 'vitez.webp' },
+  { id: 'volk', word: 'volk', audioFile: 'Volk.mp3', writtenWord: 'VOLK', shadowImage: 'volk_senca.png', originalImage: 'volk.webp' },
+  { id: 'volna', word: 'volna', audioFile: 'Volna.mp3', writtenWord: 'VOLNA', shadowImage: 'volna_senca.png', originalImage: 'volna.webp' },
+  { id: 'vozicek', word: 'voziček', audioFile: 'Vozicek.mp3', writtenWord: 'VOZIČEK', shadowImage: 'vozicek_senca.png', originalImage: 'vozicek.webp' },
+  { id: 'vrata', word: 'vrata', audioFile: 'Vrata.mp3', writtenWord: 'VRATA', shadowImage: 'vrata_senca.png', originalImage: 'vrata.webp' },
+  { id: 'vulkan', word: 'vulkan', audioFile: 'Vulkan.mp3', writtenWord: 'VULKAN', shadowImage: 'vulkan_senca.png', originalImage: 'vulkan.webp' },
+  { id: 'vaza', word: 'vaza', audioFile: 'Vaza.mp3', writtenWord: 'VAZA', shadowImage: 'vaza1_senca.png', originalImage: 'vaza1.webp' },
+  { id: 'veja', word: 'veja', audioFile: 'Veja.mp3', writtenWord: 'VEJA', shadowImage: 'veja1_senca.png', originalImage: 'veja1.webp' },
+  { id: 'vetrnica', word: 'vetrnica', audioFile: 'Vetrnica.mp3', writtenWord: 'VETRNICA', shadowImage: 'veternica1_senca.png', originalImage: 'veternica1.webp' },
+  { id: 'vilice', word: 'vilice', audioFile: 'Vilice.mp3', writtenWord: 'VILICE', shadowImage: 'vilica1_senca.png', originalImage: 'vilica1.webp' },
+  { id: 'voda', word: 'voda', audioFile: 'Voda.mp3', writtenWord: 'VODA', shadowImage: 'voda1_senca.png', originalImage: 'voda1.webp' },
+  { id: 'volan', word: 'volan', audioFile: 'Volan.mp3', writtenWord: 'VOLAN', shadowImage: 'volan1_senca.png', originalImage: 'volan1.webp' },
+  { id: 'voz', word: 'voz', audioFile: 'Voz.mp3', writtenWord: 'VOZ', shadowImage: 'voz1_senca.png', originalImage: 'voz1.webp' },
+  { id: 'verizica', word: 'verižica', audioFile: 'Verizica.mp3', writtenWord: 'VERIŽICA', shadowImage: 'verizica1_senca.png', originalImage: 'verizica1.webp' },
+  { id: 'vezalke', word: 'vezalke', audioFile: 'Vezalke.mp3', writtenWord: 'VEZALKE', shadowImage: 'vezalke1_senca.png', originalImage: 'vezalke1.webp' },
+  { id: 'visnja', word: 'višnja', audioFile: 'Visnja.mp3', writtenWord: 'VIŠNJA', shadowImage: 'visnja1_senca.png', originalImage: 'visnja1.webp' },
+  { id: 'vrabec', word: 'vrabec', audioFile: 'Vrabec.mp3', writtenWord: 'VRABEC', shadowImage: 'vrabec1_senca.png', originalImage: 'vrabec1.webp' }
+];
+
 // Function to get letter-specific data
 export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[] {
   switch (letter.toLowerCase()) {
@@ -356,6 +518,12 @@ export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[]
       return threeColumnMatchingDataC;
     case 'č':
       return threeColumnMatchingDataČ;
+    case 'f':
+      return threeColumnMatchingDataF;
+    case 'g':
+      return threeColumnMatchingDataG;
+    case 'h':
+      return threeColumnMatchingDataH;
     case 'k':
       return threeColumnMatchingDataK;
     case 'l':
@@ -366,6 +534,8 @@ export function getLetterMatchingData(letter: string): ThreeColumnMatchingItem[]
       return threeColumnMatchingDataS;
     case 'š':
       return threeColumnMatchingDataŠ;
+    case 'v':
+      return threeColumnMatchingDataV;
     case 'z':
       return threeColumnMatchingDataZ;
     case 'ž':
@@ -382,6 +552,12 @@ export function getFourColumnLetterData(letter: string): FourColumnMatchingItem[
       return fourColumnMatchingDataC;
     case 'č':
       return fourColumnMatchingDataČ;
+    case 'f':
+      return fourColumnMatchingDataF;
+    case 'g':
+      return fourColumnMatchingDataG;
+    case 'h':
+      return fourColumnMatchingDataH;
     case 'k':
       return fourColumnMatchingDataK;
     case 'l':
@@ -392,6 +568,8 @@ export function getFourColumnLetterData(letter: string): FourColumnMatchingItem[
       return fourColumnMatchingDataS;
     case 'š':
       return fourColumnMatchingDataŠ;
+    case 'v':
+      return fourColumnMatchingDataV;
     case 'z':
       return fourColumnMatchingDataZ;
     case 'ž':
