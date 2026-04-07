@@ -314,11 +314,102 @@ export const KACE_WORDS_R_ZACETEK: KaceLestveWord[] = [
   { text: "PRESTA", image: "presta1.webp", audio: "Presta.mp3", acceptedVariants: ["PRESTA", "PRESTA!", "PRESTO", "PRESTE", "PESTA"] },
 ];
 
+// Words for sound F (middle/end position)
+export const KACE_WORDS_F: KaceLestveWord[] = [
+  { text: "COF", image: "cof.webp", audio: "Cof.mp3", acceptedVariants: ["COF", "COF!", "COFA", "COFU"] },
+  { text: "DELFIN", image: "delfin.webp", audio: "Delfin.mp3", acceptedVariants: ["DELFIN", "DELFIN!", "DELFINA", "DELFINU"] },
+  { text: "FEFERON", image: "feferon.webp", audio: "Feferon.mp3", acceptedVariants: ["FEFERON", "FEFERON!", "FEFERONA", "FEFERONU"] },
+  { text: "HARFA", image: "harfa.webp", audio: "Harfa.mp3", acceptedVariants: ["HARFA", "HARFO", "HARFE", "HARFA!"] },
+  { text: "KROF", image: "krof1.webp", audio: "Krof.mp3", acceptedVariants: ["KROF", "KROF!", "KROFA", "KROFU"] },
+  { text: "MAFIN", image: "mafin1.webp", audio: "Mafin.mp3", acceptedVariants: ["MAFIN", "MAFIN!", "MAFINA", "MAFINU"] },
+  { text: "POMFRIT", image: "pomfrit.webp", audio: "Pomfri.mp3", acceptedVariants: ["POMFRIT", "POMFRIT!", "POMFRI", "POMFRITA"] },
+  { text: "SEMAFOR", image: "semafor.webp", audio: "Semafor.mp3", acceptedVariants: ["SEMAFOR", "SEMAFOR!", "SEMAFORA", "SEMAFORU"] },
+  { text: "ŠKAF", image: "skaf.webp", audio: "Skaf.mp3", acceptedVariants: ["SKAF", "ŠKAF", "ŠKAFA", "ŠKAFU", "ŠKAF!"] },
+  { text: "ŠOFER", image: "sofer1.webp", audio: "Sofer.mp3", acceptedVariants: ["SOFER", "ŠOFER", "ŠOFERJA", "ŠOFERJU", "ŠOFER!"] },
+  { text: "TELEFON", image: "telefon1.webp", audio: "Telefon.mp3", acceptedVariants: ["TELEFON", "TELEFON!", "TELEFONA", "TELEFONU"] },
+  { text: "VAFELJ", image: "vafelj.webp", audio: "Vafelj.mp3", acceptedVariants: ["VAFELJ", "VAFELJ!", "VAFLJA", "VAFLJU"] },
+  { text: "ŽIRAFA", image: "zirafa1.webp", audio: "Zirafa.mp3", acceptedVariants: ["ZIRAFA", "ŽIRAFA", "ŽIRAFO", "ŽIRAFE", "ŽIRAFA!"] },
+  { text: "FRNIKOLA", image: "frnikola.webp", audio: "Frnikola.mp3", acceptedVariants: ["FRNIKOLA", "FRNIKOLA!", "FRNIKOLO", "FRNIKOLE"] },
+];
+
+// Words for sound G (middle/end position)
+export const KACE_WORDS_G: KaceLestveWord[] = [
+  { text: "ANGEL", image: "angel1.webp", audio: "Angel.mp3", acceptedVariants: ["ANGEL", "ANGEL!", "ANGELA", "ANGELU"] },
+  { text: "DRAGULJ", image: "dragulj1.webp", audio: "Dragulj.mp3", acceptedVariants: ["DRAGULJ", "DRAGULJ!", "DRAGULJA", "DRAGULJU"] },
+  { text: "FIGA", image: "figa.webp", audio: "Figa.mp3", acceptedVariants: ["FIGA", "FIGO", "FIGE", "FIGA!"] },
+  { text: "JAGODA", image: "jagoda.webp", audio: "Jagoda.mp3", acceptedVariants: ["JAGODA", "JAGODO", "JAGODE", "JAGODA!"] },
+  { text: "JOGURT", image: "jogurt.webp", audio: "Jogurt.mp3", acceptedVariants: ["JOGURT", "JOGURT!", "JOGURTA", "JOGURTU"] },
+  { text: "KNJIGA", image: "knjiga1.webp", audio: "Knjiga.mp3", acceptedVariants: ["KNJIGA", "KNJIGO", "KNJIGE", "KNJIGA!"] },
+  { text: "MOŽGANI", image: "mozgani1.webp", audio: "Mozgani.mp3", acceptedVariants: ["MOZGANI", "MOŽGANI", "MOŽGANOV", "MOŽGANOM", "MOŽGANI!"] },
+  { text: "NOGA", image: "noga1.webp", audio: "Noga.mp3", acceptedVariants: ["NOGA", "NOGO", "NOGE", "NOGA!"] },
+  { text: "NOGAVICE", image: "nogavice1.webp", audio: "Nogavice.mp3", acceptedVariants: ["NOGAVICE", "NOGAVICA", "NOGAVICI", "NOGAVICE!"] },
+  { text: "NOGOMETAŠ", image: "nogometas1.webp", audio: "Nogometas.mp3", acceptedVariants: ["NOGOMETAS", "NOGOMETAŠ", "NOGOMETAŠA", "NOGOMETAŠU", "NOGOMETAŠ!"] },
+  { text: "OGENJ", image: "ogenj.webp", audio: "Ogenj.mp3", acceptedVariants: ["OGENJ", "OGENJ!", "OGNJA", "OGNJU"] },
+  { text: "OGRAJA", image: "ograja.webp", audio: "Ograja.mp3", acceptedVariants: ["OGRAJA", "OGRAJO", "OGRAJE", "OGRAJA!"] },
+  { text: "PAPIGA", image: "papiga.webp", audio: "Papiga.mp3", acceptedVariants: ["PAPIGA", "PAPIGO", "PAPIGE", "PAPIGA!"] },
+  { text: "ŽAGA", image: "zaga1.webp", audio: "Zaga.mp3", acceptedVariants: ["ZAGA", "ŽAGA", "ŽAGO", "ŽAGE", "ŽAGA!"] },
+  { text: "ŽOGA", image: "zoga1.webp", audio: "Zoga.mp3", acceptedVariants: ["ZOGA", "ŽOGA", "ŽOGO", "ŽOGE", "ŽOGA!"] },
+];
+
+// Words for sound H (middle/end position)
+export const KACE_WORDS_H: KaceLestveWord[] = [
+  { text: "DUH", image: "duh.webp", audio: "Duh.mp3", acceptedVariants: ["DUH", "DUH!", "DUHA", "DUHU"] },
+  { text: "GRAH", image: "grah.webp", audio: "Grah.mp3", acceptedVariants: ["GRAH", "GRAH!", "GRAHA", "GRAHU"] },
+  { text: "JUHA", image: "juha1.webp", audio: "Juha.mp3", acceptedVariants: ["JUHA", "JUHO", "JUHE", "JUHA!"] },
+  { text: "KAHLA", image: "kahla.webp", audio: "Kahla.mp3", acceptedVariants: ["KAHLA", "KAHLO", "KAHLE", "KAHLA!"] },
+  { text: "KRUH", image: "kruh1.webp", audio: "Kruh.mp3", acceptedVariants: ["KRUH", "KRUH!", "KRUHA", "KRUHU"] },
+  { text: "KUHAR", image: "kuhar.webp", audio: "Kuhar.mp3", acceptedVariants: ["KUHAR", "KUHAR!", "KUHARJA", "KUHARJU"] },
+  { text: "MAH", image: "mah.webp", audio: "Mah.mp3", acceptedVariants: ["MAH", "MAH!", "MAHA", "MAHU"] },
+  { text: "MEHURČKI", image: "mehurcki.webp", audio: "Mehurcki.mp3", acceptedVariants: ["MEHURCKI", "MEHURČKI", "MEHURČKOV", "MEHURČKI!"] },
+  { text: "MUHA", image: "muha1.webp", audio: "Muha.mp3", acceptedVariants: ["MUHA", "MUHO", "MUHE", "MUHA!"] },
+  { text: "OREH", image: "oreh.webp", audio: "Oreh.mp3", acceptedVariants: ["OREH", "OREH!", "OREHA", "OREHU"] },
+  { text: "POLH", image: "polh.webp", audio: "Polh.mp3", acceptedVariants: ["POLH", "POLH!", "POLHA", "POLHU"] },
+  { text: "ŠAH", image: "sah1.webp", audio: "Sah.mp3", acceptedVariants: ["SAH", "ŠAH", "ŠAHA", "ŠAHU", "ŠAH!"] },
+  { text: "STREHA", image: "streha.webp", audio: "Streha.mp3", acceptedVariants: ["STREHA", "STREHO", "STREHE", "STREHA!"] },
+  { text: "UHAN", image: "uhan.webp", audio: "Uhan.mp3", acceptedVariants: ["UHAN", "UHAN!", "UHANA", "UHANU"] },
+  { text: "UHO", image: "uho.webp", audio: "Uho.mp3", acceptedVariants: ["UHO", "UHO!", "UHESA", "UŠESA"] },
+];
+
+// Words for sound V (middle/end position)
+export const KACE_WORDS_V: KaceLestveWord[] = [
+  { text: "AVOKADO", image: "avokado1.webp", audio: "Avokado.mp3", acceptedVariants: ["AVOKADO", "AVOKADO!", "AVOKADA", "AVOKADU"] },
+  { text: "BARVICA", image: "barvica.webp", audio: "Barvica.mp3", acceptedVariants: ["BARVICA", "BARVICO", "BARVICE", "BARVICA!"] },
+  { text: "BOROVNICE", image: "borovnice1.webp", audio: "Borovnice.mp3", acceptedVariants: ["BOROVNICE", "BOROVNICA", "BOROVNICE!", "BOROVNIC"] },
+  { text: "CVET", image: "cvet1.webp", audio: "Cvet.mp3", acceptedVariants: ["CVET", "CVET!", "CVETA", "CVETU"] },
+  { text: "DINOZAVER", image: "dinozaver1.webp", audio: "Dinozaver.mp3", acceptedVariants: ["DINOZAVER", "DINOZAVER!", "DINOZAVRA", "DINOZAVRU"] },
+  { text: "DREVO", image: "drevo1.webp", audio: "Drevo.mp3", acceptedVariants: ["DREVO", "DREVO!", "DREVESA", "DREVESU"] },
+  { text: "GLAVA", image: "glava1.webp", audio: "Glava.mp3", acceptedVariants: ["GLAVA", "GLAVO", "GLAVE", "GLAVA!"] },
+  { text: "KAVA", image: "kava1.webp", audio: "Kava.mp3", acceptedVariants: ["KAVA", "KAVO", "KAVE", "KAVA!"] },
+  { text: "KIVI", image: "kivi.webp", audio: "Kivi.mp3", acceptedVariants: ["KIVI", "KIVI!", "KIVIJA", "KIVIJU"] },
+  { text: "KLAVIR", image: "klavir1.webp", audio: "Klavir.mp3", acceptedVariants: ["KLAVIR", "KLAVIR!", "KLAVIRJA", "KLAVIRJU"] },
+  { text: "KRAVA", image: "krava1.webp", audio: "Krava.mp3", acceptedVariants: ["KRAVA", "KRAVO", "KRAVE", "KRAVA!"] },
+  { text: "LIZIKA", image: "lizika1.webp", audio: "Lizika.mp3", acceptedVariants: ["LIZIKA", "LIZIKO", "LIZIKE", "LIZIKA!"] },
+  { text: "LOVEC", image: "lovec1.webp", audio: "Lovec.mp3", acceptedVariants: ["LOVEC", "LOVEC!", "LOVCA", "LOVCU"] },
+  { text: "MEDVED", image: "medved.webp", audio: "Medved.mp3", acceptedVariants: ["MEDVED", "MEDVED!", "MEDVEDA", "MEDVEDU"] },
+  { text: "NOGAVICE", image: "nogavice1.webp", audio: "Nogavice.mp3", acceptedVariants: ["NOGAVICE", "NOGAVICA", "NOGAVICI", "NOGAVICE!"] },
+  { text: "ROKAVICE", image: "rokavice.webp", audio: "Rokavice.mp3", acceptedVariants: ["ROKAVICE", "ROKAVICA", "ROKAVICI", "ROKAVICE!"] },
+  { text: "SOVA", image: "sova1.webp", audio: "Sova.mp3", acceptedVariants: ["SOVA", "SOVO", "SOVE", "SOVA!"] },
+  { text: "SVETILKA", image: "svetilka1.webp", audio: "Svetilka.mp3", acceptedVariants: ["SVETILKA", "SVETILKO", "SVETILKE", "SVETILKA!"] },
+  { text: "SVINČNIK", image: "svincnik1.webp", audio: "Svincnik.mp3", acceptedVariants: ["SVINCNIK", "SVINČNIK", "SVINČNIKA", "SVINČNIKU", "SVINČNIK!"] },
+  { text: "TELEVIZIJA", image: "televizija1.webp", audio: "Televizija.mp3", acceptedVariants: ["TELEVIZIJA", "TELEVIZIJO", "TELEVIZIJE", "TELEVIZIJA!"] },
+  { text: "TRAVA", image: "trava1.webp", audio: "Trava.mp3", acceptedVariants: ["TRAVA", "TRAVO", "TRAVE", "TRAVA!"] },
+  { text: "VEVERICA", image: "veverica.webp", audio: "Veverica.mp3", acceptedVariants: ["VEVERICA", "VEVERICO", "VEVERICE", "VEVERICA!"] },
+  { text: "ZAVESA", image: "zavesa1.webp", audio: "Zavesa.mp3", acceptedVariants: ["ZAVESA", "ZAVESO", "ZAVESE", "ZAVESA!"] },
+  { text: "ŽELVA", image: "zelva1.webp", audio: "Zelva.mp3", acceptedVariants: ["ZELVA", "ŽELVA", "ŽELVO", "ŽELVE", "ŽELVA!"] },
+  { text: "ZVEZDA", image: "zvezda1.webp", audio: "Zvezda.mp3", acceptedVariants: ["ZVEZDA", "ZVEZDO", "ZVEZDE", "ZVEZDA!"] },
+  { text: "ZVEZEK", image: "zvezek1.webp", audio: "Zvezek.mp3", acceptedVariants: ["ZVEZEK", "ZVEZEK!", "ZVEZKA", "ZVEZKU"] },
+  { text: "ZVOČNIK", image: "zvocnik1.webp", audio: "Zvocnik.mp3", acceptedVariants: ["ZVOCNIK", "ZVOČNIK", "ZVOČNIKA", "ZVOČNIKU", "ZVOČNIK!"] },
+];
+
 // Helper function to get the word list for a given letter
 export function getKaceWordList(letter: string): KaceLestveWord[] {
   switch (letter) {
     case 'c': return KACE_WORDS_C;
+    case 'f': return KACE_WORDS_F;
+    case 'g': return KACE_WORDS_G;
+    case 'h': return KACE_WORDS_H;
     case 's': return KACE_WORDS_S;
+    case 'v': return KACE_WORDS_V;
     case 'z': return KACE_WORDS_Z;
     case 'sh': return KACE_WORDS_SH;
     case 'zh': return KACE_WORDS_ZH;
