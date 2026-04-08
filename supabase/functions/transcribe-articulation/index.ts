@@ -221,8 +221,9 @@ serve(async (req) => {
     if (!audio) throw new Error('No audio data provided');
     if (!targetWord) throw new Error('No target word provided');
 
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) throw new Error('OPENAI_API_KEY is not configured');
+    const azureApiKey = Deno.env.get('AZURE_OPENAI_API_KEY');
+    const azureEndpoint = Deno.env.get('AZURE_OPENAI_ENDPOINT');
+    if (!azureApiKey || !azureEndpoint) throw new Error('Azure OpenAI credentials are not configured (AZURE_OPENAI_API_KEY / AZURE_OPENAI_ENDPOINT)');
 
     const binaryAudio = processBase64Chunks(audio);
     console.log(`Audio size: ${binaryAudio.length} bytes`);
@@ -230,14 +231,16 @@ serve(async (req) => {
     const formData = new FormData();
     const blob = new Blob([binaryAudio], { type: 'audio/webm' });
     formData.append('file', blob, 'recording.webm');
-    formData.append('model', 'whisper-1');
     formData.append('language', 'sl');
     formData.append('prompt', targetWord);
 
-    console.log('Sending to OpenAI Whisper API...');
-    const whisperResponse = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+    const whisperDeployment = 'whisper';
+    const azureWhisperUrl = `${azureEndpoint}/openai/deployments/${whisperDeployment}/audio/transcriptions?api-version=2024-06-01`;
+
+    console.log('Sending to Azure OpenAI Whisper API (EU)...');
+    const whisperResponse = await fetch(azureWhisperUrl, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${openAIApiKey}` },
+      headers: { 'api-key': azureApiKey },
       body: formData,
     });
 
