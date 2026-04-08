@@ -1,93 +1,59 @@
 
 
-## Analiza: Migracija Whisper iz ZDA v EU (Azure OpenAI)
+## Plan: Selitev klepeta na Azure EU
 
-### Kaj trenutno uporabljate
+### Pristop
+Dokumenti (300KB / ~75K tokenov) se vgradijo neposredno v system prompt. Brez dodatnih storitev, brez mesečnih stroškov.
 
-V projektu sta **dve** Edge funkciji, ki kličeta OpenAI API v ZDA:
+### Predpogoj (vaša naloga)
+1. Izvozite vsebino 6 dokumentov iz OpenAI Vector Store (kopirajte besedilo)
+2. Naložite jih v Supabase Storage bucket (npr. `chat-documents`) kot `.txt` datoteke ali eno združeno datoteko
 
-| Funkcija | Kaj uporablja | API endpoint | Namen |
-|----------|--------------|--------------|-------|
-| `transcribe-articulation` | Whisper (`whisper-1`) | `api.openai.com/v1/audio/transcriptions` | Preverjanje izgovorjave besed v artikulacijskih testih in govornih igrah |
-| `chat-assistant` | GPT-4.1 + file_search (vector store) | `api.openai.com/v1/responses` | Klepet s Tomijem (AI logopedski pomočnik) |
+### Spremembe
 
-### Kaj lahko prestavite na Azure EU
+**1. `supabase/functions/chat-assistant/index.ts`** (glavna sprememba)
 
-**1. Whisper (transkripcija) — DA, enostavno**
+- Odstrani: OpenAI Responses API, `file_search`, `OPENAI_VECTOR_STORE_ID`, `OPENAI_API_KEY`
+- Uporabi: Azure Chat Completions API z obstoječima secretoma `AZURE_OPENAI_API_KEY` in `AZURE_OPENAI_ENDPOINT`
+- Endpoint: `https://tomitalk-eu.openai.azure.com/openai/deployments/gpt-5-mini/chat/completions?api-version=2024-06-01`
+- Ob zagonu prebere dokumente iz Supabase Storage in jih vključi v system prompt
+- Auth header: `api-key` namesto `Authorization: Bearer`
+- System prompt ostane enak, le na konec se doda `\n\nDOKUMENTI:\n{vsebina}`
+- J↔R/L detekcija ostane enaka
+- childContext logika ostane enaka
+- SSE stream format se spremeni iz OpenAI Responses v standardni Chat Completions format
+- Odstrani TransformStream za file_search logging (ni več potreben)
 
-Iz slike vidim, da imate deployment `gpt-5-mini` na `tomitalk-eu.openai.azure.com`. Za Whisper boste potrebovali **dodaten deployment** modela `whisper` na istem Azure računu. Azure OpenAI podpira Whisper model.
+**2. `src/hooks/useChatAssistant.ts`** (parsing sprememba)
 
-Sprememba v kodi je minimalna — samo URL in avtentikacija:
-- Trenutno: `https://api.openai.com/v1/audio/transcriptions` z `Bearer` ključem
-- Azure: `https://tomitalk-eu.openai.azure.com/openai/deployments/{whisper-deployment}/audio/transcriptions?api-version=2024-06-01` z `api-key` headerjem
+- Spremeni SSE parsing iz OpenAI Responses formata (`response.output_text.delta`) v Chat Completions format (`choices[0].delta.content`)
+- Vrstica 198: `parsed.type === "response.output_text.delta"` se zamenja s `parsed.choices?.[0]?.delta?.content`
+- `[DONE]` signal ostane enak
+- Odstrani `response.completed` handling (vrstice 206-219) — ni potreben pri Chat Completions
+- Vse ostalo (shranjevanje sporočil, UI, conversation management) ostane nespremenjeno
 
-**Nič drugega se ne spremeni:**
-- Vsi filtri (profanity, halucinacije, dolžina) ostanejo enaki
-- Vse sprejemljive besede (`acceptedVariants`) ostanejo enake — te so v vaši kodi, ne pri OpenAI
-- Levenshteinova primerjava, fonetični filtri — vse ostane
-- Vse igre, ki uporabljajo transkripcijo, bodo delovale enako
+### Kaj ostane enako
+- System prompt (vsa navodila za Tomi-ja)
+- J↔R/L detekcija in augmentacija
+- childContext (podatki o otroku)
+- Shranjevanje pogovorov v bazo
+- UI klepeta
+- CORS konfiguracija
+- JWT avtentikacija
 
-**2. Klepet (chat-assistant) — KOMPLEKSNO**
+### Kaj ni več potrebno
+- `OPENAI_API_KEY` — samo če ga ne uporabljate za nič drugega
+- `OPENAI_VECTOR_STORE_ID` — ne več
+- Dokumenti na platform.openai.com — lahko jih izbrišete po migraciji
 
-Klepet uporablja OpenAI-jeve specifične funkcionalnosti:
-- **Responses API** (`/v1/responses`) — to je OpenAI-specifičen endpoint, ki ga Azure nima
-- **File Search** z **Vector Store** (`OPENAI_VECTOR_STORE_ID`) — vaši dokumenti na `platform.openai.com/storage/vector_stores/` so shranjeni tam
-- Model `gpt-4.1` z `tool_choice: "required"`
-
-Za preselitev klepeta na Azure bi morali:
-- Preklopiti iz Responses API na Chat Completions API (Azure ga podpira)
-- Postaviti lastno rešitev za vektorsko bazo (npr. Supabase pgvector) in naložiti dokumente tja
-- Ali pa ohraniti klepet na OpenAI ZDA (ker ne pošilja biometričnih podatkov — samo besedilo)
-
-### Predlog
-
-**Faza 1 (ta plan): Samo Whisper → Azure EU**
-- To je GDPR prioriteta, ker Whisper prejema **avdio posnetke otrok** (biometrični podatki)
-- Minimalna sprememba: 1 edge funkcija, 2 nova secreta
-
-**Faza 2 (pozneje, opcijsko): Klepet → Azure EU ali Lovable AI**
-- Klepet pošilja samo besedilo (ime otroka, starost), ne avdio
-- Manjše GDPR tveganje
-- Zahteva več dela (vektorska baza, sprememba API-ja)
-
-### Kaj potrebujem od vas
-
-1. **Ustvarite Whisper deployment** na Azure portalu (`ai.azure.com`):
-   - Model: `whisper` (ne gpt-5-mini, ki ga že imate)
-   - Zapišite si ime deploymenta (npr. `whisper-1`)
-
-2. **API ključ**: Ključ z Azure portala (isti kot za gpt-5-mini, viden na sliki pod "Key")
-
-3. **Endpoint URL**: `https://tomitalk-eu.openai.azure.com` (vidno na sliki)
-
-### Tehnične spremembe
-
-**1 datoteka: `supabase/functions/transcribe-articulation/index.ts`**
-
-Sprememba ~10 vrstic:
-- Namesto `OPENAI_API_KEY` prebere `AZURE_OPENAI_API_KEY` in `AZURE_OPENAI_ENDPOINT`
-- URL se spremeni iz `api.openai.com/v1/audio/transcriptions` v Azure endpoint
-- Header se spremeni iz `Authorization: Bearer ...` v `api-key: ...`
-- FormData ostane enak (file, language, prompt), le `model` polje se odstrani (model je del URL-ja pri Azure)
-
-**2 nova secreta v Supabase:**
-- `AZURE_OPENAI_API_KEY` — ključ iz Azure portala
-- `AZURE_OPENAI_ENDPOINT` — `https://tomitalk-eu.openai.azure.com`
-
-### Na kaj to vpliva
-
-| Funkcionalnost | Vpliv |
-|----------------|-------|
-| Artikulacijski testi | Samo sprememba endpointa, vse ostalo enako |
-| Govorne igre (Ponovi poved itd.) | Enako — isti edge function |
-| Sprejemljive besede (acceptedVariants) | Brez sprememb — so v kodi, ne pri OpenAI |
-| Filtri (profanity, halucinacije) | Brez sprememb |
-| Klepet (Tomi) | Brez sprememb — ostane na OpenAI ZDA (za zdaj) |
-| Dokumenti v Vector Store | Brez sprememb — ostanejo na OpenAI |
+### Stroški
+- ~$0.012 na sporočilo (namesto ~$0.001)
+- Pri 1000 sporočilih/mesec ≈ $12/mesec
+- Brez fiksnih mesečnih stroškov za dodatne storitve
 
 ### Obseg
-- 1 edge funkcija
-- 2 nova Supabase secreta
-- 0 sprememb v frontend kodi
-- Zahteva: Whisper deployment na Azure (uporabnik mora ustvariti)
+- 2 datoteki
+- 0 novih secretov (uporabi obstoječa `AZURE_OPENAI_API_KEY` in `AZURE_OPENAI_ENDPOINT`)
+- 0 novih storitev
+- Potrebno: uporabnik izvozi in naloži dokumente v Supabase Storage
 
