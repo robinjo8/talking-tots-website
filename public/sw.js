@@ -5,6 +5,10 @@ const CACHE_VERSION = 15;
 const ESSENTIAL_CACHE = [
   '/',
   '/manifest.json',
+  '/icons/splash-72x72.png',
+  '/icons/splash-144x144.png',
+  '/icons/splash-192x192.png',
+  '/icons/splash-512x512.png',
   '/icons/icon-72x72.png',
   '/icons/icon-144x144.png',
   '/icons/icon-192x192.png',
