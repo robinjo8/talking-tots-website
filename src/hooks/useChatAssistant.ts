@@ -227,8 +227,9 @@ export function useChatAssistant(childContext?: ChildContext) {
             if (jsonStr === "[DONE]") continue;
             try {
               const parsed = JSON.parse(jsonStr);
-              if (parsed.type === "response.output_text.delta" && parsed.delta) {
-                assistantContent += parsed.delta;
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
                 updateAssistant(assistantContent);
               }
             } catch {
