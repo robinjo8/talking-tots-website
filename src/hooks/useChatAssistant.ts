@@ -195,32 +195,16 @@ export function useChatAssistant(childContext?: ChildContext) {
             try {
               const parsed = JSON.parse(jsonStr);
 
-              if (parsed.type === "response.output_text.delta") {
-                const delta = parsed.delta;
-                if (delta) {
-                  assistantContent += delta;
-                  updateAssistant(assistantContent);
-                }
+              // Azure Chat Completions SSE format
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
+                updateAssistant(assistantContent);
               }
 
-              if (parsed.type === "response.completed") {
-                const output = parsed.response?.output;
-                if (output && Array.isArray(output)) {
-                  for (const item of output) {
-                    if (item.type === "message" && item.content) {
-                      for (const part of item.content) {
-                        if (part.type === "output_text" && part.text && !assistantContent) {
-                          assistantContent = part.text;
-                          updateAssistant(assistantContent);
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-
-              if (parsed.type === "error") {
-                console.error("Stream error:", parsed);
+              // Check for error
+              if (parsed.error) {
+                console.error("Stream error:", parsed.error);
                 toast.error("Napaka pri generiranju odgovora.");
                 streamDone = true;
                 break;
@@ -243,8 +227,9 @@ export function useChatAssistant(childContext?: ChildContext) {
             if (jsonStr === "[DONE]") continue;
             try {
               const parsed = JSON.parse(jsonStr);
-              if (parsed.type === "response.output_text.delta" && parsed.delta) {
-                assistantContent += parsed.delta;
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
                 updateAssistant(assistantContent);
               }
             } catch {
