@@ -70,6 +70,35 @@ async function loadDocuments(): Promise<string> {
   return cachedDocuments;
 }
 
+function normalizeAzureEndpoint(endpoint: string) {
+  const trimmed = endpoint.trim();
+
+  try {
+    const url = new URL(trimmed);
+    url.search = "";
+    url.hash = "";
+    url.pathname = url.pathname
+      .replace(/\/+$/, "")
+      .replace(/\/openai\/v1$/i, "")
+      .replace(/\/openai$/i, "")
+      .replace(/\/openai\/responses$/i, "")
+      .replace(/\/responses$/i, "")
+      .replace(/\/chat\/completions$/i, "")
+      .replace(/\/openai\/deployments\/[^/]+\/chat\/completions$/i, "");
+    return `${url.origin}${url.pathname}`.replace(/\/+$/, "");
+  } catch {
+    return trimmed
+      .replace(/[?#].*$/, "")
+      .replace(/\/+$/, "")
+      .replace(/\/openai\/v1$/i, "")
+      .replace(/\/openai$/i, "")
+      .replace(/\/openai\/responses$/i, "")
+      .replace(/\/responses$/i, "")
+      .replace(/\/chat\/completions$/i, "")
+      .replace(/\/openai\/deployments\/[^/]+\/chat\/completions$/i, "");
+  }
+}
+
 async function callAzureOpenAI(
   apiKey: string,
   endpoint: string,
@@ -77,8 +106,7 @@ async function callAzureOpenAI(
   systemPrompt: string,
   messages: BasicMessage[],
 ) {
-  // Normalize endpoint: remove trailing slashes
-  const normalizedEndpoint = endpoint.trim().replace(/\/+$/, "");
+  const normalizedEndpoint = normalizeAzureEndpoint(endpoint);
 
   const chatMessages = [
     { role: "system", content: systemPrompt },
