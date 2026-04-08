@@ -24,6 +24,52 @@ function getCorsHeaders(req: Request) {
 
 let cachedDocuments: string | null = null;
 
+type BasicMessage = { role: string; content: string };
+
+async function loadDocuments(): Promise<string> {
+  if (cachedDocuments) return cachedDocuments;
+
+  const supabaseAdmin = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
+  const { data: files, error: listError } = await supabaseAdmin.storage
+    .from("chat-documents")
+    .list("", { limit: 100, sortBy: { column: "name", order: "asc" } });
+
+  if (listError) {
+    console.error("Error listing chat-documents:", listError);
+    return "";
+  }
+
+  if (!files?.length) {
+    console.warn("No documents found in chat-documents bucket");
+    return "";
+  }
+
+  const docs: string[] = [];
+
+  for (const file of files) {
+    if (!file.name.endsWith(".txt")) continue;
+
+    const { data, error } = await supabaseAdmin.storage
+      .from("chat-documents")
+      .download(file.name);
+
+    if (error) {
+      console.error(`Error downloading ${file.name}:`, error);
+      continue;
+    }
+
+    docs.push(`--- ${file.name} ---\n${await data.text()}`);
+  }
+
+  cachedDocuments = docs.join("\n\n");
+  console.log(`[chat-assistant] Loaded ${docs.length} documents (${cachedDocuments.length} chars)`);
+  return cachedDocuments;
+}
+
 async function callAzureOpenAI(
   apiKey: string,
   endpoint: string,
