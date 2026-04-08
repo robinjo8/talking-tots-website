@@ -1,61 +1,93 @@
 
-Cilj: razložiti, zakaj se na telefonu ob zagonu PWA še vedno pokaže slika zmajčka, in kaj je realno mogoče popraviti.
 
-1. Kaj je dejanska težava
-- To, kar vidite na sliki, je skoraj zagotovo sistemski zagonski splash screen Androida, ne React del aplikacije.
-- Ta del se prikaže še preden se naloži `index.html` in še preden lahko steče video.
-- Če želite ohraniti zmajčka kot ikono aplikacije na domačem zaslonu, Android na določenih napravah ta isti znak uporabi tudi ob zagonu. Tega v PWA ni mogoče 100 % preprečiti samo s spletno kodo.
+## Analiza: Migracija Whisper iz ZDA v EU (Azure OpenAI)
 
-2. Kaj sem preveril v kodi
-- `public/manifest.json` je že nastavljen na bele `any` ikone in belo `theme_color`.
-- `index.html` ima bel loading fallback.
-- Vendar so v projektu še stari/neenotni sklici:
-  - `index.html` še vedno uporablja `icon-*.png?v=zmajcek7`
-  - `browserconfig.xml` še vedno kaže stare ikone in zelen `TileColor`
-  - manifest link v `index.html` nima verzijskega parametra, zato OS lažje obdrži star manifest
-- To pomeni, da je konfiguracija delno usklajena, delno pa še ne.
+### Kaj trenutno uporabljate
 
-3. Kaj bi popravil v kodi
-- `index.html`
-  - dodam verzijo na `<link rel="manifest" href="/manifest.json?v=...">`
-  - uskladim `apple-touch-icon`, `favicon` in ostale icon reference na isto aktualno verzijo
-- `public/browserconfig.xml`
-  - posodobim vse ikone na aktualne verzije
-  - spremenim `TileColor` v `#ffffff`
-- `public/manifest.json`
-  - po potrebi dvignem verzioniranje poti ikon, da prisilim ponovno branje
-- `public/sw.js`
-  - povečam cache verzijo, da stare reference ne ostanejo v SW cache
+V projektu sta **dve** Edge funkciji, ki kličeta OpenAI API v ZDA:
 
-4. Kaj to reši
-- Odpravi vse preostale stare reference in cache neskladja.
-- Zmanjša možnost, da telefon vleče staro ikono ali staro barvo.
-- Naredi prehod bolj bel in bolj čist.
+| Funkcija | Kaj uporablja | API endpoint | Namen |
+|----------|--------------|--------------|-------|
+| `transcribe-articulation` | Whisper (`whisper-1`) | `api.openai.com/v1/audio/transcriptions` | Preverjanje izgovorjave besed v artikulacijskih testih in govornih igrah |
+| `chat-assistant` | GPT-4.1 + file_search (vector store) | `api.openai.com/v1/responses` | Klepet s Tomijem (AI logopedski pomočnik) |
 
-5. Kaj to ne more zagotoviti
-- Če obdržimo zmajčka kot nameščeno ikono aplikacije, Android lahko še vedno za kratek trenutek pokaže zmajčka pri sistemskem zagonu.
-- To je omejitev platforme, ne napaka videa ali React aplikacije.
+### Kaj lahko prestavite na Azure EU
 
-6. Kaj morate narediti vi po popravku
-- Po objavi sprememb:
-  1. odstraniti PWA iz telefona
-  2. zapreti Chrome
-  3. po možnosti počistiti podatke spletnega mesta za `tomitalk.lovable.app`
-  4. znova odpreti objavljeno stran
-  5. ponovno “Dodaj na začetni zaslon”
-- Test je treba delati na objavljeni domeni, ne v previewju.
+**1. Whisper (transkripcija) — DA, enostavno**
 
-7. Edina pot do popolne odstranitve zmajčka ob zagonu
-- Spremeniti tudi nameščeno ikono aplikacije v belo/prazno različico.
-- Ker ste že izbrali “Ohrani zmajčka”, tega ne bom planiral kot glavno rešitev.
+Iz slike vidim, da imate deployment `gpt-5-mini` na `tomitalk-eu.openai.azure.com`. Za Whisper boste potrebovali **dodaten deployment** modela `whisper` na istem Azure računu. Azure OpenAI podpira Whisper model.
 
-8. Predlagan plan izvedbe
-- Korak 1: uskladim vse icon reference in verzije v `index.html`, `manifest.json`, `browserconfig.xml`
-- Korak 2: povečam SW cache verzijo
-- Korak 3: preverim, da nikjer več ni starih `zmajcek7` referenc ali zelene barve
-- Korak 4: po implementaciji testirate na telefonu po popolni ponovni namestitvi PWA
-- Korak 5: če se zmajček še vedno pokaže, bo to potrditev, da gre za Android sistemski splash in ne več za napačno projektno konfiguracijo
+Sprememba v kodi je minimalna — samo URL in avtentikacija:
+- Trenutno: `https://api.openai.com/v1/audio/transcriptions` z `Bearer` ključem
+- Azure: `https://tomitalk-eu.openai.azure.com/openai/deployments/{whisper-deployment}/audio/transcriptions?api-version=2024-06-01` z `api-key` headerjem
 
-Tehnična opomba
-- Trenutno stanje kaže, da problem ni več v videu ali loading fallbacku, ampak v OS-level launch zaslonu in v nekaj še neusklajenih starih referencah v HTML/browserconfig.
-- Zato je naslednji smiseln popravek “poenotenje vseh icon entryjev + cache busting”, ne pa dodatno spreminjanje samega `SplashScreen.tsx`.
+**Nič drugega se ne spremeni:**
+- Vsi filtri (profanity, halucinacije, dolžina) ostanejo enaki
+- Vse sprejemljive besede (`acceptedVariants`) ostanejo enake — te so v vaši kodi, ne pri OpenAI
+- Levenshteinova primerjava, fonetični filtri — vse ostane
+- Vse igre, ki uporabljajo transkripcijo, bodo delovale enako
+
+**2. Klepet (chat-assistant) — KOMPLEKSNO**
+
+Klepet uporablja OpenAI-jeve specifične funkcionalnosti:
+- **Responses API** (`/v1/responses`) — to je OpenAI-specifičen endpoint, ki ga Azure nima
+- **File Search** z **Vector Store** (`OPENAI_VECTOR_STORE_ID`) — vaši dokumenti na `platform.openai.com/storage/vector_stores/` so shranjeni tam
+- Model `gpt-4.1` z `tool_choice: "required"`
+
+Za preselitev klepeta na Azure bi morali:
+- Preklopiti iz Responses API na Chat Completions API (Azure ga podpira)
+- Postaviti lastno rešitev za vektorsko bazo (npr. Supabase pgvector) in naložiti dokumente tja
+- Ali pa ohraniti klepet na OpenAI ZDA (ker ne pošilja biometričnih podatkov — samo besedilo)
+
+### Predlog
+
+**Faza 1 (ta plan): Samo Whisper → Azure EU**
+- To je GDPR prioriteta, ker Whisper prejema **avdio posnetke otrok** (biometrični podatki)
+- Minimalna sprememba: 1 edge funkcija, 2 nova secreta
+
+**Faza 2 (pozneje, opcijsko): Klepet → Azure EU ali Lovable AI**
+- Klepet pošilja samo besedilo (ime otroka, starost), ne avdio
+- Manjše GDPR tveganje
+- Zahteva več dela (vektorska baza, sprememba API-ja)
+
+### Kaj potrebujem od vas
+
+1. **Ustvarite Whisper deployment** na Azure portalu (`ai.azure.com`):
+   - Model: `whisper` (ne gpt-5-mini, ki ga že imate)
+   - Zapišite si ime deploymenta (npr. `whisper-1`)
+
+2. **API ključ**: Ključ z Azure portala (isti kot za gpt-5-mini, viden na sliki pod "Key")
+
+3. **Endpoint URL**: `https://tomitalk-eu.openai.azure.com` (vidno na sliki)
+
+### Tehnične spremembe
+
+**1 datoteka: `supabase/functions/transcribe-articulation/index.ts`**
+
+Sprememba ~10 vrstic:
+- Namesto `OPENAI_API_KEY` prebere `AZURE_OPENAI_API_KEY` in `AZURE_OPENAI_ENDPOINT`
+- URL se spremeni iz `api.openai.com/v1/audio/transcriptions` v Azure endpoint
+- Header se spremeni iz `Authorization: Bearer ...` v `api-key: ...`
+- FormData ostane enak (file, language, prompt), le `model` polje se odstrani (model je del URL-ja pri Azure)
+
+**2 nova secreta v Supabase:**
+- `AZURE_OPENAI_API_KEY` — ključ iz Azure portala
+- `AZURE_OPENAI_ENDPOINT` — `https://tomitalk-eu.openai.azure.com`
+
+### Na kaj to vpliva
+
+| Funkcionalnost | Vpliv |
+|----------------|-------|
+| Artikulacijski testi | Samo sprememba endpointa, vse ostalo enako |
+| Govorne igre (Ponovi poved itd.) | Enako — isti edge function |
+| Sprejemljive besede (acceptedVariants) | Brez sprememb — so v kodi, ne pri OpenAI |
+| Filtri (profanity, halucinacije) | Brez sprememb |
+| Klepet (Tomi) | Brez sprememb — ostane na OpenAI ZDA (za zdaj) |
+| Dokumenti v Vector Store | Brez sprememb — ostanejo na OpenAI |
+
+### Obseg
+- 1 edge funkcija
+- 2 nova Supabase secreta
+- 0 sprememb v frontend kodi
+- Zahteva: Whisper deployment na Azure (uporabnik mora ustvariti)
+
