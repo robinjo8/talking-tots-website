@@ -223,8 +223,8 @@ self.addEventListener('push', (event) => {
   
   const options = {
     body: 'Čas je za novo govorino vajo!',
-    icon: '/icons/icon-192x192.png?v=zmajcek9',
-    badge: '/icons/icon-72x72.png?v=zmajcek9',
+    icon: '/icons/icon-192x192.png?v=zmajcek10',
+    badge: '/icons/icon-72x72.png?v=zmajcek10',
     tag: 'speech-reminder',
     requireInteraction: true,
     actions: [
