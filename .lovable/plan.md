@@ -1,39 +1,33 @@
 
 
-## Analiza: Ikona se prikaže pred videom ob zagonu PWA
+## Plan: Zmanjšaj vidnost ikone pred videom
 
-### Kaj se dogaja
+### Analiza problema
 
-Ko zaženete PWA aplikacijo s klikom na ikono, operacijski sistem (Android/iOS) najprej prikaže **nativni splash screen** — to je sistemska funkcija, ki jo brskalnik/OS generira avtomatsko iz `manifest.json` (ikona + ime + bela barva ozadja). Šele ko se aplikacija naloži, se prikaže vaš video splash screen.
+Na Androidu se nativni splash screen (s sliko ikone) **ne da popolnoma odstraniti** — to je sistemska funkcija Chroma. Manifest je pravilno nastavljen (bele `any` ikone + zmajček `maskable` ikone). Vendar obstajata dva dodatna problema, ki podaljšujeta prikaz ikone/nebelega ozadja:
 
-Ta nativni splash screen **ni pod nadzorom spletne aplikacije** — ga generira OS. Ne moremo ga popolnoma odstraniti, lahko pa ga minimiziramo.
+1. **`index.html` loading fallback** prikazuje zeleni spinner na sivi podlagi (`background:#f5f5f5`) — to se vidi med nativnim splash screenom in videom
+2. **`theme-color` je #4CAF50 (zelena)** — statusna vrstica je zelena med nalaganjem, kar ustvarja vizualni "blisk"
+3. **Service worker** predpomni stare ikone (`icon-*.png`) v `ESSENTIAL_CACHE`, kar lahko na nekaterih napravah povzroči starejši cache
 
-### Kaj lahko naredimo
+### Popravki
 
-**iOS (iPhone/iPad):** Že imamo nastavljene `apple-touch-startup-image` slike kot bele 1×1 piksle — torej na iOS bi moral biti splash že bel. Če še vedno vidite ikono, je potrebno generirati **prave polne bele slike** v pravih resolucijah za vsako napravo.
-
-**Android:** Nativni splash screen vedno prikaže ikono iz manifesta. Edina možnost za minimizacijo:
-1. Naredimo poseben set ikon z `purpose: "any"` ki so **samo bele** (prazne) — te se uporabijo za splash screen
-2. Obstoječe ikone z zmajčkom označimo kot `purpose: "maskable"` — te se uporabijo za ikono na domačem zaslonu
-
-### Plan popravka
-
-**1. Generiranje belih splash ikon**
-- Ustvarim bele PNG ikone (72, 144, 192, 512px) brez vsebine — samo belo ozadje
-- Shranim jih kot `/public/icons/splash-72x72.png` itd.
+**1. `index.html`**
+- Spremeni `loading-fallback` ozadje iz `#f5f5f5` v `#ffffff` (čisto belo)
+- Skrij spinner in "Nalaganje..." tekst — prikaže se le bel zaslon, ki se zlije z videom
+- Spremeni `theme-color` iz `#4CAF50` v `#ffffff` — statusna vrstica bo bela med nalaganjem
 
 **2. `public/manifest.json`**
-- Dodam bele ikone s `purpose: "any"` (OS jih uporabi za splash)
-- Obstoječe zmajček ikone obdržim samo s `purpose: "maskable"` (za ikono na zaslonu)
+- Spremeni `theme_color` iz `#4CAF50` v `#ffffff`
 
-**3. `index.html`**
-- Generiram prave polne bele slike za `apple-touch-startup-image` v pravilnih resolucijah namesto 1×1 pikselnih base64 slik
+**3. `public/sw.js`**
+- Dodaj `splash-*.png` ikone v `ESSENTIAL_CACHE`, da se bele ikone predpomnijo
+- Povečaj verzijo cache-a za prisilno osvežitev
 
-### Opozorilo
-Na Androidu se kratek prikaz nativnega splash screena **ne da popolnoma izogniti** — je vgrajen v OS. S tem popravkom bo namesto zmajčka prikazan samo bel zaslon za ~0.5s pred videom, kar bo delovalo kot gladek prehod v video.
+### Rezultat
+Prehod bo: bel nativni splash (z majhno ikono na Androidu, ki jo ne moremo odstraniti) -> bel loading zaslon -> video. Vse skupaj bo delovalo kot gladek bel prehod v video, namesto zeleni spinner + ikona.
 
 ### Obseg
-- 2 datoteki (`manifest.json`, `index.html`)
-- Generiranje belih PNG slik
-- Brez sprememb logike aplikacije
+- 3 datoteke, minimalne spremembe
+- Brez sprememb logike ali vizualnega izgleda aplikacije po nalaganju
 
