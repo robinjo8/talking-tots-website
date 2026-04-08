@@ -24,11 +24,65 @@ function getCorsHeaders(req: Request) {
 
 let cachedDocuments: string | null = null;
 
+type AzureEndpointKind = "openai" | "foundry";
+
 function normalizeAzureEndpoint(endpoint: string) {
-  return endpoint
-    .replace(/\/+$/, "")
-    .replace(/\/openai\/v1$/i, "")
-    .replace(/\/openai$/i, "");
+  const trimmed = endpoint.trim();
+
+  try {
+    const url = new URL(trimmed);
+    url.search = "";
+    url.hash = "";
+    url.pathname = url.pathname
+      .replace(/\/+$/, "")
+      .replace(/\/openai\/v1$/i, "")
+      .replace(/\/openai$/i, "")
+      .replace(/\/models\/chat\/completions$/i, "")
+      .replace(/\/models$/i, "");
+    return url.toString().replace(/\/+$/, "");
+  } catch {
+    return trimmed
+      .replace(/\/+$/, "")
+      .replace(/\/openai\/v1$/i, "")
+      .replace(/\/openai$/i, "")
+      .replace(/\/models\/chat\/completions$/i, "")
+      .replace(/\/models$/i, "");
+  }
+}
+
+function detectAzureEndpointKind(endpoint: string): AzureEndpointKind {
+  try {
+    const hostname = new URL(endpoint).hostname.toLowerCase();
+    if (hostname.endsWith(".services.ai.azure.com")) {
+      return "foundry";
+    }
+  } catch {
+    // Ignore parsing failure; validation happens separately.
+  }
+
+  return "openai";
+}
+
+function validateAzureEndpoint(endpoint: string): string | null {
+  try {
+    const hostname = new URL(endpoint).hostname.toLowerCase();
+
+    if (hostname === "ai.azure.com" || (hostname.endsWith(".ai.azure.com") && !hostname.endsWith(".services.ai.azure.com"))) {
+      return "AZURE_OPENAI_ENDPOINT trenutno kaže na Azure portal/Fabric URL. Uporabiti morate runtime endpoint v obliki https://<resource>.openai.azure.com ali https://<resource>.services.ai.azure.com.";
+    }
+
+    if (
+      !hostname.endsWith(".openai.azure.com") &&
+      !hostname.endsWith(".services.ai.azure.com") &&
+      !hostname.endsWith(".cognitiveservices.azure.com")
+    ) {
+      return "AZURE_OPENAI_ENDPOINT ni veljaven Azure AI runtime endpoint. Uporabiti morate resource endpoint, ne URL-ja iz Azure portala.";
+    }
+
+    return null;
+  } catch {
+    return "AZURE_OPENAI_ENDPOINT ni veljaven URL. Uporabiti morate celoten https:// endpoint za vaš Azure resource.";
+  }
 }
 
 async function loadDocuments(): Promise<string> {
@@ -90,7 +144,20 @@ async function callAzureOpenAI(
   systemPrompt: string,
   messages: BasicMessage[],
 ) {
+  const endpointValidationError = validateAzureEndpoint(endpoint);
+  if (endpointValidationError) {
+    console.error("[chat-assistant] Invalid Azure endpoint configuration:", endpointValidationError);
+    return new Response(
+      JSON.stringify({
+        error: "Azure OpenAI endpoint ni pravilno nastavljen.",
+        details: endpointValidationError,
+      }),
+      { status: 500 },
+    );
+  }
+
   const normalizedEndpoint = normalizeAzureEndpoint(endpoint);
+  const endpointKind = detectAzureEndpointKind(normalizedEndpoint);
 
   const responseInput = messages.map((message) => ({
     role: message.role === "assistant" ? "assistant" : "user",
@@ -102,46 +169,80 @@ async function callAzureOpenAI(
     ...responseInput,
   ];
 
-  const attempts: AzureAttempt[] = [
-    {
-      label: "responses-v1",
-      url: `${normalizedEndpoint}/openai/v1/responses`,
-      body: {
-        model: deploymentName,
-        instructions: systemPrompt,
-        input: responseInput,
-        stream: true,
+  const attempts: AzureAttempt[] = endpointKind === "foundry"
+    ? [
+      {
+        label: "foundry-models-chat-2024-05-01-preview",
+        url: `${normalizedEndpoint}/models/chat/completions?api-version=2024-05-01-preview`,
+        body: {
+          model: deploymentName,
+          messages: chatMessages,
+          stream: true,
+        },
       },
-    },
-    {
-      label: "chat-v1",
-      url: `${normalizedEndpoint}/openai/v1/chat/completions`,
-      body: {
-        model: deploymentName,
-        messages: chatMessages,
-        stream: true,
+      {
+        label: "foundry-chat-v1",
+        url: `${normalizedEndpoint}/openai/v1/chat/completions`,
+        body: {
+          model: deploymentName,
+          messages: chatMessages,
+          stream: true,
+        },
       },
-    },
-    {
-      label: "chat-legacy-2024-10-21",
-      url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-10-21`,
-      body: {
-        messages: chatMessages,
-        stream: true,
+      {
+        label: "foundry-responses-v1",
+        url: `${normalizedEndpoint}/openai/v1/responses`,
+        body: {
+          model: deploymentName,
+          instructions: systemPrompt,
+          input: responseInput,
+          stream: true,
+        },
       },
-    },
-    {
-      label: "chat-legacy-2024-08-01-preview",
-      url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-08-01-preview`,
-      body: {
-        messages: chatMessages,
-        stream: true,
+    ]
+    : [
+      {
+        label: "responses-v1",
+        url: `${normalizedEndpoint}/openai/v1/responses`,
+        body: {
+          model: deploymentName,
+          instructions: systemPrompt,
+          input: responseInput,
+          stream: true,
+        },
       },
-    },
-  ];
+      {
+        label: "chat-v1",
+        url: `${normalizedEndpoint}/openai/v1/chat/completions`,
+        body: {
+          model: deploymentName,
+          messages: chatMessages,
+          stream: true,
+        },
+      },
+      {
+        label: "chat-legacy-2024-10-21",
+        url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-10-21`,
+        body: {
+          messages: chatMessages,
+          stream: true,
+        },
+      },
+      {
+        label: "chat-legacy-2024-08-01-preview",
+        url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-08-01-preview`,
+        body: {
+          messages: chatMessages,
+          stream: true,
+        },
+      },
+    ];
+
+  console.log(`[chat-assistant] Azure endpoint type: ${endpointKind}`);
 
   let lastErrorText = "Unknown Azure OpenAI error";
   let lastStatus = 500;
+  let notFoundCount = 0;
 
   for (const attempt of attempts) {
     const response = await fetch(attempt.url, {
@@ -163,6 +264,10 @@ async function callAzureOpenAI(
     lastErrorText = errorText;
     lastStatus = response.status;
 
+    if (response.status === 404) {
+      notFoundCount += 1;
+    }
+
     if (response.status === 429) {
       return new Response(
         JSON.stringify({ error: "Preveč zahtev. Prosimo, počakajte trenutek in poskusite znova." }),
@@ -173,6 +278,20 @@ async function callAzureOpenAI(
     if (response.status === 401 || response.status === 403) {
       break;
     }
+  }
+
+  if (notFoundCount === attempts.length) {
+    const details = endpointKind === "foundry"
+      ? "Azure endpoint je dosegljiv kot Foundry resource, vendar deployment ali endpoint ni pravilen. Preverite, da AZURE_OPENAI_ENDPOINT kaže na https://<resource>.services.ai.azure.com in da AZURE_OPENAI_CHAT_DEPLOYMENT natančno ustreza imenu deploymenta."
+      : "Azure endpoint ali deployment ni bil najden. Preverite, da AZURE_OPENAI_ENDPOINT kaže na https://<resource>.openai.azure.com (ali .cognitiveservices.azure.com) in da AZURE_OPENAI_CHAT_DEPLOYMENT natančno ustreza imenu deploymenta.";
+
+    return new Response(
+      JSON.stringify({
+        error: "Azure OpenAI resource ni najden.",
+        details,
+      }),
+      { status: 500 },
+    );
   }
 
   return new Response(
