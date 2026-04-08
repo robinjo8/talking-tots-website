@@ -24,119 +24,6 @@ function getCorsHeaders(req: Request) {
 
 let cachedDocuments: string | null = null;
 
-type AzureEndpointKind = "openai" | "foundry";
-
-function normalizeAzureEndpoint(endpoint: string) {
-  const trimmed = endpoint.trim();
-
-  try {
-    const url = new URL(trimmed);
-    url.search = "";
-    url.hash = "";
-    url.pathname = url.pathname
-      .replace(/\/+$/, "")
-      .replace(/\/openai\/v1$/i, "")
-      .replace(/\/openai$/i, "")
-      .replace(/\/models\/chat\/completions$/i, "")
-      .replace(/\/models$/i, "");
-    return url.toString().replace(/\/+$/, "");
-  } catch {
-    return trimmed
-      .replace(/\/+$/, "")
-      .replace(/\/openai\/v1$/i, "")
-      .replace(/\/openai$/i, "")
-      .replace(/\/models\/chat\/completions$/i, "")
-      .replace(/\/models$/i, "");
-  }
-}
-
-function detectAzureEndpointKind(endpoint: string): AzureEndpointKind {
-  try {
-    const hostname = new URL(endpoint).hostname.toLowerCase();
-    if (hostname.endsWith(".services.ai.azure.com")) {
-      return "foundry";
-    }
-  } catch {
-    // Ignore parsing failure; validation happens separately.
-  }
-
-  return "openai";
-}
-
-function validateAzureEndpoint(endpoint: string): string | null {
-  try {
-    const hostname = new URL(endpoint).hostname.toLowerCase();
-
-    if (hostname === "ai.azure.com" || (hostname.endsWith(".ai.azure.com") && !hostname.endsWith(".services.ai.azure.com"))) {
-      return "AZURE_OPENAI_ENDPOINT trenutno kaže na Azure portal/Fabric URL. Uporabiti morate runtime endpoint v obliki https://<resource>.openai.azure.com ali https://<resource>.services.ai.azure.com.";
-    }
-
-    if (
-      !hostname.endsWith(".openai.azure.com") &&
-      !hostname.endsWith(".services.ai.azure.com") &&
-      !hostname.endsWith(".cognitiveservices.azure.com")
-    ) {
-      return "AZURE_OPENAI_ENDPOINT ni veljaven Azure AI runtime endpoint. Uporabiti morate resource endpoint, ne URL-ja iz Azure portala.";
-    }
-
-    return null;
-  } catch {
-    return "AZURE_OPENAI_ENDPOINT ni veljaven URL. Uporabiti morate celoten https:// endpoint za vaš Azure resource.";
-  }
-}
-
-async function loadDocuments(): Promise<string> {
-  if (cachedDocuments) return cachedDocuments;
-
-  const supabaseAdmin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-
-  const { data: files, error: listError } = await supabaseAdmin.storage
-    .from("chat-documents")
-    .list("", { limit: 100, sortBy: { column: "name", order: "asc" } });
-
-  if (listError) {
-    console.error("Error listing chat-documents:", listError);
-    return "";
-  }
-
-  if (!files?.length) {
-    console.warn("No documents found in chat-documents bucket");
-    return "";
-  }
-
-  const docs: string[] = [];
-
-  for (const file of files) {
-    if (!file.name.endsWith(".txt")) continue;
-
-    const { data, error } = await supabaseAdmin.storage
-      .from("chat-documents")
-      .download(file.name);
-
-    if (error) {
-      console.error(`Error downloading ${file.name}:`, error);
-      continue;
-    }
-
-    docs.push(`--- ${file.name} ---\n${await data.text()}`);
-  }
-
-  cachedDocuments = docs.join("\n\n");
-  console.log(`[chat-assistant] Loaded ${docs.length} documents (${cachedDocuments.length} chars)`);
-  return cachedDocuments;
-}
-
-type BasicMessage = { role: string; content: string };
-
-type AzureAttempt = {
-  label: string;
-  url: string;
-  body: Record<string, unknown>;
-};
-
 async function callAzureOpenAI(
   apiKey: string,
   endpoint: string,
@@ -144,129 +31,36 @@ async function callAzureOpenAI(
   systemPrompt: string,
   messages: BasicMessage[],
 ) {
-  const endpointValidationError = validateAzureEndpoint(endpoint);
-  if (endpointValidationError) {
-    console.error("[chat-assistant] Invalid Azure endpoint configuration:", endpointValidationError);
-    return new Response(
-      JSON.stringify({
-        error: "Azure OpenAI endpoint ni pravilno nastavljen.",
-        details: endpointValidationError,
-      }),
-      { status: 500 },
-    );
-  }
-
-  const normalizedEndpoint = normalizeAzureEndpoint(endpoint);
-  const endpointKind = detectAzureEndpointKind(normalizedEndpoint);
-
-  const responseInput = messages.map((message) => ({
-    role: message.role === "assistant" ? "assistant" : "user",
-    content: message.content,
-  }));
+  // Normalize endpoint: remove trailing slashes
+  const normalizedEndpoint = endpoint.trim().replace(/\/+$/, "");
 
   const chatMessages = [
     { role: "system", content: systemPrompt },
-    ...responseInput,
+    ...messages.map((m) => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: m.content,
+    })),
   ];
 
-  const attempts: AzureAttempt[] = endpointKind === "foundry"
-    ? [
-      {
-        label: "foundry-models-chat-2024-05-01-preview",
-        url: `${normalizedEndpoint}/models/chat/completions?api-version=2024-05-01-preview`,
-        body: {
-          model: deploymentName,
-          messages: chatMessages,
-          stream: true,
-        },
-      },
-      {
-        label: "foundry-chat-v1",
-        url: `${normalizedEndpoint}/openai/v1/chat/completions`,
-        body: {
-          model: deploymentName,
-          messages: chatMessages,
-          stream: true,
-        },
-      },
-      {
-        label: "foundry-responses-v1",
-        url: `${normalizedEndpoint}/openai/v1/responses`,
-        body: {
-          model: deploymentName,
-          instructions: systemPrompt,
-          input: responseInput,
-          stream: true,
-        },
-      },
-    ]
-    : [
-      {
-        label: "responses-v1",
-        url: `${normalizedEndpoint}/openai/v1/responses`,
-        body: {
-          model: deploymentName,
-          instructions: systemPrompt,
-          input: responseInput,
-          stream: true,
-        },
-      },
-      {
-        label: "chat-v1",
-        url: `${normalizedEndpoint}/openai/v1/chat/completions`,
-        body: {
-          model: deploymentName,
-          messages: chatMessages,
-          stream: true,
-        },
-      },
-      {
-        label: "chat-legacy-2024-10-21",
-        url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-10-21`,
-        body: {
-          messages: chatMessages,
-          stream: true,
-        },
-      },
-      {
-        label: "chat-legacy-2024-08-01-preview",
-        url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-08-01-preview`,
-        body: {
-          messages: chatMessages,
-          stream: true,
-        },
-      },
-    ];
+  const url = `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-12-01-preview`;
 
-  console.log(`[chat-assistant] Azure endpoint type: ${endpointKind}`);
+  console.log(`[chat-assistant] Calling Azure: ${url}`);
 
-  let lastErrorText = "Unknown Azure OpenAI error";
-  let lastStatus = 500;
-  let notFoundCount = 0;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "api-key": apiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      messages: chatMessages,
+      stream: true,
+    }),
+  });
 
-  for (const attempt of attempts) {
-    const response = await fetch(attempt.url, {
-      method: "POST",
-      headers: {
-        "api-key": apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(attempt.body),
-    });
-
-    if (response.ok) {
-      console.log(`[chat-assistant] Azure request succeeded via ${attempt.label}`);
-      return response;
-    }
-
+  if (!response.ok) {
     const errorText = await response.text();
-    console.error(`[chat-assistant] Azure request failed via ${attempt.label}:`, response.status, errorText);
-    lastErrorText = errorText;
-    lastStatus = response.status;
-
-    if (response.status === 404) {
-      notFoundCount += 1;
-    }
+    console.error(`[chat-assistant] Azure error:`, response.status, errorText);
 
     if (response.status === 429) {
       return new Response(
@@ -275,29 +69,14 @@ async function callAzureOpenAI(
       );
     }
 
-    if (response.status === 401 || response.status === 403) {
-      break;
-    }
-  }
-
-  if (notFoundCount === attempts.length) {
-    const details = endpointKind === "foundry"
-      ? "Azure endpoint je dosegljiv kot Foundry resource, vendar deployment ali endpoint ni pravilen. Preverite, da AZURE_OPENAI_ENDPOINT kaže na https://<resource>.services.ai.azure.com in da AZURE_OPENAI_CHAT_DEPLOYMENT natančno ustreza imenu deploymenta."
-      : "Azure endpoint ali deployment ni bil najden. Preverite, da AZURE_OPENAI_ENDPOINT kaže na https://<resource>.openai.azure.com (ali .cognitiveservices.azure.com) in da AZURE_OPENAI_CHAT_DEPLOYMENT natančno ustreza imenu deploymenta.";
-
     return new Response(
-      JSON.stringify({
-        error: "Azure OpenAI resource ni najden.",
-        details,
-      }),
-      { status: 500 },
+      JSON.stringify({ error: "Napaka pri komunikaciji z AI.", details: errorText }),
+      { status: response.status >= 400 ? response.status : 500 },
     );
   }
 
-  return new Response(
-    JSON.stringify({ error: "Napaka pri komunikaciji z AI.", details: lastErrorText }),
-    { status: lastStatus },
-  );
+  console.log(`[chat-assistant] Azure request succeeded`);
+  return response;
 }
 
 serve(async (req) => {
