@@ -260,7 +260,7 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
     ];
 
     // Call Azure OpenAI Chat Completions API
-    const azureUrl = `${AZURE_ENDPOINT}/openai/deployments/gpt-5-mini/chat/completions?api-version=2024-06-01`;
+    const azureUrl = `${AZURE_ENDPOINT}/openai/deployments/gpt-5-mini/chat/completions?api-version=2025-01-01-preview`;
 
     const response = await fetch(azureUrl, {
       method: "POST",
