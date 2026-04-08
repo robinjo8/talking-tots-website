@@ -9,8 +9,12 @@ const allowedOrigins = [
 
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get("Origin") || "";
-  const isAllowed = allowedOrigins.includes(origin) || (origin.startsWith("https://") && origin.endsWith(".lovable.app")) || (origin.startsWith("https://") && origin.endsWith(".lovableproject.com"));
+  const isAllowed =
+    allowedOrigins.includes(origin) ||
+    (origin.startsWith("https://") && origin.endsWith(".lovable.app")) ||
+    (origin.startsWith("https://") && origin.endsWith(".lovableproject.com"));
   const allowOrigin = isAllowed ? origin : allowedOrigins[0];
+
   return {
     "Access-Control-Allow-Origin": allowOrigin,
     "Access-Control-Allow-Headers":
@@ -18,48 +22,163 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-// Cache documents in memory (loaded once per cold start)
 let cachedDocuments: string | null = null;
+
+function normalizeAzureEndpoint(endpoint: string) {
+  return endpoint
+    .replace(/\/+$/, "")
+    .replace(/\/openai\/v1$/i, "")
+    .replace(/\/openai$/i, "");
+}
 
 async function loadDocuments(): Promise<string> {
   if (cachedDocuments) return cachedDocuments;
 
   const supabaseAdmin = createClient(
     Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
 
   const { data: files, error: listError } = await supabaseAdmin.storage
     .from("chat-documents")
-    .list("", { limit: 100 });
+    .list("", { limit: 100, sortBy: { column: "name", order: "asc" } });
 
   if (listError) {
     console.error("Error listing chat-documents:", listError);
     return "";
   }
 
-  if (!files || files.length === 0) {
+  if (!files?.length) {
     console.warn("No documents found in chat-documents bucket");
     return "";
   }
 
   const docs: string[] = [];
+
   for (const file of files) {
     if (!file.name.endsWith(".txt")) continue;
+
     const { data, error } = await supabaseAdmin.storage
       .from("chat-documents")
       .download(file.name);
+
     if (error) {
       console.error(`Error downloading ${file.name}:`, error);
       continue;
     }
-    const text = await data.text();
-    docs.push(`--- ${file.name} ---\n${text}`);
+
+    docs.push(`--- ${file.name} ---\n${await data.text()}`);
   }
 
   cachedDocuments = docs.join("\n\n");
   console.log(`[chat-assistant] Loaded ${docs.length} documents (${cachedDocuments.length} chars)`);
   return cachedDocuments;
+}
+
+type BasicMessage = { role: string; content: string };
+
+type AzureAttempt = {
+  label: string;
+  url: string;
+  body: Record<string, unknown>;
+};
+
+async function callAzureOpenAI(
+  apiKey: string,
+  endpoint: string,
+  deploymentName: string,
+  systemPrompt: string,
+  messages: BasicMessage[],
+) {
+  const normalizedEndpoint = normalizeAzureEndpoint(endpoint);
+
+  const responseInput = messages.map((message) => ({
+    role: message.role === "assistant" ? "assistant" : "user",
+    content: message.content,
+  }));
+
+  const chatMessages = [
+    { role: "system", content: systemPrompt },
+    ...responseInput,
+  ];
+
+  const attempts: AzureAttempt[] = [
+    {
+      label: "responses-v1",
+      url: `${normalizedEndpoint}/openai/v1/responses`,
+      body: {
+        model: deploymentName,
+        instructions: systemPrompt,
+        input: responseInput,
+        stream: true,
+      },
+    },
+    {
+      label: "chat-v1",
+      url: `${normalizedEndpoint}/openai/v1/chat/completions`,
+      body: {
+        model: deploymentName,
+        messages: chatMessages,
+        stream: true,
+      },
+    },
+    {
+      label: "chat-legacy-2024-10-21",
+      url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-10-21`,
+      body: {
+        messages: chatMessages,
+        stream: true,
+      },
+    },
+    {
+      label: "chat-legacy-2024-08-01-preview",
+      url: `${normalizedEndpoint}/openai/deployments/${deploymentName}/chat/completions?api-version=2024-08-01-preview`,
+      body: {
+        messages: chatMessages,
+        stream: true,
+      },
+    },
+  ];
+
+  let lastErrorText = "Unknown Azure OpenAI error";
+  let lastStatus = 500;
+
+  for (const attempt of attempts) {
+    const response = await fetch(attempt.url, {
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(attempt.body),
+    });
+
+    if (response.ok) {
+      console.log(`[chat-assistant] Azure request succeeded via ${attempt.label}`);
+      return response;
+    }
+
+    const errorText = await response.text();
+    console.error(`[chat-assistant] Azure request failed via ${attempt.label}:`, response.status, errorText);
+    lastErrorText = errorText;
+    lastStatus = response.status;
+
+    if (response.status === 429) {
+      return new Response(
+        JSON.stringify({ error: "Preveč zahtev. Prosimo, počakajte trenutek in poskusite znova." }),
+        { status: 429 },
+      );
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      break;
+    }
+  }
+
+  return new Response(
+    JSON.stringify({ error: "Napaka pri komunikaciji z AI.", details: lastErrorText }),
+    { status: lastStatus },
+  );
 }
 
 serve(async (req) => {
@@ -70,19 +189,18 @@ serve(async (req) => {
   }
 
   try {
-    // JWT verification - only authenticated users can use the chat
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(
         JSON.stringify({ error: "Nepooblaščen dostop. Prijavite se." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_ANON_KEY")!,
-      { global: { headers: { Authorization: authHeader } } }
+      { global: { headers: { Authorization: authHeader } } },
     );
 
     const token = authHeader.replace("Bearer ", "");
@@ -90,15 +208,17 @@ serve(async (req) => {
     if (claimsError || !claimsData?.claims) {
       return new Response(
         JSON.stringify({ error: "Neveljavna seja. Prijavite se znova." }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     console.log(`Authenticated user: ${claimsData.claims.sub}`);
 
-    const AZURE_API_KEY = Deno.env.get("AZURE_OPENAI_API_KEY");
-    const AZURE_ENDPOINT = Deno.env.get("AZURE_OPENAI_ENDPOINT");
-    if (!AZURE_API_KEY || !AZURE_ENDPOINT) {
+    const azureApiKey = Deno.env.get("AZURE_OPENAI_API_KEY");
+    const azureEndpoint = Deno.env.get("AZURE_OPENAI_ENDPOINT");
+    const azureDeployment = Deno.env.get("AZURE_OPENAI_CHAT_DEPLOYMENT") || "gpt-5-mini";
+
+    if (!azureApiKey || !azureEndpoint) {
       throw new Error("Azure OpenAI credentials are not configured");
     }
 
@@ -110,11 +230,10 @@ serve(async (req) => {
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
-    // Load documents from Supabase Storage
     const documentsText = await loadDocuments();
 
     const systemInstructions = `Si Tomi, strogo specializiran AI asistent za platformo TomiTalk.
@@ -203,37 +322,24 @@ KRITIČNO PRAVILO – ZAMENJAVA GLASOV R ALI L Z GLASOM J:
 
 To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš neposrednega ujemanja. V tem primeru NE uporabi generičnega odgovora o vajah, ampak VEDNO vključi zgornji stavek.`;
 
-    // Build child context block if available
     let childContextBlock = "";
     if (childContext && typeof childContext === "object") {
       const parts: string[] = [];
-      if (childContext.name)
-        parts.push(`- Ime: ${childContext.name}`);
-      if (childContext.gender)
-        parts.push(`- Spol: ${childContext.gender}`);
-      if (childContext.age !== null && childContext.age !== undefined)
-        parts.push(`- Starost: ${childContext.age} let`);
-      if (childContext.speechDifficulties && childContext.speechDifficulties !== "Ni podatka")
-        parts.push(`- Govorne težave: ${childContext.speechDifficulties}`);
-      if (childContext.speechDifficultiesDescription)
-        parts.push(`- Podroben opis govornih težav: ${childContext.speechDifficultiesDescription}`);
-      if (childContext.speechDevelopmentSummary && childContext.speechDevelopmentSummary !== "Ni podatka")
-        parts.push(`- Vprašalnik o govornem razvoju:\n  ${childContext.speechDevelopmentSummary}`);
+      if (childContext.name) parts.push(`- Ime: ${childContext.name}`);
+      if (childContext.gender) parts.push(`- Spol: ${childContext.gender}`);
+      if (childContext.age !== null && childContext.age !== undefined) parts.push(`- Starost: ${childContext.age} let`);
+      if (childContext.speechDifficulties && childContext.speechDifficulties !== "Ni podatka") parts.push(`- Govorne težave: ${childContext.speechDifficulties}`);
+      if (childContext.speechDifficultiesDescription) parts.push(`- Podroben opis govornih težav: ${childContext.speechDifficultiesDescription}`);
+      if (childContext.speechDevelopmentSummary && childContext.speechDevelopmentSummary !== "Ni podatka") parts.push(`- Vprašalnik o govornem razvoju:\n  ${childContext.speechDevelopmentSummary}`);
 
       if (parts.length > 0) {
         childContextBlock = `\n\nPODATKI O OTROKU UPORABNIKA:\n${parts.join("\n")}\n\nTe podatke IMAŠ na voljo kot ozadje. Uporabi jih SAMO kadar so neposredno relevantni za vprašanje uporabnika.\nNE omenjaj imena otroka, starosti ali govornih težav v VSAKEM odgovoru.\nČe uporabnik postavi splošno vprašanje (npr. o tehnikah, vajah, sodelovanju z vzgojitelji), odgovori splošno brez omenjanja specifičnih podatkov otroka.\nČe uporabnik vprašanje neposredno nanaša na svojega otroka ali na specifične govorne težave, TAKRAT uporabi te podatke za personaliziran odgovor.\nNE ugibaj ali dodajaj podatkov ki niso na voljo.`;
       }
     }
 
-    // Build documents block
-    let documentsBlock = "";
-    if (documentsText) {
-      documentsBlock = `\n\nDOKUMENTI:\n${documentsText}`;
-    }
-
+    const documentsBlock = documentsText ? `\n\nDOKUMENTI:\n${documentsText}` : "";
     const finalSystemPrompt = systemInstructions + childContextBlock + documentsBlock;
 
-    // Semantic normalization: detect J↔R/L pattern and augment last user message
     const lastUserMsg = messages[messages.length - 1];
     const jReplacementPattern = /j\s*namesto\s*(r|l)|zamenjuje\s*(r|l)\s*(z|za)\s*j|(r|l)\s*(z|za)\s*j|izgovarja\s*j\s*namesto|(r|l)\s*namesto.*j|j\s*za\s*(r|l)/i;
     const detectedJPattern = lastUserMsg?.role === "user" && jReplacementPattern.test(lastUserMsg.content);
@@ -242,66 +348,40 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
       console.log("[chat-assistant] ⚠️ Zaznan vzorec J↔R/L v vprašanju uporabnika");
     }
 
-    // Build messages array for Chat Completions API
-    const chatMessages = [
-      { role: "system", content: finalSystemPrompt },
-      ...messages.map((m: { role: string; content: string }, idx: number) => {
-        if (detectedJPattern && idx === messages.length - 1 && m.role === "user") {
-          return {
-            role: "user",
-            content: m.content + "\n\n[Sistemska opomba: zamenjava glasu R ali L z glasom J, obisk logopeda ne glede na starost otroka]",
-          };
-        }
+    const preparedMessages = messages.map((message: BasicMessage, idx: number) => {
+      if (detectedJPattern && idx === messages.length - 1 && message.role === "user") {
         return {
-          role: m.role === "assistant" ? "assistant" : "user",
-          content: m.content,
+          role: "user",
+          content: `${message.content}\n\n[Sistemska opomba: zamenjava glasu R ali L z glasom J, obisk logopeda ne glede na starost otroka]`,
         };
-      }),
-    ];
-
-    // Call Azure OpenAI Chat Completions API
-    const azureUrl = `${AZURE_ENDPOINT}/openai/deployments/gpt-5-mini/chat/completions?api-version=2025-01-01-preview`;
-
-    const response = await fetch(azureUrl, {
-      method: "POST",
-      headers: {
-        "api-key": AZURE_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messages: chatMessages,
-        temperature: 0,
-        stream: true,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Azure OpenAI API error:", response.status, errorText);
-
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({
-            error: "Preveč zahtev. Prosimo, počakajte trenutek in poskusite znova.",
-          }),
-          {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
       }
 
+      return {
+        role: message.role === "assistant" ? "assistant" : "user",
+        content: message.content,
+      };
+    });
+
+    const azureResponse = await callAzureOpenAI(
+      azureApiKey,
+      azureEndpoint,
+      azureDeployment,
+      finalSystemPrompt,
+      preparedMessages,
+    );
+
+    if (!azureResponse.ok) {
+      const errorBody = await azureResponse.text();
       return new Response(
-        JSON.stringify({ error: "Napaka pri komunikaciji z AI." }),
+        errorBody,
         {
-          status: 500,
+          status: azureResponse.status >= 400 ? azureResponse.status : 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
-    // Stream the response directly to client
-    return new Response(response.body, {
+    return new Response(azureResponse.body, {
       headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
@@ -309,16 +389,14 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
         Connection: "keep-alive",
       },
     });
-  } catch (e) {
-    console.error("chat-assistant error:", e);
+  } catch (error) {
+    console.error("chat-assistant error:", error);
     return new Response(
-      JSON.stringify({
-        error: e instanceof Error ? e.message : "Neznana napaka",
-      }),
+      JSON.stringify({ error: error instanceof Error ? error.message : "Neznana napaka" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      },
     );
   }
 });

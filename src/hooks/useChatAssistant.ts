@@ -195,16 +195,35 @@ export function useChatAssistant(childContext?: ChildContext) {
             try {
               const parsed = JSON.parse(jsonStr);
 
-              // Azure Chat Completions SSE format
-              const content = parsed.choices?.[0]?.delta?.content;
+              const chatDelta = parsed.choices?.[0]?.delta?.content;
+              const responsesDelta = parsed.type === "response.output_text.delta"
+                ? parsed.delta
+                : undefined;
+              const content = chatDelta || responsesDelta;
+
               if (content) {
                 assistantContent += content;
                 updateAssistant(assistantContent);
               }
 
-              // Check for error
-              if (parsed.error) {
-                console.error("Stream error:", parsed.error);
+              if (parsed.type === "response.completed") {
+                const output = parsed.response?.output;
+                if (!assistantContent && Array.isArray(output)) {
+                  for (const item of output) {
+                    if (item.type === "message" && Array.isArray(item.content)) {
+                      for (const part of item.content) {
+                        if (part.type === "output_text" && part.text) {
+                          assistantContent = part.text;
+                          updateAssistant(assistantContent);
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+
+              if (parsed.error || parsed.type === "error") {
+                console.error("Stream error:", parsed.error || parsed);
                 toast.error("Napaka pri generiranju odgovora.");
                 streamDone = true;
                 break;
@@ -227,7 +246,11 @@ export function useChatAssistant(childContext?: ChildContext) {
             if (jsonStr === "[DONE]") continue;
             try {
               const parsed = JSON.parse(jsonStr);
-              const content = parsed.choices?.[0]?.delta?.content;
+              const chatDelta = parsed.choices?.[0]?.delta?.content;
+              const responsesDelta = parsed.type === "response.output_text.delta"
+                ? parsed.delta
+                : undefined;
+              const content = chatDelta || responsesDelta;
               if (content) {
                 assistantContent += content;
                 updateAssistant(assistantContent);
