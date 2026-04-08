@@ -1,10 +1,14 @@
-const CACHE_NAME = 'tomitalk-v1.0.53';
-const CACHE_VERSION = 14;
+const CACHE_NAME = 'tomitalk-v1.0.54';
+const CACHE_VERSION = 15;
 
 // Essential files to cache for offline functionality - simplified paths without version params
 const ESSENTIAL_CACHE = [
   '/',
   '/manifest.json',
+  '/icons/splash-72x72.png',
+  '/icons/splash-144x144.png',
+  '/icons/splash-192x192.png',
+  '/icons/splash-512x512.png',
   '/icons/icon-72x72.png',
   '/icons/icon-144x144.png',
   '/icons/icon-192x192.png',
