@@ -18,6 +18,50 @@ function getCorsHeaders(req: Request) {
   };
 }
 
+// Cache documents in memory (loaded once per cold start)
+let cachedDocuments: string | null = null;
+
+async function loadDocuments(): Promise<string> {
+  if (cachedDocuments) return cachedDocuments;
+
+  const supabaseAdmin = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+
+  const { data: files, error: listError } = await supabaseAdmin.storage
+    .from("chat-documents")
+    .list("", { limit: 100 });
+
+  if (listError) {
+    console.error("Error listing chat-documents:", listError);
+    return "";
+  }
+
+  if (!files || files.length === 0) {
+    console.warn("No documents found in chat-documents bucket");
+    return "";
+  }
+
+  const docs: string[] = [];
+  for (const file of files) {
+    if (!file.name.endsWith(".txt")) continue;
+    const { data, error } = await supabaseAdmin.storage
+      .from("chat-documents")
+      .download(file.name);
+    if (error) {
+      console.error(`Error downloading ${file.name}:`, error);
+      continue;
+    }
+    const text = await data.text();
+    docs.push(`--- ${file.name} ---\n${text}`);
+  }
+
+  cachedDocuments = docs.join("\n\n");
+  console.log(`[chat-assistant] Loaded ${docs.length} documents (${cachedDocuments.length} chars)`);
+  return cachedDocuments;
+}
+
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req);
 
@@ -52,14 +96,10 @@ serve(async (req) => {
 
     console.log(`Authenticated user: ${claimsData.claims.sub}`);
 
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY is not configured");
-    }
-
-    const VECTOR_STORE_ID = Deno.env.get("OPENAI_VECTOR_STORE_ID");
-    if (!VECTOR_STORE_ID) {
-      throw new Error("OPENAI_VECTOR_STORE_ID is not configured");
+    const AZURE_API_KEY = Deno.env.get("AZURE_OPENAI_API_KEY");
+    const AZURE_ENDPOINT = Deno.env.get("AZURE_OPENAI_ENDPOINT");
+    if (!AZURE_API_KEY || !AZURE_ENDPOINT) {
+      throw new Error("Azure OpenAI credentials are not configured");
     }
 
     const { messages, childContext } = await req.json();
@@ -74,13 +114,16 @@ serve(async (req) => {
       );
     }
 
+    // Load documents from Supabase Storage
+    const documentsText = await loadDocuments();
+
     const systemInstructions = `Si Tomi, strogo specializiran AI asistent za platformo TomiTalk.
 
 Tvoja vloga je strogo omejena na delovanje kot profesionalen, miren in empatičen digitalni govorno-jezikovni svetovalec za starše otrok, starih od 3 do 10 let, IZKLJUČNO v okviru aplikacije TomiTalk.
 
 Odgovarjaš SAMO na vprašanja povezana z govorno-jezikovnim razvojem, artikulacijo in izgovorjavo, oralno-motoričnimi veščinami, komunikacijskim razvojem otrok ter interpretacijo napredka, vaj, iger in rezultatov preverjanja izgovorjave znotraj aplikacije TomiTalk.
 
-Svoje odgovore osnuješ IZKLJUČNO na vsebini dokumentov pridobljenih preko file_search. NE SMEŠ uporabljati svojega splošnega znanja o logopediji, vajah, tehnikah ali metodah za generiranje odgovorov.
+Svoje odgovore osnuješ IZKLJUČNO na vsebini dokumentov ki so priloženi spodaj. NE SMEŠ uporabljati svojega splošnega znanja o logopediji, vajah, tehnikah ali metodah za generiranje odgovorov.
 
 Na vprašanja izven tega obsega NE SMEŠ odgovarjati.
 
@@ -113,7 +156,7 @@ Ne predlagaš nepreverjenih metod ali tehnik.
 Tvoj komunikacijski slog je profesionalen, strukturiran, miren in pomirjujoč. Tvoj cilj je podpirati starše pri razumevanju govorno-jezikovnega razvoja njihovega otroka in pri učinkoviti uporabi aplikacije TomiTalk.
 
 PRAVILO O VIRIH INFORMACIJ:
-VEDNO moraš odgovarjati na podlagi dokumentov iz file_search. Tudi pri splošnih vprašanjih o govorno-jezikovnem razvoju NAJPREJ poišči informacije v dokumentih.
+VEDNO moraš odgovarjati na podlagi priloženih dokumentov. Tudi pri splošnih vprašanjih o govorno-jezikovnem razvoju NAJPREJ poišči informacije v dokumentih.
 
 Če v dokumentih najdeš relevantne informacije, odgovori IZKLJUČNO na podlagi teh dokumentov.
 
@@ -125,14 +168,14 @@ NIKOLI NE SMEŠ napisati dolgih seznamov vaj, tehnik ali metod iz svojega sploš
 
 NIKOLI NE SMEŠ trditi da TomiTalk "vsebuje" ali "ponuja" določeno funkcionalnost, če tega ne potrjujejo dokumenti. Namesto tega reci: "Priporočam, da preverite neposredno v aplikaciji TomiTalk."
 
-Če file_search vrne rezultate, ki NISO relevantni za vprašanje uporabnika, obravnavaj to ENAKO kot da dokumentov ni. NE uporabi rezultatov kot "inspiracijo" za generiranje lastnega odgovora.
+Če dokumenti NE vsebujejo informacij relevantnih za vprašanje uporabnika, obravnavaj to ENAKO kot da dokumentov ni. NE uporabi rezultatov kot "inspiracijo" za generiranje lastnega odgovora.
 
 NE SMEŠ nikoli napisati seznama z več kot 2 točkama, če vsebina NI dobesedno iz dokumentov.
 
 NIKOLI NE SMEŠ:
 - Izmišljati ali predpostavljati katere vaje, igre ali vsebine so na voljo v TomiTalk
 - Opisovati funkcionalnosti aplikacije na podlagi svojega splošnega znanja
-- Trditi da določena vaja ali funkcija "je del TomiTalk", če tega ne potrjujejo dokumenti iz file_search
+- Trditi da določena vaja ali funkcija "je del TomiTalk", če tega ne potrjujejo dokumenti
 - Navajati specifične naslove vaj, iger ali vsebin, ki jih ne najdeš v dokumentih
 - Generirati sezname vaj, tehnik, metod ali pristopov iz svojega treniranega znanja
 
@@ -182,7 +225,13 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
       }
     }
 
-    const finalInstructions = systemInstructions + childContextBlock;
+    // Build documents block
+    let documentsBlock = "";
+    if (documentsText) {
+      documentsBlock = `\n\nDOKUMENTI:\n${documentsText}`;
+    }
+
+    const finalSystemPrompt = systemInstructions + childContextBlock + documentsBlock;
 
     // Semantic normalization: detect J↔R/L pattern and augment last user message
     const lastUserMsg = messages[messages.length - 1];
@@ -193,38 +242,34 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
       console.log("[chat-assistant] ⚠️ Zaznan vzorec J↔R/L v vprašanju uporabnika");
     }
 
-    // Build input array for Responses API
-    const input = messages.map((m: { role: string; content: string }, idx: number) => {
-      // Augment the last user message with semantic search hint if J↔R/L detected
-      if (detectedJPattern && idx === messages.length - 1 && m.role === "user") {
+    // Build messages array for Chat Completions API
+    const chatMessages = [
+      { role: "system", content: finalSystemPrompt },
+      ...messages.map((m: { role: string; content: string }, idx: number) => {
+        if (detectedJPattern && idx === messages.length - 1 && m.role === "user") {
+          return {
+            role: "user",
+            content: m.content + "\n\n[Sistemska opomba: zamenjava glasu R ali L z glasom J, obisk logopeda ne glede na starost otroka]",
+          };
+        }
         return {
-          role: "user",
-          content: m.content + "\n\n[Sistemska opomba za iskanje: zamenjava glasu R ali L z glasom J, obisk logopeda ne glede na starost otroka]",
+          role: m.role === "assistant" ? "assistant" : "user",
+          content: m.content,
         };
-      }
-      return {
-        role: m.role === "assistant" ? "assistant" : "user",
-        content: m.content,
-      };
-    });
+      }),
+    ];
 
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    // Call Azure OpenAI Chat Completions API
+    const azureUrl = `${AZURE_ENDPOINT}/openai/deployments/gpt-5-mini/chat/completions?api-version=2024-06-01`;
+
+    const response = await fetch(azureUrl, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "api-key": AZURE_API_KEY,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4.1",
-        instructions: finalInstructions,
-        input,
-        tools: [
-          {
-            type: "file_search",
-            vector_store_ids: [VECTOR_STORE_ID],
-          },
-        ],
-        tool_choice: "required",
+        messages: chatMessages,
         temperature: 0,
         stream: true,
       }),
@@ -232,7 +277,7 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
+      console.error("Azure OpenAI API error:", response.status, errorText);
 
       if (response.status === 429) {
         return new Response(
@@ -255,43 +300,8 @@ To pravilo ima NAJVIŠJO PRIORITETO in velja tudi če v dokumentih ne najdeš ne
       );
     }
 
-    // Create a TransformStream to intercept and log file_search usage and fallback detection
-    let fileSearchUsed = false;
-    let responseText = "";
-    const { readable, writable } = new TransformStream({
-      transform(chunk, controller) {
-        const text = new TextDecoder().decode(chunk);
-        if (text.includes("response.file_search_call") || text.includes("file_search_call")) {
-          fileSearchUsed = true;
-          console.log("[chat-assistant] file_search orodje UPORABLJENO");
-        }
-        // Accumulate response text for fallback detection
-        if (text.includes("output_text.delta")) {
-          responseText += text;
-        }
-        controller.enqueue(chunk);
-      },
-      flush() {
-        if (!fileSearchUsed) {
-          console.warn("[chat-assistant] file_search orodje NI BILO uporabljeno - model je odgovoril brez dokumentov!");
-        } else {
-          console.log("[chat-assistant] Odgovor temelji na dokumentih iz Vector Store ✓");
-        }
-        // Log if J↔R/L was detected but model gave fallback
-        if (detectedJPattern) {
-          const isFallback = responseText.includes("ne najdem") || responseText.includes("ni navedenih") || responseText.includes("ni specifičnih");
-          if (isFallback) {
-            console.warn("[chat-assistant] ⚠️ J↔R/L vzorec zaznan, a model je vrnil FALLBACK odgovor!");
-          } else {
-            console.log("[chat-assistant] ✓ J↔R/L vzorec zaznan in model je podal usmeritev");
-          }
-        }
-      },
-    });
-
-    response.body!.pipeTo(writable);
-
-    return new Response(readable, {
+    // Stream the response directly to client
+    return new Response(response.body, {
       headers: {
         ...corsHeaders,
         "Content-Type": "text/event-stream",
